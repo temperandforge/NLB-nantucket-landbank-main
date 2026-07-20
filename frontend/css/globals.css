@@ -43,3 +43,7 @@
 
   --default-transition-duration: 250ms;
 }
+
+#mapWrap {
+  height: calc(100dvh - 6rem - 2.5rem);
+}

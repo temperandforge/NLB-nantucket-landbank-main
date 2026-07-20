@@ -95,8 +95,8 @@ function MapPageContent() {
   }
 
   return (
-    <div className="flex h-dvh flex-col">
-      <div className="flex flex-col gap-3 border-b border-neutral-200 bg-white p-4 sm:flex-row sm:items-center dark:border-neutral-800 dark:bg-neutral-950">
+    <div id="mapWrap" className="container flex flex-col px-5">
+      <div className="flex flex-col gap-3 border-b border-neutral-200 bg-white py-4 sm:flex-row sm:items-center dark:border-neutral-800 dark:bg-neutral-950">
         <MultiSelectDropdown
           label="Property Type"
           options={propertyTypeOptions}
