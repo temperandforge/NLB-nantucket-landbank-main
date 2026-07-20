@@ -1,10 +1,10 @@
 "use client";
-
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import type { Property } from "./types";
 import { NANTUCKET_CENTER } from "./properties";
+import "../../css/popup.css";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "";
 
@@ -53,7 +53,7 @@ export function MapboxMap({ properties }: MapboxMapProps) {
       if (map.getSource("property-geojson")) map.removeSource("property-geojson");
 
       for (const property of properties) {
-        let html = '<div class="map-popup">';
+        let html = '';
 
         // Is handicap accessible
         if (property.resources.indexOf('handicap_accessible') !== -1) {
@@ -63,20 +63,25 @@ export function MapboxMap({ properties }: MapboxMapProps) {
         // Image
         if (property.image) {html += `<img src="${property.image.url}" alt="${property.image.alt}" />`;}
 
+        html += '<div class="map-popup--content">';
+        html += '<div class="map-popup--content__inner">';
+        html += '<div class="map-popup--content__headline">';
+
         html += `<p class="map-popup-title">${property.name}</p>`;
 
         // Description
         if (property.desc) {html += `<p class="map-popup-desc">${property.desc}</p>`;}
+        html += '</div>'; // close .map-popup--content__headline
+
         // Is parking available
         if (property.resources.indexOf('handicap_accessible') !== -1) {
           html += '<div class="map-popup--is-parking">Parking Availability</div>';
         }
+        html += '</div>'; // close .map-popup--content__inner
         // Link
-        if (property.link) {html += `<a href="${property.link}">Find out more</a>`}
+        if (property.link) {html += `<a class="map-popup-link" href="${property.link}">Find out more</a>`}
 
-
-        html += '</div>';
-
+        html += '</div>'; // close .map-popup-content
         const popup = new mapboxgl.Popup({ offset: 24 }).setHTML(html);
 
         const marker = new mapboxgl.Marker()
