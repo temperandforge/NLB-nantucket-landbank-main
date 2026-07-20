@@ -1,0 +1,4 @@
+// interferes with storybook deployment
+{
+  "framework": "nextjs"
+}

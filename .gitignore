@@ -33,3 +33,8 @@ next-env.d.ts
 # VS Code
 .vscode
 .env*
+
+# Misc
+.superpowers
+**/*.local.*
+**/.worktrees
