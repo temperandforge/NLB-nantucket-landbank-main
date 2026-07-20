@@ -15,6 +15,12 @@ export interface Property {
   resources: Resource[];
   coordinates: [number, number]; // [lng, lat]
   geojson?: GeoJSON.Geometry;
+  image?: {
+    url: string;
+    alt?: string;
+  },
+  desc?: string;
+  link?: string;
 }
 
 export const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {

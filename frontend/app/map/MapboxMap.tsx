@@ -53,9 +53,32 @@ export function MapboxMap({ properties }: MapboxMapProps) {
       if (map.getSource("property-geojson")) map.removeSource("property-geojson");
 
       for (const property of properties) {
-        const popup = new mapboxgl.Popup({ offset: 24 }).setHTML(
-          `<strong>${property.name}</strong><br/>${property.propertyTypes.join(", ")}`
-        );
+        let html = '<div class="map-popup">';
+
+        // Is handicap accessible
+        if (property.resources.indexOf('handicap_accessible') !== -1) {
+          html += '<div class="map-popup--is-accessible">Handicap Accessible</div>';
+        }
+
+        // Image
+        if (property.image) {html += `<img src="${property.image.url}" alt="${property.image.alt}" />`;}
+
+        html += `<p class="map-popup-title">${property.name}</p>`;
+
+        // Description
+        if (property.desc) {html += `<p class="map-popup-desc">${property.desc}</p>`;}
+        // Is parking available
+        if (property.resources.indexOf('handicap_accessible') !== -1) {
+          html += '<div class="map-popup--is-parking">Parking Availability</div>';
+        }
+        // Link
+        if (property.link) {html += `<a href="${property.link}">Find out more</a>`}
+
+
+        html += '</div>';
+
+        const popup = new mapboxgl.Popup({ offset: 24 }).setHTML(html);
+
         const marker = new mapboxgl.Marker()
           .setLngLat(property.coordinates)
           .setPopup(popup)
