@@ -9,6 +9,12 @@ export const properties: Property[] = [
     propertyTypes: ["beach"],
     resources: ["parking", "handicap_accessible", "restrooms", "lifeguard", "dog_friendly"],
     coordinates: [-70.0942, 41.246],
+    image: {
+      url: '/images/properties/surfside-beach.jpg',
+      alt: 'surfside beach',
+    },
+    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    link: '#',
     geojson: {
       // Irregular strip hugging the south shore, following the curve of the coastline.
       type: "Polygon",
