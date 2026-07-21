@@ -110,7 +110,7 @@ export default function Footer() {
           </ul>
         </div>{/* .siteFooter-social */}
       </div>
-      <div className="siteFooter-legal flex justify-between gap-8 max-md:flex-col pt-8 border-t border-black">
+      <div className="siteFooter-legal flex justify-between gap-8 max-md:flex-col pt-8 mt-20 border-t border-black">
         <p>©2024 Relume. All rights reserved.</p>
         <ul className="flex gap-x-6 gap-y-2 max-md:flex-col">
           <li><a href="#" className="underline">Privacy Policy</a></li>
