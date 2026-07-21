@@ -38,6 +38,12 @@ export const properties: Property[] = [
     name: "Jetties Beach",
     propertyTypes: ["beach"],
     resources: ["parking", "handicap_accessible", "restrooms", "lifeguard", "picnic_area"],
+    image: {
+      url: '/images/properties/jetties-beach.jpg',
+      alt: 'jetties beach',
+    },
+    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    link: '#',
     coordinates: [-70.1073, 41.2989],
     geojson: {
       // Narrower crescent along the harbor mouth.
@@ -62,6 +68,12 @@ export const properties: Property[] = [
     name: "Madaket Beach",
     propertyTypes: ["beach"],
     resources: ["parking", "restrooms", "lifeguard"],
+    image: {
+      url: '/images/properties/madaket-beach.jpg',
+      alt: 'madaket beach',
+    },
+    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    link: '#',
     coordinates: [-70.2153, 41.2637],
     geojson: {
       // Long thin strip along the western tip of the island.
@@ -87,6 +99,12 @@ export const properties: Property[] = [
     name: "Sanford Farm, Ram Pasture & The Woods",
     propertyTypes: ["trail", "conservation"],
     resources: ["parking", "dog_friendly"],
+    image: {
+      url: '/images/properties/sanford-farm.webp',
+      alt: 'sanford farm barn',
+    },
+    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    link: '#',
     coordinates: [-70.1633, 41.2743],
     geojson: {
       // Winding multi-leg loop trail typical of the Sanford Farm walking path.
@@ -109,6 +127,12 @@ export const properties: Property[] = [
     name: "Middle Moors",
     propertyTypes: ["trail", "conservation"],
     resources: ["dog_friendly"],
+    image: {
+      url: '/images/properties/middle-moores.jpeg',
+      alt: 'middle moors',
+    },
+    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    link: '#',
     coordinates: [-70.0453, 41.2718],
     geojson: {
       // Braided moorland track segments.
@@ -130,6 +154,12 @@ export const properties: Property[] = [
     name: "Nantucket Harbor",
     propertyTypes: ["harbor"],
     resources: ["parking", "handicap_accessible", "restrooms"],
+    image: {
+      url: '/images/properties/nantucket-harbor.png',
+      alt: 'the harbor at nantucket',
+    },
+    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    link: '#',
     coordinates: [-70.0968, 41.2865],
     geojson: {
       // Rounded harbor basin shape, wider at the mouth and narrowing inland.
@@ -155,6 +185,12 @@ export const properties: Property[] = [
     name: "Long Pond",
     propertyTypes: ["pond", "conservation"],
     resources: ["parking", "dog_friendly", "picnic_area"],
+    image: {
+      url: '/images/properties/long-pond.jpg',
+      alt: 'long dock at long pond',
+    },
+    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    link: '#',
     coordinates: [-70.1911, 41.2764],
     geojson: {
       // Elongated kettle pond, narrow and stretched north-south.
@@ -181,6 +217,12 @@ export const properties: Property[] = [
     name: "Dionis Beach",
     propertyTypes: ["beach"],
     resources: ["parking", "handicap_accessible", "restrooms", "picnic_area"],
+    image: {
+      url: '/images/properties/dionis-beach.jpg',
+      alt: 'beach sign',
+    },
+    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    link: '#',
     coordinates: [-70.1367, 41.3105],
     geojson: {
       // Curved north-shore beach following the bay-facing coastline.
