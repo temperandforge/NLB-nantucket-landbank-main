@@ -37,6 +37,47 @@ export function MapboxMap({ properties }: MapboxMapProps) {
     };
   }, []);
 
+  /**
+   * Helper function to build popup html
+   * @param property
+   * @returns html string
+   */
+  function buildPopupHtml(property: Property): string {
+    const accessible = property.resources.includes("handicap_accessible")
+      ? '<div class="map-popup--is-accessible">Handicap Accessible</div>'
+      : "";
+
+    const image = property.image
+      ? `<img class="map-popup-image" src="${encodeURI(property.image.url)}" alt="${property.image.alt ?? ""}" />`
+      : "";
+
+    const desc = property.desc
+      ? `<p class="map-popup-desc">${property.desc}</p>`
+      : "";
+
+    const parking = property.resources.includes("parking")
+      ? '<div class="map-popup--is-parking">Parking Availability</div>'
+      : "";
+
+    const link = property.link
+      ? `<a class="map-popup-link" href="${encodeURI(property.link)}">Find out more</a>`
+      : "";
+
+    return `
+      ${accessible}
+      ${image}
+      <div class="map-popup--content">
+        <div class="map-popup--content__inner">
+          <div class="map-popup--content__headline">
+            <p class="map-popup-title">${property.name}</p>
+            ${desc}
+          </div>
+          ${parking}
+        </div>
+        ${link}
+      </div>
+    `;
+  }
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -53,35 +94,7 @@ export function MapboxMap({ properties }: MapboxMapProps) {
       if (map.getSource("property-geojson")) map.removeSource("property-geojson");
 
       for (const property of properties) {
-        let html = '';
-
-        // Is handicap accessible
-        if (property.resources.indexOf('handicap_accessible') !== -1) {
-          html += '<div class="map-popup--is-accessible">Handicap Accessible</div>';
-        }
-
-        // Image
-        if (property.image) {html += `<img class="map-popup-image" src="${property.image.url}" alt="${property.image.alt}" />`;}
-
-        html += '<div class="map-popup--content">';
-        html += '<div class="map-popup--content__inner">';
-        html += '<div class="map-popup--content__headline">';
-
-        html += `<p class="map-popup-title">${property.name}</p>`;
-
-        // Description
-        if (property.desc) {html += `<p class="map-popup-desc">${property.desc}</p>`;}
-        html += '</div>'; // close .map-popup--content__headline
-
-        // Is parking available
-        if (property.resources.indexOf('parking') !== -1) {
-          html += '<div class="map-popup--is-parking">Parking Availability</div>';
-        }
-        html += '</div>'; // close .map-popup--content__inner
-        // Link
-        if (property.link) {html += `<a class="map-popup-link" href="${property.link}">Find out more</a>`}
-
-        html += '</div>'; // close .map-popup-content
+        const html = buildPopupHtml(property);
         const popup = new mapboxgl.Popup({ offset: 24 }).setHTML(html);
 
         const marker = new mapboxgl.Marker()
