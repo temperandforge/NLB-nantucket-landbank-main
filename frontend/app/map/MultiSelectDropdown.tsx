@@ -56,7 +56,13 @@ export function MultiSelectDropdown({
         className="flex w-full items-center justify-between gap-2 border border-black bg-white p-3 text-black hover:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
       >
         <span className="dropdown-container flex gap-2 items-center truncate">
-          <span className="font-medium">{label}:</span> {summary}
+          {selected.length ? (
+            <>
+              <span className="font-medium">{label}:</span> {summary}
+            </>
+          ) : (
+            <span className="font-medium">{label}</span>
+          )}
         </span>
         <svg
           className={`ml-2 size-4 shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
