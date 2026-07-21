@@ -71,7 +71,7 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
 
   return (
     <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable} bg-white text-black`}>
-      <body className="flex flex-col min-h-screen py-24">
+      <body className="flex flex-col min-h-screen _py-24">
         <a href="#pageMain" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:bg-brand focus:text-white focus:px-4 focus:py-2">
           Skip to main content
         </a>
@@ -86,7 +86,7 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
         )}
         {/* The <SanityLive> component is responsible for making all sanityFetch calls in your application live, so should always be rendered. */}
         <SanityLive onError={handleError} />
-        <Header />
+        {/* <Header /> */}
         <main className="pageMain grow" id="pageMain">{children}</main>
         <Footer />
         <SpeedInsights />
