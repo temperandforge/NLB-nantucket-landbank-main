@@ -34,7 +34,7 @@ export default function Nav() {
                         <ul className="flex gap-4">
                             {Object.entries(menu).map(([title, slug]) => {
                                 return(
-                                    <li className="menu-item flex gap-2 items-center whitespace-nowrap">
+                                    <li key={title} className="menu-item flex gap-2 items-center whitespace-nowrap">
                                         <a href={slug}>
                                             {title}
                                         </a>

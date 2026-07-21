@@ -1,6 +1,9 @@
-export default function PageHeader(props) {
-    const title = props.title ?? '';
-    const copy = props.copy ?? '';
+type PageHeaderProps = {
+  title?: string;
+  copy?: string;
+}
+
+export default function PageHeader({title = '', copy = ''}: PageHeaderProps) {
     return (
         <div className="container flex max-lg:flex-col py-24 gap-x-20 gap-y-10">
             {title &&
