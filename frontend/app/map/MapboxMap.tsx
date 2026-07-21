@@ -74,7 +74,7 @@ export function MapboxMap({ properties }: MapboxMapProps) {
         html += '</div>'; // close .map-popup--content__headline
 
         // Is parking available
-        if (property.resources.indexOf('handicap_accessible') !== -1) {
+        if (property.resources.indexOf('parking') !== -1) {
           html += '<div class="map-popup--is-parking">Parking Availability</div>';
         }
         html += '</div>'; // close .map-popup--content__inner
