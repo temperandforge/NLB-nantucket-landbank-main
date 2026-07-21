@@ -24,7 +24,7 @@ export function MapboxMap({ properties }: MapboxMapProps) {
 
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: "mapbox://styles/mapbox/outdoors-v12",
+      style: "mapbox://styles/tfdev/cmrmj301k000p01rdcrzp6qxr",
       center: NANTUCKET_CENTER,
       zoom: 11,
     });
