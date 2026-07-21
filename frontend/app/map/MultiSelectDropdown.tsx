@@ -49,11 +49,11 @@ export function MultiSelectDropdown({
         : `${selected.length} selected`;
 
   return (
-    <div ref={containerRef} className="relative w-full sm:w-64">
+    <div ref={containerRef} className="relative w-full sm:w-81.25 max-w-[35%]">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 shadow-sm hover:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+        className="flex w-full items-center justify-between gap-2 border border-black bg-white p-3 text-black hover:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
       >
         <span className="truncate">
           <span className="font-medium">{label}:</span> {summary}
@@ -71,12 +71,12 @@ export function MultiSelectDropdown({
         </svg>
       </button>
       {open && (
-        <div className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-md border border-neutral-300 bg-white p-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
+        <div className="absolute right-0 z-20 mt-1 max-h-64 md:w-[85%] w-full overflow-auto border border-black bg-white lg:py-3 py-1 dark:border-neutral-700 dark:bg-neutral-900 scrollbar-thin">
           {selected.length > 0 && (
             <button
               type="button"
               onClick={() => onChange([])}
-              className="mb-1 w-full rounded px-2 py-1 text-left text-xs text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              className="mb-1 w-full rounded lg:px-6 px-3 py-1 text-left text-xs text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800"
             >
               Clear all
             </button>
@@ -84,15 +84,15 @@ export function MultiSelectDropdown({
           {options.map((option) => (
             <label
               key={option.value}
-              className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              className="flex cursor-pointer items-center gap-10 justify-between py-2 lg:px-6 px-3 hover:bg-neutral-100 dark:hover:bg-neutral-800"
             >
+              {option.label}
               <input
                 type="checkbox"
                 checked={selected.includes(option.value)}
                 onChange={() => toggleValue(option.value)}
-                className="size-4 rounded border-neutral-300 dark:border-neutral-600"
+                className="dropdown-checkbox size-3 border-black dark:border-neutral-600"
               />
-              {option.label}
             </label>
           ))}
         </div>

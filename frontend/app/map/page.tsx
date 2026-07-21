@@ -95,8 +95,9 @@ function MapPageContent() {
   }
 
   return (
-    <div id="mapWrap" className="container flex flex-col px-5">
-      <div className="flex flex-col gap-3 border-b border-neutral-200 bg-white py-4 sm:flex-row sm:items-center dark:border-neutral-800 dark:bg-neutral-950">
+    <div id="mapWrap" className="container flex flex-col px-5 gap-10 py-10">
+      <div className="container--inner flex flex-col gap-2">
+      <div className="flex flex-col gap-3 bg-white sm:flex-row sm:items-center">
         <MultiSelectDropdown
           label="Property Type"
           options={propertyTypeOptions}
@@ -123,20 +124,20 @@ function MapPageContent() {
         )}
       </div>
       {activeFilters.length > 0 && (
-        <div className="flex flex-wrap gap-2 border-b border-neutral-200 bg-white px-4 py-3 dark:border-neutral-800 dark:bg-neutral-950">
+        <div className="flex flex-wrap gap-2 bg-white py-3 dark:bg-neutral-950">
           {activeFilters.map((filter) => (
             <span
               key={`${filter.group}-${filter.value}`}
-              className="flex items-center gap-1.5 rounded-full bg-neutral-100 py-1 pl-3 pr-1.5 text-sm text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
+              className="flex items-center gap-2 bg-neutral-100 py-2 pl-4 pr-3 text-black dark:bg-neutral-800 dark:text-neutral-200"
             >
               {filter.label}
               <button
                 type="button"
                 onClick={() => removeFilter(filter.group, filter.value)}
                 aria-label={`Remove ${filter.label} filter`}
-                className="flex size-4 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-300 hover:text-neutral-900 dark:hover:bg-neutral-700 dark:hover:text-neutral-50"
+                className="flex size-4 items-center justify-center rounded-full text-black hover:bg-neutral-300 hover:text-neutral-900 dark:hover:bg-neutral-700 dark:hover:text-neutral-50"
               >
-                <svg viewBox="0 0 20 20" fill="currentColor" className="size-3">
+                <svg viewBox="0 0 20 20" fill="currentColor" className="size-4">
                   <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
                 </svg>
               </button>
@@ -144,6 +145,7 @@ function MapPageContent() {
           ))}
         </div>
       )}
+      </div>{/* close .container--inner -*/}
       <div className="relative flex-1">
         <MapboxMap properties={filteredProperties} />
       </div>
