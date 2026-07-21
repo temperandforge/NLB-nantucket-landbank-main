@@ -29,6 +29,62 @@ export function MapboxMap({ properties }: MapboxMapProps) {
       zoom: 11,
     });
 
+
+
+    mapRef.current.on('load', async () => {
+      try {
+        if (!mapRef.current) return;
+        const map = mapRef.current;
+
+        // 2. Fetch the pre-converted GeoJSON from /public/route.geojson
+        const response = await fetch('/geojson/sample.geojson');
+        const geojsonData = await response.json(); 
+
+        // 3. Add the GeoJSON directly as a Mapbox source
+        mapRef.current.addSource('gpx-route', {
+          type: 'geojson',
+          data: geojsonData,
+        });
+
+        // 4. Add a line layer to render the track
+        mapRef.current.addLayer({
+          id: 'gpx-route-line',
+          type: 'line',
+          source: 'gpx-route',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': '#ff385c',
+            'line-width': 4,
+          },
+        });
+
+        // 5. Fit the map bounds around the GeoJSON feature coordinates
+        const coordinates = geojsonData.features.flatMap((feature: any) => {
+          if (feature.geometry.type === 'LineString') {
+            return feature.geometry.coordinates;
+          }
+          if (feature.geometry.type === 'MultiLineString') {
+            return feature.geometry.coordinates.flat();
+          }
+          return [];
+        });
+
+        if (coordinates.length > 0) {
+          const bounds = coordinates.reduce(
+            (acc: mapboxgl.LngLatBounds, coord: [number, number]) => acc.extend(coord),
+            new mapboxgl.LngLatBounds(coordinates[0], coordinates[0])
+          );
+
+          map.fitBounds(bounds, { padding: 40 });
+        }
+      } catch (error) {
+        console.error('Failed to load route.geojson:', error);
+      }
+    });
+
     mapRef.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
     return () => {
