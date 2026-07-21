@@ -49,7 +49,7 @@ export function MultiSelectDropdown({
         : `${selected.length} selected`;
 
   return (
-    <div ref={containerRef} className="relative w-full sm:w-81.25 max-w-[35%]">
+    <div ref={containerRef} className="relative w-full sm:w-81.25 sm:max-w-[35%]">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
