@@ -7,6 +7,7 @@ import { MultiSelectDropdown } from "./MultiSelectDropdown";
 import { properties } from "./properties";
 import { PROPERTY_TYPE_LABELS, RESOURCE_LABELS, type PropertyType, type Resource } from "./types";
 import PageHeader from "@/components/PageHeader";
+import Nav from '@/components/Nav';
 
 const propertyTypeOptions = (Object.keys(PROPERTY_TYPE_LABELS) as PropertyType[]).map((value) => ({
   value,
@@ -157,6 +158,7 @@ function MapPageContent() {
 export default function MapPage() {
   return (
     <Suspense fallback={null}>
+      <Nav />
       <PageHeader title="Map with properties and boundary lines." copy="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra."/>
       <MapPageContent />
     </Suspense>
