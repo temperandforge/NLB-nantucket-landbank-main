@@ -97,7 +97,7 @@ function MapPageContent() {
   }
 
   return (
-    <div id="mapWrap" className="container flex flex-col px-5 gap-10 py-10">
+    <div id="mapWrap" className="container flex flex-col gap-10 py-10">
       <div className="container--inner flex flex-col gap-2">
       <div className="flex flex-col gap-3 bg-white sm:flex-row sm:items-center">
         <MultiSelectDropdown

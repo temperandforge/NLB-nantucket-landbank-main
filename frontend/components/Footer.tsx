@@ -1,6 +1,7 @@
 export default function Footer() {
   return (
-    <footer className="siteFooter relative py-10 px-5 flex flex-col gap-20 bg-[#eee]">
+    <footer className="siteFooter relative py-10 flex flex-col gap-20 bg-[#eee]">
+      <div className="container">
       <div className="siteFooter-top flex flex-col gap-16">
         <div className="siteFooter-menu flex justify-between gap-10 max-lg:flex-col">
           <div className="flex flex-col gap-10">
@@ -117,6 +118,7 @@ export default function Footer() {
           <li><a href="#" className="underline">Cookies Settings</a></li>
         </ul>
       </div>{/* .siteFooter-legal */}
+      </div>
     </footer>
   )
 }
