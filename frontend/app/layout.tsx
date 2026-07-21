@@ -1,4 +1,5 @@
 import '../css/globals.css'
+import '../css/map.css'
 
 import {SpeedInsights} from '@vercel/speed-insights/next'
 import type {Metadata} from 'next'
