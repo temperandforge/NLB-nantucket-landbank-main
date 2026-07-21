@@ -61,7 +61,7 @@ export function MapboxMap({ properties }: MapboxMapProps) {
         }
 
         // Image
-        if (property.image) {html += `<img src="${property.image.url}" alt="${property.image.alt}" />`;}
+        if (property.image) {html += `<img class="map-popup-image" src="${property.image.url}" alt="${property.image.alt}" />`;}
 
         html += '<div class="map-popup--content">';
         html += '<div class="map-popup--content__inner">';

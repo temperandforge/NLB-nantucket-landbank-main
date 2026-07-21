@@ -57,6 +57,11 @@
     line-height: 0;
 }
 
+.map-popup-image {
+    height: 142px;
+    object-fit: cover;
+}
+
 .map-popup-title {
     font-weight: 600;
     font-size: 16px;
