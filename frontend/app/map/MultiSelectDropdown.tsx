@@ -55,7 +55,7 @@ export function MultiSelectDropdown({
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center justify-between gap-2 border border-black bg-white p-3 text-black hover:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
       >
-        <span className="truncate">
+        <span className="dropdown-container flex gap-2 items-center truncate">
           <span className="font-medium">{label}:</span> {summary}
         </span>
         <svg
