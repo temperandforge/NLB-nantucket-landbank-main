@@ -5,6 +5,7 @@ import {SpeedInsights} from '@vercel/speed-insights/next'
 import type {Metadata} from 'next'
 import {Inter, IBM_Plex_Mono} from 'next/font/google'
 import {draftMode} from 'next/headers'
+import Script from 'next/script'
 import {toPlainText} from 'next-sanity'
 import {VisualEditing} from 'next-sanity/visual-editing'
 import {Toaster} from 'sonner'
@@ -90,6 +91,10 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
         <main className="pageMain grow" id="pageMain">{children}</main>
         <Footer />
         <SpeedInsights />
+        <Script
+          src="https://www.bugherd.com/sidebarv2.js?apikey=vuefxgttt1s6fiowcnigea"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   )
