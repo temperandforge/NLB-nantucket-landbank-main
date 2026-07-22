@@ -40,6 +40,11 @@ export function MapboxMap({ properties }: MapboxMapProps) {
         const response = await fetch('/geojson/sample.geojson');
         const geojsonData = await response.json(); 
 
+        // Assign ID's to map elements
+        geojsonData.features.forEach((feature: any, index: number) => {
+          feature.id = index;
+        });
+
         // 3. Add the GeoJSON directly as a Mapbox source
         mapRef.current.addSource('gpx-route', {
           type: 'geojson',
@@ -162,7 +167,8 @@ export function MapboxMap({ properties }: MapboxMapProps) {
 
       const geojsonFeatures = properties
         .filter((property) => property.geojson)
-        .map((property) => ({
+        .map((property, index) => ({
+          id: index,
           type: "Feature" as const,
           properties: { id: property.id, name: property.name },
           geometry: property.geojson as GeoJSON.Geometry,
@@ -187,7 +193,41 @@ export function MapboxMap({ properties }: MapboxMapProps) {
           type: "fill",
           source: "property-geojson",
           filter: ["==", ["geometry-type"], "Polygon"],
-          paint: { "fill-color": "#2563eb", "fill-opacity": 0.2 },
+          paint: {
+            "fill-color": "#2563eb",
+            "fill-opacity": [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false],
+              0.4, // hover
+              0.2, // default
+            ],
+            'fill-opacity-transition': {
+                'duration': 300,
+            }
+          },
+        });
+        // Map hover effects
+        let hoveredStateId: number | undefined = undefined;
+
+        map.on('mousemove', 'property-polygons', (e) => {
+          if (!e.features || e.features.length === 0) return;
+
+          const featureId = e.features[0].id;
+
+          // If the mouse moved from another feature, remove its hover state
+          if (hoveredStateId !== undefined) {
+            map.setFeatureState(
+              { source: 'property-geojson', id: hoveredStateId },
+              { hover: false }
+            );
+          }
+
+          // Set  hover state for new feature
+          hoveredStateId = featureId;
+          map.setFeatureState(
+              { source: 'property-geojson', id: hoveredStateId },
+              { hover: true }
+          );
         });
       }
     }
