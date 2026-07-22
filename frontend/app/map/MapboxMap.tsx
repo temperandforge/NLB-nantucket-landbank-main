@@ -163,6 +163,17 @@ export function MapboxMap({ properties }: MapboxMapProps) {
           .setPopup(popup)
           .addTo(map);
         markersRef.current.push(marker);
+        // Marker hover
+        const markerDiv = marker.getElement();
+        markerDiv.addEventListener('mouseenter', () => {
+          markerDiv.style.transition = 'top .2s ease';
+          markerDiv.style.top = '-6px';
+          markerDiv.style.cursor = 'pointer';
+        });
+        markerDiv.addEventListener('mouseleave', () => {
+          markerDiv.style.top = 0;
+          markerDiv.style.cursor = 'auto';
+        });
       }
 
       const geojsonFeatures = properties
