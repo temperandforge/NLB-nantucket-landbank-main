@@ -41,7 +41,7 @@ export function MapboxMap({ properties }: MapboxMapProps) {
         const geojsonData = await response.json(); 
 
         // Assign ID's to map elements
-        geojsonData.features.forEach((feature: any, index: number) => {
+        geojsonData.features.forEach((feature: Record<string, unknown>, index: number) => {
           feature.id = index;
         });
 
@@ -67,7 +67,7 @@ export function MapboxMap({ properties }: MapboxMapProps) {
         });
 
         // 5. Fit the map bounds around the GeoJSON feature coordinates
-        const coordinates = geojsonData.features.flatMap((feature: any) => {
+        const coordinates = geojsonData.features.flatMap((feature: Record<string, unknown>) => {
           if (feature.geometry.type === 'LineString') {
             return feature.geometry.coordinates;
           }
