@@ -154,7 +154,9 @@ export function MapboxMap({ properties }: MapboxMapProps) {
       }
       if (map.getSource("property-geojson")) map.removeSource("property-geojson");
 
-      for (const property of properties) {
+      let hoveredStateId: number | undefined = undefined;
+
+      for (const [index, property] of properties.entries()) {
         const html = buildPopupHtml(property);
         const popup = new mapboxgl.Popup({ offset: 24 }).setHTML(html);
 
@@ -163,14 +165,38 @@ export function MapboxMap({ properties }: MapboxMapProps) {
           .setPopup(popup)
           .addTo(map);
         markersRef.current.push(marker);
-        // Marker hover
+
         const markerDiv = marker.getElement();
+
         markerDiv.addEventListener('mouseenter', () => {
+          // If the mouse moved from another feature, remove its hover state
+          if (hoveredStateId !== undefined) {
+            map.setFeatureState(
+              { source: 'property-geojson', id: hoveredStateId },
+              { hover: false }
+            );
+          }
+          // Set  hover state for new feature
+          hoveredStateId = index;
+          map.setFeatureState(
+              { source: 'property-geojson', id: hoveredStateId },
+              { hover: true }
+          );
+
+          // Marker  hover effect
           markerDiv.style.transition = 'top .2s ease';
           markerDiv.style.top = '-6px';
           markerDiv.style.cursor = 'pointer';
         });
+
         markerDiv.addEventListener('mouseleave', () => {
+          if (hoveredStateId === undefined) return;
+
+          map.setFeatureState(
+              { source: 'property-geojson', id: hoveredStateId },
+              { hover: false }
+          );
+          // Marker hover effect
           markerDiv.style.top = 0;
           markerDiv.style.cursor = 'auto';
         });
@@ -217,38 +243,6 @@ export function MapboxMap({ properties }: MapboxMapProps) {
             }
           },
         });
-        // Map hover effects
-        let hoveredStateId: number | undefined = undefined;
-
-        map.on('mousemove', 'property-polygons', (e) => {
-          if (!e.features || e.features.length === 0) return;
-
-          const featureId = e.features[0].id;
-
-          // If the mouse moved from another feature, remove its hover state
-          if (hoveredStateId !== undefined) {
-            map.setFeatureState(
-              { source: 'property-geojson', id: hoveredStateId },
-              { hover: false }
-            );
-          }
-
-          // Set  hover state for new feature
-          hoveredStateId = featureId;
-          map.setFeatureState(
-              { source: 'property-geojson', id: hoveredStateId },
-              { hover: true }
-          );
-        });
-
-        map.on('mouseleave', 'property-polygons', (e) => {
-          if (!hoveredStateId) return;
-
-          map.setFeatureState(
-              { source: 'property-geojson', id: hoveredStateId },
-              { hover: false }
-          );
-        })
       }
     }
 
