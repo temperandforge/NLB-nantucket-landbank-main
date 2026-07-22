@@ -61,8 +61,8 @@ export function MapboxMap({ properties }: MapboxMapProps) {
             'line-cap': 'round',
           },
           paint: {
-            'line-color': '#ff385c',
-            'line-width': 4,
+            'line-color': '#c60024',
+            'line-width': 1,
           },
         });
 
