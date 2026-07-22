@@ -229,6 +229,15 @@ export function MapboxMap({ properties }: MapboxMapProps) {
               { hover: true }
           );
         });
+
+        map.on('mouseleave', 'property-polygons', (e) => {
+          if (!hoveredStateId) return;
+
+          map.setFeatureState(
+              { source: 'property-geojson', id: hoveredStateId },
+              { hover: false }
+          );
+        })
       }
     }
 
