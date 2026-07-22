@@ -41,7 +41,7 @@ export function MapboxMap({ properties }: MapboxMapProps) {
         const geojsonData = await response.json(); 
 
         // Assign ID's to map elements
-        geojsonData.features.forEach((feature: Record<string, unknown>, index: number) => {
+        geojsonData.features.forEach((feature: GeoJSON.Feature, index: number) => {
           feature.id = index;
         });
 
@@ -67,7 +67,7 @@ export function MapboxMap({ properties }: MapboxMapProps) {
         });
 
         // 5. Fit the map bounds around the GeoJSON feature coordinates
-        const coordinates = geojsonData.features.flatMap((feature: Record<string, unknown>) => {
+        const coordinates = geojsonData.features.flatMap((feature: GeoJSON.Feature) => {
           if (feature.geometry.type === 'LineString') {
             return feature.geometry.coordinates;
           }
@@ -197,7 +197,7 @@ export function MapboxMap({ properties }: MapboxMapProps) {
               { hover: false }
           );
           // Marker hover effect
-          markerDiv.style.top = 0;
+          markerDiv.style.top = '0';
           markerDiv.style.cursor = 'auto';
         });
       }
