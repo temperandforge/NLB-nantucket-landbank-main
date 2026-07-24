@@ -26,12 +26,12 @@ Invoked as `/figma-sync <figma-file-url>`. If no URL is given, ask for one — d
 3. **Diff tokens.**
    - For each Figma variable, check `CONTEXT.md`'s mapping table for a known code name.
    - If mapped and the value differs from `@theme`, update `@theme` in `frontend/css/globals.css` with the new value.
-   - If unmapped, ask the user (or infer from context) what the equivalent code token name should be, using the naming conventions already in `@theme` (e.g. `--color-<name>-<50..950>` for color scales). Add a new row to `CONTEXT.md`'s "Figma ↔ Code Name Mapping" table — keep the addition to a term/definition entry and a mapping-table row only; do not add implementation detail elsewhere in `CONTEXT.md`, which stays a glossary per `.agents/skills/domain-modeling/CONTEXT-FORMAT.md`.
+   - If unmapped, ask the user what the equivalent code token name should be — do not guess. Use the naming conventions already in `@theme` (e.g. `--color-<name>-<50..950>` for color scales). Add a new row to `CONTEXT.md`'s "Figma ↔ Code Name Mapping" table — keep the addition to a term/definition entry and a mapping-table row only; do not add implementation detail elsewhere in `CONTEXT.md`, which stays a glossary per `.agents/skills/domain-modeling/CONTEXT-FORMAT.md`.
    - Never rename an existing code token to match Figma's name — code naming is canonical.
 
 4. **Diff components.**
    - For each Figma component/component-set without a `Component.figma.tsx` file yet:
-     - Determine (or ask the user) which existing `frontend/components/*.tsx` file it corresponds to, or whether it's net new.
+     - Determine which existing `frontend/components/*.tsx` file it corresponds to; if it's ambiguous or possibly net new, ask the user rather than guessing.
      - Write `frontend/components/<Name>.figma.tsx` using Figma Code Connect's `figma.connect()` API, mapping Figma variant/prop names to the component's actual TypeScript prop names (per Code Connect's docs — read them via the Figma MCP server's Code Connect skill before writing the first mapping file in a sync session).
      - Create or update `frontend/components/<Name>.stories.tsx` alongside it, following the convention in `frontend/components/Cta.stories.tsx` (the reference example). `.storybook/main.ts`'s `stories` glob already picks up any `frontend/components/**/*.stories.@(js|jsx|mjs|ts|tsx)` automatically — no config change needed.
    - For each existing `Component.figma.tsx`, re-run `get_code_connect_suggestions` and update the mapping if the Figma component's props/variants changed.
