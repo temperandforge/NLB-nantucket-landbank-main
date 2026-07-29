@@ -27,6 +27,64 @@ const linkFields = /* groq */ `
       }
 `
 
+/**
+ * A menu item is either a menuLink (label + link) or a menuGroup (label + nested menuLinks).
+ * Both shapes resolve their links through linkFields so page/post references come back as
+ * slugs, ready for linkResolver().
+ */
+const menuItemFields = /* groq */ `
+  _key,
+  _type,
+  label,
+  _type == "menuLink" => {
+    ${linkFields}
+  },
+  _type == "menuGroup" => {
+    children[]{
+      _key,
+      label,
+      ${linkFields}
+    }
+  }
+`
+
+const menuFields = /* groq */ `
+  _id,
+  title,
+  items[]{
+    ${menuItemFields}
+  }
+`
+
+// Matched on both _type and the fixed singleton id: the id alone would let any document type
+// satisfy the filter, which makes the generated result type a union with an all-null variant.
+export const footerQuery = defineQuery(`
+  *[_type == "footer" && _id == "footer"][0]{
+    newsletterHeading,
+    organizationName,
+    infoColumns[]{
+      _key,
+      heading,
+      lines[]{
+        _key,
+        text,
+        href
+      }
+    },
+    socialLinks[]{
+      _key,
+      platform,
+      url
+    },
+    "footerMenu": footerMenu->{
+      ${menuFields}
+    },
+    "legalMenu": legalMenu->{
+      ${menuFields}
+    },
+  }
+`)
+
 export const getPageQuery = defineQuery(`
   *[_type == 'page' && slug.current == $slug][0]{
     _id,

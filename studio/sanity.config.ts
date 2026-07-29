@@ -72,9 +72,22 @@ export default defineConfig({
             route: '/:slug',
             filter: `_type == "page" && slug.current == $slug || _id == $slug`,
           },
+          // Page slugs may contain slashes to nest a page under a section, e.g.
+          // "about-us/conservation", where the parent segment has no page of its own. The
+          // single-segment route above cannot match those, so resolve two- and three-segment
+          // paths by reassembling the slug. Listed after /posts/:slug would shadow it, so
+          // this sits below the more specific post route.
           {
             route: '/posts/:slug',
             filter: `_type == "post" && slug.current == $slug || _id == $slug`,
+          },
+          {
+            route: '/:parent/:slug',
+            filter: `_type == "page" && slug.current == $parent + "/" + $slug`,
+          },
+          {
+            route: '/:grandparent/:parent/:slug',
+            filter: `_type == "page" && slug.current == $grandparent + "/" + $parent + "/" + $slug`,
           },
         ]),
         // Locations Resolver API allows you to define where data is being used in your application. https://www.sanity.io/docs/visual-editing/presentation-resolver-api#8d8bca7bfcd7

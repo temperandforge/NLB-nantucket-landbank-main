@@ -20,6 +20,8 @@ In scope:
 - Footer-scoped design tokens and the three brand fonts on the frontend
 - `Footer` component tree, GROQ query, committed Figma assets
 - Responsive behavior below 1440px
+- Nested page slugs (`about-us/conservation`) and the catch-all route they require
+- Seeded footer content and the 13 pages its menu links to
 
 Out of scope:
 
@@ -257,6 +259,74 @@ footer stretches while the wave stays 4758px centered, which still covers it.
 header. The footer is full-bleed edge-to-edge in the design, and body padding would inset it. Move
 that padding from `<body>` to `<main>`.
 
+## Routing and Nested Slugs
+
+Links under About Us, Explore and Public Records carry their section in the URL
+(`/about-us/conservation`), but **the section itself has no page**. There is no `about-us`
+document, by design.
+
+That has three consequences:
+
+1. **The page slug must allow slashes.** `page.slug` gets a custom `slugify` that preserves
+   `/` (the default strips it) and validation matching
+   `^[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*$` — lowercase segments, no
+   leading/trailing slash, no empty segments.
+2. **`app/[slug]` becomes `app/[...slug]`.** A single dynamic segment cannot match a
+   two-segment path, and there is no route hierarchy to build because the parent has no page.
+   `params.slug` becomes `string[]`, typed `PageProps<'/[...slug]'>`; the page joins it back
+   with `/` for the GROQ lookup, and `generateStaticParams` splits stored slugs into segments.
+   More specific routes still win: `/posts/x` matches `app/posts/[slug]` and `/map` matches
+   `app/map` before the catch-all is considered.
+3. **Presentation needs the extra routes.** `sanity.config.ts` gains `/:parent/:slug` and
+   `/:grandparent/:parent/:slug` resolvers that reassemble the slug, since `/:slug` only
+   matches one segment. They sit below `/posts/:slug` so they do not shadow it.
+
+`link.href` also gains `Rule.uri({allowRelative: true, ...})`. The default `url` validation
+rejects anything without an origin, which would fail both the `#` placeholders and the
+site-relative paths that replace them.
+
+## Seeded Content
+
+Written by `studio/scripts/seedFooterContent.ts`:
+
+```bash
+cd studio && npx sanity exec scripts/seedFooterContent.ts --with-user-token
+```
+
+Idempotent — pages and menus are matched on slug/title and reused, so re-running creates no
+duplicates. Sanity assigns their ids; only the `footer` singleton uses a fixed id, which is the
+one case where an explicit id is correct. The footer is written with `createOrReplace`, so
+re-running **does** discard Studio edits to the footer. Pages are never overwritten.
+
+### Links that are `#` placeholders
+
+Real relative paths are to be supplied later. No page is created for these:
+
+| Section | Items |
+| --- | --- |
+| About Us | Staff, FAQs |
+| Explore | Properties, ACK Trails |
+| Our Work | News, Projects, Events |
+| Legal | Cookie Settings, Privacy Policy |
+
+### Pages created (13)
+
+| Section | Slugs |
+| --- | --- |
+| About Us | `about-us/conservation`, `about-us/recreation`, `about-us/agriculture`, `about-us/history` |
+| Explore | `explore/interactive-map`, `explore/plan-your-visit`, `explore/request-for-property-use` |
+| Public Records | `public-records/meetings`, `public-records/annual-reports`, `public-records/policies`, `public-records/establishment-documents` |
+| Other | `transfer-documents`, `connect-with-us` |
+
+Items under **Other** are top-level paths — only About Us, Explore and Public Records nest.
+
+Each page gets `name`, `slug` and `heading` (required by the schema) from its menu label, and
+an empty page builder.
+
+Social links are seeded as `#` because the design supplies icons but no profile URLs, and
+guessing at them would risk pointing somewhere wrong. `socialLink.url` therefore also allows
+relative values.
+
 ## Responsive
 
 The design is desktop-only, so the following are **assumptions to confirm with the designer**:
@@ -290,26 +360,60 @@ of this at authoring time; the frontend is defensive because references can be u
 The repo has no test infrastructure, so verification is manual and type-level:
 
 1. `npm run sanity:typegen` — schema extracts and types generate cleanly
-2. `npm run type-check` in `frontend` — no type errors
+2. `npm run type-check` in `frontend`, `npx tsc --noEmit` in `studio` — no type errors
 3. `npm run lint` in `frontend`
 4. Studio: `Globals > Footer` and `Globals > Menus` present; `footer` and `menu` do not appear twice
-   at the root; author the footer menu (5 groups) and legal menu (2 links) from the design content
+   at the root
 5. Frontend: footer renders against real content; compare against the Figma screenshot at 1440;
    walk the breakpoints in the table above; confirm keyboard focus order and that the wave is not
    focusable or announced
+
+### Verified at 1440
+
+Measured in the browser against the Figma node:
+
+| Property | Design | Measured |
+| --- | --- | --- |
+| Footer background | `#3d5934` | `rgb(61, 89, 52)` |
+| Text colour | `#fdf9f4` | `rgb(253, 249, 244)` |
+| Nav grid | 5 × 200px | `200px 200px 200px 200px 200px` |
+| Headline | EB Garamond 32px | EB Garamond, 32px |
+| Column labels | DM Mono 14px / 1.54px tracking | DM Mono, 1.54px |
+| Nav links | DM Sans 13px, 75% opacity | DM Sans, 13px, 0.75 |
+| Copyright box | x 40 → 325 | 40 → 324 |
+| Legal links box | x 1063 → 1265 | 1064 → 1265 |
+| Social box | x 1289 → 1400 | 1289 → 1400 |
+| Social icon boxes | 29×29 | 29×29 |
+| Facebook glyph | 24.1667 | 24.16 |
+| Instagram / LinkedIn glyphs | 21.75 | 21.75 |
+
+Responsive: 1 column / 24px padding at 375, 2 columns / 40px padding at 768, no horizontal
+overflow at either. All 13 seeded routes return 200, and `/map` still resolves to its own route
+rather than the catch-all.
 
 ## Deferred Work
 
 Recorded here, not built:
 
-1. **Newsletter submission.** The form is presentational — no handler, no action. Needs a provider
-   decision (Mailchimp / Constant Contact / other), a server action, validation, and success/error
-   states.
-2. **Cookie Settings.** A consent-manager trigger, not a URL. It sits in the legal menu as a
+1. **Newsletter submission.** The form is presentational — no handler, no action, both controls
+   disabled so it cannot silently do nothing. Needs a provider decision (Mailchimp / Constant
+   Contact / other), a server action, validation, and success/error states.
+2. **The `#` placeholder links.** Nine menu items and three social URLs need their real values;
+   see [Seeded Content](#seeded-content).
+3. **Cookie Settings.** A consent-manager trigger, not a URL. It sits in the legal menu as a
    placeholder link until a consent manager is chosen.
-3. **Mobile footer.** Designer confirmation of the breakpoint table above.
-4. **Header menu.** Will reference the same `menu` documents. No schema change expected.
-5. **`frontend/tailwind.config.ts` is vestigial** under Tailwind v4 — `globals.css` uses
+4. **Bare section paths return 200, not 404.** `/about-us` and `/explore` have no page, but the
+   catch-all renders the starter's `PageOnboarding` ("This page has no content!") for any
+   unmatched slug rather than calling `notFound()`. Pre-existing starter behavior, now more
+   visible because section paths look like real URLs. A public visitor should get a 404 —
+   swapping `PageOnboarding` for `notFound()` is a one-line change but affects every missing
+   page, so it is a product decision rather than part of this work.
+5. **`/map` vs `/explore/interactive-map`.** The app already has a hand-built `/map` route, and
+   the footer now links to a separate empty `explore/interactive-map` page. One of the two
+   should probably redirect to the other.
+6. **Mobile footer.** Designer confirmation of the breakpoint table above.
+7. **Header menu.** Will reference the same `menu` documents. No schema change expected.
+8. **`frontend/tailwind.config.ts` is vestigial** under Tailwind v4 — `globals.css` uses
    `@import 'tailwindcss'` with `@theme` and no `@config` directive, so the file is not loaded. Its
    `green` / `yellow` scales are unrelated to the brand palette and are a trap for the next person.
-6. **Rest of the design system.** Only footer-consumed tokens are added here.
+9. **Rest of the design system.** Only footer-consumed tokens are added here.

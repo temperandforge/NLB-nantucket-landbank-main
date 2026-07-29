@@ -42,6 +42,36 @@
   --color-gray-950: #13141b;
 
   --default-transition-duration: 250ms;
+
+  /**
+   * Nantucket design system tokens.
+   *
+   * Named after the Figma variables they come from (color/brand/Lowlands ->
+   * --color-brand-lowlands) so the two stay traceable to each other. Only the tokens the
+   * footer consumes are here - the rest of the design system is a separate task, and the
+   * starter-template tokens above are still in use by other pages.
+   */
+  --color-brand-lowlands: #3d5934;
+  --color-brand-goldenrod: #ecbb20;
+  --color-warm-neutral-50: #fdf9f4;
+
+  --font-primary: var(--font-eb-garamond), ui-serif, Georgia, serif;
+  --font-secondary: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono-tracked: var(--font-dm-mono), ui-monospace, monospace;
+
+  --text-body-small: 13px;
+  --text-body-base: 16px;
+  --text-headline-base: 32px;
+
+  --spacing-gap-mini: 4px;
+  --spacing-gap-sm: 12px;
+  --spacing-gap-md: 24px;
+  --spacing-gap-lg: 40px;
+  --spacing-gap-2xl: 96px;
+  --spacing-section-p-sm: 64px;
+  --spacing-global-margin: 40px;
+
+  --container-site: 1440px;
 }
 
 #mapWrap {

@@ -8,6 +8,24 @@ import {GetPageQueryResult} from '@/sanity.types'
 import {PageOnboarding} from '@/components/Onboarding'
 
 /**
+ * This is a catch-all segment rather than a single [slug] because page slugs may contain
+ * slashes to nest a page under a section, e.g. "about-us/conservation". The parent segment
+ * ("about-us") intentionally has no page of its own, so there is no real route hierarchy to
+ * build from - the whole path is one slug stored on one document.
+ *
+ * More specific routes still win over this one: /posts/x matches app/posts/[slug] and /map
+ * matches app/map, both of which Next.js checks before a catch-all.
+ */
+
+/**
+ * Convert a stored slug ("about-us/conservation") into the array shape a catch-all segment
+ * expects (["about-us", "conservation"]).
+ */
+function toSegments(slug: string): string[] {
+  return slug.split('/').filter(Boolean)
+}
+
+/**
  * Generate the static params for the page.
  * Learn more: https://nextjs.org/docs/app/api-reference/functions/generate-static-params
  */
@@ -19,17 +37,19 @@ export async function generateStaticParams() {
     stega: false,
   })
   return data
+    .filter((page): page is {slug: string} => Boolean(page.slug))
+    .map((page) => ({slug: toSegments(page.slug)}))
 }
 
 /**
  * Generate metadata for the page.
  * Learn more: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#generatemetadata-function
  */
-export async function generateMetadata(props: PageProps<'/[slug]'>): Promise<Metadata> {
-  const params = await props.params
+export async function generateMetadata(props: PageProps<'/[...slug]'>): Promise<Metadata> {
+  const {slug} = await props.params
   const {data: page} = await sanityFetch({
     query: getPageQuery,
-    params,
+    params: {slug: slug.join('/')},
     // Metadata should never contain stega
     stega: false,
   })
@@ -40,9 +60,11 @@ export async function generateMetadata(props: PageProps<'/[slug]'>): Promise<Met
   } satisfies Metadata
 }
 
-export default async function Page(props: PageProps<'/[slug]'>) {
-  const params = await props.params
-  const [{data: page}] = await Promise.all([sanityFetch({query: getPageQuery, params})])
+export default async function Page(props: PageProps<'/[...slug]'>) {
+  const {slug} = await props.params
+  const [{data: page}] = await Promise.all([
+    sanityFetch({query: getPageQuery, params: {slug: slug.join('/')}}),
+  ])
 
   if (!page?._id) {
     return (

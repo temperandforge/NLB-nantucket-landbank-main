@@ -23,10 +23,36 @@ export const page = defineType({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
-      validation: (Rule) => Rule.required(),
+      description:
+        'The page path, without a leading slash. May include slashes to nest a page under a section, e.g. "about-us/conservation" - the parent segment does not need a page of its own.',
+      validation: (Rule) =>
+        Rule.required().custom((slug) => {
+          const current = slug?.current
+          if (!current) return true
+          // Lowercase words separated by single hyphens, in one or more slash-separated
+          // segments. Rejects leading/trailing slashes, empty segments, and uppercase or
+          // otherwise URL-unsafe characters, any of which would produce a broken route.
+          const isValid = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*$/.test(current)
+          return (
+            isValid ||
+            'Use lowercase letters, numbers and hyphens, with "/" to separate path segments. No leading or trailing slash.'
+          )
+        }),
       options: {
         source: 'name',
         maxLength: 96,
+        // The default slugifier strips "/", which would make nested paths unauthorable. This
+        // keeps slashes so a path can be typed or pasted directly, and collapses the runs of
+        // separators that produce empty segments.
+        slugify: (input) =>
+          input
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9/\s-]/g, '')
+            .replace(/[\s-]+/g, '-')
+            .replace(/\/+/g, '/')
+            .replace(/^\/|\/$/g, '')
+            .slice(0, 96),
       },
     }),
     defineField({

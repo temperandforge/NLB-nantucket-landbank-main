@@ -15,6 +15,44 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: ../sanity.schema.json
+export type SocialLink = {
+  _type: 'socialLink'
+  platform: 'facebook' | 'instagram' | 'linkedin' | 'x' | 'youtube'
+  url: string
+}
+
+export type InfoLine = {
+  _type: 'infoLine'
+  text: string
+  href?: string
+}
+
+export type InfoColumn = {
+  _type: 'infoColumn'
+  heading: string
+  lines: Array<
+    {
+      _key: string
+    } & InfoLine
+  >
+}
+
+export type MenuLink = {
+  _type: 'menuLink'
+  label: string
+  link: Link
+}
+
+export type MenuGroup = {
+  _type: 'menuGroup'
+  label: string
+  children: Array<
+    {
+      _key: string
+    } & MenuLink
+  >
+}
+
 export type PageReference = {
   _ref: string
   _type: 'reference'
@@ -227,6 +265,52 @@ export type CommissionersPage = {
   eyebrow: string
   heading: string
   intro?: string
+}
+
+export type MenuReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'menu'
+}
+
+export type Footer = {
+  _id: string
+  _type: 'footer'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  newsletterHeading: string
+  infoColumns?: Array<
+    {
+      _key: string
+    } & InfoColumn
+  >
+  footerMenu?: MenuReference
+  legalMenu?: MenuReference
+  socialLinks?: Array<
+    {
+      _key: string
+    } & SocialLink
+  >
+  organizationName: string
+}
+
+export type Menu = {
+  _id: string
+  _type: 'menu'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  items: Array<
+    | ({
+        _key: string
+      } & MenuGroup)
+    | ({
+        _key: string
+      } & MenuLink)
+  >
 }
 
 export type Settings = {
@@ -571,6 +655,11 @@ export type Geopoint = {
 }
 
 export type AllSanitySchemaTypes =
+  | SocialLink
+  | InfoLine
+  | InfoColumn
+  | MenuLink
+  | MenuGroup
   | PageReference
   | PostReference
   | Link
@@ -589,6 +678,9 @@ export type AllSanitySchemaTypes =
   | Commissioner
   | StaffPage
   | CommissionersPage
+  | MenuReference
+  | Footer
+  | Menu
   | Settings
   | Page
   | PersonReference

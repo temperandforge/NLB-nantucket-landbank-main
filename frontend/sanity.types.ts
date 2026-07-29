@@ -15,6 +15,44 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: ../sanity.schema.json
+export type SocialLink = {
+  _type: 'socialLink'
+  platform: 'facebook' | 'instagram' | 'linkedin' | 'x' | 'youtube'
+  url: string
+}
+
+export type InfoLine = {
+  _type: 'infoLine'
+  text: string
+  href?: string
+}
+
+export type InfoColumn = {
+  _type: 'infoColumn'
+  heading: string
+  lines: Array<
+    {
+      _key: string
+    } & InfoLine
+  >
+}
+
+export type MenuLink = {
+  _type: 'menuLink'
+  label: string
+  link: Link
+}
+
+export type MenuGroup = {
+  _type: 'menuGroup'
+  label: string
+  children: Array<
+    {
+      _key: string
+    } & MenuLink
+  >
+}
+
 export type PageReference = {
   _ref: string
   _type: 'reference'
@@ -127,6 +165,154 @@ export type Button = {
   link?: Link
 }
 
+export type DepartmentReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'department'
+}
+
+export type StaffMember = {
+  _id: string
+  _type: 'staffMember'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  picture?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  jobTitle: string
+  department: DepartmentReference
+  displayOrder: number
+}
+
+export type Department = {
+  _id: string
+  _type: 'department'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  displayOrder: number
+}
+
+export type Slug = {
+  _type: 'slug'
+  current: string
+  source?: string
+}
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop'
+  top: number
+  bottom: number
+  left: number
+  right: number
+}
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot'
+  x: number
+  y: number
+  height: number
+  width: number
+}
+
+export type Commissioner = {
+  _id: string
+  _type: 'commissioner'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  picture?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  role: string
+  termEndDate: string
+  displayOrder: number
+}
+
+export type StaffPage = {
+  _id: string
+  _type: 'staffPage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  eyebrow: string
+  heading: string
+  intro?: string
+}
+
+export type CommissionersPage = {
+  _id: string
+  _type: 'commissionersPage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  eyebrow: string
+  heading: string
+  intro?: string
+}
+
+export type MenuReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'menu'
+}
+
+export type Footer = {
+  _id: string
+  _type: 'footer'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  newsletterHeading: string
+  infoColumns?: Array<
+    {
+      _key: string
+    } & InfoColumn
+  >
+  footerMenu?: MenuReference
+  legalMenu?: MenuReference
+  socialLinks?: Array<
+    {
+      _key: string
+    } & SocialLink
+  >
+  organizationName: string
+}
+
+export type Menu = {
+  _id: string
+  _type: 'menu'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  items: Array<
+    | ({
+        _key: string
+      } & MenuGroup)
+    | ({
+        _key: string
+      } & MenuLink)
+  >
+}
+
 export type Settings = {
   _id: string
   _type: 'settings'
@@ -165,22 +351,6 @@ export type Settings = {
     metadataBase?: string
     _type: 'image'
   }
-}
-
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop'
-  top: number
-  bottom: number
-  left: number
-  right: number
-}
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot'
-  x: number
-  y: number
-  height: number
-  width: number
 }
 
 export type Page = {
@@ -248,12 +418,6 @@ export type Person = {
     alt?: string
     _type: 'image'
   }
-}
-
-export type Slug = {
-  _type: 'slug'
-  current: string
-  source?: string
 }
 
 export type SanityAssistInstructionTask = {
@@ -491,6 +655,11 @@ export type Geopoint = {
 }
 
 export type AllSanitySchemaTypes =
+  | SocialLink
+  | InfoLine
+  | InfoColumn
+  | MenuLink
+  | MenuGroup
   | PageReference
   | PostReference
   | Link
@@ -500,14 +669,23 @@ export type AllSanitySchemaTypes =
   | BlockContentTextOnly
   | BlockContent
   | Button
-  | Settings
+  | DepartmentReference
+  | StaffMember
+  | Department
+  | Slug
   | SanityImageCrop
   | SanityImageHotspot
+  | Commissioner
+  | StaffPage
+  | CommissionersPage
+  | MenuReference
+  | Footer
+  | Menu
+  | Settings
   | Page
   | PersonReference
   | Post
   | Person
-  | Slug
   | SanityAssistInstructionTask
   | SanityAssistTaskStatus
   | SanityAssistSchemaTypeAnnotations
@@ -571,6 +749,100 @@ export type SettingsQueryResult = {
     metadataBase?: string
     _type: 'image'
   }
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: footerQuery
+// Query: *[_type == "footer" && _id == "footer"][0]{    newsletterHeading,    organizationName,    infoColumns[]{      _key,      heading,      lines[]{        _key,        text,        href      }    },    socialLinks[]{      _key,      platform,      url    },    "footerMenu": footerMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,        link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }    }  }  }    },    "legalMenu": legalMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,        link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }    }  }  }    },  }
+export type FooterQueryResult = {
+  newsletterHeading: string
+  organizationName: string
+  infoColumns: Array<{
+    _key: string
+    heading: string
+    lines: Array<{
+      _key: string
+      text: string
+      href: string | null
+    }>
+  }> | null
+  socialLinks: Array<{
+    _key: string
+    platform: 'facebook' | 'instagram' | 'linkedin' | 'x' | 'youtube'
+    url: string
+  }> | null
+  footerMenu: {
+    _id: string
+    title: string
+    items: Array<
+      | {
+          _key: string
+          _type: 'menuGroup'
+          label: string
+          children: Array<{
+            _key: string
+            label: string
+            link: {
+              _type: 'link'
+              linkType?: 'href' | 'page' | 'post'
+              href?: string
+              page: string | null
+              post: string | null
+              openInNewTab?: boolean
+            }
+          }>
+        }
+      | {
+          _key: string
+          _type: 'menuLink'
+          label: string
+          link: {
+            _type: 'link'
+            linkType?: 'href' | 'page' | 'post'
+            href?: string
+            page: string | null
+            post: string | null
+            openInNewTab?: boolean
+          }
+        }
+    >
+  } | null
+  legalMenu: {
+    _id: string
+    title: string
+    items: Array<
+      | {
+          _key: string
+          _type: 'menuGroup'
+          label: string
+          children: Array<{
+            _key: string
+            label: string
+            link: {
+              _type: 'link'
+              linkType?: 'href' | 'page' | 'post'
+              href?: string
+              page: string | null
+              post: string | null
+              openInNewTab?: boolean
+            }
+          }>
+        }
+      | {
+          _key: string
+          _type: 'menuLink'
+          label: string
+          link: {
+            _type: 'link'
+            linkType?: 'href' | 'page' | 'post'
+            href?: string
+            page: string | null
+            post: string | null
+            openInNewTab?: boolean
+          }
+        }
+    >
+  } | null
 } | null
 
 // Source: sanity/lib/queries.ts
@@ -818,6 +1090,7 @@ import '@sanity/client'
 declare module '@sanity/client' {
   interface SanityQueries {
     '*[_type == "settings"][0]': SettingsQueryResult
+    '\n  *[_type == "footer" && _id == "footer"][0]{\n    newsletterHeading,\n    organizationName,\n    infoColumns[]{\n      _key,\n      heading,\n      lines[]{\n        _key,\n        text,\n        href\n      }\n    },\n    socialLinks[]{\n      _key,\n      platform,\n      url\n    },\n    "footerMenu": footerMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n    "legalMenu": legalMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n  }\n': FooterQueryResult
     '\n  *[_type == \'page\' && slug.current == $slug][0]{\n    _id,\n    _type,\n    name,\n    slug,\n    heading,\n    subheading,\n    "pageBuilder": pageBuilder[]{\n      ...,\n      _type == "callToAction" => {\n        ...,\n        button {\n          ...,\n          \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n        }\n      },\n      _type == "infoSection" => {\n        content[]{\n          ...,\n          markDefs[]{\n            ...,\n            \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n          }\n        }\n      },\n    },\n  }\n': GetPageQueryResult
     '\n  *[_type == "page" || _type == "post" && defined(slug.current)] | order(_type asc) {\n    "slug": slug.current,\n    _type,\n    _updatedAt,\n  }\n': SitemapDataResult
     '\n  *[_type == "post" && defined(slug.current)] | order(date desc, _updatedAt desc) {\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  "date": coalesce(date, _updatedAt),\n  "author": author->{firstName, lastName, picture},\n\n  }\n': AllPostsQueryResult

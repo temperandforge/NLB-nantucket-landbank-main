@@ -1,4 +1,13 @@
-import {CaseIcon, CogIcon, DocumentsIcon, FolderIcon, SquareIcon, UsersIcon} from '@sanity/icons'
+import {
+  CaseIcon,
+  CogIcon,
+  DocumentsIcon,
+  EarthGlobeIcon,
+  FolderIcon,
+  MenuIcon,
+  SquareIcon,
+  UsersIcon,
+} from '@sanity/icons'
 import type {StructureBuilder, StructureResolver} from 'sanity/structure'
 import pluralize from 'pluralize-esm'
 
@@ -14,6 +23,10 @@ import pluralize from 'pluralize-esm'
  *  - Flexible pages: the page-builder 'page' type - the client freely composes and reorders
  *    sections, e.g. Home, About Us.
  * Site Settings sits outside both - it's global config with no page of its own, not a page.
+ *
+ * Globals holds content that appears on every page rather than on a page of its own: the
+ * Footer singleton and the reusable Menus it references. The header menu will join it here
+ * without needing a schema change.
  */
 
 // Index pages - singletons, one fixed instance each, edited directly rather than picked
@@ -39,6 +52,9 @@ const DISABLED_TYPES = [
   'page',
   'assist.instruction.context',
   'person',
+  // Handled explicitly under Globals below.
+  'footer',
+  'menu',
 ]
 
 export const structure: StructureResolver = (S: StructureBuilder) =>
@@ -91,6 +107,25 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
         ),
       S.documentTypeListItem('post').title('News'),
       S.divider(),
+      // Globals: content rendered on every page rather than on a page of its own. Menus live
+      // here rather than under Page Content because they are navigation, not content.
+      S.listItem()
+        .title('Globals')
+        .icon(EarthGlobeIcon)
+        .child(
+          S.list()
+            .title('Globals')
+            .items([
+              S.listItem()
+                .title('Footer')
+                .icon(FolderIcon)
+                .child(S.document().schemaType('footer').documentId('footer')),
+              S.listItem()
+                .title('Menus')
+                .icon(MenuIcon)
+                .child(S.documentTypeList('menu').title('Menus')),
+            ]),
+        ),
       // Site Settings: global config with no page/route of its own - deliberately outside
       // Page Content, since it is neither an Index page nor a Flexible page.
       S.listItem()

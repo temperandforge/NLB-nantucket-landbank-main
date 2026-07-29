@@ -1,5 +1,6 @@
 import {commissioner} from './documents/commissioner'
 import {department} from './documents/department'
+import {menu} from './documents/menu'
 import {person} from './documents/person'
 import {page} from './documents/page'
 import {post} from './documents/post'
@@ -7,9 +8,15 @@ import {staffMember} from './documents/staffMember'
 import {callToAction} from './objects/callToAction'
 import {infoSection} from './objects/infoSection'
 import {settings} from './singletons/settings'
+import {footer} from './singletons/footer'
 import {commissionersPage} from './singletons/commissionersPage'
 import {staffPage} from './singletons/staffPage'
 import {link} from './objects/link'
+import {menuGroup} from './objects/menuGroup'
+import {menuLink} from './objects/menuLink'
+import {infoColumn} from './objects/infoColumn'
+import {infoLine} from './objects/infoLine'
+import {socialLink} from './objects/socialLink'
 import {blockContent} from './objects/blockContent'
 import button from './objects/button'
 import {blockContentTextOnly} from './objects/blockContentTextOnly'
@@ -19,6 +26,7 @@ import {blockContentTextOnly} from './objects/blockContentTextOnly'
 export const schemaTypes = [
   // Singletons
   settings,
+  footer,
   commissionersPage,
   staffPage,
   // Documents
@@ -28,6 +36,7 @@ export const schemaTypes = [
   commissioner,
   staffMember,
   department,
+  menu,
   // Objects
   button,
   blockContent,
@@ -35,4 +44,11 @@ export const schemaTypes = [
   infoSection,
   callToAction,
   link,
+  // Menu building blocks - menuGroup nests menuLink, capped at two levels
+  menuGroup,
+  menuLink,
+  // Footer info columns and social links
+  infoColumn,
+  infoLine,
+  socialLink,
 ]
