@@ -13,9 +13,26 @@ const postFields = /* groq */ `
   "author": author->{firstName, lastName, picture},
 `
 
+/**
+ * Assembles a page's URL path from its parent chain.
+ *
+ * The single source of truth for how a page URL is built - reused by the page lookup,
+ * generateStaticParams, the sitemap and link resolution. Do not re-inline it.
+ *
+ * GROQ cannot recurse, so the depth is fixed here at 3 segments (two ancestors); see
+ * docs/DECISIONS.md 2.4 and 2.5. Must be evaluated in a scope where the current document is a
+ * page. Raising the depth means updating this, the Presentation routes in studio/sanity.config.ts,
+ * and the validation in studio/src/schemaTypes/documents/page.ts together.
+ */
+const pagePath = /* groq */ `select(
+  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,
+  defined(parent) => parent->slug.current + "/" + slug.current,
+  slug.current
+)`
+
 const linkReference = /* groq */ `
   _type == "link" => {
-    "page": page->slug.current,
+    "page": page->{"path": ${pagePath}}.path,
     "post": post->slug.current
   }
 `
@@ -85,14 +102,22 @@ export const footerQuery = defineQuery(`
   }
 `)
 
+/**
+ * Look up a page by its full derived path.
+ *
+ * Filters on the leaf slug first so the database does the narrowing, then compares the assembled
+ * path - two pages under different parents may share a leaf slug. pathOnly pages are excluded so
+ * a grouping segment like /about-us resolves to nothing and the route 404s.
+ */
 export const getPageQuery = defineQuery(`
-  *[_type == 'page' && slug.current == $slug][0]{
+  *[_type == 'page' && slug.current == $leaf && !coalesce(pathOnly, false)]{
     _id,
     _type,
     name,
     slug,
     heading,
     subheading,
+    "path": ${pagePath},
     "pageBuilder": pageBuilder[]{
       ...,
       _type == "callToAction" => {
@@ -112,14 +137,24 @@ export const getPageQuery = defineQuery(`
         }
       },
     },
-  }
+  }[path == $path][0]
 `)
 
+/**
+ * Sitemap entries.
+ *
+ * pathOnly pages are excluded because they 404, and the parentheses around the type check are
+ * deliberate - without them `&& defined(slug.current)` binds only to the post branch, so pages
+ * with no slug were being included.
+ */
 export const sitemapData = defineQuery(`
-  *[_type == "page" || _type == "post" && defined(slug.current)] | order(_type asc) {
-    "slug": slug.current,
+  *[
+    (_type == "post" && defined(slug.current)) ||
+    (_type == "page" && defined(slug.current) && !coalesce(pathOnly, false))
+  ] | order(_type asc) {
     _type,
     _updatedAt,
+    "slug": select(_type == "page" => ${pagePath}, slug.current),
   }
 `)
 
@@ -153,7 +188,8 @@ export const postPagesSlugs = defineQuery(`
   {"slug": slug.current}
 `)
 
+// pathOnly pages are excluded: they have no route, so prerendering one would 404.
 export const pagesSlugs = defineQuery(`
-  *[_type == "page" && defined(slug.current)]
-  {"slug": slug.current}
+  *[_type == "page" && defined(slug.current) && !coalesce(pathOnly, false)]
+  {"slug": ${pagePath}}
 `)

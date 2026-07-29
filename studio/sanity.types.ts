@@ -360,8 +360,10 @@ export type Page = {
   _updatedAt: string
   _rev: string
   name: string
+  parent?: PageReference
   slug: Slug
-  heading: string
+  pathOnly?: boolean
+  heading?: string
   subheading?: string
   pageBuilder?: Array<
     | ({

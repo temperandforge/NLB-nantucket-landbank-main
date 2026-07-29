@@ -16,6 +16,11 @@ import {
   type DocumentLocation,
 } from 'sanity/presentation'
 import {assist} from '@sanity/assist'
+import {
+  buildPagePath,
+  PAGE_LOCATION_SELECT,
+  PAGE_PRESENTATION_ROUTES,
+} from './src/lib/pageHierarchy'
 
 // Environment variables for project configuration
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'your-projectID'
@@ -32,12 +37,13 @@ const homeLocation = {
 
 // resolveHref() is a convenience function that resolves the URL
 // path for different document types and used in the presentation tool.
+//
+// Pages are deliberately absent: a page's URL comes from its parent chain, not its slug alone,
+// so it is assembled in that type's location resolver below rather than from a single value here.
 function resolveHref(documentType?: string, slug?: string): string | undefined {
   switch (documentType) {
     case 'post':
       return slug ? `/posts/${slug}` : undefined
-    case 'page':
-      return slug ? `/${slug}` : undefined
     default:
       console.warn('Invalid document type:', documentType)
       return undefined
@@ -68,27 +74,17 @@ export default defineConfig({
             route: '/',
             filter: `_type == "settings" && _id == "siteSettings"`,
           },
-          {
-            route: '/:slug',
-            filter: `_type == "page" && slug.current == $slug || _id == $slug`,
-          },
-          // Page slugs may contain slashes to nest a page under a section, e.g.
-          // "about-us/conservation", where the parent segment has no page of its own. The
-          // single-segment route above cannot match those, so resolve two- and three-segment
-          // paths by reassembling the slug. Listed after /posts/:slug would shadow it, so
-          // this sits below the more specific post route.
+          // Ahead of the page routes below, which would otherwise capture /posts/:slug as a
+          // two-segment page path.
           {
             route: '/posts/:slug',
-            filter: `_type == "post" && slug.current == $slug || _id == $slug`,
+            // Parenthesised deliberately: without it && binds tighter than ||, so the filter
+            // matched any document whose _id happened to equal the slug.
+            filter: `_type == "post" && (slug.current == $slug || _id == $slug)`,
           },
-          {
-            route: '/:parent/:slug',
-            filter: `_type == "page" && slug.current == $parent + "/" + $slug`,
-          },
-          {
-            route: '/:grandparent/:parent/:slug',
-            filter: `_type == "page" && slug.current == $grandparent + "/" + $parent + "/" + $slug`,
-          },
+          // One route per URL depth, defined in src/lib/pageHierarchy.ts so the same filters can
+          // be exercised by scripts/verifyPageRouting.ts instead of being restated there.
+          ...PAGE_PRESENTATION_ROUTES,
         ]),
         // Locations Resolver API allows you to define where data is being used in your application. https://www.sanity.io/docs/visual-editing/presentation-resolver-api#8d8bca7bfcd7
         locations: {
@@ -98,18 +94,31 @@ export default defineConfig({
             tone: 'positive',
           }),
           page: defineLocations({
-            select: {
-              name: 'name',
-              slug: 'slug.current',
+            // Dereferences the parent chain so the URL can be assembled here the same way the
+            // frontend assembles it. Depth-bounded via src/lib/pageHierarchy.ts.
+            select: PAGE_LOCATION_SELECT,
+            resolve: (doc) => {
+              // A path-only page groups its children in the URL but is not viewable itself, so
+              // it has no location to point at.
+              if (doc?.pathOnly) {
+                return {
+                  locations: [],
+                  message: 'This page only groups its children in the URL - it has no page of its own.',
+                }
+              }
+              const path = buildPagePath([doc?.grandparentSlug, doc?.parentSlug, doc?.slug])
+              if (!path) {
+                return {locations: [], message: 'Add a slug to preview this page.'}
+              }
+              return {
+                locations: [
+                  {
+                    title: doc?.name || 'Untitled',
+                    href: `/${path}`,
+                  },
+                ],
+              }
             },
-            resolve: (doc) => ({
-              locations: [
-                {
-                  title: doc?.name || 'Untitled',
-                  href: resolveHref('page', doc?.slug)!,
-                },
-              ],
-            }),
           }),
           post: defineLocations({
             select: {

@@ -360,8 +360,10 @@ export type Page = {
   _updatedAt: string
   _rev: string
   name: string
+  parent?: PageReference
   slug: Slug
-  heading: string
+  pathOnly?: boolean
+  heading?: string
   subheading?: string
   pageBuilder?: Array<
     | ({
@@ -753,7 +755,7 @@ export type SettingsQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: footerQuery
-// Query: *[_type == "footer" && _id == "footer"][0]{    newsletterHeading,    organizationName,    infoColumns[]{      _key,      heading,      lines[]{        _key,        text,        href      }    },    socialLinks[]{      _key,      platform,      url    },    "footerMenu": footerMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,        link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }    }  }  }    },    "legalMenu": legalMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,        link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }    }  }  }    },  }
+// Query: *[_type == "footer" && _id == "footer"][0]{    newsletterHeading,    organizationName,    infoColumns[]{      _key,      heading,      lines[]{        _key,        text,        href      }    },    socialLinks[]{      _key,      platform,      url    },    "footerMenu": footerMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path,    "post": post->slug.current  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,        link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path,    "post": post->slug.current  }      }    }  }  }    },    "legalMenu": legalMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path,    "post": post->slug.current  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,        link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path,    "post": post->slug.current  }      }    }  }  }    },  }
 export type FooterQueryResult = {
   newsletterHeading: string
   organizationName: string
@@ -847,14 +849,15 @@ export type FooterQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: getPageQuery
-// Query: *[_type == 'page' && slug.current == $slug][0]{    _id,    _type,    name,    slug,    heading,    subheading,    "pageBuilder": pageBuilder[]{      ...,      _type == "callToAction" => {        ...,        button {          ...,            link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }        }      },      _type == "infoSection" => {        content[]{          ...,          markDefs[]{            ...,              _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }          }        }      },    },  }
+// Query: *[_type == 'page' && slug.current == $leaf && !coalesce(pathOnly, false)]{    _id,    _type,    name,    slug,    heading,    subheading,    "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),    "pageBuilder": pageBuilder[]{      ...,      _type == "callToAction" => {        ...,        button {          ...,            link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path,    "post": post->slug.current  }      }        }      },      _type == "infoSection" => {        content[]{          ...,          markDefs[]{            ...,              _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path,    "post": post->slug.current  }          }        }      },    },  }[path == $path][0]
 export type GetPageQueryResult = {
   _id: string
   _type: 'page'
   name: string
   slug: Slug
-  heading: string
+  heading: string | null
   subheading: string | null
+  path: string | null
   pageBuilder: Array<
     | {
         _key: string
@@ -928,17 +931,17 @@ export type GetPageQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: sitemapData
-// Query: *[_type == "page" || _type == "post" && defined(slug.current)] | order(_type asc) {    "slug": slug.current,    _type,    _updatedAt,  }
+// Query: *[    (_type == "post" && defined(slug.current)) ||    (_type == "page" && defined(slug.current) && !coalesce(pathOnly, false))  ] | order(_type asc) {    _type,    _updatedAt,    "slug": select(_type == "page" => select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current), slug.current),  }
 export type SitemapDataResult = Array<
   | {
-      slug: string
       _type: 'page'
       _updatedAt: string
+      slug: string | null
     }
   | {
-      slug: string
       _type: 'post'
       _updatedAt: string
+      slug: string
     }
 >
 
@@ -1008,7 +1011,7 @@ export type MorePostsQueryResult = Array<{
 
 // Source: sanity/lib/queries.ts
 // Variable: postQuery
-// Query: *[_type == "post" && slug.current == $slug] [0] {    content[]{    ...,    markDefs[]{      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }    }  },      _id,  "status": select(_originalId in path("drafts.**") => "draft", "published"),  "title": coalesce(title, "Untitled"),  "slug": slug.current,  excerpt,  coverImage,  "date": coalesce(date, _updatedAt),  "author": author->{firstName, lastName, picture},  }
+// Query: *[_type == "post" && slug.current == $slug] [0] {    content[]{    ...,    markDefs[]{      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path,    "post": post->slug.current  }    }  },      _id,  "status": select(_originalId in path("drafts.**") => "draft", "published"),  "title": coalesce(title, "Untitled"),  "slug": slug.current,  excerpt,  coverImage,  "date": coalesce(date, _updatedAt),  "author": author->{firstName, lastName, picture},  }
 export type PostQueryResult = {
   content: Array<
     | {
@@ -1080,9 +1083,9 @@ export type PostPagesSlugsResult = Array<{
 
 // Source: sanity/lib/queries.ts
 // Variable: pagesSlugs
-// Query: *[_type == "page" && defined(slug.current)]  {"slug": slug.current}
+// Query: *[_type == "page" && defined(slug.current) && !coalesce(pathOnly, false)]  {"slug": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}
 export type PagesSlugsResult = Array<{
-  slug: string
+  slug: string | null
 }>
 
 // Query TypeMap
@@ -1090,13 +1093,13 @@ import '@sanity/client'
 declare module '@sanity/client' {
   interface SanityQueries {
     '*[_type == "settings"][0]': SettingsQueryResult
-    '\n  *[_type == "footer" && _id == "footer"][0]{\n    newsletterHeading,\n    organizationName,\n    infoColumns[]{\n      _key,\n      heading,\n      lines[]{\n        _key,\n        text,\n        href\n      }\n    },\n    socialLinks[]{\n      _key,\n      platform,\n      url\n    },\n    "footerMenu": footerMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n    "legalMenu": legalMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n  }\n': FooterQueryResult
-    '\n  *[_type == \'page\' && slug.current == $slug][0]{\n    _id,\n    _type,\n    name,\n    slug,\n    heading,\n    subheading,\n    "pageBuilder": pageBuilder[]{\n      ...,\n      _type == "callToAction" => {\n        ...,\n        button {\n          ...,\n          \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n        }\n      },\n      _type == "infoSection" => {\n        content[]{\n          ...,\n          markDefs[]{\n            ...,\n            \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n          }\n        }\n      },\n    },\n  }\n': GetPageQueryResult
-    '\n  *[_type == "page" || _type == "post" && defined(slug.current)] | order(_type asc) {\n    "slug": slug.current,\n    _type,\n    _updatedAt,\n  }\n': SitemapDataResult
+    '\n  *[_type == "footer" && _id == "footer"][0]{\n    newsletterHeading,\n    organizationName,\n    infoColumns[]{\n      _key,\n      heading,\n      lines[]{\n        _key,\n        text,\n        href\n      }\n    },\n    socialLinks[]{\n      _key,\n      platform,\n      url\n    },\n    "footerMenu": footerMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n    "legalMenu": legalMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n  }\n': FooterQueryResult
+    '\n  *[_type == \'page\' && slug.current == $leaf && !coalesce(pathOnly, false)]{\n    _id,\n    _type,\n    name,\n    slug,\n    heading,\n    subheading,\n    "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n    "pageBuilder": pageBuilder[]{\n      ...,\n      _type == "callToAction" => {\n        ...,\n        button {\n          ...,\n          \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n      }\n\n        }\n      },\n      _type == "infoSection" => {\n        content[]{\n          ...,\n          markDefs[]{\n            ...,\n            \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n          }\n        }\n      },\n    },\n  }[path == $path][0]\n': GetPageQueryResult
+    '\n  *[\n    (_type == "post" && defined(slug.current)) ||\n    (_type == "page" && defined(slug.current) && !coalesce(pathOnly, false))\n  ] | order(_type asc) {\n    _type,\n    _updatedAt,\n    "slug": select(_type == "page" => select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n), slug.current),\n  }\n': SitemapDataResult
     '\n  *[_type == "post" && defined(slug.current)] | order(date desc, _updatedAt desc) {\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  "date": coalesce(date, _updatedAt),\n  "author": author->{firstName, lastName, picture},\n\n  }\n': AllPostsQueryResult
     '\n  *[_type == "post" && _id != $skip && defined(slug.current)] | order(date desc, _updatedAt desc) [0...$limit] {\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  "date": coalesce(date, _updatedAt),\n  "author": author->{firstName, lastName, picture},\n\n  }\n': MorePostsQueryResult
-    '\n  *[_type == "post" && slug.current == $slug] [0] {\n    content[]{\n    ...,\n    markDefs[]{\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n    }\n  },\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  "date": coalesce(date, _updatedAt),\n  "author": author->{firstName, lastName, picture},\n\n  }\n': PostQueryResult
+    '\n  *[_type == "post" && slug.current == $slug] [0] {\n    content[]{\n    ...,\n    markDefs[]{\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n    }\n  },\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  "date": coalesce(date, _updatedAt),\n  "author": author->{firstName, lastName, picture},\n\n  }\n': PostQueryResult
     '\n  *[_type == "post" && defined(slug.current)]\n  {"slug": slug.current}\n': PostPagesSlugsResult
-    '\n  *[_type == "page" && defined(slug.current)]\n  {"slug": slug.current}\n': PagesSlugsResult
+    '\n  *[_type == "page" && defined(slug.current) && !coalesce(pathOnly, false)]\n  {"slug": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}\n': PagesSlugsResult
   }
 }

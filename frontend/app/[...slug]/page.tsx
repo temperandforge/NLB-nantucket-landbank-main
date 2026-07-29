@@ -1,28 +1,33 @@
 import type {Metadata} from 'next'
 import Head from 'next/head'
+import {notFound} from 'next/navigation'
 
 import PageBuilderPage from '@/components/PageBuilder'
 import {sanityFetch} from '@/sanity/lib/live'
 import {getPageQuery, pagesSlugs} from '@/sanity/lib/queries'
 import {GetPageQueryResult} from '@/sanity.types'
-import {PageOnboarding} from '@/components/Onboarding'
 
 /**
- * This is a catch-all segment rather than a single [slug] because page slugs may contain
- * slashes to nest a page under a section, e.g. "about-us/conservation". The parent segment
- * ("about-us") intentionally has no page of its own, so there is no real route hierarchy to
- * build from - the whole path is one slug stored on one document.
+ * This is a catch-all segment rather than a single [slug] because a page URL spans as many
+ * segments as its parent chain is deep ("/about-us/conservation"), while grouping ancestors are
+ * marked pathOnly and have no page of their own - so there is no real route hierarchy to build.
+ * One catch-all owns every page path.
  *
  * More specific routes still win over this one: /posts/x matches app/posts/[slug] and /map
  * matches app/map, both of which Next.js checks before a catch-all.
  */
 
+/** Split a derived path ("about-us/conservation") into catch-all segments. */
+function toSegments(path: string): string[] {
+  return path.split('/').filter(Boolean)
+}
+
 /**
- * Convert a stored slug ("about-us/conservation") into the array shape a catch-all segment
- * expects (["about-us", "conservation"]).
+ * The query narrows on the leaf slug and then matches the full assembled path, so both are
+ * needed. An empty segment list cannot match a page and is treated as not found.
  */
-function toSegments(slug: string): string[] {
-  return slug.split('/').filter(Boolean)
+function toQueryParams(segments: string[]): {leaf: string; path: string} {
+  return {leaf: segments[segments.length - 1] ?? '', path: segments.join('/')}
 }
 
 /**
@@ -41,6 +46,8 @@ export async function generateStaticParams() {
     .map((page) => ({slug: toSegments(page.slug)}))
 }
 
+export const dynamicParams = true
+
 /**
  * Generate metadata for the page.
  * Learn more: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#generatemetadata-function
@@ -49,7 +56,7 @@ export async function generateMetadata(props: PageProps<'/[...slug]'>): Promise<
   const {slug} = await props.params
   const {data: page} = await sanityFetch({
     query: getPageQuery,
-    params: {slug: slug.join('/')},
+    params: toQueryParams(slug),
     // Metadata should never contain stega
     stega: false,
   })
@@ -63,15 +70,14 @@ export async function generateMetadata(props: PageProps<'/[...slug]'>): Promise<
 export default async function Page(props: PageProps<'/[...slug]'>) {
   const {slug} = await props.params
   const [{data: page}] = await Promise.all([
-    sanityFetch({query: getPageQuery, params: {slug: slug.join('/')}}),
+    sanityFetch({query: getPageQuery, params: toQueryParams(slug)}),
   ])
 
+  // No page at this path - including a pathOnly grouping segment like /about-us, which the query
+  // deliberately excludes. A real 404 rather than the starter's "no content" placeholder, which
+  // was returning 200 for every unmatched URL.
   if (!page?._id) {
-    return (
-      <div className="py-40">
-        <PageOnboarding />
-      </div>
-    )
+    notFound()
   }
 
   return (
