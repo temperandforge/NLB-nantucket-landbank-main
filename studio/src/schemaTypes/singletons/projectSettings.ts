@@ -66,11 +66,23 @@ export const projectSettings = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'trailsData',
+      title: 'Trails data file',
+      type: 'file',
+      group: 'map',
+      description:
+        'GeoJSON of the trail tracks, drawn as lines beneath the property boundaries. Unlike the boundary file, nothing points into this one - every line in it is drawn. Leave empty to hide the trails layer.',
+      options: {
+        accept: '.geojson,.json,application/geo+json,application/json',
+      },
+    }),
+    defineField({
       name: 'defaultCenter',
       title: 'Default map centre',
       type: 'geopoint',
       group: 'map',
-      description: 'Where the map opens. Defaults to Nantucket if empty.',
+      description:
+        'Where the map opens. Defaults to Nantucket if empty. Note that an uploaded trails file currently overrides this, since the map zooms to fit the trails once they load.',
     }),
     defineField({
       name: 'defaultZoom',

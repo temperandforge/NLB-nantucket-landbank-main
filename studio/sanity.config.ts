@@ -9,6 +9,7 @@ import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './src/schemaTypes'
 import {structure} from './src/structure'
 import {unsplashImageAsset} from 'sanity-plugin-asset-source-unsplash'
+import {media} from 'sanity-plugin-media'
 import {
   presentationTool,
   defineDocuments,
@@ -146,6 +147,15 @@ export default defineConfig({
     }),
     // Additional plugins for enhanced functionality
     unsplashImageAsset(),
+    /**
+     * Media browser. Adds a "Media" tool for browsing, tagging and bulk-managing every asset in
+     * the dataset, and registers itself as an asset source on image and file fields.
+     *
+     * Left unconfigured deliberately: it is enabled for file fields as well as images, which is
+     * what lets an editor re-select an already-uploaded GeoJSON on Project Settings rather than
+     * having to upload it again.
+     */
+    media(),
     assist(),
     visionTool(),
   ],

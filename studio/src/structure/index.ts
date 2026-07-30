@@ -63,6 +63,9 @@ const DISABLED_TYPES = [
   'propertyType',
   'resource',
   'projectSettings',
+  // Internal to sanity-plugin-media. Tags are managed inside the Media tool, so listing them at
+  // the root would just be a dead end for an editor.
+  'media.tag',
 ]
 
 export const structure: StructureResolver = (S: StructureBuilder) =>

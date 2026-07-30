@@ -18,9 +18,6 @@ import {
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? ''
 
-/** Sample trails track, drawn beneath the property boundaries. Static, not authored in Sanity. */
-const TRAILS_GEOJSON_URL = '/geojson/sample.geojson'
-
 interface MapboxMapProps {
   projects: Project[]
   settings: MapSettings | null
@@ -93,6 +90,7 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
 
   const boundaryUrl = settings?.boundaryDataUrl ?? null
   const idProperty = settings?.boundaryIdProperty ?? 'id'
+  const trailsUrl = settings?.trailsDataUrl ?? null
 
   useEffect(() => {
     let cancelled = false
@@ -119,44 +117,63 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
     })
     mapRef.current = map
 
-    // Sample trails track. Separate from the property boundaries, which are keyed per project.
-    map.on('load', async () => {
-      try {
-        const response = await fetch(TRAILS_GEOJSON_URL)
-        if (!response.ok) return
-        const geojsonData = await response.json()
+    /**
+     * Trails track, uploaded on Project Settings. Separate from the property boundaries: nothing
+     * points into this file, so every line in it is drawn.
+     *
+     * Guarded rather than returned early - the control and the cleanup below must still run when no
+     * trails file is uploaded.
+     */
+    if (trailsUrl) {
+      map.on('load', async () => {
+        try {
+          const response = await fetch(trailsUrl)
+          if (!response.ok) {
+            console.error(`Could not download the trails GeoJSON (${response.status}).`)
+            return
+          }
+          const geojsonData = await response.json()
+          const features: GeoJSON.Feature[] = Array.isArray(geojsonData?.features)
+            ? geojsonData.features
+            : []
+          if (!features.length) return
 
-        geojsonData.features.forEach((feature: GeoJSON.Feature, index: number) => {
-          feature.id = index
-        })
+          features.forEach((feature, index) => {
+            feature.id = index
+          })
 
-        map.addSource('gpx-route', {type: 'geojson', data: geojsonData})
+          map.addSource('gpx-route', {type: 'geojson', data: geojsonData})
 
-        map.addLayer({
-          id: 'gpx-route-line',
-          type: 'line',
-          source: 'gpx-route',
-          layout: {'line-join': 'round', 'line-cap': 'round'},
-          paint: {'line-color': '#c60024', 'line-width': 1},
-        })
+          map.addLayer({
+            id: 'gpx-route-line',
+            type: 'line',
+            source: 'gpx-route',
+            layout: {'line-join': 'round', 'line-cap': 'round'},
+            paint: {'line-color': '#c60024', 'line-width': 1},
+          })
 
-        const coordinates = geojsonData.features.flatMap((feature: GeoJSON.Feature) => {
-          if (feature.geometry.type === 'LineString') return feature.geometry.coordinates
-          if (feature.geometry.type === 'MultiLineString') return feature.geometry.coordinates.flat()
-          return []
-        })
+          const coordinates = features.flatMap((feature) => {
+            if (feature.geometry.type === 'LineString') return feature.geometry.coordinates
+            if (feature.geometry.type === 'MultiLineString')
+              return feature.geometry.coordinates.flat()
+            return []
+          })
 
-        if (coordinates.length > 0) {
-          const bounds = coordinates.reduce(
-            (acc: mapboxgl.LngLatBounds, coord: [number, number]) => acc.extend(coord),
-            new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]),
-          )
-          map.fitBounds(bounds, {padding: 40})
+          if (coordinates.length > 0) {
+            const bounds = coordinates.reduce(
+              (acc: mapboxgl.LngLatBounds, coord) => acc.extend(coord as [number, number]),
+              new mapboxgl.LngLatBounds(
+                coordinates[0] as [number, number],
+                coordinates[0] as [number, number],
+              ),
+            )
+            map.fitBounds(bounds, {padding: 40})
+          }
+        } catch (error) {
+          console.error('Failed to load the trails GeoJSON:', error)
         }
-      } catch (error) {
-        console.error('Failed to load the trails GeoJSON:', error)
-      }
-    })
+      })
+    }
 
     map.addControl(new mapboxgl.NavigationControl(), 'top-right')
 

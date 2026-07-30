@@ -149,6 +149,7 @@ export const mapSettingsQuery = defineQuery(`
     intro,
     "boundaryDataUrl": boundaryData.asset->url,
     "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),
+    "trailsDataUrl": trailsData.asset->url,
     defaultCenter,
     defaultZoom
   }

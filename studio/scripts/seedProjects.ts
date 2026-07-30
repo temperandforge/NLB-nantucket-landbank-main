@@ -19,7 +19,7 @@
  * Pass --dry to print the plan without writing.
  */
 
-import {readFileSync} from 'node:fs'
+import {existsSync, readFileSync} from 'node:fs'
 import {join} from 'node:path'
 
 import {getCliClient} from 'sanity/cli'
@@ -29,6 +29,12 @@ const client = getCliClient({apiVersion: '2025-09-25'})
 const DRY_RUN = process.argv.includes('--dry')
 
 const BOUNDARY_FILE = join(__dirname, 'data', 'boundaries.geojson')
+
+/**
+ * The trails track that used to be fetched from a hardcoded /geojson/sample.geojson path. Seeded
+ * into Project Settings so the layer is authored rather than shipped in the bundle.
+ */
+const TRAILS_FILE = join(__dirname, '..', '..', 'frontend', 'public', 'geojson', 'sample.geojson')
 
 /** Matches the "id" property on each feature in boundaries.geojson. */
 const BOUNDARY_ID_PROPERTY = 'id'
@@ -197,10 +203,12 @@ async function main() {
   const settings = await client.fetch<{
     _id: string
     hasBoundaryData: boolean
+    hasTrailsData: boolean
   } | null>(
     `*[_type == "projectSettings" && _id == "projectSettings"][0]{
        _id,
-       "hasBoundaryData": defined(boundaryData.asset)
+       "hasBoundaryData": defined(boundaryData.asset),
+       "hasTrailsData": defined(trailsData.asset)
      }`,
   )
 
@@ -231,6 +239,27 @@ async function main() {
       })
       .commit()
     console.log('  + settings written')
+  }
+
+  // The trails layer used to be a hardcoded fetch of /geojson/sample.geojson. Uploading it here
+  // makes it authored content, so the client can replace it without a deploy.
+  if (settings?.hasTrailsData) {
+    console.log('  = trails data already uploaded, left untouched')
+  } else if (!existsSync(TRAILS_FILE)) {
+    console.warn(`  ! trails file not found, skipped: ${TRAILS_FILE}`)
+  } else if (DRY_RUN) {
+    console.log(`  + would upload ${TRAILS_FILE} as the trails data file`)
+  } else {
+    const asset = await client.assets.upload('file', readFileSync(TRAILS_FILE), {
+      filename: 'nantucket-trails.geojson',
+      contentType: 'application/geo+json',
+    })
+    await client.createIfNotExists({_id: 'projectSettings', _type: 'projectSettings'})
+    await client
+      .patch('projectSettings')
+      .set({trailsData: {_type: 'file', asset: {_type: 'reference', _ref: asset._id}}})
+      .commit()
+    console.log(`  + uploaded trails file (${asset._id})`)
   }
 
   console.log(`\n${DRY_RUN ? 'Dry run complete.' : 'Done.'}`)
