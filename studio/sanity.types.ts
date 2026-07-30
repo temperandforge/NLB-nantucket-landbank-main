@@ -165,6 +165,75 @@ export type Button = {
   link?: Link
 }
 
+export type Resource = {
+  _id: string
+  _type: 'resource'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+}
+
+export type Slug = {
+  _type: 'slug'
+  current: string
+  source?: string
+}
+
+export type PropertyType = {
+  _id: string
+  _type: 'propertyType'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+}
+
+export type PropertyTypeReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'propertyType'
+}
+
+export type ResourceReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'resource'
+}
+
+export type Project = {
+  _id: string
+  _type: 'project'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  slug: Slug
+  propertyTypes?: Array<
+    {
+      _key: string
+    } & PropertyTypeReference
+  >
+  resources?: Array<
+    {
+      _key: string
+    } & ResourceReference
+  >
+  boundaryId?: string
+  location?: Geopoint
+}
+
+export type Geopoint = {
+  _type: 'geopoint'
+  lat?: number
+  lng?: number
+  alt?: number
+}
+
 export type DepartmentReference = {
   _ref: string
   _type: 'reference'
@@ -203,12 +272,6 @@ export type Department = {
   displayOrder: number
 }
 
-export type Slug = {
-  _type: 'slug'
-  current: string
-  source?: string
-}
-
 export type SanityImageCrop = {
   _type: 'sanity.imageCrop'
   top: number
@@ -243,6 +306,32 @@ export type Commissioner = {
   role: string
   termEndDate: string
   displayOrder: number
+}
+
+export type SanityFileAssetReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'sanity.fileAsset'
+}
+
+export type ProjectSettings = {
+  _id: string
+  _type: 'projectSettings'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  eyebrow?: string
+  heading?: string
+  intro?: string
+  boundaryData?: {
+    asset?: SanityFileAssetReference
+    media?: unknown
+    _type: 'file'
+  }
+  boundaryIdProperty: string
+  defaultCenter?: Geopoint
+  defaultZoom?: number
 }
 
 export type StaffPage = {
@@ -649,13 +738,6 @@ export type SanityImageAsset = {
   source?: SanityAssetSourceData
 }
 
-export type Geopoint = {
-  _type: 'geopoint'
-  lat?: number
-  lng?: number
-  alt?: number
-}
-
 export type AllSanitySchemaTypes =
   | SocialLink
   | InfoLine
@@ -671,13 +753,21 @@ export type AllSanitySchemaTypes =
   | BlockContentTextOnly
   | BlockContent
   | Button
+  | Resource
+  | Slug
+  | PropertyType
+  | PropertyTypeReference
+  | ResourceReference
+  | Project
+  | Geopoint
   | DepartmentReference
   | StaffMember
   | Department
-  | Slug
   | SanityImageCrop
   | SanityImageHotspot
   | Commissioner
+  | SanityFileAssetReference
+  | ProjectSettings
   | StaffPage
   | CommissionersPage
   | MenuReference
@@ -708,4 +798,3 @@ export type AllSanitySchemaTypes =
   | SanityFileAsset
   | SanityAssetSourceData
   | SanityImageAsset
-  | Geopoint

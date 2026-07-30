@@ -27,6 +27,24 @@ Design docs live in [docs/superpowers/specs/](docs/superpowers/specs/).
 - **Compute derivable values at render** instead of storing them (e.g. the copyright year).
 - **Constrain singleton queries by `_type` as well as `_id`** — `_id` alone widens the generated
   type to a union with an all-null variant.
+- **Categorisation is referenced documents, not union types.** `propertyType` and `resource` are
+  documents so the client can extend them without a deploy. Never restate their values in frontend
+  code — derive from the generated query types.
+- **A taxonomy's slug is its stable key; its title is the label.** URL filters use the slug, so
+  renaming a title is safe and changing a slug breaks shared links.
+
+## Projects and the map
+
+- **`project` is a Land Bank property** — the things on the interactive map. It replaced the
+  hardcoded `frontend/app/map/properties.ts`.
+- **Boundary geometry is not stored per project.** One GeoJSON FeatureCollection on
+  `projectSettings.boundaryData` holds every boundary; a project stores only `boundaryId`.
+- **Which feature property holds the identifier is configurable** (`boundaryIdProperty`). The file
+  is the client's, so never hardcode a key like `MAP_ID`.
+- **Replacing the boundary file does not re-point any project.** Re-check assignments afterwards;
+  the `boundaryId` input flags a value that is no longer in the file.
+- **Mapbox does not render locally** — the token makes no `api.mapbox.com` request, so the style
+  never loads and no markers or outlines appear. Verify map *data* separately from map *rendering*.
 
 ## Page URLs
 

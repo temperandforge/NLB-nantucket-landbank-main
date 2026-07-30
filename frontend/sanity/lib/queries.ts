@@ -103,6 +103,55 @@ export const footerQuery = defineQuery(`
 `)
 
 /**
+ * Projects (the Land Bank properties shown on the interactive map).
+ *
+ * Taxonomies are dereferenced to their slug and title: the slug is the stable key the map's URL
+ * filters use, the title is what a visitor reads. A dereferenced entry is null when the referenced
+ * document is unpublished, so consumers must filter those out.
+ *
+ * Boundary geometry is not here - it lives in the single GeoJSON file on Project Settings, and
+ * boundaryId says which feature in it belongs to this project.
+ */
+export const projectsQuery = defineQuery(`
+  *[_type == "project" && defined(slug.current)] | order(name asc) {
+    _id,
+    name,
+    "slug": slug.current,
+    boundaryId,
+    location,
+    "propertyTypes": propertyTypes[]->{"slug": slug.current, title},
+    "resources": resources[]->{"slug": slug.current, title}
+  }
+`)
+
+/**
+ * Every available filter option, not just the ones currently in use - a category the client has
+ * created but not yet assigned should still appear in the dropdown.
+ */
+export const mapFiltersQuery = defineQuery(`{
+  "propertyTypes": *[_type == "propertyType" && defined(slug.current)] | order(title asc){
+    "slug": slug.current,
+    title
+  },
+  "resources": *[_type == "resource" && defined(slug.current)] | order(title asc){
+    "slug": slug.current,
+    title
+  }
+}`)
+
+export const mapSettingsQuery = defineQuery(`
+  *[_type == "projectSettings" && _id == "projectSettings"][0]{
+    eyebrow,
+    heading,
+    intro,
+    "boundaryDataUrl": boundaryData.asset->url,
+    "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),
+    defaultCenter,
+    defaultZoom
+  }
+`)
+
+/**
  * Look up a page by its full derived path.
  *
  * Filters on the leaf slug first so the database does the narrowing, then compares the assembled

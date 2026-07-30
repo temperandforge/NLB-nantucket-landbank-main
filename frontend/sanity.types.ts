@@ -165,6 +165,75 @@ export type Button = {
   link?: Link
 }
 
+export type Resource = {
+  _id: string
+  _type: 'resource'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+}
+
+export type Slug = {
+  _type: 'slug'
+  current: string
+  source?: string
+}
+
+export type PropertyType = {
+  _id: string
+  _type: 'propertyType'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+}
+
+export type PropertyTypeReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'propertyType'
+}
+
+export type ResourceReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'resource'
+}
+
+export type Project = {
+  _id: string
+  _type: 'project'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  slug: Slug
+  propertyTypes?: Array<
+    {
+      _key: string
+    } & PropertyTypeReference
+  >
+  resources?: Array<
+    {
+      _key: string
+    } & ResourceReference
+  >
+  boundaryId?: string
+  location?: Geopoint
+}
+
+export type Geopoint = {
+  _type: 'geopoint'
+  lat?: number
+  lng?: number
+  alt?: number
+}
+
 export type DepartmentReference = {
   _ref: string
   _type: 'reference'
@@ -203,12 +272,6 @@ export type Department = {
   displayOrder: number
 }
 
-export type Slug = {
-  _type: 'slug'
-  current: string
-  source?: string
-}
-
 export type SanityImageCrop = {
   _type: 'sanity.imageCrop'
   top: number
@@ -243,6 +306,32 @@ export type Commissioner = {
   role: string
   termEndDate: string
   displayOrder: number
+}
+
+export type SanityFileAssetReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'sanity.fileAsset'
+}
+
+export type ProjectSettings = {
+  _id: string
+  _type: 'projectSettings'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  eyebrow?: string
+  heading?: string
+  intro?: string
+  boundaryData?: {
+    asset?: SanityFileAssetReference
+    media?: unknown
+    _type: 'file'
+  }
+  boundaryIdProperty: string
+  defaultCenter?: Geopoint
+  defaultZoom?: number
 }
 
 export type StaffPage = {
@@ -649,13 +738,6 @@ export type SanityImageAsset = {
   source?: SanityAssetSourceData
 }
 
-export type Geopoint = {
-  _type: 'geopoint'
-  lat?: number
-  lng?: number
-  alt?: number
-}
-
 export type AllSanitySchemaTypes =
   | SocialLink
   | InfoLine
@@ -671,13 +753,21 @@ export type AllSanitySchemaTypes =
   | BlockContentTextOnly
   | BlockContent
   | Button
+  | Resource
+  | Slug
+  | PropertyType
+  | PropertyTypeReference
+  | ResourceReference
+  | Project
+  | Geopoint
   | DepartmentReference
   | StaffMember
   | Department
-  | Slug
   | SanityImageCrop
   | SanityImageHotspot
   | Commissioner
+  | SanityFileAssetReference
+  | ProjectSettings
   | StaffPage
   | CommissionersPage
   | MenuReference
@@ -708,7 +798,6 @@ export type AllSanitySchemaTypes =
   | SanityFileAsset
   | SanityAssetSourceData
   | SanityImageAsset
-  | Geopoint
 
 // Source: sanity/lib/queries.ts
 // Variable: settingsQuery
@@ -845,6 +934,52 @@ export type FooterQueryResult = {
         }
     >
   } | null
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: projectsQuery
+// Query: *[_type == "project" && defined(slug.current)] | order(name asc) {    _id,    name,    "slug": slug.current,    boundaryId,    location,    "propertyTypes": propertyTypes[]->{"slug": slug.current, title},    "resources": resources[]->{"slug": slug.current, title}  }
+export type ProjectsQueryResult = Array<{
+  _id: string
+  name: string
+  slug: string
+  boundaryId: string | null
+  location: Geopoint | null
+  propertyTypes: Array<{
+    slug: string
+    title: string
+  }> | null
+  resources: Array<{
+    slug: string
+    title: string
+  }> | null
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: mapFiltersQuery
+// Query: {  "propertyTypes": *[_type == "propertyType" && defined(slug.current)] | order(title asc){    "slug": slug.current,    title  },  "resources": *[_type == "resource" && defined(slug.current)] | order(title asc){    "slug": slug.current,    title  }}
+export type MapFiltersQueryResult = {
+  propertyTypes: Array<{
+    slug: string
+    title: string
+  }>
+  resources: Array<{
+    slug: string
+    title: string
+  }>
+}
+
+// Source: sanity/lib/queries.ts
+// Variable: mapSettingsQuery
+// Query: *[_type == "projectSettings" && _id == "projectSettings"][0]{    eyebrow,    heading,    intro,    "boundaryDataUrl": boundaryData.asset->url,    "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),    defaultCenter,    defaultZoom  }
+export type MapSettingsQueryResult = {
+  eyebrow: string | null
+  heading: string | null
+  intro: string | null
+  boundaryDataUrl: string | null
+  boundaryIdProperty: string
+  defaultCenter: Geopoint | null
+  defaultZoom: number | null
 } | null
 
 // Source: sanity/lib/queries.ts
@@ -1094,6 +1229,9 @@ declare module '@sanity/client' {
   interface SanityQueries {
     '*[_type == "settings"][0]': SettingsQueryResult
     '\n  *[_type == "footer" && _id == "footer"][0]{\n    newsletterHeading,\n    organizationName,\n    infoColumns[]{\n      _key,\n      heading,\n      lines[]{\n        _key,\n        text,\n        href\n      }\n    },\n    socialLinks[]{\n      _key,\n      platform,\n      url\n    },\n    "footerMenu": footerMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n    "legalMenu": legalMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n  }\n': FooterQueryResult
+    '\n  *[_type == "project" && defined(slug.current)] | order(name asc) {\n    _id,\n    name,\n    "slug": slug.current,\n    boundaryId,\n    location,\n    "propertyTypes": propertyTypes[]->{"slug": slug.current, title},\n    "resources": resources[]->{"slug": slug.current, title}\n  }\n': ProjectsQueryResult
+    '{\n  "propertyTypes": *[_type == "propertyType" && defined(slug.current)] | order(title asc){\n    "slug": slug.current,\n    title\n  },\n  "resources": *[_type == "resource" && defined(slug.current)] | order(title asc){\n    "slug": slug.current,\n    title\n  }\n}': MapFiltersQueryResult
+    '\n  *[_type == "projectSettings" && _id == "projectSettings"][0]{\n    eyebrow,\n    heading,\n    intro,\n    "boundaryDataUrl": boundaryData.asset->url,\n    "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),\n    defaultCenter,\n    defaultZoom\n  }\n': MapSettingsQueryResult
     '\n  *[_type == \'page\' && slug.current == $leaf && !coalesce(pathOnly, false)]{\n    _id,\n    _type,\n    name,\n    slug,\n    heading,\n    subheading,\n    "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n    "pageBuilder": pageBuilder[]{\n      ...,\n      _type == "callToAction" => {\n        ...,\n        button {\n          ...,\n          \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n      }\n\n        }\n      },\n      _type == "infoSection" => {\n        content[]{\n          ...,\n          markDefs[]{\n            ...,\n            \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n          }\n        }\n      },\n    },\n  }[path == $path][0]\n': GetPageQueryResult
     '\n  *[\n    (_type == "post" && defined(slug.current)) ||\n    (_type == "page" && defined(slug.current) && !coalesce(pathOnly, false))\n  ] | order(_type asc) {\n    _type,\n    _updatedAt,\n    "slug": select(_type == "page" => select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n), slug.current),\n  }\n': SitemapDataResult
     '\n  *[_type == "post" && defined(slug.current)] | order(date desc, _updatedAt desc) {\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  "date": coalesce(date, _updatedAt),\n  "author": author->{firstName, lastName, picture},\n\n  }\n': AllPostsQueryResult

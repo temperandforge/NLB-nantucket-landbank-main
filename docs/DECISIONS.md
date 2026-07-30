@@ -88,6 +88,68 @@ field.
 are selectable but render nothing until an icon is exported from Figma into
 `frontend/components/icons`. A platform with no icon is skipped, not rendered as an empty box.
 
+### 1.7 Projects are the map's properties, and their categorisation is referenced
+
+**Status:** Implemented
+
+`project` is a Land Bank property — the parcels, beaches, trails and ponds on the interactive map.
+It replaced the hardcoded array in `frontend/app/map/properties.ts`. Categorisation is by reference
+to `propertyType` and `resource` documents.
+
+**Why:** The taxonomies were TypeScript union types plus parallel label maps, so adding a category
+meant a code change and a deploy. As documents, the client owns them.
+
+**Implication:** The frontend must not restate the category list. Filter options come from the
+documents, and `frontend/app/map/types.ts` derives its types from the generated query results.
+A dereferenced taxonomy entry is null when its document is unpublished, so consumers filter those
+out rather than rendering a blank option.
+
+### 1.8 A taxonomy's slug is the stable key, its title is the label
+
+**Status:** Implemented
+
+Both `propertyType` and `resource` carry a slug and a title. The map's URL filters use the slug
+(`/map?propertyType=beach`).
+
+**Why:** Filter state is shareable and bookmarkable. Keying off the title would break every shared
+link the moment someone fixed a typo.
+
+**Implication:** Renaming a title is safe; changing a slug breaks existing links. The active-filter
+chips look their label up from the fetched options, so a slug left in a URL for a category that has
+since been deleted still renders as itself instead of blank.
+
+### 1.9 Boundary geometry lives in one file, not on the documents
+
+**Status:** Implemented
+
+The client maintains a single GeoJSON FeatureCollection covering every boundary, uploaded to
+`projectSettings.boundaryData`. Each project stores only `boundaryId`, naming one feature in it.
+
+**Why:** This is how the client works — one export from their GIS, not per-parcel geometry pasted
+into a CMS field. It also means re-exporting updates every boundary at once.
+
+**Implication:** Which feature property holds the identifier is **configurable**
+(`boundaryIdProperty`), because the file's schema is the client's, not ours — hardcoding a guess
+like `MAP_ID` would break on their first upload. Replacing the file does not re-point any project,
+so assignments must be re-checked afterwards. A duplicate identifier resolves to the first match,
+since choosing arbitrarily would make the map depend on file ordering.
+
+### 1.10 The boundary picker reads the real file
+
+**Status:** Implemented
+
+`boundaryId` uses a custom Studio input (`studio/src/components/BoundaryIdInput.tsx`) that loads the
+uploaded file, offers the identifiers it actually contains, and flags a stored value that is not
+among them.
+
+**Why:** A mistyped identifier produces a property that silently never draws on the map, with
+nothing in the Studio to indicate why. Across hundreds of parcels that is the likeliest failure
+mode in the whole feature.
+
+**Implication:** The input degrades to an explanatory message and the raw stored value when no file
+is uploaded, when it cannot be read, or when no feature carries the configured property — never a
+blank control with no explanation.
+
 ---
 
 ## 2. Page hierarchy and URLs
@@ -450,6 +512,14 @@ Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-desig
 - `/map` and the seeded `explore/interactive-map` page overlap; one should redirect.
 - The Studio's Flexible Pages list is flat. It shows each page's resolved path in the subtitle,
   but does not nest children under their parent, which gets harder to scan as pages are added.
+- `NEXT_PUBLIC_MAPBOX_TOKEN` does not work in local development: no request to `api.mapbox.com` is
+  ever made, so the Mapbox style never loads and the `load` event never fires. Markers and boundary
+  outlines therefore do not render locally. Pre-existing, and independent of where the data comes
+  from — the data pipeline itself is verified separately (see `seedProjects.ts` and section 1.9).
+- The boundary file currently in Sanity was generated from the geometry that used to be inline in
+  `properties.ts`, purely so the map keeps working until the client's real export arrives. It lives
+  at `studio/scripts/data/boundaries.geojson` and uses the project slug as each feature's `id`.
+- `project` has no page of its own and no body content. Explore → Properties is still `#`.
 - Renaming an ancestor's slug silently changes every descendant URL (2.3). There is no redirect
   mechanism for the old paths.
 - Mobile footer breakpoints are assumptions awaiting designer confirmation.

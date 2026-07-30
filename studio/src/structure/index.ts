@@ -2,10 +2,13 @@ import {
   CaseIcon,
   CogIcon,
   DocumentsIcon,
+  DropIcon,
   EarthGlobeIcon,
   FolderIcon,
   MenuIcon,
+  PinIcon,
   SquareIcon,
+  TagIcon,
   UsersIcon,
 } from '@sanity/icons'
 import type {StructureBuilder, StructureResolver} from 'sanity/structure'
@@ -55,6 +58,11 @@ const DISABLED_TYPES = [
   // Handled explicitly under Globals below.
   'footer',
   'menu',
+  // Handled explicitly under Projects below.
+  'project',
+  'propertyType',
+  'resource',
+  'projectSettings',
 ]
 
 export const structure: StructureResolver = (S: StructureBuilder) =>
@@ -106,6 +114,29 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
             ]),
         ),
       S.documentTypeListItem('post').title('News'),
+      // Projects: the Land Bank's properties, their categorisation, and the settings that
+      // configure both the projects page and the interactive map. Grouped together because the
+      // taxonomies are meaningless outside this section.
+      S.listItem()
+        .title('Projects')
+        .icon(PinIcon)
+        .child(
+          S.list()
+            .title('Projects')
+            .items([
+              S.documentTypeListItem('project').title('Projects').icon(PinIcon),
+              S.divider(),
+              S.documentTypeListItem('propertyType').title('Property Types').icon(TagIcon),
+              S.documentTypeListItem('resource').title('Resources').icon(DropIcon),
+              S.divider(),
+              S.listItem()
+                .title('Project Settings')
+                .icon(CogIcon)
+                .child(
+                  S.document().schemaType('projectSettings').documentId('projectSettings'),
+                ),
+            ]),
+        ),
       S.divider(),
       // Globals: content rendered on every page rather than on a page of its own. Menus live
       // here rather than under Page Content because they are navigation, not content.

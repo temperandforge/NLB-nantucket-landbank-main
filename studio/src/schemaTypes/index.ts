@@ -4,12 +4,16 @@ import {menu} from './documents/menu'
 import {person} from './documents/person'
 import {page} from './documents/page'
 import {post} from './documents/post'
+import {project} from './documents/project'
+import {propertyType} from './documents/propertyType'
+import {resource} from './documents/resource'
 import {staffMember} from './documents/staffMember'
 import {callToAction} from './objects/callToAction'
 import {infoSection} from './objects/infoSection'
 import {settings} from './singletons/settings'
 import {footer} from './singletons/footer'
 import {commissionersPage} from './singletons/commissionersPage'
+import {projectSettings} from './singletons/projectSettings'
 import {staffPage} from './singletons/staffPage'
 import {link} from './objects/link'
 import {menuGroup} from './objects/menuGroup'
@@ -29,6 +33,7 @@ export const schemaTypes = [
   footer,
   commissionersPage,
   staffPage,
+  projectSettings,
   // Documents
   page,
   post,
@@ -37,6 +42,10 @@ export const schemaTypes = [
   staffMember,
   department,
   menu,
+  project,
+  // Categorisation for projects - referenced, so the client can extend either without a deploy
+  propertyType,
+  resource,
   // Objects
   button,
   blockContent,
