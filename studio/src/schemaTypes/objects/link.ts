@@ -32,16 +32,24 @@ export const link = defineType({
       name: 'href',
       title: 'URL',
       type: 'url',
+      description:
+        'An absolute URL (https://example.com), a path on this site (/about-us/staff), or # as a placeholder until the real path is known.',
       hidden: ({parent}) => parent?.linkType !== 'href',
       validation: (Rule) =>
-        // Custom validation to ensure URL is provided if the link type is 'href'
-        Rule.custom((value, context) => {
-          const parent = context.parent as Link
-          if (parent?.linkType === 'href' && !value) {
-            return 'URL is required when Link Type is URL'
-          }
-          return true
-        }),
+        // allowRelative is required: many links here are site-relative paths rather than
+        // absolute URLs, and the default url validation rejects anything without an origin.
+        Rule.uri({
+          allowRelative: true,
+          scheme: ['http', 'https', 'mailto', 'tel'],
+        })
+          // Custom validation to ensure URL is provided if the link type is 'href'
+          .custom((value, context) => {
+            const parent = context.parent as Link
+            if (parent?.linkType === 'href' && !value) {
+              return 'URL is required when Link Type is URL'
+            }
+            return true
+          }),
     }),
     defineField({
       name: 'page',

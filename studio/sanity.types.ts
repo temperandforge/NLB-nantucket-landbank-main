@@ -15,6 +15,44 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: ../sanity.schema.json
+export type SocialLink = {
+  _type: 'socialLink'
+  platform: 'facebook' | 'instagram' | 'linkedin' | 'x' | 'youtube'
+  url: string
+}
+
+export type InfoLine = {
+  _type: 'infoLine'
+  text: string
+  href?: string
+}
+
+export type InfoColumn = {
+  _type: 'infoColumn'
+  heading: string
+  lines: Array<
+    {
+      _key: string
+    } & InfoLine
+  >
+}
+
+export type MenuLink = {
+  _type: 'menuLink'
+  label: string
+  link: Link
+}
+
+export type MenuGroup = {
+  _type: 'menuGroup'
+  label: string
+  children: Array<
+    {
+      _key: string
+    } & MenuLink
+  >
+}
+
 export type PageReference = {
   _ref: string
   _type: 'reference'
@@ -127,6 +165,253 @@ export type Button = {
   link?: Link
 }
 
+export type Resource = {
+  _id: string
+  _type: 'resource'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+}
+
+export type Slug = {
+  _type: 'slug'
+  current: string
+  source?: string
+}
+
+export type PropertyType = {
+  _id: string
+  _type: 'propertyType'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+}
+
+export type PropertyTypeReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'propertyType'
+}
+
+export type ResourceReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'resource'
+}
+
+export type Project = {
+  _id: string
+  _type: 'project'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  slug: Slug
+  image?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  description?: string
+  link?: string
+  propertyTypes?: Array<
+    {
+      _key: string
+    } & PropertyTypeReference
+  >
+  resources?: Array<
+    {
+      _key: string
+    } & ResourceReference
+  >
+  boundaryId?: string
+  location?: Geopoint
+}
+
+export type Geopoint = {
+  _type: 'geopoint'
+  lat?: number
+  lng?: number
+  alt?: number
+}
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop'
+  top: number
+  bottom: number
+  left: number
+  right: number
+}
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot'
+  x: number
+  y: number
+  height: number
+  width: number
+}
+
+export type DepartmentReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'department'
+}
+
+export type StaffMember = {
+  _id: string
+  _type: 'staffMember'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  picture?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  jobTitle: string
+  department: DepartmentReference
+  displayOrder: number
+}
+
+export type Department = {
+  _id: string
+  _type: 'department'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  displayOrder: number
+}
+
+export type Commissioner = {
+  _id: string
+  _type: 'commissioner'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  picture?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  role: string
+  termEndDate: string
+  displayOrder: number
+}
+
+export type SanityFileAssetReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'sanity.fileAsset'
+}
+
+export type ProjectSettings = {
+  _id: string
+  _type: 'projectSettings'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  eyebrow?: string
+  heading?: string
+  intro?: string
+  boundaryData?: {
+    asset?: SanityFileAssetReference
+    media?: unknown
+    _type: 'file'
+  }
+  boundaryIdProperty: string
+  defaultCenter?: Geopoint
+  defaultZoom?: number
+}
+
+export type StaffPage = {
+  _id: string
+  _type: 'staffPage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  eyebrow: string
+  heading: string
+  intro?: string
+}
+
+export type CommissionersPage = {
+  _id: string
+  _type: 'commissionersPage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  eyebrow: string
+  heading: string
+  intro?: string
+}
+
+export type MenuReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'menu'
+}
+
+export type Footer = {
+  _id: string
+  _type: 'footer'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  newsletterHeading: string
+  infoColumns?: Array<
+    {
+      _key: string
+    } & InfoColumn
+  >
+  footerMenu?: MenuReference
+  legalMenu?: MenuReference
+  socialLinks?: Array<
+    {
+      _key: string
+    } & SocialLink
+  >
+  organizationName: string
+}
+
+export type Menu = {
+  _id: string
+  _type: 'menu'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  items: Array<
+    | ({
+        _key: string
+      } & MenuGroup)
+    | ({
+        _key: string
+      } & MenuLink)
+  >
+}
+
 export type Settings = {
   _id: string
   _type: 'settings'
@@ -167,22 +452,6 @@ export type Settings = {
   }
 }
 
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop'
-  top: number
-  bottom: number
-  left: number
-  right: number
-}
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot'
-  x: number
-  y: number
-  height: number
-  width: number
-}
-
 export type Page = {
   _id: string
   _type: 'page'
@@ -190,8 +459,10 @@ export type Page = {
   _updatedAt: string
   _rev: string
   name: string
+  parent?: PageReference
   slug: Slug
-  heading: string
+  pathOnly?: boolean
+  heading?: string
   subheading?: string
   pageBuilder?: Array<
     | ({
@@ -248,12 +519,6 @@ export type Person = {
     alt?: string
     _type: 'image'
   }
-}
-
-export type Slug = {
-  _type: 'slug'
-  current: string
-  source?: string
 }
 
 export type SanityAssistInstructionTask = {
@@ -483,14 +748,12 @@ export type SanityImageAsset = {
   source?: SanityAssetSourceData
 }
 
-export type Geopoint = {
-  _type: 'geopoint'
-  lat?: number
-  lng?: number
-  alt?: number
-}
-
 export type AllSanitySchemaTypes =
+  | SocialLink
+  | InfoLine
+  | InfoColumn
+  | MenuLink
+  | MenuGroup
   | PageReference
   | PostReference
   | Link
@@ -500,14 +763,31 @@ export type AllSanitySchemaTypes =
   | BlockContentTextOnly
   | BlockContent
   | Button
-  | Settings
+  | Resource
+  | Slug
+  | PropertyType
+  | PropertyTypeReference
+  | ResourceReference
+  | Project
+  | Geopoint
   | SanityImageCrop
   | SanityImageHotspot
+  | DepartmentReference
+  | StaffMember
+  | Department
+  | Commissioner
+  | SanityFileAssetReference
+  | ProjectSettings
+  | StaffPage
+  | CommissionersPage
+  | MenuReference
+  | Footer
+  | Menu
+  | Settings
   | Page
   | PersonReference
   | Post
   | Person
-  | Slug
   | SanityAssistInstructionTask
   | SanityAssistTaskStatus
   | SanityAssistSchemaTypeAnnotations
@@ -528,4 +808,3 @@ export type AllSanitySchemaTypes =
   | SanityFileAsset
   | SanityAssetSourceData
   | SanityImageAsset
-  | Geopoint

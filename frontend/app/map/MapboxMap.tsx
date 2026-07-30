@@ -1,257 +1,301 @@
-"use client";
-import { useEffect, useRef } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
-import type { Property } from "./types";
-import { NANTUCKET_CENTER } from "./properties";
-import "../../css/popup.css";
+'use client'
 
-const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "";
+import {useEffect, useRef, useState} from 'react'
+import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
+import '../../css/popup.css'
+
+import {geometryCenter, loadBoundaryIndex, type BoundaryIndex} from './boundaries'
+import {
+  DEFAULT_ZOOM,
+  NANTUCKET_CENTER,
+  projectSlugs,
+  RESOURCE_SLUG,
+  toLngLat,
+  type MapSettings,
+  type Project,
+} from './types'
+
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? ''
+
+/** Sample trails track, drawn beneath the property boundaries. Static, not authored in Sanity. */
+const TRAILS_GEOJSON_URL = '/geojson/sample.geojson'
 
 interface MapboxMapProps {
-  properties: Property[];
+  projects: Project[]
+  settings: MapSettings | null
 }
 
-export function MapboxMap({ properties }: MapboxMapProps) {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<mapboxgl.Marker[]>([]);
+/** Popup content is injected as HTML, so any authored value must be escaped first. */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
 
-  useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return;
+/**
+ * Build the popup markup for a project. Styled by css/popup.css.
+ *
+ * Every interpolated value is escaped: these come from the CMS, and setHTML would otherwise let
+ * a stray angle bracket in a description break the markup.
+ */
+function buildPopupHtml(project: Project): string {
+  const resources = projectSlugs(project.resources)
 
-    mapboxgl.accessToken = MAPBOX_TOKEN;
+  const accessible = resources.includes(RESOURCE_SLUG.handicapAccessible)
+    ? '<div class="map-popup--is-accessible">Handicap Accessible</div>'
+    : ''
 
-    mapRef.current = new mapboxgl.Map({
-      container: mapContainerRef.current,
-      style: "mapbox://styles/tfdev/cmrmj301k000p01rdcrzp6qxr",
-      center: NANTUCKET_CENTER,
-      zoom: 11,
-    });
+  const parking = resources.includes(RESOURCE_SLUG.parking)
+    ? '<div class="map-popup--is-parking">Parking Availability</div>'
+    : ''
 
+  const image = project.image?.url
+    ? `<img class="map-popup-image" src="${encodeURI(project.image.url)}" alt="${escapeHtml(
+        project.image.alt ?? '',
+      )}" />`
+    : ''
 
+  const desc = project.description
+    ? `<p class="map-popup-desc">${escapeHtml(project.description)}</p>`
+    : ''
 
-    mapRef.current.on('load', async () => {
-      try {
-        if (!mapRef.current) return;
-        const map = mapRef.current;
+  const link = project.link
+    ? `<a class="map-popup-link" href="${encodeURI(project.link)}">Find out more</a>`
+    : ''
 
-        // 2. Fetch the pre-converted GeoJSON from /public/route.geojson
-        const response = await fetch('/geojson/sample.geojson');
-        const geojsonData = await response.json(); 
-
-        // Assign ID's to map elements
-        geojsonData.features.forEach((feature: GeoJSON.Feature, index: number) => {
-          feature.id = index;
-        });
-
-        // 3. Add the GeoJSON directly as a Mapbox source
-        mapRef.current.addSource('gpx-route', {
-          type: 'geojson',
-          data: geojsonData,
-        });
-
-        // 4. Add a line layer to render the track
-        mapRef.current.addLayer({
-          id: 'gpx-route-line',
-          type: 'line',
-          source: 'gpx-route',
-          layout: {
-            'line-join': 'round',
-            'line-cap': 'round',
-          },
-          paint: {
-            'line-color': '#c60024',
-            'line-width': 1,
-          },
-        });
-
-        // 5. Fit the map bounds around the GeoJSON feature coordinates
-        const coordinates = geojsonData.features.flatMap((feature: GeoJSON.Feature) => {
-          if (feature.geometry.type === 'LineString') {
-            return feature.geometry.coordinates;
-          }
-          if (feature.geometry.type === 'MultiLineString') {
-            return feature.geometry.coordinates.flat();
-          }
-          return [];
-        });
-
-        if (coordinates.length > 0) {
-          const bounds = coordinates.reduce(
-            (acc: mapboxgl.LngLatBounds, coord: [number, number]) => acc.extend(coord),
-            new mapboxgl.LngLatBounds(coordinates[0], coordinates[0])
-          );
-
-          map.fitBounds(bounds, { padding: 40 });
-        }
-      } catch (error) {
-        console.error('Failed to load route.geojson:', error);
-      }
-    });
-
-    mapRef.current.addControl(new mapboxgl.NavigationControl(), "top-right");
-
-    return () => {
-      mapRef.current?.remove();
-      mapRef.current = null;
-    };
-  }, []);
-
-  /**
-   * Helper function to build popup html
-   * @param property
-   * @returns html string
-   */
-  function buildPopupHtml(property: Property): string {
-    const accessible = property.resources.includes("handicap_accessible")
-      ? '<div class="map-popup--is-accessible">Handicap Accessible</div>'
-      : "";
-
-    const image = property.image
-      ? `<img class="map-popup-image" src="${encodeURI(property.image.url)}" alt="${property.image.alt ?? ""}" />`
-      : "";
-
-    const desc = property.desc
-      ? `<p class="map-popup-desc">${property.desc}</p>`
-      : "";
-
-    const parking = property.resources.includes("parking")
-      ? '<div class="map-popup--is-parking">Parking Availability</div>'
-      : "";
-
-    const link = property.link
-      ? `<a class="map-popup-link" href="${encodeURI(property.link)}">Find out more</a>`
-      : "";
-
-    return `
+  return `
       ${accessible}
       ${image}
       <div class="map-popup--content">
         <div class="map-popup--content__inner">
           <div class="map-popup--content__headline">
-            <p class="map-popup-title">${property.name}</p>
+            <p class="map-popup-title">${escapeHtml(project.name)}</p>
             ${desc}
           </div>
           ${parking}
         </div>
         ${link}
       </div>
-    `;
-  }
+    `
+}
+
+export function MapboxMap({projects, settings}: MapboxMapProps) {
+  const mapContainerRef = useRef<HTMLDivElement>(null)
+  const mapRef = useRef<mapboxgl.Map | null>(null)
+  const markersRef = useRef<mapboxgl.Marker[]>([])
+
+  // Boundaries come from one file shared by every project, so they are fetched once and indexed
+  // rather than re-read whenever the filters change.
+  const [boundaries, setBoundaries] = useState<BoundaryIndex>(() => new Map())
+
+  const boundaryUrl = settings?.boundaryDataUrl ?? null
+  const idProperty = settings?.boundaryIdProperty ?? 'id'
+
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
+    let cancelled = false
+    loadBoundaryIndex(boundaryUrl, idProperty).then((index) => {
+      if (!cancelled) setBoundaries(index)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [boundaryUrl, idProperty])
+
+  useEffect(() => {
+    if (!mapContainerRef.current || mapRef.current) return
+
+    mapboxgl.accessToken = MAPBOX_TOKEN
+
+    const center = toLngLat(settings?.defaultCenter) ?? NANTUCKET_CENTER
+
+    const map = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: 'mapbox://styles/tfdev/cmrmj301k000p01rdcrzp6qxr',
+      center,
+      zoom: settings?.defaultZoom ?? DEFAULT_ZOOM,
+    })
+    mapRef.current = map
+
+    // Sample trails track. Separate from the property boundaries, which are keyed per project.
+    map.on('load', async () => {
+      try {
+        const response = await fetch(TRAILS_GEOJSON_URL)
+        if (!response.ok) return
+        const geojsonData = await response.json()
+
+        geojsonData.features.forEach((feature: GeoJSON.Feature, index: number) => {
+          feature.id = index
+        })
+
+        map.addSource('gpx-route', {type: 'geojson', data: geojsonData})
+
+        map.addLayer({
+          id: 'gpx-route-line',
+          type: 'line',
+          source: 'gpx-route',
+          layout: {'line-join': 'round', 'line-cap': 'round'},
+          paint: {'line-color': '#c60024', 'line-width': 1},
+        })
+
+        const coordinates = geojsonData.features.flatMap((feature: GeoJSON.Feature) => {
+          if (feature.geometry.type === 'LineString') return feature.geometry.coordinates
+          if (feature.geometry.type === 'MultiLineString') return feature.geometry.coordinates.flat()
+          return []
+        })
+
+        if (coordinates.length > 0) {
+          const bounds = coordinates.reduce(
+            (acc: mapboxgl.LngLatBounds, coord: [number, number]) => acc.extend(coord),
+            new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]),
+          )
+          map.fitBounds(bounds, {padding: 40})
+        }
+      } catch (error) {
+        console.error('Failed to load the trails GeoJSON:', error)
+      }
+    })
+
+    map.addControl(new mapboxgl.NavigationControl(), 'top-right')
+
+    return () => {
+      map.remove()
+      mapRef.current = null
+    }
+    // Deliberately mount-only: re-running would tear down and rebuild the map, losing the
+    // visitor's pan and zoom every time a filter changed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
 
     function renderMarkersAndGeojson() {
-      if (!map) return;
+      if (!map) return
 
-      markersRef.current.forEach((marker) => marker.remove());
-      markersRef.current = [];
+      markersRef.current.forEach((marker) => marker.remove())
+      markersRef.current = []
 
-      for (const layerId of ["property-lines", "property-polygons"]) {
-        if (map.getLayer(layerId)) map.removeLayer(layerId);
+      for (const layerId of ['property-lines', 'property-polygons']) {
+        if (map.getLayer(layerId)) map.removeLayer(layerId)
       }
-      if (map.getSource("property-geojson")) map.removeSource("property-geojson");
+      if (map.getSource('property-geojson')) map.removeSource('property-geojson')
 
-      let hoveredStateId: number | undefined = undefined;
+      /**
+       * Markers and boundary features are built in one pass so a project's marker and its polygon
+       * share the same numeric feature id. Keying them off two separate indexes - one over all
+       * projects, one over only those with geometry - makes hovering highlight the wrong polygon as
+       * soon as a single project has no boundary assigned.
+       */
+      const features: GeoJSON.Feature[] = []
+      const markerEntries: {featureId: number; marker: mapboxgl.Marker}[] = []
 
-      for (const [index, property] of properties.entries()) {
-        const html = buildPopupHtml(property);
-        const popup = new mapboxgl.Popup({ offset: 24 }).setHTML(html);
+      for (const project of projects) {
+        const boundary = project.boundaryId ? boundaries.get(project.boundaryId) : undefined
 
-        const marker = new mapboxgl.Marker()
-          .setLngLat(property.coordinates)
-          .setPopup(popup)
-          .addTo(map);
-        markersRef.current.push(marker);
+        let featureId: number | undefined
+        if (boundary?.geometry) {
+          featureId = features.length
+          features.push({
+            id: featureId,
+            type: 'Feature',
+            properties: {id: project.boundaryId, name: project.name},
+            geometry: boundary.geometry,
+          })
+        }
 
-        const markerDiv = marker.getElement();
+        // An explicit marker position wins; otherwise fall back to the middle of the boundary. A
+        // project with neither gets no marker at all, rather than one at a made-up coordinate.
+        const position =
+          toLngLat(project.location) ??
+          (boundary?.geometry ? geometryCenter(boundary.geometry) : null)
 
-        markerDiv.addEventListener('mouseenter', () => {
-          // If the mouse moved from another feature, remove its hover state
-          if (hoveredStateId !== undefined) {
-            map.setFeatureState(
-              { source: 'property-geojson', id: hoveredStateId },
-              { hover: false }
-            );
-          }
-          // Set  hover state for new feature
-          hoveredStateId = index;
-          map.setFeatureState(
-              { source: 'property-geojson', id: hoveredStateId },
-              { hover: true }
-          );
+        if (!position) continue
 
-          // Marker  hover effect
-          markerDiv.style.transition = 'top .2s ease';
-          markerDiv.style.top = '-6px';
-          markerDiv.style.cursor = 'pointer';
-        });
+        const popup = new mapboxgl.Popup({offset: 24}).setHTML(buildPopupHtml(project))
 
-        markerDiv.addEventListener('mouseleave', () => {
-          if (hoveredStateId === undefined) return;
-
-          map.setFeatureState(
-              { source: 'property-geojson', id: hoveredStateId },
-              { hover: false }
-          );
-          // Marker hover effect
-          markerDiv.style.top = '0';
-          markerDiv.style.cursor = 'auto';
-        });
+        const marker = new mapboxgl.Marker().setLngLat(position).setPopup(popup).addTo(map)
+        markersRef.current.push(marker)
+        if (featureId !== undefined) markerEntries.push({featureId, marker})
       }
 
-      const geojsonFeatures = properties
-        .filter((property) => property.geojson)
-        .map((property, index) => ({
-          id: index,
-          type: "Feature" as const,
-          properties: { id: property.id, name: property.name },
-          geometry: property.geojson as GeoJSON.Geometry,
-        }));
-
-      if (geojsonFeatures.length > 0) {
-        map.addSource("property-geojson", {
-          type: "geojson",
-          data: { type: "FeatureCollection", features: geojsonFeatures },
-        });
+      if (features.length > 0) {
+        map.addSource('property-geojson', {
+          type: 'geojson',
+          data: {type: 'FeatureCollection', features},
+        })
 
         map.addLayer({
-          id: "property-lines",
-          type: "line",
-          source: "property-geojson",
-          filter: ["==", ["geometry-type"], "LineString"],
-          paint: { "line-color": "#2563eb", "line-width": 3 },
-        });
+          id: 'property-lines',
+          type: 'line',
+          source: 'property-geojson',
+          filter: ['==', ['geometry-type'], 'LineString'],
+          paint: {'line-color': '#2563eb', 'line-width': 3},
+        })
 
         map.addLayer({
-          id: "property-polygons",
-          type: "fill",
-          source: "property-geojson",
-          filter: ["==", ["geometry-type"], "Polygon"],
+          id: 'property-polygons',
+          type: 'fill',
+          source: 'property-geojson',
+          filter: ['==', ['geometry-type'], 'Polygon'],
           paint: {
-            "fill-color": "#2563eb",
-            "fill-opacity": [
+            'fill-color': '#2563eb',
+            'fill-opacity': [
               'case',
               ['boolean', ['feature-state', 'hover'], false],
               0.4, // hover
               0.2, // default
             ],
-            'fill-opacity-transition': {
-                'duration': 300,
-            }
+            'fill-opacity-transition': {duration: 300},
           },
-        });
+        })
+      }
+
+      // Hover wiring runs after the source exists - setFeatureState throws on an unknown source.
+      let hoveredStateId: number | undefined = undefined
+
+      for (const {featureId, marker} of markerEntries) {
+        const markerDiv = marker.getElement()
+
+        markerDiv.addEventListener('mouseenter', () => {
+          if (hoveredStateId !== undefined) {
+            map.setFeatureState({source: 'property-geojson', id: hoveredStateId}, {hover: false})
+          }
+          hoveredStateId = featureId
+          map.setFeatureState({source: 'property-geojson', id: featureId}, {hover: true})
+
+          markerDiv.style.transition = 'top .2s ease'
+          markerDiv.style.top = '-6px'
+          markerDiv.style.cursor = 'pointer'
+        })
+
+        markerDiv.addEventListener('mouseleave', () => {
+          if (hoveredStateId !== undefined) {
+            map.setFeatureState({source: 'property-geojson', id: hoveredStateId}, {hover: false})
+            hoveredStateId = undefined
+          }
+          markerDiv.style.top = '0'
+          markerDiv.style.cursor = 'auto'
+        })
       }
     }
 
     if (map.isStyleLoaded()) {
-      renderMarkersAndGeojson();
-    } else {
-      map.once("load", renderMarkersAndGeojson);
+      renderMarkersAndGeojson()
+      return
     }
-  }, [properties]);
 
-  return <div ref={mapContainerRef} className="h-full w-full" />;
+    // Waiting on the style. The listener is removed on cleanup: this effect re-runs whenever the
+    // filters change or the boundaries arrive, and without this each run would leave another
+    // handler behind, all of which would fire together once the style loaded.
+    map.once('load', renderMarkersAndGeojson)
+    return () => {
+      map.off('load', renderMarkersAndGeojson)
+    }
+  }, [projects, boundaries])
+
+  return <div ref={mapContainerRef} className="h-full w-full" />
 }

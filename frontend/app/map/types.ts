@@ -1,41 +1,69 @@
-export type PropertyType = "beach" | "trail" | "conservation" | "harbor" | "pond";
+import type {
+  MapFiltersQueryResult,
+  MapSettingsQueryResult,
+  ProjectsQueryResult,
+} from '@/sanity.types'
 
-export type Resource =
-  | "parking"
-  | "handicap_accessible"
-  | "restrooms"
-  | "lifeguard"
-  | "picnic_area"
-  | "dog_friendly";
+/**
+ * Map types derived from the generated GROQ result types, so they cannot drift from the queries.
+ *
+ * This file used to hold hardcoded PropertyType / Resource unions, a Property interface and
+ * parallel label maps. Those are now project / propertyType / resource documents in Sanity - a
+ * category can be added or renamed without a deploy, so the frontend must not restate the list.
+ */
 
-export interface Property {
-  id: string;
-  name: string;
-  propertyTypes: PropertyType[];
-  resources: Resource[];
-  coordinates: [number, number]; // [lng, lat]
-  geojson?: GeoJSON.Geometry;
-  image?: {
-    url: string;
-    alt?: string;
-  },
-  desc?: string;
-  link?: string;
+export type Project = ProjectsQueryResult[number]
+export type MapFilters = MapFiltersQueryResult
+export type MapSettings = NonNullable<MapSettingsQueryResult>
+
+/** A filter option as the dropdowns consume it. */
+export type FilterOption = {value: string; label: string}
+
+/** Fallback view when Project Settings has no default centre, i.e. the whole island. */
+export const NANTUCKET_CENTER: [number, number] = [-70.0995, 41.2835]
+export const DEFAULT_ZOOM = 11
+
+/**
+ * Resource slugs the map gives special treatment to in the popup.
+ *
+ * These are the slugs of `resource` documents, so they use hyphens - the old hardcoded union used
+ * underscores ("handicap_accessible"). Renaming a resource's title is safe; changing its slug
+ * breaks these badges, which is why they are named in one place.
+ */
+export const RESOURCE_SLUG = {
+  parking: 'parking',
+  handicapAccessible: 'handicap-accessible',
+} as const
+
+/**
+ * Turn taxonomy documents into dropdown options. A dereferenced entry is null when its document is
+ * unpublished, so those are dropped rather than rendered as a blank option.
+ */
+export function toFilterOptions(
+  entries: {slug: string; title: string}[] | null | undefined,
+): FilterOption[] {
+  return (entries ?? [])
+    .filter((entry) => Boolean(entry?.slug))
+    .map((entry) => ({value: entry.slug, label: entry.title}))
 }
 
-export const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
-  beach: "Beach",
-  trail: "Trail",
-  conservation: "Conservation Land",
-  harbor: "Harbor",
-  pond: "Pond",
-};
+/**
+ * Convert a Sanity geopoint to a Mapbox [lng, lat] pair.
+ *
+ * Returns null unless both coordinates are present: on the generated type they are optional, and
+ * defaulting a missing one to 0 would silently place the point in the Atlantic rather than
+ * revealing that the data is incomplete.
+ */
+export function toLngLat(
+  point: {lat?: number; lng?: number} | null | undefined,
+): [number, number] | null {
+  if (typeof point?.lng !== 'number' || typeof point?.lat !== 'number') return null
+  return [point.lng, point.lat]
+}
 
-export const RESOURCE_LABELS: Record<Resource, string> = {
-  parking: "Parking",
-  handicap_accessible: "Handicap Accessible",
-  restrooms: "Restrooms",
-  lifeguard: "Lifeguard",
-  picnic_area: "Picnic Area",
-  dog_friendly: "Dog Friendly",
-};
+/** The taxonomy slugs attached to a project, for filter matching and popup badges. */
+export function projectSlugs(
+  entries: {slug: string; title: string}[] | null | undefined,
+): string[] {
+  return (entries ?? []).filter((entry) => Boolean(entry?.slug)).map((entry) => entry.slug)
+}
