@@ -188,13 +188,14 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
      * TODO: remove this block, and the matching source/layers in renderMarkersAndGeojson, once
      * every parcel has been matched to a project.
      */
+    // TODO(all-boundaries): remove with the temporary all-boundaries layers
     for (const layerId of ['all-boundaries-lines', 'all-boundaries-polygons']) {
       map.on('click', layerId, (e) => {
-        const name = e.features?.[0]?.properties?.name
-        if (typeof name !== 'string') return
+        const boundaryIdValue = e.features?.[0]?.properties?.boundaryIdValue
+        if (typeof boundaryIdValue !== 'string') return
         new mapboxgl.Popup({offset: 12})
           .setLngLat(e.lngLat)
-          .setHTML(`<div class="map-popup-title">${escapeHtml(name)}</div>`)
+          .setHTML(`<div class="map-popup-title">${escapeHtml(boundaryIdValue)}</div>`)
           .addTo(map)
       })
     }
@@ -218,6 +219,7 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
       markersRef.current.forEach((marker) => marker.remove())
       markersRef.current = []
 
+      // TODO(all-boundaries): remove with the temporary all-boundaries layers
       for (const layerId of [
         'all-boundaries-lines',
         'all-boundaries-polygons',
@@ -226,6 +228,7 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
       ]) {
         if (map.getLayer(layerId)) map.removeLayer(layerId)
       }
+      // TODO(all-boundaries): remove with the temporary all-boundaries layers
       if (map.getSource('all-boundaries-geojson')) map.removeSource('all-boundaries-geojson')
       if (map.getSource('property-geojson')) map.removeSource('property-geojson')
 
@@ -237,8 +240,10 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
        */
       const features: GeoJSON.Feature[] = []
       const markerEntries: {featureId: number; marker: mapboxgl.Marker}[] = []
+      const assignedBoundaryIds = new Set<string>()
 
       for (const project of projects) {
+        if (project.boundaryId) assignedBoundaryIds.add(project.boundaryId)
         const boundary = project.boundaryId ? boundaries.get(project.boundaryId) : undefined
 
         let featureId: number | undefined
@@ -268,9 +273,18 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
       }
 
       if (boundaries.size > 0) {
+        // TODO(all-boundaries): remove with the temporary all-boundaries layers
         map.addSource('all-boundaries-geojson', {
           type: 'geojson',
-          data: {type: 'FeatureCollection', features: Array.from(boundaries.values())},
+          data: {
+            type: 'FeatureCollection',
+            features: Array.from(boundaries)
+              .filter(([id]) => !assignedBoundaryIds.has(id))
+              .map(([id, feature]) => ({
+                ...feature,
+                properties: {...feature.properties, boundaryIdValue: id},
+              })),
+          },
         })
 
         map.addLayer({
