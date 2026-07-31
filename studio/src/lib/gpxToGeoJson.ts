@@ -14,15 +14,37 @@ export function gpxToGeoJson(gpxText: string): GeoJSON.FeatureCollection {
   }
 
   const converted = gpx(xml) as GeoJSON.FeatureCollection
-  const features = converted.features
-    .filter((feature) => feature.geometry.type !== 'Point')
-    .map(closeIfLoop)
+  const features = dedupeFeatureNames(
+    converted.features.filter((feature) => feature.geometry.type !== 'Point').map(closeIfLoop),
+  )
 
   if (features.length === 0) {
     throw new Error('No tracks or routes found in this GPX file.')
   }
 
   return {type: 'FeatureCollection', features}
+}
+
+/**
+ * Replaces any feature's name that is blank or a duplicate of an earlier feature's name with
+ * `track_<position>` (1-based). Real client GPX data has been found to carry a literal blank
+ * `<name> </name>` on every track, which otherwise collides on the boundary-picker's dedup key.
+ */
+function dedupeFeatureNames(features: GeoJSON.Feature[]): GeoJSON.Feature[] {
+  const seen = new Set<string>()
+
+  return features.map((feature, i) => {
+    const rawName = feature.properties?.name
+    const trimmedName = typeof rawName === 'string' ? rawName.trim() : ''
+    const isBlank = trimmedName === ''
+    const isDuplicate = !isBlank && seen.has(trimmedName)
+
+    if (!isBlank) seen.add(trimmedName)
+
+    if (!isBlank && !isDuplicate) return feature
+
+    return {...feature, properties: {...feature.properties, name: `track_${i + 1}`}}
+  })
 }
 
 const CLOSE_TOLERANCE_METERS = 2
