@@ -20,6 +20,7 @@
     "@sanity/assist": "^6.0.7",
     "@sanity/icons": "^3.7.4",
     "@sanity/vision": "^5.31.1",
+    "@tmcw/togeojson": "^7.1.2",
     "date-fns": "^4.4.0",
     "pluralize-esm": "^9.0.5",
     "react": "^19.2.7",
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "@sanity/eslint-config-studio": "^6.0.0",
+    "@types/geojson": "^7946.0.16",
     "@types/react": "^19.2.16",
     "typescript": "^5.9.3"
   }
