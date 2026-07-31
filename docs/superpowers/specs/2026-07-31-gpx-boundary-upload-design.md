@@ -49,7 +49,8 @@ so a GPX upload needs to be converted before the rest of the map pipeline (`fron
 - For each remaining `LineString` feature, compute the haversine distance between its first and
   last coordinate. If within tolerance (~1–2m), close the ring and rewrite the feature as a
   `Polygon` with a single linear ring; otherwise leave it as a `LineString`.
-- `properties.name` comes from `togeojson`'s own handling of `<name>` (no extra work needed there).
+- `properties.name` comes from `togeojson`'s own handling of `<name>`, then gets the additional
+  blank/duplicate post-processing described in the amendment below.
 - Throws if the resulting `FeatureCollection` has zero features (no tracks/routes found), so the
   caller can surface an error and abort.
 

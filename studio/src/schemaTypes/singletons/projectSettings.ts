@@ -14,6 +14,10 @@ import GpxAwareFileInput from '../../components/GpxAwareFileInput'
  *  - Map: the single GeoJSON file holding every property boundary, plus how to read it.
  */
 
+/** Shared by `boundaryData` and `trailsData` — both accept GeoJSON or a GPX file to convert. */
+const GEOJSON_OR_GPX_ACCEPT =
+  '.geojson,.json,application/geo+json,application/json,.gpx,application/gpx+xml'
+
 export const projectSettings = defineType({
   name: 'projectSettings',
   title: 'Project Settings',
@@ -54,7 +58,7 @@ export const projectSettings = defineType({
       description:
         'One GeoJSON FeatureCollection containing every property boundary. Each project then points at a single feature inside it. Replacing this file does not change any project’s assignment, so check for warnings on the projects afterwards. A GPX file is also accepted and converted to GeoJSON automatically on upload — a closed track becomes a boundary polygon.',
       options: {
-        accept: '.geojson,.json,application/geo+json,application/json,.gpx,application/gpx+xml',
+        accept: GEOJSON_OR_GPX_ACCEPT,
       },
       components: {
         input: GpxAwareFileInput,
@@ -78,7 +82,7 @@ export const projectSettings = defineType({
       description:
         'GeoJSON of the trail tracks, drawn as lines beneath the property boundaries. Unlike the boundary file, nothing points into this one - every line in it is drawn. Leave empty to hide the trails layer. A GPX file is also accepted and converted to GeoJSON automatically on upload.',
       options: {
-        accept: '.geojson,.json,application/geo+json,application/json,.gpx,application/gpx+xml',
+        accept: GEOJSON_OR_GPX_ACCEPT,
       },
       components: {
         input: GpxAwareFileInput,
