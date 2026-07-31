@@ -264,16 +264,16 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
       const assignedBoundaryIds = new Set<string>()
 
       for (const project of projects) {
-        if (project.boundaryId) assignedBoundaryIds.add(project.boundaryId)
-        const boundary = project.boundaryId ? boundaries.get(project.boundaryId) : undefined
+        for (const boundaryId of project.boundaryIds ?? []) {
+          assignedBoundaryIds.add(boundaryId)
+          const boundary = boundaries.get(boundaryId)
+          if (!boundary?.geometry) continue
 
-        let featureId: number | undefined
-        if (boundary?.geometry) {
-          featureId = features.length
+          const featureId = features.length
           features.push({
             id: featureId,
             type: 'Feature',
-            properties: {id: project.boundaryId, name: project.name},
+            properties: {id: boundaryId, name: project.name},
             geometry: boundary.geometry,
           })
           projectByFeatureIdRef.current.set(featureId, project)
@@ -282,18 +282,16 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
         // Markers are off entirely for now - every property relies on clicking its polygon (see
         // the property-polygons click handler above) to see its popup.
         //
-        // TODO(markers): to bring pins back, restore this (previously gated on
-        // projectSlugs(project.propertyTypes).includes(PROPERTY_TYPE_SLUG.beach) for beach-only,
-        // or unconditionally for everyone):
+        // TODO(markers): to bring pins back, restore something like this per project (previously
+        // gated on projectSlugs(project.propertyTypes).includes(PROPERTY_TYPE_SLUG.beach) for
+        // beach-only, or unconditionally for everyone) - a project may have several boundaries
+        // now, so pick project.location or the first resolved boundary's centre:
         //
-        //   const position =
-        //     toLngLat(project.location) ??
-        //     (boundary?.geometry ? geometryCenter(boundary.geometry) : null)
+        //   const position = toLngLat(project.location) ?? null
         //   if (!position) continue
         //   const popup = new mapboxgl.Popup({offset: 24}).setHTML(buildPopupHtml(project))
         //   const marker = new mapboxgl.Marker().setLngLat(position).setPopup(popup).addTo(map)
         //   markersRef.current.push(marker)
-        //   if (featureId !== undefined) markerEntries.push({featureId, marker})
       }
 
       if (boundaries.size > 0) {

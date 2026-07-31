@@ -1372,10 +1372,13 @@
         },
         "optional": true
       },
-      "boundaryId": {
+      "boundaryIds": {
         "type": "objectAttribute",
         "value": {
-          "type": "string"
+          "type": "array",
+          "of": {
+            "type": "string"
+          }
         },
         "optional": true
       },

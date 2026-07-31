@@ -117,7 +117,7 @@ export const projectsQuery = defineQuery(`
     _id,
     name,
     "slug": slug.current,
-    boundaryId,
+    boundaryIds,
     location,
     description,
     link,
