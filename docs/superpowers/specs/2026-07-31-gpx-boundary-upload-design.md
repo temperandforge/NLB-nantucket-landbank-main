@@ -19,6 +19,16 @@ so a GPX upload needs to be converted before the rest of the map pipeline (`fron
 - **Track/route `<name>` becomes `properties.name`** on the corresponding GeoJSON feature. Editors
   set `boundaryIdProperty` to `"name"` for a GPX-sourced file — `BoundaryIdInput.tsx` needs no
   changes, it already reads whatever property `boundaryIdProperty` names.
+- **A blank or duplicated name is replaced with an auto-numbered fallback.** Real-world GPX
+  exports were found (via manual verification with the client's actual `LandBankProperties.gpx`)
+  to sometimes carry a literal `<name> </name>` — a single space — on every track, with no other
+  identifying tag anywhere in the file. Copying that straight into `properties.name` produces
+  every feature with the same unusable, colliding value, which makes `boundaryIdProperty: "name"`
+  unusable — `BoundaryIdInput`'s dedup logic collapses them all into one option. So after copying
+  `<name>`, `gpxToGeoJson` post-processes the feature list: any feature whose `name` is
+  empty/whitespace-only, or a duplicate of a name already seen earlier in the same file, gets
+  replaced with `track_<n>` (`<n>` = 1-based position in the FeatureCollection). Non-blank,
+  non-duplicated names are left untouched.
 - **A closed track becomes a `Polygon`; an open one stays a `LineString`.** "Closed" means the
   first and last points of a track/route are within ~1–2 meters of each other (haversine
   distance). This lets one converter serve both boundary polygons and trail lines without
