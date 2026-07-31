@@ -83,6 +83,7 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<mapboxgl.Map | null>(null)
   const markersRef = useRef<mapboxgl.Marker[]>([])
+  const projectByFeatureIdRef = useRef<Map<number, Project>>(new Map())
 
   // Boundaries come from one file shared by every project, so they are fetched once and indexed
   // rather than re-read whenever the filters change.
@@ -200,6 +201,25 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
       })
     }
 
+    /**
+     * A project's boundary polygon should open the same popup its marker does - not just the
+     * pin. Registered once here, not inside renderMarkersAndGeojson (which reruns on every
+     * filter/boundary change), for the same reason as the all-boundaries click handlers above:
+     * Mapbox GL layer-scoped listeners persist across removeLayer/addLayer cycles for the same
+     * layer id, so registering this inside renderMarkersAndGeojson would stack up duplicate
+     * handlers every time it reruns.
+     */
+    map.on('click', 'property-polygons', (e) => {
+      const featureId = e.features?.[0]?.id
+      if (typeof featureId !== 'number') return
+      const project = projectByFeatureIdRef.current.get(featureId)
+      if (!project) return
+      new mapboxgl.Popup({offset: 12})
+        .setLngLat(e.lngLat)
+        .setHTML(buildPopupHtml(project))
+        .addTo(map)
+    })
+
     return () => {
       map.remove()
       mapRef.current = null
@@ -218,6 +238,7 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
 
       markersRef.current.forEach((marker) => marker.remove())
       markersRef.current = []
+      projectByFeatureIdRef.current = new Map()
 
       // TODO(all-boundaries): remove with the temporary all-boundaries layers
       for (const layerId of [
@@ -255,6 +276,7 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
             properties: {id: project.boundaryId, name: project.name},
             geometry: boundary.geometry,
           })
+          projectByFeatureIdRef.current.set(featureId, project)
         }
 
         // An explicit marker position wins; otherwise fall back to the middle of the boundary. A
