@@ -177,6 +177,28 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
 
     map.addControl(new mapboxgl.NavigationControl(), 'top-right')
 
+    /**
+     * Temporary: shows every boundary in the file, not just ones a project points at, so the
+     * unnamed real-world parcels (LandBankProperties.gpx converted to track_1, track_2, ...) can
+     * be matched to projects by hand. Registered once here, not inside renderMarkersAndGeojson
+     * (which reruns on every filter/boundary change) - Mapbox GL layer-scoped listeners persist
+     * across removeLayer/addLayer cycles for the same layer id, so registering them there again
+     * on every rerun would stack up duplicate handlers.
+     *
+     * TODO: remove this block, and the matching source/layers in renderMarkersAndGeojson, once
+     * every parcel has been matched to a project.
+     */
+    for (const layerId of ['all-boundaries-lines', 'all-boundaries-polygons']) {
+      map.on('click', layerId, (e) => {
+        const name = e.features?.[0]?.properties?.name
+        if (typeof name !== 'string') return
+        new mapboxgl.Popup({offset: 12})
+          .setLngLat(e.lngLat)
+          .setHTML(`<div class="map-popup-title">${escapeHtml(name)}</div>`)
+          .addTo(map)
+      })
+    }
+
     return () => {
       map.remove()
       mapRef.current = null
@@ -196,9 +218,15 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
       markersRef.current.forEach((marker) => marker.remove())
       markersRef.current = []
 
-      for (const layerId of ['property-lines', 'property-polygons']) {
+      for (const layerId of [
+        'all-boundaries-lines',
+        'all-boundaries-polygons',
+        'property-lines',
+        'property-polygons',
+      ]) {
         if (map.getLayer(layerId)) map.removeLayer(layerId)
       }
+      if (map.getSource('all-boundaries-geojson')) map.removeSource('all-boundaries-geojson')
       if (map.getSource('property-geojson')) map.removeSource('property-geojson')
 
       /**
@@ -237,6 +265,29 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
         const marker = new mapboxgl.Marker().setLngLat(position).setPopup(popup).addTo(map)
         markersRef.current.push(marker)
         if (featureId !== undefined) markerEntries.push({featureId, marker})
+      }
+
+      if (boundaries.size > 0) {
+        map.addSource('all-boundaries-geojson', {
+          type: 'geojson',
+          data: {type: 'FeatureCollection', features: Array.from(boundaries.values())},
+        })
+
+        map.addLayer({
+          id: 'all-boundaries-lines',
+          type: 'line',
+          source: 'all-boundaries-geojson',
+          filter: ['==', ['geometry-type'], 'LineString'],
+          paint: {'line-color': '#f59e0b', 'line-width': 1, 'line-dasharray': [2, 2]},
+        })
+
+        map.addLayer({
+          id: 'all-boundaries-polygons',
+          type: 'fill',
+          source: 'all-boundaries-geojson',
+          filter: ['==', ['geometry-type'], 'Polygon'],
+          paint: {'fill-color': '#f59e0b', 'fill-opacity': 0.15},
+        })
       }
 
       if (features.length > 0) {
