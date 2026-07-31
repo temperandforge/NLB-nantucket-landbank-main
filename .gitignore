@@ -38,3 +38,6 @@ next-env.d.ts
 .superpowers
 **/*.local.*
 **/.worktrees
+.agents
+.claude/skills
+skills.json
