@@ -36,6 +36,15 @@ export const RESOURCE_SLUG = {
 } as const
 
 /**
+ * Property type slug the map gives special treatment to: only a project tagged with this shows a
+ * marker pin. Named here for the same reason as RESOURCE_SLUG - a title can be renamed safely,
+ * but this slug must stay in sync with the propertyType document if it's ever changed.
+ */
+export const PROPERTY_TYPE_SLUG = {
+  beach: 'beaches',
+} as const
+
+/**
  * Turn taxonomy documents into dropdown options. A dereferenced entry is null when its document is
  * unpublished, so those are dropped rather than rendered as a blank option.
  */

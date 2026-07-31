@@ -10,6 +10,7 @@ import {
   DEFAULT_ZOOM,
   NANTUCKET_CENTER,
   projectSlugs,
+  PROPERTY_TYPE_SLUG,
   RESOURCE_SLUG,
   toLngLat,
   type MapSettings,
@@ -278,6 +279,11 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
           })
           projectByFeatureIdRef.current.set(featureId, project)
         }
+
+        // Only a beach gets a pin - every other property relies on clicking its polygon (see the
+        // property-polygons click handler above) to see its popup.
+        const isBeach = projectSlugs(project.propertyTypes).includes(PROPERTY_TYPE_SLUG.beach)
+        if (!isBeach) continue
 
         // An explicit marker position wins; otherwise fall back to the middle of the boundary. A
         // project with neither gets no marker at all, rather than one at a made-up coordinate.
