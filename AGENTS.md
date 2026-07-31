@@ -38,11 +38,12 @@ Design docs live in [docs/superpowers/specs/](docs/superpowers/specs/).
 - **`project` is a Land Bank property** — the things on the interactive map. It replaced the
   hardcoded `frontend/app/map/properties.ts`.
 - **Boundary geometry is not stored per project.** One GeoJSON FeatureCollection on
-  `projectSettings.boundaryData` holds every boundary; a project stores only `boundaryId`.
+  `projectSettings.boundaryData` holds every boundary; a project stores only `boundaryIds`, an
+  array naming one or more features since a project may span more than one.
 - **Which feature property holds the identifier is configurable** (`boundaryIdProperty`). The file
   is the client's, so never hardcode a key like `MAP_ID`.
 - **Replacing the boundary file does not re-point any project.** Re-check assignments afterwards;
-  the `boundaryId` input flags a value that is no longer in the file.
+  the `BoundaryIdsInput.tsx` component flags any value that is no longer in the file.
 - **Nothing draws until Mapbox fires `load`.** That needs the style request to `api.mapbox.com` to
   succeed, so a dev server without `NEXT_PUBLIC_MAPBOX_TOKEN` shows an empty canvas with controls.
   An empty map is not evidence the data is wrong — verify map *data* separately from *rendering*.

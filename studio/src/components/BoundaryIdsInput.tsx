@@ -28,11 +28,12 @@ type LoadState =
   | {status: 'notice'; message: string}
 
 export function BoundaryIdsInput(props: ArrayOfPrimitivesInputProps) {
-  const {value, onChange, readOnly} = props
+  const {value, onChange, elementProps, readOnly} = props
   const client = useClient({apiVersion: '2025-09-25'})
   const documentId = useFormValue(['_id']) as string | undefined
   const [state, setState] = useState<LoadState>({status: 'loading'})
   const [otherOwners, setOtherOwners] = useState<Map<string, string[]>>(new Map())
+  const [otherOwnersError, setOtherOwnersError] = useState(false)
 
   // The schema constrains this field to an array of strings; the wider default generic on
   // ArrayOfPrimitivesInputProps is what the `components.input` slot expects, so normalize here.
@@ -113,20 +114,26 @@ export function BoundaryIdsInput(props: ArrayOfPrimitivesInputProps) {
 
     async function loadOtherOwners() {
       if (!currentId) return
-      const others = await client.fetch<{name: string; boundaryIds: string[] | null}[]>(
-        `*[_type == "project" && !(_id in [$id, "drafts." + $id])]{name, boundaryIds}`,
-        {id: currentId},
-      )
-      if (cancelled) return
-      const owners = new Map<string, string[]>()
-      for (const other of others) {
-        for (const id of other.boundaryIds ?? []) {
-          const names = owners.get(id) ?? []
-          names.push(other.name || 'Untitled')
-          owners.set(id, names)
+      try {
+        const others = await client.fetch<{name: string; boundaryIds: string[] | null}[]>(
+          `*[_type == "project" && !(_id in [$id, "drafts." + $id])]{name, boundaryIds}`,
+          {id: currentId},
+        )
+        if (cancelled) return
+        const owners = new Map<string, string[]>()
+        for (const other of others) {
+          for (const id of other.boundaryIds ?? []) {
+            const names = owners.get(id) ?? []
+            names.push(other.name || 'Untitled')
+            owners.set(id, names)
+          }
         }
+        setOtherOwners(owners)
+        setOtherOwnersError(false)
+      } catch {
+        if (cancelled) return
+        setOtherOwnersError(true)
       }
-      setOtherOwners(owners)
     }
 
     loadOtherOwners()
@@ -138,7 +145,7 @@ export function BoundaryIdsInput(props: ArrayOfPrimitivesInputProps) {
   const orphanedIds = useMemo(() => {
     if (state.status !== 'ready') return new Set<string>()
     const known = new Set(state.options.map((option) => option.value))
-    return new Set(boundaryIds.filter((id) => !known.has(id)))
+    return new Set(boundaryIds.filter((id) => id && !known.has(id)))
   }, [boundaryIds, state])
 
   function setRow(index: number, nextValue: string) {
@@ -193,7 +200,10 @@ export function BoundaryIdsInput(props: ArrayOfPrimitivesInputProps) {
             <Flex gap={2} align="center">
               <Box flex={1}>
                 <Autocomplete<BoundaryOption>
-                  id={`boundary-${index}`}
+                  id={index === 0 ? elementProps.id : `${elementProps.id}-${index}`}
+                  ref={index === 0 ? elementProps.ref : undefined}
+                  onFocus={index === 0 ? elementProps.onFocus : undefined}
+                  onBlur={index === 0 ? elementProps.onBlur : undefined}
                   options={rowOptions}
                   value={id}
                   placeholder="Search boundaries…"
@@ -250,6 +260,11 @@ export function BoundaryIdsInput(props: ArrayOfPrimitivesInputProps) {
       <Text size={1} muted>
         {state.options.length} boundaries available.
       </Text>
+      {otherOwnersError ? (
+        <Text size={1} muted>
+          Could not check other projects for conflicts.
+        </Text>
+      ) : null}
     </Stack>
   )
 }

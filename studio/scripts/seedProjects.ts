@@ -193,7 +193,7 @@ async function main() {
       resources: spec.resources.map((s) => reference(resourceIds.get(s)!, `r-${s}`)),
       // The generated boundary file uses the project slug as each feature's id, so the two line
       // up without a mapping table. The client's real file will use its own identifiers.
-      boundaryId: spec.slug,
+      boundaryIds: [spec.slug],
       location: {_type: 'geopoint', lng: spec.coordinates[0], lat: spec.coordinates[1]},
     })
     console.log(`  + project created: ${spec.slug} (${created._id})`)

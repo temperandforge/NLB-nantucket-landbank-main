@@ -118,7 +118,9 @@ export const project = defineType({
       boundaryIds: 'boundaryIds',
     },
     prepare({name, boundaryIds}) {
-      const count = Array.isArray(boundaryIds) ? boundaryIds.length : 0
+      const count = Array.isArray(boundaryIds)
+        ? boundaryIds.filter((id) => Boolean(id)).length
+        : 0
       return {
         title: name || 'Untitled',
         // Surfaces the commonest data gap - a property with no boundary assigned - in the list,

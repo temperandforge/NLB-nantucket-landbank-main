@@ -119,7 +119,7 @@ async function main() {
         _type: 'project',
         name: id,
         slug: {_type: 'slug', current: id},
-        boundaryId: id,
+        boundaryIds: [id],
         propertyTypes: [reference(propertyType, 'pt-0')],
         resources: resources.map((resourceId, index) => reference(resourceId, `r-${index}`)),
       })
