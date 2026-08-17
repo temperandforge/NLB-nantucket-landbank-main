@@ -271,11 +271,6 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
         if (!project.disablePopup) {
           marker.setPopup(new mapboxgl.Popup({offset: 24}).setHTML(buildPopupHtml(project)))
         }
-        // A marker sits inside the map's container div, which is also what Mapbox listens on for
-        // its own click handling - so an unstopped click bubbles up and also fires the polygon
-        // layer's click handler below whenever the marker happens to sit over a boundary,
-        // opening two popups at once for one click.
-        marker.getElement().addEventListener('click', (e) => e.stopPropagation())
         markersRef.current.push(marker)
       }
 
@@ -354,6 +349,14 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
         }
 
         const onClick = (e: mapboxgl.MapLayerMouseEvent) => {
+          // A Marker's own popup opens by listening for the map's 'click' event and checking
+          // whether the original DOM target was its element - it does not stop propagation, so a
+          // click that lands on a marker sitting over a polygon reaches this handler too, keyed
+          // by the same pixel. Skipping here when the click actually landed on a marker avoids
+          // opening this polygon's popup on top of that marker's own.
+          const target = e.originalEvent.target
+          if (target instanceof Element && target.closest('.mapboxgl-marker')) return
+
           const feature = e.features?.[0]
           if (feature?.id === undefined) return
           const project = featureIdToProject.get(feature.id as number)
