@@ -44,12 +44,13 @@ export async function loadBoundaryIndex(
 }
 
 /**
- * A representative point for a geometry, used to place a marker when a project has no explicit
- * location set. The mean of the outline's vertices - good enough to sit a pin on, and far cheaper
- * than a true centroid.
+ * A representative point across several geometries — the marker fallback for a project made of
+ * multiple parcels (used when it needs a marker despite having a boundary, e.g. a beach property).
+ * Averages every geometry's vertices together rather than averaging their individual centers, so
+ * a project with one huge parcel and several slivers isn't pulled toward the slivers.
  */
-export function geometryCenter(geometry: GeoJSON.Geometry): [number, number] | null {
-  const positions = collectPositions(geometry)
+export function geometryCenterOfMany(geometries: GeoJSON.Geometry[]): [number, number] | null {
+  const positions = geometries.flatMap(collectPositions)
   if (!positions.length) return null
 
   let lng = 0

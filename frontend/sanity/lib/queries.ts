@@ -110,15 +110,16 @@ export const footerQuery = defineQuery(`
  * document is unpublished, so consumers must filter those out.
  *
  * Boundary geometry is not here - it lives in the single GeoJSON file on Project Settings, and
- * boundaryId says which feature in it belongs to this project.
+ * boundaryIds says which features in it belong to this project.
  */
 export const projectsQuery = defineQuery(`
   *[_type == "project" && defined(slug.current)] | order(name asc) {
     _id,
     name,
     "slug": slug.current,
-    boundaryId,
+    boundaryIds,
     location,
+    disablePopup,
     description,
     link,
     "image": image{"url": asset->url, alt},

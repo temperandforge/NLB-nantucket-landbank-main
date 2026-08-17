@@ -233,8 +233,9 @@ export type Project = {
       _key: string
     } & ResourceReference
   >
-  boundaryId?: string
+  boundaryIds?: Array<string>
   location?: Geopoint
+  disablePopup?: boolean
 }
 
 export type Geopoint = {

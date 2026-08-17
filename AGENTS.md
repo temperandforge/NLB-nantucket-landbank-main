@@ -38,11 +38,12 @@ Design docs live in [docs/superpowers/specs/](docs/superpowers/specs/).
 - **`project` is a Land Bank property** — the things on the interactive map. It replaced the
   hardcoded `frontend/app/map/properties.ts`.
 - **Boundary geometry is not stored per project.** One GeoJSON FeatureCollection on
-  `projectSettings.boundaryData` holds every boundary; a project stores only `boundaryId`.
+  `projectSettings.boundaryData` holds every boundary; a project stores `boundaryIds`, an array —
+  usually one id, but several when a property is split across multiple GIS parcels.
 - **Which feature property holds the identifier is configurable** (`boundaryIdProperty`). The file
   is the client's, so never hardcode a key like `MAP_ID`.
 - **Replacing the boundary file does not re-point any project.** Re-check assignments afterwards;
-  the `boundaryId` input flags a value that is no longer in the file.
+  the picker flags any id in `boundaryIds` that is no longer in the file.
 - **Nothing draws until Mapbox fires `load`.** That needs the style request to `api.mapbox.com` to
   succeed, so a dev server without `NEXT_PUBLIC_MAPBOX_TOKEN` shows an empty canvas with controls.
   An empty map is not evidence the data is wrong — verify map *data* separately from *rendering*.
@@ -129,6 +130,11 @@ plausible external URL to fill a gap — say what's outstanding instead.
 No test framework exists. Before claiming work is done, run `npm run sanity:typegen`,
 `npm run type-check` and `npm run lint` in `frontend`, and `npx tsc --noEmit` in `studio`.
 For anything visual, verify in the browser rather than asking the user to check.
+
+**Stop any dev server you started once verification is done.** Don't leave `next dev` / `sanity
+dev` processes running after the task is finished — check what's already running before starting
+one (a server on the target port may belong to the user or another session; don't kill it without
+checking first), and stop the one you started, not someone else's.
 
 After changing the page hierarchy, routes or Presentation config, also run:
 

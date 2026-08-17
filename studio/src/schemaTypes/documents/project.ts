@@ -1,7 +1,7 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {PinIcon} from '@sanity/icons'
 
-import {BoundaryIdInput} from '../../components/BoundaryIdInput'
+import {BoundaryIdsInput} from '../../components/BoundaryIdsInput'
 
 /**
  * A Land Bank property - the parcels, beaches, trails and ponds shown on the interactive map.
@@ -12,7 +12,7 @@ import {BoundaryIdInput} from '../../components/BoundaryIdInput'
  *
  * Boundary geometry is NOT stored here. The client maintains one GeoJSON file covering every
  * boundary (uploaded on Project Settings) and each project points into it by identifier - see
- * boundaryId below.
+ * boundaryIds below.
  */
 
 export const project = defineType({
@@ -92,14 +92,15 @@ export const project = defineType({
       description: 'Amenities available here. Drives the Resources filter on the map.',
     }),
     defineField({
-      name: 'boundaryId',
-      title: 'Property map ID',
-      type: 'string',
+      name: 'boundaryIds',
+      title: 'Property map IDs',
+      type: 'array',
+      of: [defineArrayMember({type: 'string'})],
       group: 'map',
       description:
-        'Which boundary in the uploaded map data file belongs to this property. Pick from the list rather than typing - an identifier that is not in the file draws nothing on the map.',
+        'Which boundaries in the uploaded map data file belong to this property — usually one, sometimes several separate parcels. Pick from the list rather than typing; an identifier that is not in the file draws nothing on the map.',
       components: {
-        input: BoundaryIdInput,
+        input: BoundaryIdsInput,
       },
     }),
     defineField({
@@ -110,18 +111,28 @@ export const project = defineType({
       description:
         'Optional. Where the marker sits. Leave empty to place it at the centre of the assigned boundary.',
     }),
+    defineField({
+      name: 'disablePopup',
+      title: 'Disable map popup',
+      type: 'boolean',
+      group: 'map',
+      initialValue: false,
+      description:
+        'Turn on to stop this property from opening a popup on the map — its marker or boundary still shows and (for a boundary) still highlights on hover, it just does not respond to a click.',
+    }),
   ],
   preview: {
     select: {
       name: 'name',
-      boundaryId: 'boundaryId',
+      boundaryIds: 'boundaryIds',
     },
-    prepare({name, boundaryId}) {
+    prepare({name, boundaryIds}) {
+      const count = Array.isArray(boundaryIds) ? boundaryIds.length : 0
       return {
         title: name || 'Untitled',
-        // Surfaces the commonest data gap - a property with no boundary assigned - in the list,
-        // without having to open each one.
-        subtitle: boundaryId ? `Boundary: ${boundaryId}` : 'No boundary assigned',
+        subtitle: count
+          ? `${count} boundar${count === 1 ? 'y' : 'ies'} assigned`
+          : 'No boundary assigned',
       }
     },
   },
