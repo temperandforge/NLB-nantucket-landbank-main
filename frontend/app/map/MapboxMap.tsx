@@ -5,7 +5,7 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import '../../css/popup.css'
 
-import {geometryCenter, geometryCenterOfMany, loadBoundaryIndex, type BoundaryIndex} from './boundaries'
+import {geometryCenterOfMany, loadBoundaryIndex, type BoundaryIndex} from './boundaries'
 import {
   DEFAULT_ZOOM,
   NANTUCKET_CENTER,
