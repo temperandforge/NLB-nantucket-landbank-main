@@ -123,7 +123,7 @@ since been deleted still renders as itself instead of blank.
 **Status:** Implemented
 
 The client maintains a single GeoJSON FeatureCollection covering every boundary, uploaded to
-`projectSettings.boundaryData`. Each project stores only `boundaryId`, naming one feature in it.
+`projectSettings.boundaryData`. Each project stores `boundaryIds`, naming every feature in it that belongs to that property — most projects have one, some (e.g. a preserve split across many GIS parcels) have several.
 
 **Why:** This is how the client works — one export from their GIS, not per-parcel geometry pasted
 into a CMS field. It also means re-exporting updates every boundary at once.
@@ -154,9 +154,11 @@ into `setHTML`, so all authored text is escaped first.
 
 **Status:** Implemented
 
-`boundaryId` uses a custom Studio input (`studio/src/components/BoundaryIdInput.tsx`) that loads the
-uploaded file, offers the identifiers it actually contains, and flags a stored value that is not
-among them.
+`boundaryIds` uses a custom Studio input (`studio/src/components/BoundaryIdsInput.tsx`, backed by
+the useBoundaryOptions hook) that loads the uploaded file, offers the identifiers it actually
+contains, and flags a stored value that is not among them. It is a multi-select — a project can be
+several parcels, and each is checked against the file independently so a stale one among several
+is visible on its own.
 
 **Why:** A mistyped identifier produces a property that silently never draws on the map, with
 nothing in the Studio to indicate why. Across hundreds of parcels that is the likeliest failure
