@@ -5,7 +5,7 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import '../../css/popup.css'
 
-import {geometryCenter, loadBoundaryIndex, type BoundaryIndex} from './boundaries'
+import {geometryCenter, geometryCenterOfMany, loadBoundaryIndex, type BoundaryIndex} from './boundaries'
 import {
   DEFAULT_ZOOM,
   NANTUCKET_CENTER,
@@ -208,27 +208,33 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
        * soon as a single project has no boundary assigned.
        */
       const features: GeoJSON.Feature[] = []
-      const markerEntries: {featureId: number; marker: mapboxgl.Marker}[] = []
+      const markerEntries: {featureIds: number[]; marker: mapboxgl.Marker}[] = []
 
       for (const project of projects) {
-        const boundary = project.boundaryId ? boundaries.get(project.boundaryId) : undefined
+        const projectBoundaries = (project.boundaryIds ?? [])
+          .map((id) => boundaries.get(id))
+          .filter((feature): feature is GeoJSON.Feature => Boolean(feature?.geometry))
 
-        let featureId: number | undefined
-        if (boundary?.geometry) {
-          featureId = features.length
+        const featureIds: number[] = []
+        for (const boundary of projectBoundaries) {
+          const featureId = features.length
           features.push({
             id: featureId,
             type: 'Feature',
-            properties: {id: project.boundaryId, name: project.name},
+            properties: {name: project.name},
             geometry: boundary.geometry,
           })
+          featureIds.push(featureId)
         }
 
-        // An explicit marker position wins; otherwise fall back to the middle of the boundary. A
-        // project with neither gets no marker at all, rather than one at a made-up coordinate.
+        // An explicit marker position wins; otherwise fall back to the combined centre of every
+        // parcel assigned to this project. A project with neither gets no marker at all, rather
+        // than one at a made-up coordinate.
         const position =
           toLngLat(project.location) ??
-          (boundary?.geometry ? geometryCenter(boundary.geometry) : null)
+          (projectBoundaries.length
+            ? geometryCenterOfMany(projectBoundaries.map((boundary) => boundary.geometry))
+            : null)
 
         if (!position) continue
 
@@ -236,7 +242,7 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
 
         const marker = new mapboxgl.Marker().setLngLat(position).setPopup(popup).addTo(map)
         markersRef.current.push(marker)
-        if (featureId !== undefined) markerEntries.push({featureId, marker})
+        if (featureIds.length) markerEntries.push({featureIds, marker})
       }
 
       if (features.length > 0) {
@@ -272,17 +278,19 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
       }
 
       // Hover wiring runs after the source exists - setFeatureState throws on an unknown source.
-      let hoveredStateId: number | undefined = undefined
+      let hoveredStateIds: number[] = []
 
-      for (const {featureId, marker} of markerEntries) {
+      for (const {featureIds, marker} of markerEntries) {
         const markerDiv = marker.getElement()
 
         markerDiv.addEventListener('mouseenter', () => {
-          if (hoveredStateId !== undefined) {
-            map.setFeatureState({source: 'property-geojson', id: hoveredStateId}, {hover: false})
+          for (const id of hoveredStateIds) {
+            map.setFeatureState({source: 'property-geojson', id}, {hover: false})
           }
-          hoveredStateId = featureId
-          map.setFeatureState({source: 'property-geojson', id: featureId}, {hover: true})
+          hoveredStateIds = featureIds
+          for (const id of featureIds) {
+            map.setFeatureState({source: 'property-geojson', id}, {hover: true})
+          }
 
           markerDiv.style.transition = 'top .2s ease'
           markerDiv.style.top = '-6px'
@@ -290,10 +298,10 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
         })
 
         markerDiv.addEventListener('mouseleave', () => {
-          if (hoveredStateId !== undefined) {
-            map.setFeatureState({source: 'property-geojson', id: hoveredStateId}, {hover: false})
-            hoveredStateId = undefined
+          for (const id of hoveredStateIds) {
+            map.setFeatureState({source: 'property-geojson', id}, {hover: false})
           }
+          hoveredStateIds = []
           markerDiv.style.top = '0'
           markerDiv.style.cursor = 'auto'
         })
