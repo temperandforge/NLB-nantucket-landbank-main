@@ -130,6 +130,11 @@ No test framework exists. Before claiming work is done, run `npm run sanity:type
 `npm run type-check` and `npm run lint` in `frontend`, and `npx tsc --noEmit` in `studio`.
 For anything visual, verify in the browser rather than asking the user to check.
 
+**Stop any dev server you started once verification is done.** Don't leave `next dev` / `sanity
+dev` processes running after the task is finished — check what's already running before starting
+one (a server on the target port may belong to the user or another session; don't kill it without
+checking first), and stop the one you started, not someone else's.
+
 After changing the page hierarchy, routes or Presentation config, also run:
 
 ```bash
