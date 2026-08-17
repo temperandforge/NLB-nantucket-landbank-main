@@ -61,6 +61,25 @@ export function geometryCenter(geometry: GeoJSON.Geometry): [number, number] | n
   return [lng / positions.length, lat / positions.length]
 }
 
+/**
+ * A representative point across several geometries — the marker fallback for a project made of
+ * multiple parcels. Averages every geometry's vertices together rather than averaging their
+ * individual centers, so a project with one huge parcel and several slivers isn't pulled toward
+ * the slivers.
+ */
+export function geometryCenterOfMany(geometries: GeoJSON.Geometry[]): [number, number] | null {
+  const positions = geometries.flatMap(collectPositions)
+  if (!positions.length) return null
+
+  let lng = 0
+  let lat = 0
+  for (const [x, y] of positions) {
+    lng += x
+    lat += y
+  }
+  return [lng / positions.length, lat / positions.length]
+}
+
 function collectPositions(geometry: GeoJSON.Geometry): [number, number][] {
   switch (geometry.type) {
     case 'Point':
