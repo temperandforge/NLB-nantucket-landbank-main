@@ -233,7 +233,7 @@ export type Project = {
       _key: string
     } & ResourceReference
   >
-  boundaryId?: string
+  boundaryIds?: Array<string>
   location?: Geopoint
 }
 
@@ -963,12 +963,12 @@ export type FooterQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: projectsQuery
-// Query: *[_type == "project" && defined(slug.current)] | order(name asc) {    _id,    name,    "slug": slug.current,    boundaryId,    location,    description,    link,    "image": image{"url": asset->url, alt},    "propertyTypes": propertyTypes[]->{"slug": slug.current, title},    "resources": resources[]->{"slug": slug.current, title}  }
+// Query: *[_type == "project" && defined(slug.current)] | order(name asc) {    _id,    name,    "slug": slug.current,    boundaryIds,    location,    description,    link,    "image": image{"url": asset->url, alt},    "propertyTypes": propertyTypes[]->{"slug": slug.current, title},    "resources": resources[]->{"slug": slug.current, title}  }
 export type ProjectsQueryResult = Array<{
   _id: string
   name: string
   slug: string
-  boundaryId: string | null
+  boundaryIds: Array<string> | null
   location: Geopoint | null
   description: string | null
   link: string | null
@@ -1261,7 +1261,7 @@ declare module '@sanity/client' {
   interface SanityQueries {
     '*[_type == "settings"][0]': SettingsQueryResult
     '\n  *[_type == "footer" && _id == "footer"][0]{\n    newsletterHeading,\n    organizationName,\n    infoColumns[]{\n      _key,\n      heading,\n      lines[]{\n        _key,\n        text,\n        href\n      }\n    },\n    socialLinks[]{\n      _key,\n      platform,\n      url\n    },\n    "footerMenu": footerMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n    "legalMenu": legalMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n  }\n': FooterQueryResult
-    '\n  *[_type == "project" && defined(slug.current)] | order(name asc) {\n    _id,\n    name,\n    "slug": slug.current,\n    boundaryId,\n    location,\n    description,\n    link,\n    "image": image{"url": asset->url, alt},\n    "propertyTypes": propertyTypes[]->{"slug": slug.current, title},\n    "resources": resources[]->{"slug": slug.current, title}\n  }\n': ProjectsQueryResult
+    '\n  *[_type == "project" && defined(slug.current)] | order(name asc) {\n    _id,\n    name,\n    "slug": slug.current,\n    boundaryIds,\n    location,\n    description,\n    link,\n    "image": image{"url": asset->url, alt},\n    "propertyTypes": propertyTypes[]->{"slug": slug.current, title},\n    "resources": resources[]->{"slug": slug.current, title}\n  }\n': ProjectsQueryResult
     '{\n  "propertyTypes": *[_type == "propertyType" && defined(slug.current)] | order(title asc){\n    "slug": slug.current,\n    title\n  },\n  "resources": *[_type == "resource" && defined(slug.current)] | order(title asc){\n    "slug": slug.current,\n    title\n  }\n}': MapFiltersQueryResult
     '\n  *[_type == "projectSettings" && _id == "projectSettings"][0]{\n    eyebrow,\n    heading,\n    intro,\n    "boundaryDataUrl": boundaryData.asset->url,\n    "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),\n    "trailsDataUrl": trailsData.asset->url,\n    defaultCenter,\n    defaultZoom\n  }\n': MapSettingsQueryResult
     '\n  *[_type == \'page\' && slug.current == $leaf && !coalesce(pathOnly, false)]{\n    _id,\n    _type,\n    name,\n    slug,\n    heading,\n    subheading,\n    "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n    "pageBuilder": pageBuilder[]{\n      ...,\n      _type == "callToAction" => {\n        ...,\n        button {\n          ...,\n          \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n      }\n\n        }\n      },\n      _type == "infoSection" => {\n        content[]{\n          ...,\n          markDefs[]{\n            ...,\n            \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n    "post": post->slug.current\n  }\n\n          }\n        }\n      },\n    },\n  }[path == $path][0]\n': GetPageQueryResult
