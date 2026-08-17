@@ -5,7 +5,7 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import '../../css/popup.css'
 
-import {geometryCenterOfMany, loadBoundaryIndex, type BoundaryIndex} from './boundaries'
+import {loadBoundaryIndex, type BoundaryIndex} from './boundaries'
 import {
   DEFAULT_ZOOM,
   NANTUCKET_CENTER,
@@ -83,6 +83,15 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<mapboxgl.Map | null>(null)
   const markersRef = useRef<mapboxgl.Marker[]>([])
+  // map.on(type, layerId, listener) listeners outlive the layer they were bound to - removing and
+  // re-adding 'property-polygons' on every render does not unregister them. Tracked here so each
+  // render's listeners are unbound before the next render's are added, instead of stacking.
+  const polygonListenersRef = useRef<
+    {
+      type: 'mousemove' | 'mouseleave' | 'click'
+      listener: (e: mapboxgl.MapLayerMouseEvent) => void
+    }[]
+  >([])
 
   // Boundaries come from one file shared by every project, so they are fetched once and indexed
   // rather than re-read whenever the filters change.
@@ -196,19 +205,30 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
       markersRef.current.forEach((marker) => marker.remove())
       markersRef.current = []
 
+      // map.on(type, layer, listener) is independent of the layer's lifecycle, so removing
+      // 'property-polygons' below does not unbind these - they must be unbound explicitly or
+      // every render adds another copy on top of the last.
+      for (const {type, listener} of polygonListenersRef.current) {
+        map.off(type, 'property-polygons', listener)
+      }
+      polygonListenersRef.current = []
+
       for (const layerId of ['property-lines', 'property-polygons']) {
         if (map.getLayer(layerId)) map.removeLayer(layerId)
       }
       if (map.getSource('property-geojson')) map.removeSource('property-geojson')
 
       /**
-       * Markers and boundary features are built in one pass so a project's marker and its polygon
-       * share the same numeric feature id. Keying them off two separate indexes - one over all
-       * projects, one over only those with geometry - makes hovering highlight the wrong polygon as
-       * soon as a single project has no boundary assigned.
+       * Boundary features are built first so every project with geometry can be looked up by
+       * feature id when the polygon layer is clicked or hovered. A project with geometry gets no
+       * marker at all - the popup opens by clicking its polygon instead - so only projects with
+       * neither an explicit location, nor a boundary, are dropped from the map entirely.
        */
       const features: GeoJSON.Feature[] = []
-      const markerEntries: {featureIds: number[]; marker: mapboxgl.Marker}[] = []
+      const featureIdToProject = new Map<number, Project>()
+      // Every id in a project's own parcel group maps back to that same group array, so hovering
+      // any one of a multi-parcel project's polygons highlights all of them together.
+      const featureIdToGroupIds = new Map<number, number[]>()
 
       for (const project of projects) {
         const projectBoundaries = (project.boundaryIds ?? [])
@@ -225,24 +245,24 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
             geometry: boundary.geometry,
           })
           featureIds.push(featureId)
+          featureIdToProject.set(featureId, project)
+        }
+        for (const featureId of featureIds) {
+          featureIdToGroupIds.set(featureId, featureIds)
         }
 
-        // An explicit marker position wins; otherwise fall back to the combined centre of every
-        // parcel assigned to this project. A project with neither gets no marker at all, rather
-        // than one at a made-up coordinate.
-        const position =
-          toLngLat(project.location) ??
-          (projectBoundaries.length
-            ? geometryCenterOfMany(projectBoundaries.map((boundary) => boundary.geometry))
-            : null)
+        // A project with a boundary is clicked on its polygon, not its marker, so it gets no
+        // marker even when it also has an explicit location. Only a project with neither gets
+        // skipped - never one placed at a made-up coordinate.
+        if (featureIds.length) continue
 
+        const position = toLngLat(project.location)
         if (!position) continue
 
         const popup = new mapboxgl.Popup({offset: 24}).setHTML(buildPopupHtml(project))
 
         const marker = new mapboxgl.Marker().setLngLat(position).setPopup(popup).addTo(map)
         markersRef.current.push(marker)
-        if (featureIds.length) markerEntries.push({featureIds, marker})
       }
 
       if (features.length > 0) {
@@ -277,34 +297,61 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
         })
       }
 
-      // Hover wiring runs after the source exists - setFeatureState throws on an unknown source.
-      let hoveredStateIds: number[] = []
+      if (features.length > 0) {
+        // Hover highlights every parcel of the moused-over project together, and click opens its
+        // popup at the click point - a project with a boundary has no marker, so this layer is
+        // its only interactive surface. Wiring runs after the source exists - setFeatureState
+        // throws on an unknown source.
+        let hoveredFeatureIds: number[] = []
 
-      for (const {featureIds, marker} of markerEntries) {
-        const markerDiv = marker.getElement()
+        const onMouseMove = (e: mapboxgl.MapLayerMouseEvent) => {
+          const feature = e.features?.[0]
+          if (feature?.id === undefined) return
 
-        markerDiv.addEventListener('mouseenter', () => {
-          for (const id of hoveredStateIds) {
+          const groupIds = featureIdToGroupIds.get(feature.id as number) ?? []
+          // Comparing by reference against the group array already set: every id in one project's
+          // group points at the same array, so this is false while the cursor stays within one
+          // project's parcels, and only clears/resets state when it crosses into another's.
+          if (groupIds !== hoveredFeatureIds) {
+            for (const id of hoveredFeatureIds) {
+              map.setFeatureState({source: 'property-geojson', id}, {hover: false})
+            }
+            hoveredFeatureIds = groupIds
+            for (const id of groupIds) {
+              map.setFeatureState({source: 'property-geojson', id}, {hover: true})
+            }
+          }
+          map.getCanvas().style.cursor = 'pointer'
+        }
+
+        const onMouseLeave = () => {
+          for (const id of hoveredFeatureIds) {
             map.setFeatureState({source: 'property-geojson', id}, {hover: false})
           }
-          hoveredStateIds = featureIds
-          for (const id of featureIds) {
-            map.setFeatureState({source: 'property-geojson', id}, {hover: true})
-          }
+          hoveredFeatureIds = []
+          map.getCanvas().style.cursor = ''
+        }
 
-          markerDiv.style.transition = 'top .2s ease'
-          markerDiv.style.top = '-6px'
-          markerDiv.style.cursor = 'pointer'
-        })
+        const onClick = (e: mapboxgl.MapLayerMouseEvent) => {
+          const feature = e.features?.[0]
+          if (feature?.id === undefined) return
+          const project = featureIdToProject.get(feature.id as number)
+          if (!project) return
 
-        markerDiv.addEventListener('mouseleave', () => {
-          for (const id of hoveredStateIds) {
-            map.setFeatureState({source: 'property-geojson', id}, {hover: false})
-          }
-          hoveredStateIds = []
-          markerDiv.style.top = '0'
-          markerDiv.style.cursor = 'auto'
-        })
+          new mapboxgl.Popup({offset: 12})
+            .setLngLat(e.lngLat)
+            .setHTML(buildPopupHtml(project))
+            .addTo(map)
+        }
+
+        map.on('mousemove', 'property-polygons', onMouseMove)
+        map.on('mouseleave', 'property-polygons', onMouseLeave)
+        map.on('click', 'property-polygons', onClick)
+        polygonListenersRef.current = [
+          {type: 'mousemove', listener: onMouseMove},
+          {type: 'mouseleave', listener: onMouseLeave},
+          {type: 'click', listener: onClick},
+        ]
       }
     }
 
