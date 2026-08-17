@@ -271,6 +271,11 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
         if (!project.disablePopup) {
           marker.setPopup(new mapboxgl.Popup({offset: 24}).setHTML(buildPopupHtml(project)))
         }
+        // A marker sits inside the map's container div, which is also what Mapbox listens on for
+        // its own click handling - so an unstopped click bubbles up and also fires the polygon
+        // layer's click handler below whenever the marker happens to sit over a boundary,
+        // opening two popups at once for one click.
+        marker.getElement().addEventListener('click', (e) => e.stopPropagation())
         markersRef.current.push(marker)
       }
 
