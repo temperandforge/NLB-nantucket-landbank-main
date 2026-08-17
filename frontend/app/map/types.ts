@@ -36,6 +36,16 @@ export const RESOURCE_SLUG = {
 } as const
 
 /**
+ * Property type slugs the map gives special treatment to.
+ *
+ * These are the slugs of `propertyType` documents. Named once here for the same reason as
+ * RESOURCE_SLUG above: a slug is a stable key, and code should never restate a taxonomy's values.
+ */
+export const PROPERTY_TYPE_SLUG = {
+  beach: 'beaches',
+} as const
+
+/**
  * Turn taxonomy documents into dropdown options. A dereferenced entry is null when its document is
  * unpublished, so those are dropped rather than rendered as a blank option.
  */

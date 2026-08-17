@@ -5,10 +5,11 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import '../../css/popup.css'
 
-import {loadBoundaryIndex, type BoundaryIndex} from './boundaries'
+import {geometryCenterOfMany, loadBoundaryIndex, type BoundaryIndex} from './boundaries'
 import {
   DEFAULT_ZOOM,
   NANTUCKET_CENTER,
+  PROPERTY_TYPE_SLUG,
   projectSlugs,
   RESOURCE_SLUG,
   toLngLat,
@@ -220,9 +221,10 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
 
       /**
        * Boundary features are built first so every project with geometry can be looked up by
-       * feature id when the polygon layer is clicked or hovered. A project with geometry gets no
-       * marker at all - the popup opens by clicking its polygon instead - so only projects with
-       * neither an explicit location, nor a boundary, are dropped from the map entirely.
+       * feature id when the polygon layer is clicked or hovered. A project with geometry normally
+       * gets no marker - the popup opens by clicking its polygon instead - except a beach property,
+       * which gets both. Only a project with neither a boundary nor a location is dropped from the
+       * map entirely.
        */
       const features: GeoJSON.Feature[] = []
       const featureIdToProject = new Map<number, Project>()
@@ -251,12 +253,18 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
           featureIdToGroupIds.set(featureId, featureIds)
         }
 
-        // A project with a boundary is clicked on its polygon, not its marker, so it gets no
-        // marker even when it also has an explicit location. Only a project with neither gets
-        // skipped - never one placed at a made-up coordinate.
-        if (featureIds.length) continue
+        // A project with a boundary is otherwise clicked on its polygon, not a marker - except a
+        // beach property, which keeps a marker even though it also has a boundary, since a beach's
+        // access point is what a visitor is actually looking for. Only a project with neither a
+        // boundary nor a location is skipped - never one placed at a made-up coordinate.
+        const isBeach = projectSlugs(project.propertyTypes).includes(PROPERTY_TYPE_SLUG.beach)
+        if (featureIds.length && !isBeach) continue
 
-        const position = toLngLat(project.location)
+        const position =
+          toLngLat(project.location) ??
+          (projectBoundaries.length
+            ? geometryCenterOfMany(projectBoundaries.map((boundary) => boundary.geometry))
+            : null)
         if (!position) continue
 
         const marker = new mapboxgl.Marker().setLngLat(position).addTo(map)
