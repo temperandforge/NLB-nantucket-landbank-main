@@ -119,6 +119,7 @@ export const projectsQuery = defineQuery(`
     "slug": slug.current,
     boundaryIds,
     location,
+    disablePopup,
     description,
     link,
     "image": image{"url": asset->url, alt},

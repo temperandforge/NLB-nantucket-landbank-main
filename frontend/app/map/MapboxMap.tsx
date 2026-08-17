@@ -259,9 +259,10 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
         const position = toLngLat(project.location)
         if (!position) continue
 
-        const popup = new mapboxgl.Popup({offset: 24}).setHTML(buildPopupHtml(project))
-
-        const marker = new mapboxgl.Marker().setLngLat(position).setPopup(popup).addTo(map)
+        const marker = new mapboxgl.Marker().setLngLat(position).addTo(map)
+        if (!project.disablePopup) {
+          marker.setPopup(new mapboxgl.Popup({offset: 24}).setHTML(buildPopupHtml(project)))
+        }
         markersRef.current.push(marker)
       }
 
@@ -336,7 +337,7 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
           const feature = e.features?.[0]
           if (feature?.id === undefined) return
           const project = featureIdToProject.get(feature.id as number)
-          if (!project) return
+          if (!project || project.disablePopup) return
 
           new mapboxgl.Popup({offset: 12})
             .setLngLat(e.lngLat)

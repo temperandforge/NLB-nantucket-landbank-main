@@ -1389,6 +1389,13 @@
           "name": "geopoint"
         },
         "optional": true
+      },
+      "disablePopup": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
       }
     }
   },

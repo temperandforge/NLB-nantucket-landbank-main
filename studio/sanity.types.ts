@@ -235,6 +235,7 @@ export type Project = {
   >
   boundaryIds?: Array<string>
   location?: Geopoint
+  disablePopup?: boolean
 }
 
 export type Geopoint = {

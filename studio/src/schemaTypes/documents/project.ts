@@ -111,6 +111,15 @@ export const project = defineType({
       description:
         'Optional. Where the marker sits. Leave empty to place it at the centre of the assigned boundary.',
     }),
+    defineField({
+      name: 'disablePopup',
+      title: 'Disable map popup',
+      type: 'boolean',
+      group: 'map',
+      initialValue: false,
+      description:
+        'Turn on to stop this property from opening a popup on the map — its marker or boundary still shows and (for a boundary) still highlights on hover, it just does not respond to a click.',
+    }),
   ],
   preview: {
     select: {
