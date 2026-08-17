@@ -309,6 +309,13 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
           const feature = e.features?.[0]
           if (feature?.id === undefined) return
 
+          // A popup-disabled project doesn't respond to a click, so the hover highlight and
+          // pointer cursor - both signals of "this is clickable" - are suppressed too.
+          if (featureIdToProject.get(feature.id as number)?.disablePopup) {
+            onMouseLeave()
+            return
+          }
+
           const groupIds = featureIdToGroupIds.get(feature.id as number) ?? []
           // Comparing by reference against the group array already set: every id in one project's
           // group points at the same array, so this is false while the cursor stays within one
