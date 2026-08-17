@@ -277,7 +277,7 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
           type: 'line',
           source: 'property-geojson',
           filter: ['==', ['geometry-type'], 'LineString'],
-          paint: {'line-color': '#2563eb', 'line-width': 3},
+          paint: {'line-color': '#dc2626', 'line-width': 3},
         })
 
         map.addLayer({
@@ -286,7 +286,7 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
           source: 'property-geojson',
           filter: ['==', ['geometry-type'], 'Polygon'],
           paint: {
-            'fill-color': '#2563eb',
+            'fill-color': '#dc2626',
             'fill-opacity': [
               'case',
               ['boolean', ['feature-state', 'hover'], false],
