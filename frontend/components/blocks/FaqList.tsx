@@ -54,7 +54,7 @@ export default function FaqList({block}: BlockProps<'faqList'>) {
             )}
           </div>
         )}
-        <div className="flex w-full flex-col items-start gap-16 lg:w-[668px] lg:shrink-0">
+        <div className="flex w-full min-w-0 flex-col items-start gap-16 lg:max-w-[668px] lg:flex-1">
           {ungrouped.length > 0 && (
             <div className="flex w-full flex-col items-start gap-6">
               <FaqRows faqs={ungrouped} />

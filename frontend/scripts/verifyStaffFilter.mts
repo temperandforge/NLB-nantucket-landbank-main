@@ -6,10 +6,10 @@
  * Imports the real helpers, not a copy. Exits non-zero on failure.
  */
 import {
-  departmentSearch,
   departmentTabs,
   filterByDepartment,
   parseDepartment,
+  withDepartment,
 } from '../sanity/lib/staffFilter.ts'
 
 let failed = false
@@ -78,8 +78,12 @@ same(parseDepartment('?department=nope', tabs), null, 'an unknown department is 
 same(parseDepartment('?department=', tabs), null, 'a blank department is ignored')
 same(parseDepartment('', tabs), null, 'no query is no filter')
 same(parseDepartment('?department=administration&department=environmental', tabs), 'administration', 'a repeated parameter uses the first')
-same(departmentSearch(null), '', 'no filter has no query')
-same(departmentSearch('property-management'), '?department=property-management', 'a filter becomes a query')
-same(departmentSearch('a b&c'), '?department=a%20b%26c', 'the slug is encoded')
+same(withDepartment('', null), '', 'no filter and no query stays empty')
+same(withDepartment('', 'property-management'), '?department=property-management', 'a filter becomes a query')
+same(withDepartment('?department=a&department=b', null), '', 'clearing the filter removes every department parameter')
+same(withDepartment('?department=old', 'new'), '?department=new', 'a new filter replaces the old one')
+same(withDepartment('?utm_source=x', 'new'), '?utm_source=x&department=new', 'other parameters are kept')
+same(withDepartment('?utm_source=x&department=old', null), '?utm_source=x', 'clearing keeps other parameters')
+same(withDepartment('?x=1', 'a b&c'), '?x=1&department=a%20b%26c', 'the slug is encoded')
 
 if (failed) process.exit(1)

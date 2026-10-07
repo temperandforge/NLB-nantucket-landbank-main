@@ -33,6 +33,14 @@ export function parseDepartment(search: string, tabs: ReadonlyArray<DepartmentTa
   return value && tabs.some((tab) => tab.slug === value) ? value : null
 }
 
-export function departmentSearch(slug: string | null): string {
-  return slug ? `?department=${encodeURIComponent(slug)}` : ''
+/**
+ * A query string with the department set (or cleared, with null), keeping every other parameter.
+ * Returns '' or a string starting with '?'.
+ */
+export function withDepartment(search: string, slug: string | null): string {
+  const params = new URLSearchParams(search)
+  params.delete('department')
+  const others = params.toString()
+  if (!slug) return others ? `?${others}` : ''
+  return `?${others ? `${others}&` : ''}department=${encodeURIComponent(slug)}`
 }

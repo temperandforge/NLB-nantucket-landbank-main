@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import {stegaClean} from 'next-sanity'
 import Link from 'next/link'
 
 import {ArrowDownRightIcon} from '@/components/icons'
@@ -41,7 +42,9 @@ export default function NewsPreviewView({
   articles: Article[]
   cta?: Cta | null
 }) {
-  const showCta = Boolean(cta && (cta.heading || cta.label))
+  // stegaClean: in Presentation an empty string is encoded as invisible characters and would
+  // read as text, showing an empty tile that production does not.
+  const showCta = Boolean(cta && (stegaClean(cta.heading) || stegaClean(cta.label)))
   if (articles.length === 0 && !showCta) return null
 
   return (
