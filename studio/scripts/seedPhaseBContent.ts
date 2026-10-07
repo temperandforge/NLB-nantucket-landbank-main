@@ -9,7 +9,8 @@
  * What it writes: draft documents (Sanity generates every id) plus the sample images it
  * references. Idempotent: each document is matched on a natural key (slug, name, question or
  * title) among published documents and drafts, and skipped if it exists. It never edits an
- * existing document. Events are dated relative to the day it runs, so there are always upcoming
+ * existing document (so an article seeded before it had a body keeps none: add text in Studio, or
+ * remove the draft and run this again). Events are dated relative to the day it runs, so there are always upcoming
  * ones. References to the draft taxonomies are weak (they strengthen on publish). Staff and commissioners have no headshots: the cards must show their neutral fallback.
  */
 
@@ -121,12 +122,22 @@ async function main() {
     uploadImage('long-pond.jpg'),
   ])
   const image = (id: string, alt: string) => ({_type: 'image', asset: ref(id), alt})
+  // An article's text: a paragraph, its image, then two more paragraphs.
+  const body = (id: string, alt: string) => [
+    text('It turns out the best thing you can do for yourself might also be the most obvious.'),
+    {...image(id, alt), _key: key()},
+    text('Walking in natural settings amplifies those benefits further, and the trails are open every day.'),
+    text('The land is here, and so are all the reasons to get out onto it.'),
+  ]
+
   await ensure('article', 'slug.current', 'moorland-carbon-study', {
     title: 'New Study Highlights Carbon Storage Value of Nantucket’s Moorland Ecosystems',
     slug: slug('moorland-carbon-study'),
     date: '2026-08-02',
     image: image(pond, 'A moorland pond'),
     categories: [{...weakRef(conservation, 'newsCategory'), _key: key()}],
+    body: body(pond, 'A moorland pond'),
+    // An override: this tile goes to /map, though the article's own page is still reachable.
     link: {_type: 'link', linkType: 'href', href: '/map'},
   })
   await ensure('article', 'slug.current', 'polpis-road-farm', {
@@ -135,13 +146,15 @@ async function main() {
     date: '2026-07-12',
     image: image(beach, 'A sandy path through moorland'),
     categories: [{...weakRef(conservation, 'newsCategory'), _key: key()}],
-    // No link: this tile must be a plain tile, not a dead anchor.
+    body: body(beach, 'A sandy path through moorland'),
+    // No link: this tile goes to the article's own page.
   })
   await ensure('article', 'slug.current', 'no-category-article', {
     title: 'An article with no category and no link',
     slug: slug('no-category-article'),
     date: '2026-06-20',
     image: image(jetties, 'A beach'),
+    // No body at all: the page must still render its title and the share row.
   })
 
   // Events: two upcoming, one that ended long ago (must not appear), one spanning days.

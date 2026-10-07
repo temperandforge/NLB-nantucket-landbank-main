@@ -99,6 +99,9 @@ async function main() {
     contentType: 'text/plain',
   })
 
+  // A project for the Map Teaser's detail card, if the dataset has one.
+  const featuredProject = await client.fetch<string | null>(`*[_type == "project"][0]._id`)
+
   const pageBuilder = [
     {
       _type: 'hero',
@@ -270,7 +273,26 @@ async function main() {
         {_key: key(), _type: 'download', file: {_type: 'file', asset: ref(sample._id)}},
       ],
     },
-    {_type: 'mapTeaser', _key: key(), heading: 'Map teaser', body: 'A short line above the map preview placeholder.'},
+    {
+      _type: 'mapTeaser',
+      _key: key(),
+      eyebrow: 'Our interactive map',
+      heading: 'Find properties, explore the island.',
+      body: 'Explore the full network of Land Bank properties across Nantucket with our interactive map.',
+      ...(featuredProject ? {featuredProject: ref(featuredProject)} : {}),
+      button: {
+        _type: 'button',
+        buttonText: 'View the map',
+        link: {_type: 'link', linkType: 'href', href: '/map'},
+      },
+    },
+    {
+      // A button whose link points at no page: it must not render.
+      _type: 'mapTeaser',
+      _key: key(),
+      heading: 'Map teaser, no featured property, unresolvable button',
+      button: {_type: 'button', buttonText: 'Should not appear', link: {_type: 'link', linkType: 'page'}},
+    },
     // Hidden: must be absent on the live site and badged in Presentation.
     {_type: 'mapTeaser', _key: key(), heading: 'Hidden map teaser', body: 'Should only appear in Presentation, with a Hidden badge.', disabled: true},
     {_type: 'contactForm', _key: key(), heading: 'Contact form'},

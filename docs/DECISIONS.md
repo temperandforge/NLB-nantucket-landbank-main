@@ -699,6 +699,54 @@ consumer); see the spec.
 3, projects 4), commissioners shown as "Since Month YYYY", and the "No upcoming events right now."
 message are assumptions.
 
+## 10. News article pages and the map teaser
+
+Design: [the news article and map teaser spec](superpowers/specs/2026-10-07-news-article-and-map-teaser-design.md).
+
+### 10.1 Articles live at /news/<slug>, as a static route
+
+**Status:** Implemented
+
+`app/news/[slug]/page.tsx` renders an article (Figma: news_content_desktop). It is a static route,
+so it wins over the catch-all that owns CMS pages: a CMS page can sit at `/news` (the archive) but
+not beneath it. An unknown slug is a 404. Presentation resolves `/news/:slug` to the article, and
+the route is listed before the page routes because `/news/<slug>` also fits their two-segment
+pattern.
+
+**Implication:** Don't create CMS pages whose path begins `news/<something>`.
+
+### 10.2 A news tile goes to the article, unless it has its own link
+
+**Status:** Implemented
+
+`article.link` is now an optional override (an external story). A tile goes to it when it resolves
+(not empty, not `#`), otherwise to `/news/<slug>`. A call to action tile with no link stays a plain
+tile.
+
+### 10.3 The Share row: copy link, Facebook, LinkedIn
+
+**Status:** Implemented. Instagram is left out: it has no web share address.
+
+The buttons read the page address in the browser when clicked (`frontend/sanity/lib/share.ts`,
+checked by `frontend/scripts/verifyShare.mts`), so no site URL setting is needed and nothing is
+computed on the server. Copy-link success and failure are announced.
+
+### 10.4 "More news" has no call to action tile
+
+**Status:** Implemented, until the news archive exists
+([#11](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/11))
+
+The page shows up to three other articles, and the section is hidden when there are none.
+
+### 10.5 The Map Teaser is artwork, not a live map
+
+**Status:** Implemented, to compare with Figma ([#15](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/15))
+
+The block is the Figma Interactive Map Block: text on a brown panel, and a map illustration with a
+pin, a card for one featured `project`, and a button. Figma's absolute positions became
+percentages of the map panel's width at `md:` and up, and a stacked layout below: an assumption to
+check.
+
 ## Known outstanding items
 
 Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-design.md):

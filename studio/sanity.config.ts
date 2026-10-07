@@ -63,6 +63,12 @@ export default defineConfig({
             filter: `_type == "page" && !coalesce(pathOnly, false)
               && string::split(_id, "drafts.")[-1] == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref`,
           },
+          // A news article page. Listed before the page routes: /news/<slug> also fits their
+          // two-segment pattern, and the more specific route must be tried first.
+          {
+            route: '/news/:slug',
+            filter: `_type == "article" && slug.current == $slug`,
+          },
           // One route per URL depth, defined in src/lib/pageHierarchy.ts so the same filters can
           // be exercised by scripts/verifyPageRouting.ts instead of being restated there.
           ...PAGE_PRESENTATION_ROUTES,
@@ -73,6 +79,15 @@ export default defineConfig({
             locations: [homeLocation],
             message: 'This document is used on all pages',
             tone: 'positive',
+          }),
+          article: defineLocations({
+            select: {title: 'title', slug: 'slug.current'},
+            resolve: (doc) => ({
+              locations: doc?.slug
+                ? [{title: doc.title || 'Untitled', href: `/news/${doc.slug}`}]
+                : [],
+              message: doc?.slug ? undefined : 'Add a slug to preview this article.',
+            }),
           }),
           page: defineLocations({
             // Dereferences the parent chain so the URL can be assembled here the same way the
