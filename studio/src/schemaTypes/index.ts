@@ -30,6 +30,7 @@ import {link} from './objects/link'
 import {anchorLinks} from './objects/anchorLinks'
 import {peopleGrid} from './objects/peopleGrid'
 import {projectGrid} from './objects/projectGrid'
+import {propertyArchive} from './objects/propertyArchive'
 import {projectPreview} from './objects/projectPreview'
 import {faqList} from './objects/faqList'
 import {jobListings} from './objects/jobListings'
@@ -95,6 +96,7 @@ export const schemaTypes = [
   jobListings,
   peopleGrid,
   projectGrid,
+  propertyArchive,
   projectPreview,
   eventsPreview,
   ctaContact,

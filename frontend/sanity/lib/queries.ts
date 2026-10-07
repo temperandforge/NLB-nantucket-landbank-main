@@ -302,6 +302,19 @@ const pageBuilderFields = /* groq */ `
         "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order}
       }
     },
+    _type == "propertyArchive" => {
+      ...,
+      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {
+        _id,
+        name,
+        description,
+        link,
+        image,
+        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
+        "resources": resources[]->{"slug": slug.current, title, order}
+      },
+      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage
+    },
     _type == "imageCarousel" => {
       ...,
       images[]{
