@@ -1,6 +1,7 @@
 import {
   CalendarIcon,
   CaseIcon,
+  ClipboardIcon,
   CogIcon,
   DocumentsIcon,
   DocumentTextIcon,
@@ -8,6 +9,7 @@ import {
   EarthGlobeIcon,
   FolderIcon,
   HelpCircleIcon,
+  InboxIcon,
   MenuIcon,
   PinIcon,
   TagIcon,
@@ -54,6 +56,8 @@ const DISABLED_TYPES = [
   'faq',
   'faqCategory',
   'job',
+  'form',
+  'formSubmission',
   // Internal to sanity-plugin-media. Tags are managed inside the Media tool, so listing them at
   // the root would just be a dead end for an editor.
   'media.tag',
@@ -130,6 +134,22 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
             ]),
         ),
       S.documentTypeListItem('job').title('Jobs').icon(CaseIcon),
+      // Forms: the forms editors build, and what visitors sent. Submissions hold personal data, so
+      // they sit in their own clearly named list rather than among content.
+      S.listItem()
+        .title('Forms')
+        .icon(ClipboardIcon)
+        .child(
+          S.list()
+            .title('Forms')
+            .items([
+              S.documentTypeListItem('form').title('Forms').icon(ClipboardIcon),
+              S.divider(),
+              S.documentTypeListItem('formSubmission')
+                .title('Submissions (personal data)')
+                .icon(InboxIcon),
+            ]),
+        ),
       S.divider(),
       // Globals: content rendered on every page rather than on a page of its own. Menus live
       // here rather than under Pages because they are navigation, not content.
