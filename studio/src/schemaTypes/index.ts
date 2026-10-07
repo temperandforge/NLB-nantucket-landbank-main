@@ -8,6 +8,7 @@ import {hero} from './objects/hero'
 import {heroImage} from './objects/heroImage'
 import {heroSecondary} from './objects/heroSecondary'
 import {heroTertiary} from './objects/heroTertiary'
+import {basicLeftRightText} from './objects/basicLeftRightText'
 import {settings} from './singletons/settings'
 import {footer} from './singletons/footer'
 import {projectSettings} from './singletons/projectSettings'
@@ -44,6 +45,7 @@ export const schemaTypes = [
   heroImage,
   heroSecondary,
   heroTertiary,
+  basicLeftRightText,
   link,
   // Menu building blocks - menuGroup nests menuLink, capped at two levels
   menuGroup,

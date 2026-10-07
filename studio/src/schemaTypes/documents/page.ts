@@ -158,6 +158,7 @@ export const page = defineType({
         {type: 'heroImage'},
         {type: 'heroSecondary'},
         {type: 'heroTertiary'},
+        {type: 'basicLeftRightText'},
       ],
       hidden: ({document}) => Boolean(document?.pathOnly),
       options: {

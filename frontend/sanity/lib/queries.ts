@@ -143,15 +143,15 @@ export const mapSettingsQuery = defineQuery(`
   }
 `)
 
-/** Projects a Portable Text field and resolves page references inside its link annotations. */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const portableText = (field: string) => /* groq */ `
-  ${field}[]{
+/**
+ * Resolves page references inside a Portable Text field's link annotations. A constant, not a
+ * function of the field name: a function call inside a template literal widens the query's type
+ * to `string`, and typegen's result map is keyed by the literal.
+ */
+const markDefsFields = /* groq */ `
+  markDefs[]{
     ...,
-    markDefs[]{
-      ...,
-      ${linkReference}
-    }
+    ${linkReference}
   }
 `
 
@@ -165,6 +165,21 @@ const pageBuilderFields = /* groq */ `
     _type == "heroVideo" => {
       ...,
       "videoUrl": video.asset->url
+    },
+    _type == "basicLeftRightText" => {
+      ...,
+      body[]{
+        ...,
+        ${markDefsFields}
+      },
+      rightContent[]{
+        ...,
+        ${markDefsFields}
+      },
+      button{
+        ...,
+        ${linkFields}
+      }
     },
   }
 `
