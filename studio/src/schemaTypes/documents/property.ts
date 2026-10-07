@@ -6,18 +6,20 @@ import {BoundaryIdInput} from '../../components/BoundaryIdInput'
 /**
  * A Land Bank property - the parcels, beaches, trails and ponds shown on the interactive map.
  *
- * Replaces the hardcoded list that used to live in frontend/app/map/properties.ts. Categorisation
+ * Listed on the Properties archive too. It replaced the `project` type (migrated by
+ * scripts/migrateProjectsToProperties.ts), which itself replaced the hardcoded list that used to
+ * live in frontend/app/map/properties.ts. Categorisation
  * is by reference to propertyType and resource documents so the client can extend either without
  * a deploy.
  *
  * Boundary geometry is NOT stored here. The client maintains one GeoJSON file covering every
- * boundary (uploaded on Project Settings) and each project points into it by identifier - see
+ * boundary (uploaded on Project Settings) and each property points into it by identifier - see
  * boundaryId below.
  */
 
-export const project = defineType({
-  name: 'project',
-  title: 'Project',
+export const property = defineType({
+  name: 'property',
+  title: 'Property',
   type: 'document',
   icon: PinIcon,
   groups: [
@@ -46,7 +48,8 @@ export const project = defineType({
       title: 'Image',
       type: 'image',
       group: 'details',
-      description: 'Shown in the map popup.',
+      description:
+        'Shown in the map popup and on the Properties archive. A property without one shows the default property image from Site Settings.',
       options: {hotspot: true},
       fields: [
         defineField({

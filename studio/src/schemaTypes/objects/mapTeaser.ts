@@ -31,7 +31,7 @@ export const mapTeaser = defineBlock({
       name: 'featuredProject',
       title: 'Featured property',
       type: 'reference',
-      to: [{type: 'project'}],
+      to: [{type: 'property'}],
       description: 'Fills the detail card on the map. Leave empty to hide the card.',
     }),
     defineField({

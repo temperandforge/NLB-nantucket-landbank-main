@@ -1,6 +1,6 @@
 import {menu} from './documents/menu'
 import {page} from './documents/page'
-import {project} from './documents/project'
+import {property} from './documents/property'
 import {article} from './documents/article'
 import {commissioner} from './documents/commissioner'
 import {event} from './documents/event'
@@ -57,7 +57,7 @@ export const schemaTypes = [
   // Documents
   page,
   menu,
-  project,
+  property,
   article,
   event,
   staffMember,
@@ -68,7 +68,7 @@ export const schemaTypes = [
   newsCategory,
   department,
   faqCategory,
-  // Categorisation for projects - referenced, so the client can extend either without a deploy
+  // Categorisation for properties - referenced, so the client can extend either without a deploy
   propertyType,
   resource,
   // Objects

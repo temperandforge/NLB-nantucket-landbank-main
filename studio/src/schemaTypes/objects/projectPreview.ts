@@ -28,7 +28,7 @@ export const projectPreview = defineBlock({
       title: 'Projects',
       type: 'array',
       description: 'Shown in order, numbered 01, 02, 03. Up to four.',
-      of: [defineArrayMember({type: 'reference', to: [{type: 'project'}]})],
+      of: [defineArrayMember({type: 'reference', to: [{type: 'property'}]})],
       validation: (rule) => rule.max(4),
     }),
   ],

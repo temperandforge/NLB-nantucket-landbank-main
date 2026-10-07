@@ -50,7 +50,7 @@ export function BoundaryIdInput(props: StringInputProps) {
             setState({
               status: 'notice',
               message:
-                'No boundary data file has been uploaded yet. Add one under Projects → Project Settings, then reopen this project.',
+                'No boundary data file has been uploaded yet. Add one under Projects → Project Settings, then reopen this property.',
             })
           }
           return
@@ -168,7 +168,7 @@ export function BoundaryIdInput(props: StringInputProps) {
       {isOrphaned ? (
         <Card padding={3} radius={2} shadow={1} tone="critical">
           <Text size={1}>
-            &ldquo;{value}&rdquo; is not in the uploaded boundary file, so this project will not
+            &ldquo;{value}&rdquo; is not in the uploaded boundary file, so this property will not
             draw on the map. Pick one of the {state.options.length} available boundaries.
           </Text>
         </Card>
