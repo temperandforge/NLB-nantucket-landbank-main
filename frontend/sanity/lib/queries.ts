@@ -283,6 +283,14 @@ const pageBuilderFields = /* groq */ `
         "resources": resources[]->{"slug": slug.current, title}
       }
     },
+    _type == "mapTeaser" => {
+      ...,
+      button{
+        ...,
+        ${linkFields}
+      },
+      "featuredProject": featuredProject->{name, description, image}
+    },
     _type == "downloadBlock" => {
       ...,
       downloads[]{

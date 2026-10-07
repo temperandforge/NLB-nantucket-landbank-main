@@ -326,3 +326,9 @@
 .rich-text-basic ol {
   list-style: decimal;
 }
+
+/* Map Teaser (Figma 1910:9569). The brown panel's line art is a very wide drawing, positioned as
+   in the design: 10381 x 1369, offset -541px from the top. */
+.map-teaser__lines {
+  background: url('/images/blocks/map-teaser-lines.svg') 0 -541px / 10381.64px 1369.495px no-repeat;
+}

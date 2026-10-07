@@ -1,6 +1,10 @@
+import {ArrowRightIcon} from '@/components/icons'
+
 type ButtonLinkProps = {
   label: string
   href: string
+  /** An arrow after the label. */
+  rightIcon?: boolean
   variant?: 'primary' | 'secondary' | 'ghost'
   newTab?: boolean
   className?: string
@@ -18,6 +22,7 @@ export default function ButtonLink({
   href,
   variant = 'primary',
   newTab = false,
+  rightIcon = false,
   className,
 }: ButtonLinkProps) {
   return (
@@ -28,6 +33,7 @@ export default function ButtonLink({
       className={`button ${VARIANT_CLASSES[variant]} ${className ?? ''}`}
     >
       {label}
+      {rightIcon && <ArrowRightIcon className="size-6 shrink-0" />}
     </a>
   )
 }
