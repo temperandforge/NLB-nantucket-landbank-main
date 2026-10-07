@@ -3,7 +3,7 @@ import {LinkIcon} from '@sanity/icons'
 
 /**
  * A single clickable menu entry - a label plus the shared 'link' object, so menus get
- * URL / page reference / post reference support and 'open in new tab' for free, and link
+ * URL / page reference support and 'open in new tab' for free, and link
  * authoring stays consistent with the rest of the Studio.
  *
  * Used as a leaf both at the top level of a menu and inside a menuGroup's submenu. Menu
@@ -36,9 +36,8 @@ export const menuLink = defineType({
       linkType: 'link.linkType',
       href: 'link.href',
       pageSlug: 'link.page->slug.current',
-      postSlug: 'link.post->slug.current',
     },
-    prepare({label, linkType, href, pageSlug, postSlug}) {
+    prepare({label, linkType, href, pageSlug}) {
       // Show where the link actually points, so a menu of a dozen items is scannable
       // without opening each one.
       let subtitle: string | undefined
@@ -48,9 +47,6 @@ export const menuLink = defineType({
           break
         case 'page':
           subtitle = pageSlug ? `/${pageSlug}` : 'No page selected'
-          break
-        case 'post':
-          subtitle = postSlug ? `/posts/${postSlug}` : 'No post selected'
           break
         default:
           subtitle = undefined

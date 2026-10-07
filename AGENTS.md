@@ -73,15 +73,16 @@ Design docs live in [docs/superpowers/specs/](docs/superpowers/specs/).
 ## Routing
 
 - **`app/[...slug]` is a catch-all** owning all page paths; `params.slug` is `string[]`. More
-  specific routes (`app/posts/[slug]`, `app/map`) still win, so adding a static route above it is
+  specific routes (`app/map`) still win, so adding a static route above it is
   safe.
 - **`link.href` and `socialLink.url` allow relative URLs.** Internal links are site-relative and
   `#` is the placeholder convention; the default `url` validation rejects both.
 - **Presentation needs both directions wired** — a `mainDocuments` route per depth (URL →
   document) and `defineLocations` per type (document → URL). Presentation picks a route by
   parameter count. Anchor each with `!defined(...)` at the top of the parent chain or a shallow
-  URL resolves to a deeper document, and keep page routes below more specific ones like
-  `/posts/:slug`. `defineLocations` `select` does dereference, so `parent->slug.current` works.
+  URL resolves to a deeper document, and keep page routes below any more specific static route. A `defineLocations` `select` is a
+  document-preview path, not GROQ: dereference with dots (`parent.slug.current`). `parent->slug.current`
+  returns undefined there, so a nested page previews at its leaf slug alone.
 
 ## Frontend and design
 
@@ -123,6 +124,15 @@ the result. Derive component prop types from the generated query result types (s
 
 Use `#` for a link whose real path isn't known yet, and create no page for it. Never invent a
 plausible external URL to fill a gap — say what's outstanding instead.
+
+## Deferred work
+
+**Every piece of deferred work gets a GitHub issue.** When you descope, stub, disable or leave
+something unfinished, open one with `gh issue create` before finishing, and link it from the spec's
+deferred section (and from a `TODO` in code, if one is needed). The issue states what is missing,
+why it was deferred, and enough context to act on without this conversation. Search existing issues
+first (`gh issue list --search`) so you don't file a duplicate. Mention the issue numbers in your
+summary to the user.
 
 ## Verification
 

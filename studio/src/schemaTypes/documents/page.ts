@@ -1,7 +1,7 @@
 import {defineField, defineType} from 'sanity'
 import {DocumentIcon} from '@sanity/icons'
 
-import {buildPagePath, MAX_PAGE_DEPTH} from '../../lib/pageHierarchy'
+import {buildPagePath, MAX_PAGE_DEPTH, slugifySegment} from '../../lib/pageHierarchy'
 
 /**
  * Page schema.  Define and edit the fields for the 'page' content type.
@@ -43,50 +43,25 @@ function publishedId(id: string): string {
 
 export const page = defineType({
   name: 'page',
-  title: 'Flexible Page',
+  title: 'Page',
   type: 'document',
   icon: DocumentIcon,
+  groups: [
+    {name: 'content', title: 'Content', default: true},
+    {name: 'settings', title: 'Settings'},
+  ],
   fields: [
     defineField({
       name: 'name',
+      group: 'content',
       title: 'Name',
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
 
     defineField({
-      name: 'parent',
-      title: 'Parent page',
-      type: 'reference',
-      to: [{type: 'page'}],
-      description:
-        'Optional. Nests this page under another one in the URL. Leave empty for a top-level page. The parent must be published, or this page’s URL will break.',
-      validation: (Rule) =>
-        Rule.custom(async (value, context) => {
-          const ref = (value as {_ref?: string} | undefined)?._ref
-          if (!ref) return true
-
-          const selfId = publishedId(context.document?._id ?? '')
-          if (publishedId(ref) === selfId) return 'A page cannot be its own parent.'
-
-          const client = context.getClient({apiVersion: '2025-09-25'})
-          const chain = (await ancestorIds(client, ref)).map(publishedId)
-
-          // A cycle would make path computation non-terminating.
-          if (chain.includes(selfId)) {
-            return 'This would create a loop - the chosen page is already below this one.'
-          }
-          // chain excludes the parent itself, so its length is the parent's own ancestor count.
-          // parent + its ancestors + this page must stay within MAX_PAGE_DEPTH.
-          if (chain.length + 2 > MAX_PAGE_DEPTH) {
-            return `Pages can be nested ${MAX_PAGE_DEPTH} levels deep at most. Choose a parent nearer the top.`
-          }
-          return true
-        }),
-    }),
-
-    defineField({
       name: 'slug',
+      group: 'settings',
       title: 'Slug',
       type: 'slug',
       description:
@@ -126,19 +101,45 @@ export const page = defineType({
         source: 'name',
         maxLength: 96,
         // Slashes are stripped: a slug is one segment, and nesting comes from 'parent'.
-        slugify: (input) =>
-          input
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9\s-]/g, '')
-            .replace(/[\s-]+/g, '-')
-            .replace(/^-|-$/g, '')
-            .slice(0, 96),
+        slugify: slugifySegment,
       },
     }),
 
     defineField({
+      name: 'parent',
+      group: 'settings',
+      title: 'Parent page',
+      type: 'reference',
+      to: [{type: 'page'}],
+      description:
+        'Optional. Nests this page under another one in the URL. Leave empty for a top-level page. The parent must be published, or this page’s URL will break.',
+      validation: (Rule) =>
+        Rule.custom(async (value, context) => {
+          const ref = (value as {_ref?: string} | undefined)?._ref
+          if (!ref) return true
+
+          const selfId = publishedId(context.document?._id ?? '')
+          if (publishedId(ref) === selfId) return 'A page cannot be its own parent.'
+
+          const client = context.getClient({apiVersion: '2025-09-25'})
+          const chain = (await ancestorIds(client, ref)).map(publishedId)
+
+          // A cycle would make path computation non-terminating.
+          if (chain.includes(selfId)) {
+            return 'This would create a loop - the chosen page is already below this one.'
+          }
+          // chain excludes the parent itself, so its length is the parent's own ancestor count.
+          // parent + its ancestors + this page must stay within MAX_PAGE_DEPTH.
+          if (chain.length + 2 > MAX_PAGE_DEPTH) {
+            return `Pages can be nested ${MAX_PAGE_DEPTH} levels deep at most. Choose a parent nearer the top.`
+          }
+          return true
+        }),
+    }),
+
+    defineField({
       name: 'pathOnly',
+      group: 'settings',
       title: 'Path segment only (no page of its own)',
       type: 'boolean',
       initialValue: false,
@@ -147,28 +148,11 @@ export const page = defineType({
     }),
 
     defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-      // Not required for a path-only page: it is never rendered, so it has no heading to show.
-      hidden: ({document}) => Boolean(document?.pathOnly),
-      validation: (Rule) =>
-        Rule.custom((value, context) => {
-          if (context.document?.pathOnly) return true
-          return value ? true : 'Required'
-        }),
-    }),
-    defineField({
-      name: 'subheading',
-      title: 'Subheading',
-      type: 'string',
-      hidden: ({document}) => Boolean(document?.pathOnly),
-    }),
-    defineField({
       name: 'pageBuilder',
+      group: 'content',
       title: 'Page builder',
       type: 'array',
-      of: [{type: 'callToAction'}, {type: 'infoSection'}],
+      of: [{type: 'heroVideo'}],
       hidden: ({document}) => Boolean(document?.pathOnly),
       options: {
         insertMenu: {

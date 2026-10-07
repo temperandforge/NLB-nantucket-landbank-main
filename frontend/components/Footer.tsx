@@ -56,7 +56,7 @@ export default async function Footer() {
     footer
 
   return (
-    <footer className="siteFooter relative overflow-hidden bg-brand-lowlands text-warm-neutral-50">
+    <footer className="siteFooter relative overflow-hidden bg-lowlands-500 text-warm-neutral-50">
       {/*
         Decorative wave. Reproduces the Figma structure exactly: a 4758x760 box centred on the
         footer, with the artwork bleeding past its top and left edges (inset -7.29% / -1.1%),

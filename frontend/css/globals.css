@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './tokens.css';
 
 @plugin "@tailwindcss/typography";
 
@@ -44,24 +45,16 @@
   --default-transition-duration: 250ms;
 
   /**
-   * Nantucket design system tokens.
-   *
-   * Named after the Figma variables they come from (color/brand/Lowlands ->
-   * --color-brand-lowlands) so the two stay traceable to each other. Only the tokens the
-   * footer consumes are here - the rest of the design system is a separate task, and the
-   * starter-template tokens above are still in use by other pages.
+   * Nantucket tokens that are not in the Figma variable collections (those are in tokens.css):
+   * the footer's layout spacing and one off-palette neutral. Named after their Figma variables.
+   * The starter-template tokens above are still in use by other pages.
    */
-  --color-brand-lowlands: #3d5934;
-  --color-brand-goldenrod: #ecbb20;
   --color-warm-neutral-50: #fdf9f4;
 
-  --font-primary: var(--font-eb-garamond), ui-serif, Georgia, serif;
-  --font-secondary: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono-tracked: var(--font-dm-mono), ui-monospace, monospace;
-
-  --text-body-small: 13px;
-  --text-body-base: 16px;
-  --text-headline-base: 32px;
+  /* Brand font names used by components, aliased to the Figma families in tokens.css. */
+  --font-primary: var(--font-serif);
+  --font-secondary: var(--font-sans);
+  --font-mono-tracked: var(--font-mono);
 
   --spacing-gap-mini: 4px;
   --spacing-gap-sm: 12px;

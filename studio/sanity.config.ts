@@ -36,21 +36,6 @@ const homeLocation = {
   href: '/',
 } satisfies DocumentLocation
 
-// resolveHref() is a convenience function that resolves the URL
-// path for different document types and used in the presentation tool.
-//
-// Pages are deliberately absent: a page's URL comes from its parent chain, not its slug alone,
-// so it is assembled in that type's location resolver below rather than from a single value here.
-function resolveHref(documentType?: string, slug?: string): string | undefined {
-  switch (documentType) {
-    case 'post':
-      return slug ? `/posts/${slug}` : undefined
-    default:
-      console.warn('Invalid document type:', documentType)
-      return undefined
-  }
-}
-
 // Main Sanity configuration
 export default defineConfig({
   name: 'default',
@@ -71,17 +56,12 @@ export default defineConfig({
       resolve: {
         // The Main Document Resolver API provides a method of resolving a main document from a given route or route pattern. https://www.sanity.io/docs/visual-editing/presentation-resolver-api#57720a5678d9
         mainDocuments: defineDocuments([
+          // The root shows the landing page chosen in Site Settings. A draft is matched too, so a
+          // landing page that has not been published yet still opens in Presentation.
           {
             route: '/',
-            filter: `_type == "settings" && _id == "siteSettings"`,
-          },
-          // Ahead of the page routes below, which would otherwise capture /posts/:slug as a
-          // two-segment page path.
-          {
-            route: '/posts/:slug',
-            // Parenthesised deliberately: without it && binds tighter than ||, so the filter
-            // matched any document whose _id happened to equal the slug.
-            filter: `_type == "post" && (slug.current == $slug || _id == $slug)`,
+            filter: `_type == "page" && !coalesce(pathOnly, false)
+              && string::split(_id, "drafts.")[-1] == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref`,
           },
           // One route per URL depth, defined in src/lib/pageHierarchy.ts so the same filters can
           // be exercised by scripts/verifyPageRouting.ts instead of being restated there.
@@ -120,24 +100,6 @@ export default defineConfig({
                 ],
               }
             },
-          }),
-          post: defineLocations({
-            select: {
-              title: 'title',
-              slug: 'slug.current',
-            },
-            resolve: (doc) => ({
-              locations: [
-                {
-                  title: doc?.title || 'Untitled',
-                  href: resolveHref('post', doc?.slug)!,
-                },
-                {
-                  title: 'Home',
-                  href: '/',
-                } satisfies DocumentLocation,
-              ].filter(Boolean) as DocumentLocation[],
-            }),
           }),
         },
       },

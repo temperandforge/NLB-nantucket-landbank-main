@@ -119,8 +119,6 @@ async function ensurePage(slug: string, name: string): Promise<string> {
     _type: 'page',
     name,
     slug: {_type: 'slug', current: slug},
-    // 'heading' is required by the page schema.
-    heading: name,
   })
   console.log(`  + page created: ${slug} (${created._id})`)
   return created._id

@@ -46,7 +46,7 @@ not a demonstrated need. Raise the cap only when something actually requires it.
 
 **Status:** Implemented
 
-**Why:** URL / page reference / post reference and `openInNewTab` come for free, and link
+**Why:** URL / page reference and `openInNewTab` come for free, and link
 authoring stays identical everywhere in the Studio.
 
 **Implication:** Extending `link` extends every menu. Prefer changing `link` over adding a
@@ -283,8 +283,8 @@ through the same path, because the page query excludes it rather than the route 
 there is no real route hierarchy to build. One catch-all owns all page paths.
 
 **Implication:** `params.slug` is `string[]`; type it `PageProps<'/[...slug]'>` and join with
-`/` for the lookup. More specific routes still win — `/posts/x` matches `app/posts/[slug]` and
-`/map` matches `app/map` before the catch-all is considered. Adding a real static route above
+`/` for the lookup. More specific routes still win — `/map` matches
+`app/map` before the catch-all is considered. Adding a real static route above
 the catch-all is safe.
 
 ### 3.2 `link.href` allows relative URLs
@@ -314,12 +314,14 @@ Presentation selects a route by parameter count, so one route per depth covers e
 **Implication:** Each route is anchored with `!defined(...)` at the top of the parent chain, so
 a shallow URL cannot resolve to a deeper document — without it, `/conservation` would also match
 the page that lives at `/about-us/conservation`. Page routes must sit below more specific ones
-like `/posts/:slug`, which a two-segment page route would otherwise capture. A `pathOnly` page
+like a future `/news/:slug`, which a two-segment page route would otherwise capture. A `pathOnly` page
 reports no location rather than a broken link.
 
-`defineLocations` `select` **does** dereference (`parent->slug.current`), which is what makes
-assembling the URL there possible; `verifyPageRouting.ts` exercises that projection so a
-regression surfaces.
+`defineLocations` `select` dereferences through document-preview paths (`parent.slug.current`),
+which is what makes assembling the URL there possible. It is **not** GROQ: `parent->slug.current`
+returns undefined, so a nested page was previewed at its leaf slug alone (`/conservation`, a 404).
+`verifyPageRouting.ts` checks the GROQ equivalent of these fields; it cannot prove the preview store
+follows the reference, so confirm that in Presentation after changing the select.
 
 ---
 
@@ -486,7 +488,8 @@ fill a gap. Use `#` and list what is outstanding.
 Every spec in `docs/superpowers/specs/` ends with a deferred-work section.
 
 **Implication:** When you descope something, write it down there with enough context to act on
-later.
+later, and open a GitHub issue for it (see AGENTS.md "Deferred work") so it is tracked outside the
+spec.
 
 ### 6.3 Content-shape contracts get an executable check
 
@@ -526,7 +529,7 @@ Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-desig
 - Newsletter submission has no provider, action, or validation.
 - Cookie Settings needs a consent manager; it is a JS trigger, not a URL.
 - `/map` and the seeded `explore/interactive-map` page overlap; one should redirect.
-- The Studio's Flexible Pages list is flat. It shows each page's resolved path in the subtitle,
+- The Studio's Pages list is flat. It shows each page's resolved path in the subtitle,
   but does not nest children under their parent, which gets harder to scan as pages are added.
 - Markers and boundaries render only once Mapbox fires `load`, which needs the style request to
   `api.mapbox.com` to succeed. If a dev server is started without `NEXT_PUBLIC_MAPBOX_TOKEN`
@@ -537,8 +540,18 @@ Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-desig
   at `studio/scripts/data/boundaries.geojson` and uses the project slug as each feature's `id`.
 - `project` has no page of its own and no body content. Explore → Properties is still `#`.
 - Renaming an ancestor's slug silently changes every descendant URL (2.3). There is no redirect
-  mechanism for the old paths.
+  mechanism for the old paths (tracked in [#9](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/9)).
 - Mobile footer breakpoints are assumptions awaiting designer confirmation.
 - `frontend/tailwind.config.ts` is vestigial under Tailwind v4 — `globals.css` uses
   `@import 'tailwindcss'` with `@theme` and no `@config`, so the file is never loaded. Its
   `green` / `yellow` scales are unrelated to the brand palette.
+
+## Content model reset (2026-10)
+
+- Removed the `post`, `person`, `commissioner`, `staffMember`, `department`, `commissionersPage` and
+  `staffPage` types, with the /posts route and its components. The Studio's "Page Content" folder is
+  now a flat "Pages" list.
+- `settings.landingPage` references the `page` shown at `/`; Presentation's `/` route resolves to it.
+  With none set, `/` redirects to `/map`.
+- `studio/scripts/cleanupRemovedTypes.ts` deleted every page and all orphaned documents, and turned
+  menu links to deleted pages into `#` placeholders. Re-run `seedFooterContent.ts` to recreate pages.

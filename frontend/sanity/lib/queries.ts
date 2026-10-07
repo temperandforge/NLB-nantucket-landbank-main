@@ -2,17 +2,6 @@ import {defineQuery} from 'next-sanity'
 
 export const settingsQuery = defineQuery(`*[_type == "settings"][0]`)
 
-const postFields = /* groq */ `
-  _id,
-  "status": select(_originalId in path("drafts.**") => "draft", "published"),
-  "title": coalesce(title, "Untitled"),
-  "slug": slug.current,
-  excerpt,
-  coverImage,
-  "date": coalesce(date, _updatedAt),
-  "author": author->{firstName, lastName, picture},
-`
-
 /**
  * Assembles a page's URL path from its parent chain.
  *
@@ -32,8 +21,7 @@ const pagePath = /* groq */ `select(
 
 const linkReference = /* groq */ `
   _type == "link" => {
-    "page": page->{"path": ${pagePath}}.path,
-    "post": post->slug.current
+    "page": page->{"path": ${pagePath}}.path
   }
 `
 
@@ -46,7 +34,7 @@ const linkFields = /* groq */ `
 
 /**
  * A menu item is either a menuLink (label + link) or a menuGroup (label + nested menuLinks).
- * Both shapes resolve their links through linkFields so page/post references come back as
+ * Both shapes resolve their links through linkFields so page references come back as
  * slugs, ready for linkResolver().
  */
 const menuItemFields = /* groq */ `
@@ -156,6 +144,25 @@ export const mapSettingsQuery = defineQuery(`
 `)
 
 /**
+ * The projection shared by every query that renders a page, so a page looked up by path and the
+ * landing page chosen in Site Settings come back in the same shape.
+ */
+const pageFields = /* groq */ `
+  _id,
+  _type,
+  name,
+  slug,
+  "path": ${pagePath},
+  "pageBuilder": pageBuilder[]{
+    ...,
+    _type == "heroVideo" => {
+      ...,
+      "videoUrl": video.asset->url
+    },
+  }
+`
+
+/**
  * Look up a page by its full derived path.
  *
  * Filters on the leaf slug first so the database does the narrowing, then compares the assembled
@@ -164,81 +171,37 @@ export const mapSettingsQuery = defineQuery(`
  */
 export const getPageQuery = defineQuery(`
   *[_type == 'page' && slug.current == $leaf && !coalesce(pathOnly, false)]{
-    _id,
-    _type,
-    name,
-    slug,
-    heading,
-    subheading,
-    "path": ${pagePath},
-    "pageBuilder": pageBuilder[]{
-      ...,
-      _type == "callToAction" => {
-        ...,
-        button {
-          ...,
-          ${linkFields}
-        }
-      },
-      _type == "infoSection" => {
-        content[]{
-          ...,
-          markDefs[]{
-            ...,
-            ${linkReference}
-          }
-        }
-      },
-    },
+    ${pageFields}
   }[path == $path][0]
+`)
+
+/**
+ * The page chosen as the site's landing page in Site Settings. Null when none is set, or when the
+ * chosen page is unpublished or a pathOnly grouping segment (which has no page of its own).
+ * Matched on _type and the fixed singleton id for the same reason as footerQuery.
+ */
+export const landingPageQuery = defineQuery(`
+  *[
+    _type == "page" && !coalesce(pathOnly, false)
+    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref
+  ][0]{
+    ${pageFields}
+  }
 `)
 
 /**
  * Sitemap entries.
  *
- * pathOnly pages are excluded because they 404, and the parentheses around the type check are
- * deliberate - without them `&& defined(slug.current)` binds only to the post branch, so pages
- * with no slug were being included.
+ * pathOnly pages are excluded because they 404.
  */
 export const sitemapData = defineQuery(`
   *[
-    (_type == "post" && defined(slug.current)) ||
-    (_type == "page" && defined(slug.current) && !coalesce(pathOnly, false))
-  ] | order(_type asc) {
+    _type == "page" && defined(slug.current) && !coalesce(pathOnly, false)
+  ] {
     _type,
     _updatedAt,
-    "slug": select(_type == "page" => ${pagePath}, slug.current),
+    "slug": ${pagePath},
   }
-`)
-
-export const allPostsQuery = defineQuery(`
-  *[_type == "post" && defined(slug.current)] | order(date desc, _updatedAt desc) {
-    ${postFields}
-  }
-`)
-
-export const morePostsQuery = defineQuery(`
-  *[_type == "post" && _id != $skip && defined(slug.current)] | order(date desc, _updatedAt desc) [0...$limit] {
-    ${postFields}
-  }
-`)
-
-export const postQuery = defineQuery(`
-  *[_type == "post" && slug.current == $slug] [0] {
-    content[]{
-    ...,
-    markDefs[]{
-      ...,
-      ${linkReference}
-    }
-  },
-    ${postFields}
-  }
-`)
-
-export const postPagesSlugs = defineQuery(`
-  *[_type == "post" && defined(slug.current)]
-  {"slug": slug.current}
 `)
 
 // pathOnly pages are excluded: they have no route, so prerendering one would 404.

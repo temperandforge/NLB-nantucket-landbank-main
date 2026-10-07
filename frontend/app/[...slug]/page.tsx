@@ -1,11 +1,9 @@
 import type {Metadata} from 'next'
-import Head from 'next/head'
 import {notFound} from 'next/navigation'
 
-import PageBuilderPage from '@/components/PageBuilder'
+import PageView from '@/components/PageView'
 import {sanityFetch} from '@/sanity/lib/live'
 import {getPageQuery, pagesSlugs} from '@/sanity/lib/queries'
-import {GetPageQueryResult} from '@/sanity.types'
 
 /**
  * This is a catch-all segment rather than a single [slug] because a page URL spans as many
@@ -13,7 +11,7 @@ import {GetPageQueryResult} from '@/sanity.types'
  * marked pathOnly and have no page of their own - so there is no real route hierarchy to build.
  * One catch-all owns every page path.
  *
- * More specific routes still win over this one: /posts/x matches app/posts/[slug] and /map
+ * More specific routes still win over this one: /map
  * matches app/map, both of which Next.js checks before a catch-all.
  */
 
@@ -63,7 +61,6 @@ export async function generateMetadata(props: PageProps<'/[...slug]'>): Promise<
 
   return {
     title: page?.name,
-    description: page?.heading,
   } satisfies Metadata
 }
 
@@ -80,24 +77,5 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
     notFound()
   }
 
-  return (
-    <div className="my-12 lg:my-24">
-      <Head>
-        <title>{page.heading}</title>
-      </Head>
-      <div className="">
-        <div className="container">
-          <div className="pb-6 border-b border-gray-100">
-            <div className="max-w-3xl">
-              <h1 className="text-4xl text-gray-900 sm:text-5xl lg:text-7xl">{page.heading}</h1>
-              <p className="mt-4 text-base lg:text-lg leading-relaxed text-gray-600 uppercase font-light">
-                {page.subheading}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <PageBuilderPage page={page as GetPageQueryResult} />
-    </div>
-  )
+  return <PageView page={page} />
 }

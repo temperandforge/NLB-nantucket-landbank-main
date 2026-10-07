@@ -24,6 +24,18 @@ export const settings = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'landingPage',
+      title: 'Landing page',
+      type: 'reference',
+      to: [{type: 'page'}],
+      description:
+        'The page shown at the site root (/). Until one is chosen, visitors are sent to the map. The page must be published.',
+      options: {
+        // A path-only page has no page of its own, so it cannot be a landing page.
+        filter: '!coalesce(pathOnly, false)',
+      },
+    }),
+    defineField({
       name: 'description',
       description: 'Used on the Homepage',
       title: 'Description',
@@ -53,7 +65,6 @@ export const settings = defineType({
                       list: [
                         {title: 'URL', value: 'href'},
                         {title: 'Page', value: 'page'},
-                        {title: 'Post', value: 'post'},
                       ],
                       layout: 'radio',
                     },
@@ -83,21 +94,6 @@ export const settings = defineType({
                         const parent = context.parent as Link
                         if (parent?.linkType === 'page' && !value) {
                           return 'Page reference is required when Link Type is Page'
-                        }
-                        return true
-                      }),
-                  }),
-                  defineField({
-                    name: 'post',
-                    title: 'Post',
-                    type: 'reference',
-                    to: [{type: 'post'}],
-                    hidden: ({parent}) => parent?.linkType !== 'post',
-                    validation: (Rule) =>
-                      Rule.custom((value, context) => {
-                        const parent = context.parent as Link
-                        if (parent?.linkType === 'post' && !value) {
-                          return 'Post reference is required when Link Type is Post'
                         }
                         return true
                       }),
