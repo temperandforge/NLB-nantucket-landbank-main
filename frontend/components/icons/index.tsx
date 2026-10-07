@@ -199,3 +199,21 @@ export function ArrowDownRightIcon({className}: IconProps) {
     </svg>
   )
 }
+
+/** Chevron pointing down. Figma: chevron-down. 24 x 24. */
+export function ChevronDownIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+/** Chevron pointing up. Figma: chevron-up. 24 x 24. */
+export function ChevronUpIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <path d="M18 15L12 9L6 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}

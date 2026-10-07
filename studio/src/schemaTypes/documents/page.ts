@@ -15,6 +15,7 @@ import {jumpNavContent} from '../objects/jumpNavContent'
 import {mapTeaser} from '../objects/mapTeaser'
 import {missionStatement} from '../objects/missionStatement'
 import {eventsPreview} from '../objects/eventsPreview'
+import {faqList} from '../objects/faqList'
 import {newsPreview} from '../objects/newsPreview'
 import {timeline} from '../objects/timeline'
 import {buildPagePath, MAX_PAGE_DEPTH, slugifySegment} from '../../lib/pageHierarchy'
@@ -29,6 +30,7 @@ const pageBuilderBlocks = [
   ctaContact,
   downloadBlock,
   eventsPreview,
+  faqList,
   hero,
   heroImage,
   heroSecondary,

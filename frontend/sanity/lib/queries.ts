@@ -231,6 +231,29 @@ const pageBuilderFields = /* groq */ `
         description
       }
     },
+    _type == "faqList" => {
+      ...,
+      "ungrouped": *[_type == "faq" && !defined(category)] | order(order asc, question asc) {
+        _id,
+        question,
+        answer[]{
+          ...,
+          ${markDefsFields}
+        }
+      },
+      "groups": *[_type == "faqCategory"] | order(order asc, title asc) {
+        _id,
+        title,
+        "faqs": *[_type == "faq" && category._ref == ^._id] | order(order asc, question asc) {
+          _id,
+          question,
+          answer[]{
+            ...,
+            ${markDefsFields}
+          }
+        }
+      }[count(faqs) > 0]
+    },
     _type == "downloadBlock" => {
       ...,
       downloads[]{

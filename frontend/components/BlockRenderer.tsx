@@ -5,6 +5,7 @@ import Hero from '@/components/blocks/Hero'
 import CtaContact from '@/components/blocks/CtaContact'
 import EventsPreview from '@/components/blocks/EventsPreview'
 import NewsPreview from '@/components/blocks/NewsPreview'
+import FaqList from '@/components/blocks/FaqList'
 import MissionStatement from '@/components/blocks/MissionStatement'
 import ContactForm from '@/components/blocks/ContactForm'
 import DownloadBlock from '@/components/blocks/DownloadBlock'
@@ -48,6 +49,7 @@ const Blocks = {
   missionStatement: MissionStatement,
   newsPreview: NewsPreview,
   eventsPreview: EventsPreview,
+  faqList: FaqList,
 } as BlocksType
 
 /**

@@ -268,7 +268,7 @@
 /* Rich text in Basic - Left Right Text (nlb-design BasicLeftRight): sections 64px apart, a
    heading 24px above its text, link rows 16px apart (set on the anchor-links wrapper). */
 .rich-text-basic {
-  color: var(--color-on-background);
+  color: var(--rich-text-color, var(--color-on-background));
   font-family: var(--font-sans);
   font-size: var(--text-body-base);
   line-height: 1.6;

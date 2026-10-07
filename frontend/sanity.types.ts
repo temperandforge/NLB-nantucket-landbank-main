@@ -111,6 +111,12 @@ export type EventsPreview = {
   disabled?: boolean
 }
 
+export type FaqList = {
+  _type: 'faqList'
+  heading?: string
+  disabled?: boolean
+}
+
 export type NewsPreview = {
   _type: 'newsPreview'
   heading?: string
@@ -774,6 +780,9 @@ export type Page = {
       } & EventsPreview)
     | ({
         _key: string
+      } & FaqList)
+    | ({
+        _key: string
       } & Hero)
     | ({
         _key: string
@@ -1056,6 +1065,7 @@ export type AllSanitySchemaTypes =
   | MenuGroup
   | CtaContact
   | EventsPreview
+  | FaqList
   | NewsPreview
   | MissionStatement
   | AnchorLinks
@@ -1312,7 +1322,7 @@ export type MapSettingsQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: getPageQuery
-// Query: *[_type == 'page' && slug.current == $leaf && !coalesce(pathOnly, false)]{      _id,  _type,  name,  slug,  "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),    pageBuilder[$includeHidden || !coalesce(disabled, false)]{    ...,    _type == "heroVideo" => {      ...,      "videoUrl": video.asset->url    },    _type == "basicLeftRightText" => {      ...,      buttons[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      rightContent[]{        ...,        _type == "anchorLinks" => {          links[]{            ...,              link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }          }        },          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },    _type == "missionStatement" => {      ...,      links[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "ctaContact" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "newsPreview" => {      ...,      ctaLink{        ...,          _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      },      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) [0...12] {        _id,        title,        date,        image,        link{          ...,            _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }        },        "categories": categories[]->{"slug": slug.current, title}      }    },    _type == "eventsPreview" => {      ...,      "events": *[        _type == "event" && defined(start)        && dateTime(coalesce(end, start)) >= dateTime(now())      ] | order(start asc) [0...12] {        _id,        title,        start,        end,        location,        description      }    },    _type == "downloadBlock" => {      ...,      downloads[]{        ...,        "fileUrl": file.asset->url,        "fileName": file.asset->originalFilename      }    },    _type == "jumpNavContent" => {      ...,      content[]{        ...,        _type == "anchorLinks" => {          links[]{            ...,              link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }          }        },          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },  }  }[path == $path][0]
+// Query: *[_type == 'page' && slug.current == $leaf && !coalesce(pathOnly, false)]{      _id,  _type,  name,  slug,  "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),    pageBuilder[$includeHidden || !coalesce(disabled, false)]{    ...,    _type == "heroVideo" => {      ...,      "videoUrl": video.asset->url    },    _type == "basicLeftRightText" => {      ...,      buttons[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      rightContent[]{        ...,        _type == "anchorLinks" => {          links[]{            ...,              link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }          }        },          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },    _type == "missionStatement" => {      ...,      links[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "ctaContact" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "newsPreview" => {      ...,      ctaLink{        ...,          _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      },      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) [0...12] {        _id,        title,        date,        image,        link{          ...,            _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }        },        "categories": categories[]->{"slug": slug.current, title}      }    },    _type == "eventsPreview" => {      ...,      "events": *[        _type == "event" && defined(start)        && dateTime(coalesce(end, start)) >= dateTime(now())      ] | order(start asc) [0...12] {        _id,        title,        start,        end,        location,        description      }    },    _type == "faqList" => {      ...,      "ungrouped": *[_type == "faq" && !defined(category)] | order(order asc, question asc) {        _id,        question,        answer[]{          ...,            markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }        }      },      "groups": *[_type == "faqCategory"] | order(order asc, title asc) {        _id,        title,        "faqs": *[_type == "faq" && category._ref == ^._id] | order(order asc, question asc) {          _id,          question,          answer[]{            ...,              markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }          }        }      }[count(faqs) > 0]    },    _type == "downloadBlock" => {      ...,      downloads[]{        ...,        "fileUrl": file.asset->url,        "fileName": file.asset->originalFilename      }    },    _type == "jumpNavContent" => {      ...,      content[]{        ...,        _type == "anchorLinks" => {          links[]{            ...,              link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }          }        },          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },  }  }[path == $path][0]
 export type GetPageQueryResult = {
   _id: string
   _type: 'page'
@@ -1456,6 +1466,114 @@ export type GetPageQueryResult = {
           end: string | null
           location: string | null
           description: string | null
+        }>
+      }
+    | {
+        _key: string
+        _type: 'faqList'
+        heading?: string
+        disabled?: boolean
+        ungrouped: Array<{
+          _id: string
+          question: string
+          answer: Array<
+            | {
+                _key: string
+                _type: 'anchorLinks'
+                links?: Array<{
+                  label: string
+                  link?: Link
+                  icon?: 'download' | 'link'
+                  _type: 'anchorLink'
+                  _key: string
+                }>
+                markDefs: null
+              }
+            | {
+                children?: Array<{
+                  marks?: Array<string>
+                  text?: string
+                  _type: 'span'
+                  _key: string
+                }>
+                style?: 'blockquote' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+                listItem?: 'bullet' | 'number'
+                markDefs: Array<{
+                  linkType?: 'href' | 'page'
+                  href?: string
+                  page: string | null
+                  openInNewTab?: boolean
+                  _type: 'link'
+                  _key: string
+                }> | null
+                level?: number
+                _type: 'block'
+                _key: string
+              }
+            | {
+                asset?: SanityImageAssetReference
+                media?: unknown
+                hotspot?: SanityImageHotspot
+                crop?: SanityImageCrop
+                alt?: string
+                _type: 'image'
+                _key: string
+                markDefs: null
+              }
+          >
+        }>
+        groups: Array<{
+          _id: string
+          title: string
+          faqs: Array<{
+            _id: string
+            question: string
+            answer: Array<
+              | {
+                  _key: string
+                  _type: 'anchorLinks'
+                  links?: Array<{
+                    label: string
+                    link?: Link
+                    icon?: 'download' | 'link'
+                    _type: 'anchorLink'
+                    _key: string
+                  }>
+                  markDefs: null
+                }
+              | {
+                  children?: Array<{
+                    marks?: Array<string>
+                    text?: string
+                    _type: 'span'
+                    _key: string
+                  }>
+                  style?: 'blockquote' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+                  listItem?: 'bullet' | 'number'
+                  markDefs: Array<{
+                    linkType?: 'href' | 'page'
+                    href?: string
+                    page: string | null
+                    openInNewTab?: boolean
+                    _type: 'link'
+                    _key: string
+                  }> | null
+                  level?: number
+                  _type: 'block'
+                  _key: string
+                }
+              | {
+                  asset?: SanityImageAssetReference
+                  media?: unknown
+                  hotspot?: SanityImageHotspot
+                  crop?: SanityImageCrop
+                  alt?: string
+                  _type: 'image'
+                  _key: string
+                  markDefs: null
+                }
+            >
+          }>
         }>
       }
     | {
@@ -1687,7 +1805,7 @@ export type GetPageQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: landingPageQuery
-// Query: *[    _type == "page" && !coalesce(pathOnly, false)    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref  ][0]{      _id,  _type,  name,  slug,  "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),    pageBuilder[$includeHidden || !coalesce(disabled, false)]{    ...,    _type == "heroVideo" => {      ...,      "videoUrl": video.asset->url    },    _type == "basicLeftRightText" => {      ...,      buttons[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      rightContent[]{        ...,        _type == "anchorLinks" => {          links[]{            ...,              link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }          }        },          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },    _type == "missionStatement" => {      ...,      links[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "ctaContact" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "newsPreview" => {      ...,      ctaLink{        ...,          _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      },      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) [0...12] {        _id,        title,        date,        image,        link{          ...,            _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }        },        "categories": categories[]->{"slug": slug.current, title}      }    },    _type == "eventsPreview" => {      ...,      "events": *[        _type == "event" && defined(start)        && dateTime(coalesce(end, start)) >= dateTime(now())      ] | order(start asc) [0...12] {        _id,        title,        start,        end,        location,        description      }    },    _type == "downloadBlock" => {      ...,      downloads[]{        ...,        "fileUrl": file.asset->url,        "fileName": file.asset->originalFilename      }    },    _type == "jumpNavContent" => {      ...,      content[]{        ...,        _type == "anchorLinks" => {          links[]{            ...,              link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }          }        },          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },  }  }
+// Query: *[    _type == "page" && !coalesce(pathOnly, false)    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref  ][0]{      _id,  _type,  name,  slug,  "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),    pageBuilder[$includeHidden || !coalesce(disabled, false)]{    ...,    _type == "heroVideo" => {      ...,      "videoUrl": video.asset->url    },    _type == "basicLeftRightText" => {      ...,      buttons[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      rightContent[]{        ...,        _type == "anchorLinks" => {          links[]{            ...,              link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }          }        },          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },    _type == "missionStatement" => {      ...,      links[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "ctaContact" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "newsPreview" => {      ...,      ctaLink{        ...,          _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      },      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) [0...12] {        _id,        title,        date,        image,        link{          ...,            _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }        },        "categories": categories[]->{"slug": slug.current, title}      }    },    _type == "eventsPreview" => {      ...,      "events": *[        _type == "event" && defined(start)        && dateTime(coalesce(end, start)) >= dateTime(now())      ] | order(start asc) [0...12] {        _id,        title,        start,        end,        location,        description      }    },    _type == "faqList" => {      ...,      "ungrouped": *[_type == "faq" && !defined(category)] | order(order asc, question asc) {        _id,        question,        answer[]{          ...,            markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }        }      },      "groups": *[_type == "faqCategory"] | order(order asc, title asc) {        _id,        title,        "faqs": *[_type == "faq" && category._ref == ^._id] | order(order asc, question asc) {          _id,          question,          answer[]{            ...,              markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }          }        }      }[count(faqs) > 0]    },    _type == "downloadBlock" => {      ...,      downloads[]{        ...,        "fileUrl": file.asset->url,        "fileName": file.asset->originalFilename      }    },    _type == "jumpNavContent" => {      ...,      content[]{        ...,        _type == "anchorLinks" => {          links[]{            ...,              link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }          }        },          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },  }  }
 export type LandingPageQueryResult = {
   _id: string
   _type: 'page'
@@ -1831,6 +1949,114 @@ export type LandingPageQueryResult = {
           end: string | null
           location: string | null
           description: string | null
+        }>
+      }
+    | {
+        _key: string
+        _type: 'faqList'
+        heading?: string
+        disabled?: boolean
+        ungrouped: Array<{
+          _id: string
+          question: string
+          answer: Array<
+            | {
+                _key: string
+                _type: 'anchorLinks'
+                links?: Array<{
+                  label: string
+                  link?: Link
+                  icon?: 'download' | 'link'
+                  _type: 'anchorLink'
+                  _key: string
+                }>
+                markDefs: null
+              }
+            | {
+                children?: Array<{
+                  marks?: Array<string>
+                  text?: string
+                  _type: 'span'
+                  _key: string
+                }>
+                style?: 'blockquote' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+                listItem?: 'bullet' | 'number'
+                markDefs: Array<{
+                  linkType?: 'href' | 'page'
+                  href?: string
+                  page: string | null
+                  openInNewTab?: boolean
+                  _type: 'link'
+                  _key: string
+                }> | null
+                level?: number
+                _type: 'block'
+                _key: string
+              }
+            | {
+                asset?: SanityImageAssetReference
+                media?: unknown
+                hotspot?: SanityImageHotspot
+                crop?: SanityImageCrop
+                alt?: string
+                _type: 'image'
+                _key: string
+                markDefs: null
+              }
+          >
+        }>
+        groups: Array<{
+          _id: string
+          title: string
+          faqs: Array<{
+            _id: string
+            question: string
+            answer: Array<
+              | {
+                  _key: string
+                  _type: 'anchorLinks'
+                  links?: Array<{
+                    label: string
+                    link?: Link
+                    icon?: 'download' | 'link'
+                    _type: 'anchorLink'
+                    _key: string
+                  }>
+                  markDefs: null
+                }
+              | {
+                  children?: Array<{
+                    marks?: Array<string>
+                    text?: string
+                    _type: 'span'
+                    _key: string
+                  }>
+                  style?: 'blockquote' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+                  listItem?: 'bullet' | 'number'
+                  markDefs: Array<{
+                    linkType?: 'href' | 'page'
+                    href?: string
+                    page: string | null
+                    openInNewTab?: boolean
+                    _type: 'link'
+                    _key: string
+                  }> | null
+                  level?: number
+                  _type: 'block'
+                  _key: string
+                }
+              | {
+                  asset?: SanityImageAssetReference
+                  media?: unknown
+                  hotspot?: SanityImageHotspot
+                  crop?: SanityImageCrop
+                  alt?: string
+                  _type: 'image'
+                  _key: string
+                  markDefs: null
+                }
+            >
+          }>
         }>
       }
     | {
@@ -2085,8 +2311,8 @@ declare module '@sanity/client' {
     '\n  *[_type == "project" && defined(slug.current)] | order(name asc) {\n    _id,\n    name,\n    "slug": slug.current,\n    boundaryId,\n    location,\n    description,\n    link,\n    "image": image{"url": asset->url, alt},\n    "propertyTypes": propertyTypes[]->{"slug": slug.current, title},\n    "resources": resources[]->{"slug": slug.current, title}\n  }\n': ProjectsQueryResult
     '{\n  "propertyTypes": *[_type == "propertyType" && defined(slug.current)] | order(title asc){\n    "slug": slug.current,\n    title\n  },\n  "resources": *[_type == "resource" && defined(slug.current)] | order(title asc){\n    "slug": slug.current,\n    title\n  }\n}': MapFiltersQueryResult
     '\n  *[_type == "projectSettings" && _id == "projectSettings"][0]{\n    eyebrow,\n    heading,\n    intro,\n    "boundaryDataUrl": boundaryData.asset->url,\n    "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),\n    "trailsDataUrl": trailsData.asset->url,\n    defaultCenter,\n    defaultZoom\n  }\n': MapSettingsQueryResult
-    '\n  *[_type == \'page\' && slug.current == $leaf && !coalesce(pathOnly, false)]{\n    \n  _id,\n  _type,\n  name,\n  slug,\n  "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  \n  pageBuilder[$includeHidden || !coalesce(disabled, false)]{\n    ...,\n    _type == "heroVideo" => {\n      ...,\n      "videoUrl": video.asset->url\n    },\n    _type == "basicLeftRightText" => {\n      ...,\n      buttons[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      rightContent[]{\n        ...,\n        _type == "anchorLinks" => {\n          links[]{\n            ...,\n            \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n          }\n        },\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n    _type == "missionStatement" => {\n      ...,\n      links[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "ctaContact" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "newsPreview" => {\n      ...,\n      ctaLink{\n        ...,\n        \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      },\n      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) [0...12] {\n        _id,\n        title,\n        date,\n        image,\n        link{\n          ...,\n          \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n        },\n        "categories": categories[]->{"slug": slug.current, title}\n      }\n    },\n    _type == "eventsPreview" => {\n      ...,\n      "events": *[\n        _type == "event" && defined(start)\n        && dateTime(coalesce(end, start)) >= dateTime(now())\n      ] | order(start asc) [0...12] {\n        _id,\n        title,\n        start,\n        end,\n        location,\n        description\n      }\n    },\n    _type == "downloadBlock" => {\n      ...,\n      downloads[]{\n        ...,\n        "fileUrl": file.asset->url,\n        "fileName": file.asset->originalFilename\n      }\n    },\n    _type == "jumpNavContent" => {\n      ...,\n      content[]{\n        ...,\n        _type == "anchorLinks" => {\n          links[]{\n            ...,\n            \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n          }\n        },\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n  }\n\n\n  }[path == $path][0]\n': GetPageQueryResult
-    '\n  *[\n    _type == "page" && !coalesce(pathOnly, false)\n    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref\n  ][0]{\n    \n  _id,\n  _type,\n  name,\n  slug,\n  "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  \n  pageBuilder[$includeHidden || !coalesce(disabled, false)]{\n    ...,\n    _type == "heroVideo" => {\n      ...,\n      "videoUrl": video.asset->url\n    },\n    _type == "basicLeftRightText" => {\n      ...,\n      buttons[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      rightContent[]{\n        ...,\n        _type == "anchorLinks" => {\n          links[]{\n            ...,\n            \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n          }\n        },\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n    _type == "missionStatement" => {\n      ...,\n      links[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "ctaContact" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "newsPreview" => {\n      ...,\n      ctaLink{\n        ...,\n        \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      },\n      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) [0...12] {\n        _id,\n        title,\n        date,\n        image,\n        link{\n          ...,\n          \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n        },\n        "categories": categories[]->{"slug": slug.current, title}\n      }\n    },\n    _type == "eventsPreview" => {\n      ...,\n      "events": *[\n        _type == "event" && defined(start)\n        && dateTime(coalesce(end, start)) >= dateTime(now())\n      ] | order(start asc) [0...12] {\n        _id,\n        title,\n        start,\n        end,\n        location,\n        description\n      }\n    },\n    _type == "downloadBlock" => {\n      ...,\n      downloads[]{\n        ...,\n        "fileUrl": file.asset->url,\n        "fileName": file.asset->originalFilename\n      }\n    },\n    _type == "jumpNavContent" => {\n      ...,\n      content[]{\n        ...,\n        _type == "anchorLinks" => {\n          links[]{\n            ...,\n            \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n          }\n        },\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n  }\n\n\n  }\n': LandingPageQueryResult
+    '\n  *[_type == \'page\' && slug.current == $leaf && !coalesce(pathOnly, false)]{\n    \n  _id,\n  _type,\n  name,\n  slug,\n  "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  \n  pageBuilder[$includeHidden || !coalesce(disabled, false)]{\n    ...,\n    _type == "heroVideo" => {\n      ...,\n      "videoUrl": video.asset->url\n    },\n    _type == "basicLeftRightText" => {\n      ...,\n      buttons[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      rightContent[]{\n        ...,\n        _type == "anchorLinks" => {\n          links[]{\n            ...,\n            \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n          }\n        },\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n    _type == "missionStatement" => {\n      ...,\n      links[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "ctaContact" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "newsPreview" => {\n      ...,\n      ctaLink{\n        ...,\n        \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      },\n      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) [0...12] {\n        _id,\n        title,\n        date,\n        image,\n        link{\n          ...,\n          \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n        },\n        "categories": categories[]->{"slug": slug.current, title}\n      }\n    },\n    _type == "eventsPreview" => {\n      ...,\n      "events": *[\n        _type == "event" && defined(start)\n        && dateTime(coalesce(end, start)) >= dateTime(now())\n      ] | order(start asc) [0...12] {\n        _id,\n        title,\n        start,\n        end,\n        location,\n        description\n      }\n    },\n    _type == "faqList" => {\n      ...,\n      "ungrouped": *[_type == "faq" && !defined(category)] | order(order asc, question asc) {\n        _id,\n        question,\n        answer[]{\n          ...,\n          \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n        }\n      },\n      "groups": *[_type == "faqCategory"] | order(order asc, title asc) {\n        _id,\n        title,\n        "faqs": *[_type == "faq" && category._ref == ^._id] | order(order asc, question asc) {\n          _id,\n          question,\n          answer[]{\n            ...,\n            \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n          }\n        }\n      }[count(faqs) > 0]\n    },\n    _type == "downloadBlock" => {\n      ...,\n      downloads[]{\n        ...,\n        "fileUrl": file.asset->url,\n        "fileName": file.asset->originalFilename\n      }\n    },\n    _type == "jumpNavContent" => {\n      ...,\n      content[]{\n        ...,\n        _type == "anchorLinks" => {\n          links[]{\n            ...,\n            \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n          }\n        },\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n  }\n\n\n  }[path == $path][0]\n': GetPageQueryResult
+    '\n  *[\n    _type == "page" && !coalesce(pathOnly, false)\n    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref\n  ][0]{\n    \n  _id,\n  _type,\n  name,\n  slug,\n  "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  \n  pageBuilder[$includeHidden || !coalesce(disabled, false)]{\n    ...,\n    _type == "heroVideo" => {\n      ...,\n      "videoUrl": video.asset->url\n    },\n    _type == "basicLeftRightText" => {\n      ...,\n      buttons[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      rightContent[]{\n        ...,\n        _type == "anchorLinks" => {\n          links[]{\n            ...,\n            \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n          }\n        },\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n    _type == "missionStatement" => {\n      ...,\n      links[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "ctaContact" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "newsPreview" => {\n      ...,\n      ctaLink{\n        ...,\n        \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      },\n      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) [0...12] {\n        _id,\n        title,\n        date,\n        image,\n        link{\n          ...,\n          \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n        },\n        "categories": categories[]->{"slug": slug.current, title}\n      }\n    },\n    _type == "eventsPreview" => {\n      ...,\n      "events": *[\n        _type == "event" && defined(start)\n        && dateTime(coalesce(end, start)) >= dateTime(now())\n      ] | order(start asc) [0...12] {\n        _id,\n        title,\n        start,\n        end,\n        location,\n        description\n      }\n    },\n    _type == "faqList" => {\n      ...,\n      "ungrouped": *[_type == "faq" && !defined(category)] | order(order asc, question asc) {\n        _id,\n        question,\n        answer[]{\n          ...,\n          \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n        }\n      },\n      "groups": *[_type == "faqCategory"] | order(order asc, title asc) {\n        _id,\n        title,\n        "faqs": *[_type == "faq" && category._ref == ^._id] | order(order asc, question asc) {\n          _id,\n          question,\n          answer[]{\n            ...,\n            \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n          }\n        }\n      }[count(faqs) > 0]\n    },\n    _type == "downloadBlock" => {\n      ...,\n      downloads[]{\n        ...,\n        "fileUrl": file.asset->url,\n        "fileName": file.asset->originalFilename\n      }\n    },\n    _type == "jumpNavContent" => {\n      ...,\n      content[]{\n        ...,\n        _type == "anchorLinks" => {\n          links[]{\n            ...,\n            \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n          }\n        },\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n  }\n\n\n  }\n': LandingPageQueryResult
     '\n  *[\n    _type == "page" && defined(slug.current) && !coalesce(pathOnly, false)\n  ] {\n    _type,\n    _updatedAt,\n    "slug": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  }\n': SitemapDataResult
     '\n  *[_type == "page" && defined(slug.current) && !coalesce(pathOnly, false)]\n  {"slug": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}\n': PagesSlugsResult
   }
