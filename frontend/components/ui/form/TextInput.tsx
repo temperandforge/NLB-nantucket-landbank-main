@@ -28,7 +28,6 @@ export default function TextInput({field, id, value, error, onChange, onBlur}: C
       inputMode={field.fieldType === 'number' ? 'decimal' : undefined}
       autoComplete={field.fieldType === 'email' ? 'email' : field.fieldType === 'phone' ? 'tel' : undefined}
       placeholder={field.placeholder ?? undefined}
-      maxLength={field.maxLength ?? undefined}
       required={false}
       aria-required={field.required || undefined}
       aria-invalid={error ? true : undefined}

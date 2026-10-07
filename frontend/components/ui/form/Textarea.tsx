@@ -25,7 +25,6 @@ export default function Textarea({field, id, value, error, onChange, onBlur}: Co
         id={id}
         name={field.name ?? undefined}
         placeholder={field.placeholder ?? undefined}
-        maxLength={max ?? undefined}
         aria-required={field.required || undefined}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy(id, field, error, Boolean(max))}

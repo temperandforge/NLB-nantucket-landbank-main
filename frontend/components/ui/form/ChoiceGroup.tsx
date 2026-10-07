@@ -28,8 +28,12 @@ export default function ChoiceGroup({field, id, value, error, onChange, onBlur}:
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) onBlur()
       }}
-      aria-required={field.required || undefined}
-      aria-invalid={error ? true : undefined}
+      // aria-required and aria-invalid are only supported on the radiogroup role, not on a plain
+      // group. A checkbox group keeps aria-describedby: the asterisk is in the legend and the
+      // error text is reached through the description.
+      role={multi ? undefined : 'radiogroup'}
+      aria-required={!multi ? field.required || undefined : undefined}
+      aria-invalid={!multi && error ? true : undefined}
       aria-describedby={describedBy(id, field, error)}
     >
       <legend className="form-legend mb-3">
@@ -44,7 +48,7 @@ export default function ChoiceGroup({field, id, value, error, onChange, onBlur}:
             <input
               id={optionId}
               type={multi ? 'checkbox' : 'radio'}
-              name={id}
+              name={field.name ?? undefined}
               value={option}
               checked={checked}
               onChange={(event) => toggle(option, event.target.checked)}
