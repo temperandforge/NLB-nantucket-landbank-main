@@ -2,6 +2,7 @@
 @import './tokens.css';
 @import './blocks.css';
 @import './ui.css';
+@import './form.css';
 
 @plugin "@tailwindcss/typography";
 
