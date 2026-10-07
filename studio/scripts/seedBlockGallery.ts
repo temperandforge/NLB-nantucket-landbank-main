@@ -101,6 +101,7 @@ async function main() {
 
   // A project for the Map Teaser's detail card, if the dataset has one.
   const featuredProject = await client.fetch<string | null>(`*[_type == "project"][0]._id`)
+  const projectRefs = await client.fetch<string[]>(`*[_type == "project" && !(_id in path("drafts.**"))][0...3]._id`)
 
   const pageBuilder = [
     {
@@ -247,7 +248,7 @@ async function main() {
       _key: key(),
       eyebrow: 'Image carousel',
       images: [
-        {_key: key(), _type: 'carouselImage', image: imageValue(beach, 'Dionis Beach'), caption: 'Dionis Beach'},
+        {_key: key(), _type: 'carouselImage', image: imageValue(beach, 'Dionis Beach'), caption: 'Dionis Beach', link: {_type: 'link', linkType: 'href', href: '/map'}},
         {_key: key(), _type: 'carouselImage', image: imageValue(jetties, 'Jetties Beach'), caption: 'Jetties Beach'},
         {_key: key(), _type: 'carouselImage', image: imageValue(pond, 'Long Pond'), caption: 'Long Pond'},
         {_key: key(), _type: 'carouselImage', image: imageValue(beach, 'Dionis Beach'), caption: 'Dionis Beach again'},
@@ -363,6 +364,14 @@ async function main() {
     {_type: 'peopleGrid', _key: key(), heading: 'Staff', source: 'staff'},
     {_type: 'peopleGrid', _key: key(), heading: 'Commissioners', source: 'commissioners'},
     {_type: 'projectGrid', _key: key(), heading: 'Properties'},
+    {
+      _type: 'projectPreview',
+      _key: key(),
+      eyebrow: 'Projects - Conservation',
+      body: 'Our conservation work does not stop at the property line. We partner with scientists, agencies and local organizations to monitor wildlife, restore habitat and track how the island is changing.',
+      button: {_type: 'button', buttonText: 'View all projects', link: {_type: 'link', linkType: 'href', href: '/map'}},
+      projects: projectRefs.slice(0, 3).map((id) => ({...ref(id), _key: key()})),
+    },
 
     // Empty states: every optional field empty. These must render without error or junk.
     {_type: 'hero', _key: key()},
@@ -392,6 +401,7 @@ async function main() {
     {_type: 'faqList', _key: key()},
     {_type: 'peopleGrid', _key: key(), source: 'staff'},
     {_type: 'projectGrid', _key: key()},
+    {_type: 'projectPreview', _key: key()},
   ]
 
   const doc = {

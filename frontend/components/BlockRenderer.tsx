@@ -6,8 +6,10 @@ import CtaContact from '@/components/blocks/CtaContact'
 import EventsPreview from '@/components/blocks/EventsPreview'
 import NewsPreview from '@/components/blocks/NewsPreview'
 import FaqList from '@/components/blocks/FaqList'
+import JobListings from '@/components/blocks/JobListings'
 import PeopleGrid from '@/components/blocks/PeopleGrid'
 import ProjectGrid from '@/components/blocks/ProjectGrid'
+import ProjectPreview from '@/components/blocks/ProjectPreview'
 import MissionStatement from '@/components/blocks/MissionStatement'
 import ContactForm from '@/components/blocks/ContactForm'
 import DownloadBlock from '@/components/blocks/DownloadBlock'
@@ -52,8 +54,10 @@ const Blocks = {
   newsPreview: NewsPreview,
   eventsPreview: EventsPreview,
   faqList: FaqList,
+  jobListings: JobListings,
   peopleGrid: PeopleGrid,
   projectGrid: ProjectGrid,
+  projectPreview: ProjectPreview,
 } as BlocksType
 
 /**

@@ -260,6 +260,21 @@ const pageBuilderFields = /* groq */ `
         }
       }[count(faqs) > 0]
     },
+    _type == "jobListings" => {
+      ...,
+      "jobs": *[_type == "job"] | order(order asc, title asc) {
+        _id,
+        title,
+        description,
+        location,
+        employmentType,
+        "department": department->{"slug": slug.current, title},
+        applyLink{
+          ...,
+          ${linkReference}
+        }
+      }
+    },
     _type == "peopleGrid" => {
       ...,
       "staff": *[_type == "staffMember" && ^.source == "staff"] | order(order asc, name asc) {
@@ -287,6 +302,26 @@ const pageBuilderFields = /* groq */ `
         link,
         "propertyTypes": propertyTypes[]->{"slug": slug.current, title},
         "resources": resources[]->{"slug": slug.current, title}
+      }
+    },
+    _type == "imageCarousel" => {
+      ...,
+      images[]{
+        ...,
+        ${linkFields}
+      }
+    },
+    _type == "projectPreview" => {
+      ...,
+      button{
+        ...,
+        ${linkFields}
+      },
+      "projects": projects[]->{
+        _id,
+        name,
+        image,
+        link
       }
     },
     _type == "mapTeaser" => {

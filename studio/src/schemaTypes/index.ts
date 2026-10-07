@@ -5,6 +5,7 @@ import {article} from './documents/article'
 import {commissioner} from './documents/commissioner'
 import {event} from './documents/event'
 import {faq} from './documents/faq'
+import {job} from './documents/job'
 import {staffMember} from './documents/staffMember'
 import {department, faqCategory, newsCategory} from './documents/taxonomies'
 import {propertyType} from './documents/propertyType'
@@ -29,7 +30,9 @@ import {link} from './objects/link'
 import {anchorLinks} from './objects/anchorLinks'
 import {peopleGrid} from './objects/peopleGrid'
 import {projectGrid} from './objects/projectGrid'
+import {projectPreview} from './objects/projectPreview'
 import {faqList} from './objects/faqList'
+import {jobListings} from './objects/jobListings'
 import {newsPreview} from './objects/newsPreview'
 import {eventsPreview} from './objects/eventsPreview'
 import {missionStatement} from './objects/missionStatement'
@@ -60,6 +63,7 @@ export const schemaTypes = [
   staffMember,
   commissioner,
   faq,
+  job,
   // Categorisation for the above - referenced, so the client can extend them without a deploy
   newsCategory,
   department,
@@ -88,8 +92,10 @@ export const schemaTypes = [
   missionStatement,
   newsPreview,
   faqList,
+  jobListings,
   peopleGrid,
   projectGrid,
+  projectPreview,
   eventsPreview,
   ctaContact,
   // Menu building blocks - menuGroup nests menuLink, capped at two levels

@@ -1,5 +1,6 @@
 import {
   CalendarIcon,
+  CaseIcon,
   CogIcon,
   DocumentsIcon,
   DocumentTextIcon,
@@ -52,6 +53,7 @@ const DISABLED_TYPES = [
   'department',
   'faq',
   'faqCategory',
+  'job',
   // Internal to sanity-plugin-media. Tags are managed inside the Media tool, so listing them at
   // the root would just be a dead end for an editor.
   'media.tag',
@@ -127,6 +129,7 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
               S.documentTypeListItem('faqCategory').title('FAQ Categories').icon(TagIcon),
             ]),
         ),
+      S.documentTypeListItem('job').title('Jobs').icon(CaseIcon),
       S.divider(),
       // Globals: content rendered on every page rather than on a page of its own. Menus live
       // here rather than under Pages because they are navigation, not content.

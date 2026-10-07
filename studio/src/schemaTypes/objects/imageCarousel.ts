@@ -3,7 +3,12 @@ import {defineArrayMember, defineField} from 'sanity'
 
 import {defineBlock, eyebrowField, imageWithAltField} from './blockFields'
 
-/** A horizontally scrolling row of captioned images. */
+/**
+ * A horizontally scrolling row of images (Figma: Image Carousel). The eyebrow shows as a tag
+ * above the row. An image with a label opens into a green card showing the label and an arrow on
+ * hover or focus; with a link it is clickable. The field is still named `caption`, so existing
+ * content keeps its text.
+ */
 export const imageCarousel = defineBlock({
   name: 'imageCarousel',
   title: 'Image Carousel',
@@ -21,7 +26,18 @@ export const imageCarousel = defineBlock({
           name: 'carouselImage',
           fields: [
             imageWithAltField({required: true}),
-            defineField({name: 'caption', title: 'Caption', type: 'string'}),
+            defineField({
+              name: 'caption',
+              title: 'Label',
+              type: 'string',
+              description: 'Shown on the card when the image is hovered or focused.',
+            }),
+            defineField({
+              name: 'link',
+              title: 'Link',
+              type: 'link',
+              description: 'Optional. Leave empty for an image that is not a link.',
+            }),
           ],
           preview: {
             select: {title: 'caption', media: 'image'},
