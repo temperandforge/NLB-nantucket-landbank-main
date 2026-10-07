@@ -37,20 +37,21 @@ This repo's `tokens.css` and `$ND/css/tokens.css` come from the same Figma varia
 
 | Topic | `$ND` | This repo | Resolution |
 |---|---|---|---|
-| Headline sizes | fluid `clamp` between 375px and 1440px | stepwise, switching at 768px | Keep this repo's `--text-headline-*` untouched (the footer uses them). Add **new** fluid utilities `text-fluid-2xl/xl/lg/base/sm`, each = heading style + the `$ND` clamp. Follow-up issue: unify typography. |
-| `headline-2xl` | `clamp(2.6875rem, …, 5rem)` | absent | Added inside `text-fluid-2xl` (Task 1). |
+| Headline and display sizes | fluid `clamp` between 375px and 1440px | stepwise, switching at 768px | **Replace** this repo's stepwise `--text-display-*` and `--text-headline-*` with `$ND`'s fluid clamps, add `--text-headline-2xl`, drop the mobile override block, and define `text-headline-2xl/xl/lg/base` utilities (serif, -0.05em, 1.1) exactly as `$ND` does. No parallel utilities are added. |
+| Slice 1 `text-h1..h6` | n/a | fluid, weight 500 | **Removed.** Their remaining users (`Hero`, `JumpNavContent`, `MapTeaser`, `ContactForm`) move to `text-headline-*` by visual size: h1 -> 2xl, h2 -> xl, h3 -> lg, h4 -> base, h5/h6 -> sm. |
+| Footer's `text-headline-base` | n/a | stepwise size only | Now also gets the heading style (serif, -0.05em). Re-checked in Task 1; its look must not regress. |
 | Section spacing `py-s1`..`s9` | fluid clamps | absent | Added to `@theme` in Task 1, with `rem` literals. |
-| Letter-spacing `tracking-wide` | `0.125rem` (2px) | `0.02em` | Figma eyebrow measures 1.54px (≈0.11em). Use `0.11em` for tag/eyebrow labels. Flag. |
+| `tracking-wide` | `0.125rem` (2px) | `0.02em` | **Replace** with `0.125rem`. Tags and eyebrows use it. `tracking-tight` and `tracking-normal` are left alone (the base heading style uses `tracking-tight`). |
 | `hover-darker` / `hover-lighter` | 8% / 70% translucent mixes | solid hexes | Do not touch the existing tokens. UI CSS uses its own `--ui-hover-darker` / `--ui-hover-lighter` mixes. Flag. |
 | Semantic colours (`background`, `primary`, `surface-dark`, `on-*`, `tag`…) | same names | same names | Reused as is. |
-| `tf-px` | `clamp(1.25rem … 2.25rem)` | `clamp(1.5rem … 2.9507rem)` (Task 1 of slice 1) | Keep this repo's. Flag. |
-| Heading weight | 400 | 500 on `text-h*` | `text-fluid-*` is 400, as in `$ND`. |
+| `tf-px` | `clamp(1.25rem … 2.25rem)` | `clamp(1.5rem … 2.9507rem)` (slice 1) | Keep this repo's. Flag. |
+| Heading weight | 400 | 500 on `text-h*` | `text-headline-*` is 400, as in `$ND`. |
 
 ## Review Focus
 
 Input classes the spec implies but a happy-path build does not exercise. Each is pinned by a named step.
 
-1. **A link row, mission link or button whose link resolves to nothing** (empty page reference, unpublished page, blank URL) renders nothing, not a dead link or a labelled blank. Pinned in Tasks 3, 7, 8 and the Task 10 gallery.
+1. **A link row, mission link or button whose link resolves to nothing** (empty page reference, unpublished page, blank URL) renders nothing, not a dead link or a labelled blank. Pinned in Tasks 3, 4, 7, 8 and the Task 10 gallery.
 2. **A rich-text anchor-links item with zero links, or links with no label.** It renders nothing. Pinned in Task 3.
 3. **A timeline with 0, 1 or 2 entries, or more than ten.** Fewer slides than the slider shows per page, and line lengths cycling past ten entries, must not break the dot math or throw. Pinned in Task 9.
 4. **CTA and hero images missing** (no asset, or deleted): text and button still render, with no broken `<img>`. Pinned in Tasks 5, 6 and 8.
@@ -59,29 +60,29 @@ Input classes the spec implies but a happy-path build does not exercise. Each is
 ## File Structure
 
 **Create (frontend):**
-- `css/ui.css` — shared UI CSS ported from `$ND/css/components/*.css`, plus the fluid heading/spacing helpers
-- `components/ui/{Tag,Button,LinkButton,IconButton,LinkRow}.tsx`
+- `css/ui.css` — shared UI CSS ported from `$ND/css/components/*.css`, plus the heading utilities and section spacing
+- `components/ui/{Tag,Button,ButtonLink,LinkButton,IconButton,LinkRow}.tsx`
 - `components/blocks/{MissionStatement,CtaContact,TimelineSlider}.tsx`
 - `public/images/blocks/` — line art copied from `$ND/public/svg`
 - `docs/design/` (repo root `docs/`) — `$ND/docs` moved in
 
 **Create (studio):** `objects/{anchorLinks,missionStatement,ctaContact}.ts`
 
-**Modify:** `frontend/css/globals.css`, `frontend/css/blocks.css`, `frontend/components/icons/index.tsx`, `frontend/components/PortableText.tsx`, `frontend/components/BlockRenderer.tsx`, `frontend/components/blocks/{BasicLeftRightText,HeroTertiary,HeroImage,HeroSecondary,Timeline}.tsx`, `frontend/sanity/lib/queries.ts`, `studio/src/schemaTypes/objects/{blockContent.tsx,link.ts,basicLeftRightText.ts,heroTertiary.ts,timeline.ts}`, `studio/src/schemaTypes/{index.ts,documents/page.ts}`, `studio/scripts/seedBlockGallery.ts`, `docs/DECISIONS.md`, `frontend/package.json`.
+**Modify:** `frontend/css/globals.css`, `frontend/css/tokens.css`, `frontend/css/blocks.css`, `frontend/components/NewsletterSignup.tsx` (only if its look regresses), `frontend/components/blocks/{Hero,JumpNavContent,MapTeaser,ContactForm}.tsx`, `frontend/components/icons/index.tsx`, `frontend/components/PortableText.tsx`, `frontend/components/BlockRenderer.tsx`, `frontend/components/blocks/{BasicLeftRightText,HeroTertiary,HeroImage,HeroSecondary,Timeline}.tsx`, `frontend/sanity/lib/queries.ts`, `studio/src/schemaTypes/objects/{blockContent.tsx,link.ts,basicLeftRightText.ts,heroTertiary.ts,timeline.ts}`, `studio/src/schemaTypes/{index.ts,documents/page.ts}`, `studio/scripts/seedBlockGallery.ts`, `docs/DECISIONS.md`, `frontend/package.json`.
 
 **Delete:** `frontend/components/blocks/TimelineTrack.tsx`, `frontend/public/images/blocks/hero-tertiary-lines.svg` (unused after Task 5).
 
 ---
 
-### Task 1: Shared UI CSS, fluid typography and spacing
+### Task 1: Shared UI CSS, typography replacement and spacing
 
 **Files:**
 - Create: `frontend/css/ui.css`
-- Modify: `frontend/css/globals.css`
+- Modify: `frontend/css/globals.css`, `frontend/css/tokens.css`, `frontend/components/blocks/{Eyebrow,Hero,JumpNavContent,MapTeaser,ContactForm}.tsx`
 - Copy: line art from `$ND/public/svg` into `frontend/public/images/blocks/`
 
 **Interfaces:**
-- Produces utilities and classes used by every later task: `text-fluid-2xl|xl|lg|base|sm`, `py-s1`..`py-s9` (and `pt-`, `pb-`, `p-`), `.button`, `.button-primary|secondary|ghost`, `.icon-button`, `.icon-button-primary|secondary|ghost`, `.link-button`, `.link-button-icon`, `.link-item--inactive`, `.link-item--hover`, `.tag-label`, `.history-slider-arrow`, `.basic-left-right__lines`, `.mission-statement__lines`, `.hero-quaternary__lines`.
+- Produces utilities and classes used by every later task: `text-headline-2xl|xl|lg|base|sm`, `py-s1`..`py-s9` (and `pt-`, `pb-`, `p-`), `.button`, `.button-primary|secondary|ghost`, `.icon-button`, `.icon-button-primary|secondary|ghost`, `.link-button`, `.link-button-icon`, `.link-item--inactive`, `.link-item--hover`, `.tag-label`, `.history-slider-arrow`, `.basic-left-right__lines`, `.mission-statement__lines`. `tokens.css` now has fluid `--text-display-*` and `--text-headline-*` (plus `--text-headline-2xl`) and `--tracking-wide: 0.125rem`.
 - Produces assets under `/images/blocks/`: `decorative-line-basic-left-right.svg`, `decorative-line-mission.svg`, `decorative-line-hero.svg`, `decorative-line-hero-tertiary.svg`, `decorative-line-cta-contact-1.svg`, `decorative-line-cta-contact-2.svg`, `decorative-line-cta-contact-mobile.svg`.
 
 - [ ] **Step 1: Read the framework docs**
@@ -122,37 +123,37 @@ Expected: seven new `.svg` files plus the slice 1 ones, all non-empty.
   --spacing-s9: clamp(5rem, calc(5rem + 5rem * ((100vw - 375px) / 1065px)), 10rem); /* Home - Mission */
 }
 
-/* ---- Fluid headlines ---------------------------------------------------------------------- */
-@utility heading-style {
+/* ---- Headline utilities (as in nlb-design). The fluid sizes live in tokens.css. -------------- */
+@utility text-heading-base {
   font-family: var(--font-serif);
   font-weight: 400;
   letter-spacing: -0.05em;
   line-height: 1.1;
 }
 
-@utility text-fluid-2xl {
-  @apply heading-style;
-  font-size: clamp(2.6875rem, calc(2.6875rem + 2.3125rem * ((100vw - 375px) / 1065px)), 5rem);
+@utility text-headline-2xl {
+  @apply text-heading-base;
+  font-size: var(--text-headline-2xl);
 }
 
-@utility text-fluid-xl {
-  @apply heading-style;
-  font-size: clamp(2.75rem, calc(2.75rem + 0.9375rem * ((100vw - 375px) / 1065px)), 3.6875rem);
+@utility text-headline-xl {
+  @apply text-heading-base;
+  font-size: var(--text-headline-xl);
 }
 
-@utility text-fluid-lg {
-  @apply heading-style;
-  font-size: clamp(2rem, calc(2rem + 0.75rem * ((100vw - 375px) / 1065px)), 2.75rem);
+@utility text-headline-lg {
+  @apply text-heading-base;
+  font-size: var(--text-headline-lg);
 }
 
-@utility text-fluid-base {
-  @apply heading-style;
-  font-size: clamp(1.5rem, calc(1.5rem + 0.5rem * ((100vw - 375px) / 1065px)), 2rem);
+@utility text-headline-base {
+  @apply text-heading-base;
+  font-size: var(--text-headline-base);
 }
 
-@utility text-fluid-sm {
-  @apply heading-style;
-  font-size: clamp(1.25rem, calc(1.25rem + 0.25rem * ((100vw - 375px) / 1065px)), 1.5rem);
+@utility text-headline-sm {
+  @apply text-heading-base;
+  font-size: var(--text-headline-sm);
 }
 
 /* ---- Hover overlays. tokens.css has solid hexes for hover-*; nlb-design uses translucent mixes. */
@@ -161,14 +162,14 @@ Expected: seven new `.svg` files plus the slice 1 ones, all non-empty.
   --ui-hover-darker: color-mix(in srgb, var(--color-dusty-heath-200) 8%, transparent);
 }
 
-/* ---- Tag. Letter-spacing is the Figma-measured 1.54px at 14px, not nlb-design's 2px. ---------- */
+/* ---- Tag. Letter-spacing is --tracking-wide (2px), as in nlb-design. ------------------------- */
 @utility tag-label {
   white-space: nowrap;
   overflow-wrap: break-word;
   font-family: var(--font-mono);
   font-size: var(--text-body-small);
   line-height: 1.6;
-  letter-spacing: 0.11em;
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   color: var(--color-on-tag);
 }
@@ -374,31 +375,74 @@ Expected: seven new `.svg` files plus the slice 1 ones, all non-empty.
 
 In `frontend/css/globals.css`, add `@import './ui.css';` after `@import './blocks.css';`.
 
-- [ ] **Step 5: Verify the CSS compiles and the utilities exist**
+- [ ] **Step 5: Replace the type sizes and tracking in `tokens.css`**
+
+In `frontend/css/tokens.css`:
+
+1. In the primitives `@theme`, change `--tracking-wide: 0.02em;` to `--tracking-wide: 0.125rem;` (Figma stores letter-spacing as a bare number; `$ND` reads it as 2px). Leave `--tracking-tight` and `--tracking-normal`.
+2. Replace the whole "Type sizes (breakpoint collection)" `@theme` block **and** the `@media (width < 48rem) { :root { … } }` block after it with one fluid block (the mobile and desktop values are the same pairs the old stepwise tokens switched between):
+
+```css
+/* ---- Type sizes (breakpoint collection) ----------------------------------------------------
+ * Fluid between the mobile (375px) and desktop (1440px) Figma values, as in nlb-design. Body
+ * sizes are identical in both modes, so they stay fixed.
+ */
+@theme {
+  --text-display-lg: clamp(var(--font-size-text-6xl), calc(var(--font-size-text-6xl) + (var(--font-size-text-7xl) - var(--font-size-text-6xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-7xl));
+  --text-display-base: clamp(var(--font-size-text-5xl), calc(var(--font-size-text-5xl) + (var(--font-size-text-6xl) - var(--font-size-text-5xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-6xl));
+  --text-display-sm: clamp(var(--font-size-text-4xl), calc(var(--font-size-text-4xl) + (var(--font-size-text-5xl) - var(--font-size-text-4xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-5xl));
+  /* Not a real Figma token: the design for it is missing (see nlb-design's tokens.css). */
+  --text-headline-2xl: clamp(2.6875rem, calc(2.6875rem + 2.3125rem * ((100vw - 375px) / 1065px)), 5rem);
+  --text-headline-xl: clamp(var(--font-size-text-3xl), calc(var(--font-size-text-3xl) + (var(--font-size-text-4xl) - var(--font-size-text-3xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-4xl));
+  --text-headline-lg: clamp(var(--font-size-text-2xl), calc(var(--font-size-text-2xl) + (var(--font-size-text-3xl) - var(--font-size-text-2xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-3xl));
+  --text-headline-base: clamp(var(--font-size-text-xl), calc(var(--font-size-text-xl) + (var(--font-size-text-2xl) - var(--font-size-text-xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-2xl));
+  --text-headline-sm: clamp(var(--font-size-text-lg), calc(var(--font-size-text-lg) + (var(--font-size-text-xl) - var(--font-size-text-lg)) * ((100vw - 375px) / 1065px)), var(--font-size-text-xl));
+  --text-body-large: var(--font-size-text-lg);
+  --text-body-base: var(--font-size-text-base);
+  --text-body-small: var(--font-size-text-sm);
+  --text-body-xs: var(--font-size-text-xs);
+}
+```
+
+(Open `tokens.css` first and confirm the existing body lines match; keep any body token that differs from the above.)
+
+- [ ] **Step 6: Move the slice 1 `text-h*` users to `text-headline-*`, and the eyebrow to 2px**
+
+```bash
+cd frontend/components/blocks
+sed -i '' 's/text-h1/text-headline-2xl/g' Hero.tsx JumpNavContent.tsx
+sed -i '' 's/text-h4/text-headline-base/g' MapTeaser.tsx ContactForm.tsx
+sed -i '' 's/tracking-widest/tracking-wide/' Eyebrow.tsx
+grep -n "text-h[1-6]\b" *.tsx
+```
+
+Expected: the grep prints only the files whose own task rewrites them (`BasicLeftRightText`, `HeroTertiary`, `HeroImage`, `HeroSecondary`'s none, `Timeline`, `TimelineTrack`); none of `Hero`, `JumpNavContent`, `MapTeaser`, `ContactForm`. The `text-h*` utilities are removed from `blocks.css` in Task 10, after the last user is gone.
+
+- [ ] **Step 7: Verify the CSS compiles and the utilities exist**
 
 ```bash
 cd frontend && NODE_ENV=production npx next build 2>&1 | tail -15
 cd .next && python3 - <<'EOF'
 import glob,re
 css=''.join(open(f).read() for f in glob.glob('static/**/*.css',recursive=True))
-for c in ['text-fluid-2xl','text-fluid-xl','text-fluid-lg','text-fluid-base','text-fluid-sm','heading-style','tag-label','link-item--inactive','link-item--hover','link-button','button-primary','icon-button-ghost']:
+for c in ['text-headline-2xl','text-headline-xl','text-headline-lg','text-headline-base','text-headline-sm','text-heading-base','tag-label','link-item--inactive','link-item--hover','link-button','button-primary','icon-button-ghost']:
     print(f"{c:24}", "OK" if re.search(r'\.'+re.escape(c)+r'(?![\w-])',css) else "not emitted (expected until a component uses it)")
 EOF
 ```
 
 Expected: build succeeds. Some utilities are not emitted until a component uses them; the build succeeding (no CSS errors) is the check here. Re-run this scan at Task 2's end.
 
-- [ ] **Step 6: Gate and commit**
+- [ ] **Step 8: Gate and commit**
 
 Run the gate commands from Global Constraints (separately). Then:
 
 ```bash
-git add frontend/css frontend/public/images/blocks
-git commit -m "feat: add shared UI CSS, fluid headlines and section spacing from nlb-design
+git add frontend/css frontend/components/blocks frontend/public/images/blocks
+git commit -m "feat: replace headline sizes and tracking with nlb-design's, add shared UI CSS
 
-Token discrepancies (see the plan): tracking-wide 0.11em vs nlb-design's 2px,
-hover overlays use local mixes, and the fluid headline utilities are new
-text-fluid-* names so the footer's text-headline-* is untouched.
+Headline and display sizes are now fluid and text-headline-* carry the heading
+style; the footer's text-headline-base picks up the serif heading style and
+should be checked against the design. Hover overlays use local mixes.
 
 Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 ```
@@ -408,7 +452,7 @@ Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 ### Task 2: Shared UI components and icons
 
 **Files:**
-- Create: `frontend/components/ui/Tag.tsx`, `Button.tsx`, `LinkButton.tsx`, `IconButton.tsx`, `LinkRow.tsx`
+- Create: `frontend/components/ui/Tag.tsx`, `Button.tsx`, `ButtonLink.tsx`, `LinkButton.tsx`, `IconButton.tsx`, `LinkRow.tsx`
 - Modify: `frontend/components/icons/index.tsx`
 
 **Interfaces:**
@@ -416,6 +460,7 @@ Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 - Produces icons: `ArrowRightIcon({className})`, `ArrowLeftIcon({className})`, `DownloadIcon({className})` (all `currentColor`, `aria-hidden`).
 - Produces `Tag({label, size?: 'sm'|'lg', rounded?: boolean, className?})`.
 - Produces `Button({children, variant?: 'primary'|'secondary'|'ghost', leftIcon?, rightIcon?, disabled?, type?, onClick?, className?})`.
+- Produces `ButtonLink({label, href, variant?: 'primary'|'secondary'|'ghost', newTab?, className?})`: a link styled as a button (an `<a class="button …">`, no asterisk icons, as `nlb-design`'s CTA uses it).
 - Produces `LinkButton({label, href, iconLeft?, iconRight?, className?})` (renders `<a>`).
 - Produces `IconButton({children, label, variant?, disabled?, type?, onClick?, className?})`.
 - Produces `LinkRow({label, href, icon: 'link' | 'download', className?})` (renders `<a>`; `download` attribute when icon is `download`).
@@ -573,6 +618,44 @@ export default function Button({
       <span>{children}</span>
       {rightIcon && <Asterisk />}
     </button>
+  )
+}
+```
+
+`frontend/components/ui/ButtonLink.tsx`:
+
+```tsx
+type ButtonLinkProps = {
+  label: string
+  href: string
+  variant?: 'primary' | 'secondary' | 'ghost'
+  newTab?: boolean
+  className?: string
+}
+
+// Full class names as literals, so Tailwind's scanner sees them.
+const VARIANT_CLASSES = {
+  primary: 'button-primary',
+  secondary: 'button-secondary',
+  ghost: 'button-ghost',
+} as const
+
+export default function ButtonLink({
+  label,
+  href,
+  variant = 'primary',
+  newTab = false,
+  className,
+}: ButtonLinkProps) {
+  return (
+    <a
+      href={href}
+      target={newTab ? '_blank' : undefined}
+      rel={newTab ? 'noopener noreferrer' : undefined}
+      className={`button ${VARIANT_CLASSES[variant]} ${className ?? ''}`}
+    >
+      {label}
+    </a>
   )
 }
 ```
@@ -865,18 +948,55 @@ Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 - Copy: nothing new (the line art was copied in Task 1)
 
 **Interfaces:**
-- Consumes: Task 1 (`py-s6`, `text-fluid-lg`, `.basic-left-right__lines`), Task 3 (`anchorLinks`).
-- Produces: block `basicLeftRightText` with fields `eyebrow`, `heading`, `headingLevel`, `rightContent` (rich text). `body` and `button` are removed. `CustomPortableText` gains an optional `variant?: 'prose' | 'basic'` prop (default `'prose'`).
+- Consumes: Task 1 (`py-s6`, `text-headline-lg`, `.basic-left-right__lines`), Task 3 (`anchorLinks`).
+- Consumes: `ButtonLink` (Task 2).
+- Produces: block `basicLeftRightText` with fields `eyebrow`, `heading`, `headingLevel`, `buttons[]: {_key, label, link, variant}` (on the left, under the heading) and `rightContent` (rich text). The theme's `body` and `button` are removed. `CustomPortableText` gains an optional `variant?: 'prose' | 'basic'` prop (default `'prose'`).
 
 - [ ] **Step 1: Schema**
 
-Replace the `fields` in `basicLeftRightText.ts` with:
+Replace the `fields` in `basicLeftRightText.ts` with the following, and add `defineArrayMember` to its `sanity` import:
 
 ```ts
   fields: [
     eyebrowField(),
     defineField({name: 'heading', title: 'Heading', type: 'string'}),
     headingLevelField('h2'),
+    defineField({
+      name: 'buttons',
+      title: 'Buttons',
+      type: 'array',
+      description: 'Shown on the left, under the heading. Optional.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          name: 'blockButton',
+          fields: [
+            defineField({
+              name: 'label',
+              title: 'Label',
+              type: 'string',
+              validation: (rule) => rule.required(),
+            }),
+            defineField({name: 'link', title: 'Link', type: 'link'}),
+            defineField({
+              name: 'variant',
+              title: 'Style',
+              type: 'string',
+              options: {
+                list: [
+                  {title: 'Primary', value: 'primary'},
+                  {title: 'Secondary (gold)', value: 'secondary'},
+                  {title: 'Ghost', value: 'ghost'},
+                ],
+                layout: 'radio',
+              },
+              initialValue: 'primary',
+            }),
+          ],
+          preview: {select: {title: 'label', subtitle: 'variant'}},
+        }),
+      ],
+    }),
     defineField({
       name: 'rightContent',
       title: 'Right column',
@@ -887,7 +1007,16 @@ Replace the `fields` in `basicLeftRightText.ts` with:
   ],
 ```
 
-Update the doc comment above the type to say the right column is rich text with anchor links and the theme's left-column text and button no longer exist.
+Update the doc comment above the type: the left column is eyebrow, heading and optional buttons; the right column is rich text with anchor links; the theme's left-column text and single button no longer exist. The button style is not specified in the Figma links given, so the variants are the design system's three button styles, defaulting to Primary: an assumption for the user to confirm.
+
+Also add the buttons to the `basicLeftRightText` branch of `pageBuilderFields` in `frontend/sanity/lib/queries.ts`, before `rightContent[]{`:
+
+```ts
+      buttons[]{
+        ...,
+        ${linkFields}
+      },
+```
 
 - [ ] **Step 2: A proseless rich-text variant**
 
@@ -919,16 +1048,16 @@ In `PortableText.tsx` add `variant?: 'prose' | 'basic'` to the props (default `'
 }
 
 .rich-text-basic > h3 {
-  font-size: clamp(2rem, calc(2rem + 0.75rem * ((100vw - 375px) / 1065px)), 2.75rem);
+  font-size: var(--text-headline-lg);
 }
 
 .rich-text-basic > h4 {
-  font-size: clamp(1.5rem, calc(1.5rem + 0.5rem * ((100vw - 375px) / 1065px)), 2rem);
+  font-size: var(--text-headline-base);
 }
 
 .rich-text-basic > h5,
 .rich-text-basic > h6 {
-  font-size: clamp(1.25rem, calc(1.25rem + 0.25rem * ((100vw - 375px) / 1065px)), 1.5rem);
+  font-size: var(--text-headline-sm);
 }
 
 .rich-text-basic > :first-child {
@@ -967,13 +1096,26 @@ Replace `frontend/components/blocks/BasicLeftRightText.tsx` with (port of `$ND/c
 import {stegaClean, type PortableTextBlock} from 'next-sanity'
 
 import CustomPortableText from '@/components/PortableText'
+import ButtonLink from '@/components/ui/ButtonLink'
+import {DereferencedLink} from '@/sanity/lib/types'
+import {linkResolver} from '@/sanity/lib/utils'
 
 import Eyebrow from './Eyebrow'
 import {BlockProps} from './types'
 
+const BUTTON_VARIANTS = ['primary', 'secondary', 'ghost'] as const
+
 export default function BasicLeftRightText({block}: BlockProps<'basicLeftRightText'>) {
   // stegaClean: in Presentation the value carries invisible characters.
   const Heading = stegaClean(block.headingLevel) === 'h1' ? 'h1' : 'h2'
+  // A button needs a label and a link that resolves; anything else would be a dead button.
+  const buttons = (block.buttons ?? []).flatMap((button) => {
+    const href = button.link ? linkResolver(button.link as DereferencedLink) : null
+    if (!button.label || !href) return []
+    const chosen = stegaClean(button.variant)
+    const variant = BUTTON_VARIANTS.find((v) => v === chosen) ?? 'primary'
+    return [{key: button._key, label: button.label, href, variant, newTab: Boolean(button.link?.openInNewTab)}]
+  })
 
   return (
     <section className="relative w-full overflow-clip bg-background tf-px py-s6">
@@ -982,7 +1124,20 @@ export default function BasicLeftRightText({block}: BlockProps<'basicLeftRightTe
         <div className="flex w-full flex-col items-start gap-10 md:flex-1">
           {block.eyebrow && <Eyebrow className="text-on-background">{block.eyebrow}</Eyebrow>}
           {block.heading && (
-            <Heading className="w-full text-fluid-xl text-on-background text-balance">{block.heading}</Heading>
+            <Heading className="w-full text-headline-xl text-on-background text-balance">{block.heading}</Heading>
+          )}
+          {buttons.length > 0 && (
+            <div className="flex flex-wrap gap-4">
+              {buttons.map((button) => (
+                <ButtonLink
+                  key={button.key}
+                  label={button.label}
+                  href={button.href}
+                  variant={button.variant}
+                  newTab={button.newTab}
+                />
+              ))}
+            </div>
           )}
         </div>
         <div className="flex w-full flex-col items-start md:flex-1">
@@ -1023,7 +1178,7 @@ Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 - Delete: `frontend/public/images/blocks/hero-tertiary-lines.svg`
 
 **Interfaces:**
-- Consumes: `decorative-line-hero-tertiary.svg` (Task 1), `text-fluid-2xl`, `py-s3`.
+- Consumes: `decorative-line-hero-tertiary.svg` (Task 1), `text-headline-2xl`, `py-s3`.
 - Produces: block `heroTertiary` with fields `eyebrow`, `heading`, `headingLevel` (h1 default, h2 for the `SectionIntro` use), `body`.
 
 - [ ] **Step 1: Schema**
@@ -1058,7 +1213,7 @@ export default function HeroTertiary({block}: BlockProps<'heroTertiary'>) {
         />
         <div className="relative z-10 flex max-w-[34.5rem] flex-col items-start gap-6 text-on-background">
           {block.eyebrow && <Eyebrow className="whitespace-nowrap">{block.eyebrow}</Eyebrow>}
-          {block.heading && <Heading className="text-fluid-2xl leading-[1.05]">{block.heading}</Heading>}
+          {block.heading && <Heading className="text-headline-2xl leading-[1.05]">{block.heading}</Heading>}
         </div>
         {block.body && (
           <p className="relative z-10 max-w-[42rem] pt-0 font-sans text-body-base leading-[1.6] text-on-background md:pt-[2.875rem]">
@@ -1093,7 +1248,7 @@ Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 - Delete from `blocks.css`: the `.hero-image__lines` rule
 
 **Interfaces:**
-- Consumes: `decorative-line-hero.svg` (Task 1), `text-fluid-xl`, `py-s3`, `BlockImage`.
+- Consumes: `decorative-line-hero.svg` (Task 1), `text-headline-xl`, `py-s3`, `BlockImage`.
 - Produces: `heroImage` styled as `$ND`'s `HeroQuaternary`; `.hero-secondary__lines--light-brown` now uses `decorative-line-hero.svg`.
 
 - [ ] **Step 1: Component**
@@ -1130,7 +1285,7 @@ export default function HeroImage({block}: BlockProps<'heroImage'>) {
             <Eyebrow className="relative z-10 text-on-background">{block.eyebrow}</Eyebrow>
           )}
           {block.heading && (
-            <p className="relative z-10 w-full text-fluid-xl text-on-background [text-wrap:pretty]">
+            <p className="relative z-10 w-full text-headline-xl text-on-background [text-wrap:pretty]">
               {block.heading}
             </p>
           )}
@@ -1141,7 +1296,7 @@ export default function HeroImage({block}: BlockProps<'heroImage'>) {
 }
 ```
 
-Heading semantics: `$ND` renders the title as a `<p>`. A page's main heading should be a heading, so render it as `<h1>` with the same classes (replace `<p className="relative z-10 w-full text-fluid-xl …">` and its closing tag with `h1`); record this as a ruling in the ledger.
+Heading semantics: `$ND` renders the title as a `<p>`. A page's main heading should be a heading, so render it as `<h1>` with the same classes (replace `<p className="relative z-10 w-full text-headline-xl …">` and its closing tag with `h1`); record this as a ruling in the ledger.
 
 - [ ] **Step 2: Hero - Secondary's light-brown art**
 
@@ -1279,7 +1434,7 @@ export default function MissionStatement({block}: BlockProps<'missionStatement'>
         <div className="flex w-full max-w-[62.375rem] flex-col items-center gap-16 md:gap-20">
           {block.eyebrow && <Tag label={block.eyebrow} />}
           {block.heading && (
-            <h2 className="w-full text-center text-fluid-xl text-on-background text-pretty">
+            <h2 className="w-full text-center text-headline-xl text-on-background text-pretty">
               {block.heading}
             </h2>
           )}
@@ -1445,7 +1600,7 @@ export default function CtaContact({block}: BlockProps<'ctaContact'>) {
           />
 
           <div className="relative z-10 flex size-full flex-col items-center justify-center gap-8 px-5 text-center md:mx-auto md:w-[30.4375rem] md:gap-10 md:px-0">
-            {block.heading && <h2 className="w-full text-fluid-xl text-on-background text-pretty">{block.heading}</h2>}
+            {block.heading && <h2 className="w-full text-headline-xl text-on-background text-pretty">{block.heading}</h2>}
             {block.body && (
               <p className="w-full font-sans text-body-base leading-[1.6] text-on-background">{block.body}</p>
             )}
@@ -1485,7 +1640,7 @@ Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 - Delete: `frontend/components/blocks/TimelineTrack.tsx`
 
 **Interfaces:**
-- Consumes: `.history-slider*` CSS and `text-fluid-2xl` (Task 1).
+- Consumes: `.history-slider*` CSS and `text-headline-2xl` (Task 1).
 - Produces: `TimelineSlider({events, className?})` where `events: TimelineEvent[]`, `TimelineEvent = {year: string; title: string; description: string; lineLength: number}`. `Timeline` maps `entries` to events, deriving `lineLength` per index (never stored).
 
 - [ ] **Step 1: Add the dependency**
@@ -1509,7 +1664,6 @@ for old,new in [
   ('type HistorySliderProps','type TimelineSliderProps'),
   ('events: HistoryEvent[]','events: TimelineEvent[]'),
   ('export default function HistorySlider({ events, className }: HistorySliderProps)','export default function TimelineSlider({ events, className }: TimelineSliderProps)'),
-  ('text-headline-2xl font-normal leading-[1.05]','text-fluid-2xl font-normal leading-[1.05]'),
   ('hover:bg-hover-darker','hover:bg-(--ui-hover-darker)'),
 ]:
     assert old in s, old
@@ -1604,13 +1758,13 @@ Add `docs/design/README.md` (new, 10 lines): says these are `nlb-design`'s docs 
 
 - [ ] **Step 3: Record decisions**
 
-Append a section `## 8. Absorbing nlb-design` to `docs/DECISIONS.md` (match the existing "Status / Why / Implication" format) covering: nlb-design's visuals win on overlap; the reworked and new blocks; the typography reconciliation table from this plan (new `text-fluid-*` utilities, and why); hover tokens; tracking; the `tf-px` difference; and that Phase B follows.
+Append a section `## 8. Absorbing nlb-design` to `docs/DECISIONS.md` (match the existing "Status / Why / Implication" format) covering: nlb-design's visuals win on overlap; the reworked and new blocks; the typography reconciliation table from this plan (new `text-headline-*` utilities, and why); hover tokens; tracking; the `tf-px` difference; and that Phase B follows.
 
 - [ ] **Step 4: File the follow-up issues**
 
 ```bash
 gh issue list --search "typography" --state all
-gh issue create --title "Unify typography: text-h*, text-headline-* and text-fluid-*" --body "Three heading systems now coexist: text-h1..h6 (WordPress theme port), the stepwise text-headline-* tokens in tokens.css (used by the footer), and text-fluid-* (nlb-design). Pick one, migrate the others, and remove the rest. See docs/DECISIONS.md section 8."
+gh issue create --title "Unify typography: text-h*, text-headline-* and text-headline-*" --body "Three heading systems now coexist: text-h1..h6 (WordPress theme port), the stepwise text-headline-* tokens in tokens.css (used by the footer), and text-headline-* (nlb-design). Pick one, migrate the others, and remove the rest. See docs/DECISIONS.md section 8."
 gh issue create --title "Confirm design tokens that differ between nlb-design and tokens.css" --body "Needs the designer: letter-spacing for tags and eyebrows (nlb-design 2px vs Figma-measured 1.54px), hover overlay colours (translucent mixes vs the solid hex tokens), tf-px padding clamp, and the Lowlands hero panel colour. See docs/DECISIONS.md sections 7.5 and 8."
 gh issue create --title "Compare reworked blocks to the Figma designs in Presentation" --body "Phase A blocks were built from nlb-design components and checked only by type-check, lint and a production build. Review the Block gallery draft in Studio Presentation at desktop and mobile widths against Figma, including the light-brown Hero - Secondary line art and the anchor link rows (Figma nodes 2668:7765 and 2668:12795 are not readable through the Figma tool)."
 ```
@@ -1633,5 +1787,5 @@ Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 ## Self-review notes
 
 - **Spec coverage:** shared UI (Tasks 1-2); `missionStatement`, `ctaContact` (7, 8); reworked `basicLeftRightText` with rich text restricted to H3-H6 and anchor links with a link/download icon at 16px spacing (3, 4); `heroTertiary` with an H2 option replacing Section Intro (5); `heroImage` as HeroQuaternary (6); `timeline` as HistorySlider with Splide (9); assets, tokens reconciliation and docs moved in (1, 10); `heroVideo` and `Footer` untouched; gallery extended and issues filed (10). Verification gate in Global Constraints and Task 10. Phase B is not touched.
-- **Names checked across tasks:** `text-fluid-*`, `py-s*`, `.basic-left-right__lines`, `.mission-statement__lines`, `LinkRow`, `LinkButton`, `Tag`, `anchorLinks`, `variant: 'prose' | 'basic'`, `TimelineSlider`/`TimelineEvent` are defined where produced and used with the same signatures later.
+- **Names checked across tasks:** `text-headline-*`, `py-s*`, `.basic-left-right__lines`, `.mission-statement__lines`, `LinkRow`, `LinkButton`, `Tag`, `anchorLinks`, `variant: 'prose' | 'basic'`, `TimelineSlider`/`TimelineEvent` are defined where produced and used with the same signatures later.
 - **Judgement calls an executor may hit:** the ported `TimelineSlider` may trip lint (fix minimally, ledger it); generated unions may need a cast for `rightContent` into `PortableTextBlock[]`; `BlockImage` must accept the plain CTA images (Task 8); the `HeroImage` title becomes an `<h1>` where `nlb-design` used a `<p>` (ledger it).
