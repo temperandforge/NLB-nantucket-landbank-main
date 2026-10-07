@@ -28,7 +28,7 @@ import {resolve} from 'node:path'
 
 import {getCliClient} from 'sanity/cli'
 
-import {planProperties, type SourceDoc} from './migrations/projectsToProperties'
+import {planProperties, referenceTargets, type SourceDoc} from './migrations/projectsToProperties'
 
 const client = getCliClient({apiVersion: '2025-09-25'}).withConfig({
   perspective: 'raw',
@@ -43,7 +43,8 @@ async function main() {
   console.log(`${projects.length} project document(s) found.`)
 
   const referrers = await client.fetch<Array<{_id: string; _type: string}>>(
-    `*[_type != "project" && references(*[_type == "project"]._id)]{_id, _type}`,
+    `*[_type != "project" && references($ids)]{_id, _type}`,
+    {ids: referenceTargets(projects)},
   )
   if (referrers.length > 0) {
     console.error('Refusing to migrate: these documents reference a project, and re-pointing is not built:')

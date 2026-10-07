@@ -912,6 +912,15 @@ choice is kept in the address as `?type=a,b&resource=c`. The filter functions li
 `frontend/scripts/verifyPropertyFilter.mts`. A card with no image shows **Default property image**
 from Site Settings, or the staff cards' neutral box when that is unset.
 
+**Deploy order.** The map, the Project Grid, the Property Archive and the Studio's Properties list all
+read `property`, which is empty until the migration runs. Run `migrateProjectsToProperties.ts`, then
+`verifyPropertyMigration.ts`, **before** the frontend and Studio changes are deployed; otherwise the map
+shows no properties.
+
+**Open question.** The seeded top-level Projects page (a Project Grid with copy about conservation
+initiatives) now lists properties, so the same beaches and ponds appear under two pages. Whether to
+retire it, re-copy it or wait for a real "project" (initiative) type is the client's call.
+
 **Not done:** property detail pages ([#23](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/23)),
 renaming the Project blocks ([#24](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/24)),
 pagination or search ([#25](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/25)).

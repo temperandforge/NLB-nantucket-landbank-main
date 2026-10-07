@@ -96,3 +96,17 @@ export function planProperties(
   }
   return {create, skipped, issues}
 }
+
+/**
+ * Every id a reference to one of these projects could use: the base id and the `drafts.` id of
+ * each. A reference to a draft-only project is stored against its base id, which the raw query
+ * `references(*[_type == "project"]._id)` would miss (it yields `drafts.<id>` for such a project).
+ */
+export function referenceTargets(docs: ReadonlyArray<{_id: string}>): string[] {
+  const ids = new Set<string>()
+  for (const doc of [...docs].sort((a, b) => baseId(a._id).localeCompare(baseId(b._id)))) {
+    ids.add(baseId(doc._id))
+    ids.add(`drafts.${baseId(doc._id)}`)
+  }
+  return [...ids]
+}

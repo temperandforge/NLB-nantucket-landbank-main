@@ -6,7 +6,7 @@
  *
  * Imports the real module, not a copy. Exits non-zero on failure.
  */
-import {COPIED_FIELDS, planProperties} from './projectsToProperties.ts'
+import {COPIED_FIELDS, planProperties, referenceTargets} from './projectsToProperties.ts'
 
 let failed = false
 function same(actual: unknown, expected: unknown, message: string) {
@@ -65,5 +65,12 @@ same([noSlug.create.length, noSlug.issues.length], [0, 1], 'a project with no sl
 
 const dup = planProperties([full, {...full, _id: 'p5'}], new Set())
 same([dup.create.length, dup.issues.length], [1, 1], 'a second project with the same slug is reported, not migrated')
+
+// A reference to a draft-only project is stored against its base id, so the guard must look for both.
+same(
+  referenceTargets([{_id: 'a', _type: 'project'}, {_id: 'drafts.b', _type: 'project'}, {_id: 'drafts.a', _type: 'project'}]),
+  ['a', 'drafts.a', 'b', 'drafts.b'],
+  'reference targets include the base id and the draft id of every project, once each',
+)
 
 process.exit(failed ? 1 : 0)
