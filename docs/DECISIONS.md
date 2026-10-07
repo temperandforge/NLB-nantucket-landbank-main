@@ -766,11 +766,18 @@ entry per archive: nothing in code needs to find an archive page.
 
 **Status:** Implemented
 
-The People Grid's tabs are derived from the staff on the block (`frontend/sanity/lib/staffFilter.ts`,
+The People Grid's tabs are derived from the staff on the block (`frontend/sanity/lib/archiveFilter.ts`,
 checked by `frontend/scripts/verifyStaffFilter.mts`): one per department with at least one member, in
 the department's `order`. The chosen department is `?department=<slug>`, read with `useSearchParams`
 and changed with the History API, so a filtered view can be shared without a server request. The
 server render is "All".
+
+The tab row is a shared `components/ui/FilterTabs` and the address handling a shared
+`useQueryFilter` hook, so any archive block can filter the same way. The Project Grid uses them with
+`?type=<slug>`, tabs from the property types on its projects (resources are amenities, not
+categories, and get no tab). The Project Grid's card follows the Figma projects archive (two
+columns, types as tags over the image, name below, no description), replacing the earlier assumed
+four-column card (9.6).
 
 ### 11.3 The footer links are wired by a guarded script
 

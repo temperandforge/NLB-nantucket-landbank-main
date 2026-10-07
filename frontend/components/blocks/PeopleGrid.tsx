@@ -1,10 +1,10 @@
 import {Suspense} from 'react'
 
 import CardCommissioner from '@/components/cards/CardCommissioner'
+import FilterTabs from '@/components/ui/FilterTabs'
 
-import {departmentTabs} from '@/sanity/lib/staffFilter'
+import {DEPARTMENT_FILTER_LABEL, departmentTabs} from '@/sanity/lib/archiveFilter'
 
-import DepartmentTabs from './DepartmentTabs'
 import StaffFilter from './StaffFilter'
 import StaffGrid from './StaffGrid'
 import {BlockProps} from './types'
@@ -28,7 +28,7 @@ export default function PeopleGrid({block}: BlockProps<'peopleGrid'>) {
             <Suspense
               fallback={
                 <div className="flex w-full flex-col items-start gap-16">
-                  <DepartmentTabs tabs={tabs} active={null} />
+                  <FilterTabs tabs={tabs} active={null} label={DEPARTMENT_FILTER_LABEL} />
                   <StaffGrid people={staff} />
                 </div>
               }

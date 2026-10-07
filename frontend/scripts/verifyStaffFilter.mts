@@ -6,11 +6,15 @@
  * Imports the real helpers, not a copy. Exits non-zero on failure.
  */
 import {
+  filterByPropertyType,
+  parseProjectType,
+  projectTabs,
+  withProjectType,
   departmentTabs,
   filterByDepartment,
   parseDepartment,
   withDepartment,
-} from '../sanity/lib/staffFilter.ts'
+} from '../sanity/lib/archiveFilter.ts'
 
 let failed = false
 function same(actual: unknown, expected: unknown, message: string) {
@@ -85,5 +89,27 @@ same(withDepartment('?department=old', 'new'), '?department=new', 'a new filter 
 same(withDepartment('?utm_source=x', 'new'), '?utm_source=x&department=new', 'other parameters are kept')
 same(withDepartment('?utm_source=x&department=old', null), '?utm_source=x', 'clearing keeps other parameters')
 same(withDepartment('?x=1', 'a b&c'), '?x=1&department=a%20b%26c', 'the slug is encoded')
+
+// Project type tabs share the same machinery.
+const beach = {slug: 'beach', title: 'Beach', order: 2}
+const trail = {slug: 'trail', title: 'Trail', order: 1}
+const projects = [
+  {name: 'a', propertyTypes: [beach, trail]},
+  {name: 'b', propertyTypes: [beach, null]},
+  {name: 'c', propertyTypes: null},
+]
+same(
+  projectTabs(projects),
+  [
+    {slug: 'trail', title: 'Trail'},
+    {slug: 'beach', title: 'Beach'},
+  ],
+  'project tabs are the property types in use, in their own order, ignoring unpublished ones',
+)
+same(filterByPropertyType(projects, 'beach').map((p) => p.name), ['a', 'b'], 'a type filter keeps projects with that type')
+same(filterByPropertyType(projects, null).length, 3, 'no filter keeps every project')
+same(parseProjectType('?type=beach', projectTabs(projects)), 'beach', 'a known type is read from the address')
+same(parseProjectType('?type=nope', projectTabs(projects)), null, 'an unknown type is ignored')
+same(withProjectType('?department=x', 'beach'), '?department=x&type=beach', 'the project filter keeps the staff filter parameter')
 
 if (failed) process.exit(1)

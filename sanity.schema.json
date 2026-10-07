@@ -642,6 +642,13 @@
           },
           "optional": true
         },
+        "showFilters": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        },
         "disabled": {
           "type": "objectAttribute",
           "value": {

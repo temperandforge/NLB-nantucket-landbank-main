@@ -297,11 +297,9 @@ const pageBuilderFields = /* groq */ `
       "projects": *[_type == "project" && defined(slug.current)] | order(name asc) {
         _id,
         name,
-        description,
         image,
         link,
-        "propertyTypes": propertyTypes[]->{"slug": slug.current, title},
-        "resources": resources[]->{"slug": slug.current, title}
+        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order}
       }
     },
     _type == "imageCarousel" => {
