@@ -20,11 +20,17 @@ without a deploy), `boundaryId` and `location` (map marker). The Studio title is
 
 **Migration.** `studio/scripts/migrateProjectsToProperties.ts`, run with
 `npx sanity exec … --with-user-token`:
-- Copies every `project` (published or draft) into a **draft** `property`. Sanity generates the id;
-  the match key is the slug, so a re-run skips a property that exists and never edits it.
+- Copies every `project` into a `property` **in the same publish state**: a published project becomes
+  a published property, a project with unpublished edits also gets the matching draft. (The dataset
+  has 152 projects, 150 of them published; creating drafts only would empty the map until each
+  was published.) Sanity generates the id; the match key is the slug, so a re-run skips a property
+  that exists and never edits it.
 - Copies image (the same asset, no re-upload), description, link, taxonomy references,
-  `boundaryId` and `location` exactly. Taxonomy references are strong where the target is published
-  and weak (`_strengthenOnPublish`) where it is draft-only, as the other imports do.
+  `boundaryId` and `location` exactly. The taxonomy documents are all published, so the references
+  stay strong.
+- **Refuses to run if any document other than a project references a project**, naming the
+  referrers: re-pointing references is not built because there are none today (checked
+  2026-10-07). Pages that use Project Preview or Map Teaser would otherwise break silently.
 - `--dry` prints the plan and writes nothing. It is run first; the real run needs the user's go-ahead.
 - Leaves the `project` documents in the dataset. The user deletes them after checking the map.
   Nothing is deleted automatically.
