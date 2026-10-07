@@ -47,7 +47,11 @@ export default function BasicLeftRightText({block}: BlockProps<'basicLeftRightTe
         </div>
         <div className="flex w-full flex-col items-start md:flex-1">
           {block.rightContent && (
-            <CustomPortableText variant="basic" value={block.rightContent as PortableTextBlock[]} />
+            <CustomPortableText
+              variant="basic"
+              className="w-full"
+              value={block.rightContent as PortableTextBlock[]}
+            />
           )}
         </div>
       </div>

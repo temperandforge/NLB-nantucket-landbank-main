@@ -136,17 +136,22 @@
 /* ---- Type sizes (breakpoint collection) ----------------------------------------------------
  * Fluid between the mobile (375px) and desktop (1440px) Figma values, as in nlb-design. Body
  * sizes are identical in both modes, so they stay fixed.
+ *
+ * Written as MIN + DIFF * (100vw - 375px) / 1065, where DIFF is the unitless pixel difference
+ * between the two Figma values. nlb-design divided a length by a length, which needs CSS typed
+ * arithmetic and is invalid in older browsers (every heading would fall back to body size).
+ * frontend/scripts/verifyFluidTokens.mts checks the form and the endpoints.
  */
 @theme {
-  --text-display-lg: clamp(var(--font-size-text-6xl), calc(var(--font-size-text-6xl) + (var(--font-size-text-7xl) - var(--font-size-text-6xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-7xl));
-  --text-display-base: clamp(var(--font-size-text-5xl), calc(var(--font-size-text-5xl) + (var(--font-size-text-6xl) - var(--font-size-text-5xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-6xl));
-  --text-display-sm: clamp(var(--font-size-text-4xl), calc(var(--font-size-text-4xl) + (var(--font-size-text-5xl) - var(--font-size-text-4xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-5xl));
+  --text-display-lg: clamp(6.25rem, calc(6.25rem + 20 * (100vw - 375px) / 1065), 7.5rem);
+  --text-display-base: clamp(5rem, calc(5rem + 20 * (100vw - 375px) / 1065), 6.25rem);
+  --text-display-sm: clamp(3.6875rem, calc(3.6875rem + 21 * (100vw - 375px) / 1065), 5rem);
   /* Not a real Figma token: the design for it is missing (see nlb-design's tokens.css). */
-  --text-headline-2xl: clamp(2.6875rem, calc(2.6875rem + 2.3125rem * ((100vw - 375px) / 1065px)), 5rem);
-  --text-headline-xl: clamp(var(--font-size-text-3xl), calc(var(--font-size-text-3xl) + (var(--font-size-text-4xl) - var(--font-size-text-3xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-4xl));
-  --text-headline-lg: clamp(var(--font-size-text-2xl), calc(var(--font-size-text-2xl) + (var(--font-size-text-3xl) - var(--font-size-text-2xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-3xl));
-  --text-headline-base: clamp(var(--font-size-text-xl), calc(var(--font-size-text-xl) + (var(--font-size-text-2xl) - var(--font-size-text-xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-2xl));
-  --text-headline-sm: clamp(var(--font-size-text-lg), calc(var(--font-size-text-lg) + (var(--font-size-text-xl) - var(--font-size-text-lg)) * ((100vw - 375px) / 1065px)), var(--font-size-text-xl));
+  --text-headline-2xl: clamp(2.6875rem, calc(2.6875rem + 37 * (100vw - 375px) / 1065), 5rem);
+  --text-headline-xl: clamp(2.75rem, calc(2.75rem + 15 * (100vw - 375px) / 1065), 3.6875rem);
+  --text-headline-lg: clamp(2rem, calc(2rem + 12 * (100vw - 375px) / 1065), 2.75rem);
+  --text-headline-base: clamp(1.5rem, calc(1.5rem + 8 * (100vw - 375px) / 1065), 2rem);
+  --text-headline-sm: clamp(1.25rem, calc(1.25rem + 4 * (100vw - 375px) / 1065), 1.5rem);
   --text-body-large: var(--font-size-text-lg);
   --text-body-base: var(--font-size-text-base);
   --text-body-small: var(--font-size-text-sm);

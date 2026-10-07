@@ -7,15 +7,15 @@
 
 /* ---- Fluid section spacing, nlb-design --spacing-s1..s9 (375px -> 1440px) ------------------- */
 @theme {
-  --spacing-s1: clamp(1.25rem, calc(1.25rem + 1.25rem * ((100vw - 375px) / 1065px)), 2.5rem); /* Hero - Tertiary top */
-  --spacing-s2: clamp(2rem, calc(2rem + 0.5rem * ((100vw - 375px) / 1065px)), 2.5rem); /* Hero - Secondary */
-  --spacing-s3: clamp(2.5rem, calc(2.5rem + 1.5rem * ((100vw - 375px) / 1065px)), 4rem); /* Hero - Tertiary, interactive map */
-  --spacing-s4: clamp(3rem, calc(3rem + 2rem * ((100vw - 375px) / 1065px)), 5rem);
-  --spacing-s5: clamp(4rem, calc(4rem + 1rem * ((100vw - 375px) / 1065px)), 5rem); /* Image Carousel */
-  --spacing-s6: clamp(4rem, calc(4rem + 2rem * ((100vw - 375px) / 1065px)), 6rem); /* Basic - Left Right Text */
-  --spacing-s7: clamp(4rem, calc(4rem + 4rem * ((100vw - 375px) / 1065px)), 8rem);
-  --spacing-s8: clamp(5rem, calc(5rem + 3rem * ((100vw - 375px) / 1065px)), 8rem);
-  --spacing-s9: clamp(5rem, calc(5rem + 5rem * ((100vw - 375px) / 1065px)), 10rem); /* Home - Mission */
+  --spacing-s1: clamp(1.25rem, calc(1.25rem + 20 * (100vw - 375px) / 1065), 2.5rem); /* Hero - Tertiary top */
+  --spacing-s2: clamp(2rem, calc(2rem + 8 * (100vw - 375px) / 1065), 2.5rem); /* Hero - Secondary */
+  --spacing-s3: clamp(2.5rem, calc(2.5rem + 24 * (100vw - 375px) / 1065), 4rem); /* Hero - Tertiary, interactive map */
+  --spacing-s4: clamp(3rem, calc(3rem + 32 * (100vw - 375px) / 1065), 5rem);
+  --spacing-s5: clamp(4rem, calc(4rem + 16 * (100vw - 375px) / 1065), 5rem); /* Image Carousel */
+  --spacing-s6: clamp(4rem, calc(4rem + 32 * (100vw - 375px) / 1065), 6rem); /* Basic - Left Right Text */
+  --spacing-s7: clamp(4rem, calc(4rem + 64 * (100vw - 375px) / 1065), 8rem);
+  --spacing-s8: clamp(5rem, calc(5rem + 48 * (100vw - 375px) / 1065), 8rem);
+  --spacing-s9: clamp(5rem, calc(5rem + 80 * (100vw - 375px) / 1065), 10rem); /* Home - Mission */
 }
 
 /* ---- Headline utilities (as in nlb-design). The fluid sizes live in tokens.css. -------------- */

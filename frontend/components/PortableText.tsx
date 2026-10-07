@@ -17,8 +17,16 @@ import {
 import ResolvedLink from '@/components/ResolvedLink'
 import Image from '@/components/SanityImage'
 import LinkRow from '@/components/ui/LinkRow'
-import {DereferencedLink} from '@/sanity/lib/types'
+import {ExtractPageBuilderType} from '@/sanity/lib/types'
 import {linkResolver} from '@/sanity/lib/utils'
+
+/** One row of an anchor-links item, derived from the generated query result so it cannot drift. */
+type AnchorLinkRow = NonNullable<
+  Extract<
+    NonNullable<ExtractPageBuilderType<'basicLeftRightText'>['rightContent']>[number],
+    {_type: 'anchorLinks'}
+  >['links']
+>[number]
 
 export default function CustomPortableText({
   className,
@@ -36,13 +44,7 @@ export default function CustomPortableText({
   const components: PortableTextComponents = {
     types: {
       anchorLinks: ({value}) => {
-        type Row = {
-          _key: string
-          label?: string
-          icon?: string
-          link?: DereferencedLink
-        }
-        const rows = ((value?.links ?? []) as Row[]).flatMap((row) => {
+        const rows = ((value?.links ?? []) as AnchorLinkRow[]).flatMap((row) => {
           // A row needs a label and a link that resolves; anything else would be a dead row.
           const href = row.link ? linkResolver(row.link) : null
           if (!row.label || !href) return []
