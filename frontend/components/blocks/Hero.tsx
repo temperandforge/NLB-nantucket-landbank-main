@@ -7,7 +7,7 @@ export default function Hero({block}: BlockProps<'hero'>) {
     <section className="w-full">
       <div className="max-w-[1360px] mx-auto px-10 py-24 text-center">
         {block.eyebrow && <Eyebrow className="text-moody-moor-700 mb-3">{block.eyebrow}</Eyebrow>}
-        {block.heading && <h1 className="text-h1 mb-6">{block.heading}</h1>}
+        {block.heading && <h1 className="text-headline-2xl mb-6">{block.heading}</h1>}
         {block.body && <p className="text-moody-moor-600 max-w-[42rem] mx-auto">{block.body}</p>}
         <BlockImage
           image={block.image}

@@ -24,7 +24,7 @@
   /* Figma stores letter-spacing as a bare -2 / 0 / 2 with no unit; read as percent (em / 100). */
   --tracking-tight: -0.02em;
   --tracking-normal: 0em;
-  --tracking-wide: 0.02em;
+  --tracking-wide: 0.125rem;
 
   /*
    * The Figma font-size scale, in rem (px / 16). Named --font-size-* rather than --text-* so it
@@ -134,35 +134,21 @@
 }
 
 /* ---- Type sizes (breakpoint collection) ----------------------------------------------------
- * Desktop values live in @theme; the mobile mode overrides them below the breakpoint. Utilities
- * read var(--text-*), so text-headline-lg switches size on its own.
+ * Fluid between the mobile (375px) and desktop (1440px) Figma values, as in nlb-design. Body
+ * sizes are identical in both modes, so they stay fixed.
  */
 @theme {
-  --text-display-lg: var(--font-size-text-7xl);
-  --text-display-base: var(--font-size-text-6xl);
-  --text-display-sm: var(--font-size-text-5xl);
-  --text-headline-xl: var(--font-size-text-4xl);
-  --text-headline-lg: var(--font-size-text-3xl);
-  --text-headline-base: var(--font-size-text-2xl);
-  --text-headline-sm: var(--font-size-text-xl);
+  --text-display-lg: clamp(var(--font-size-text-6xl), calc(var(--font-size-text-6xl) + (var(--font-size-text-7xl) - var(--font-size-text-6xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-7xl));
+  --text-display-base: clamp(var(--font-size-text-5xl), calc(var(--font-size-text-5xl) + (var(--font-size-text-6xl) - var(--font-size-text-5xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-6xl));
+  --text-display-sm: clamp(var(--font-size-text-4xl), calc(var(--font-size-text-4xl) + (var(--font-size-text-5xl) - var(--font-size-text-4xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-5xl));
+  /* Not a real Figma token: the design for it is missing (see nlb-design's tokens.css). */
+  --text-headline-2xl: clamp(2.6875rem, calc(2.6875rem + 2.3125rem * ((100vw - 375px) / 1065px)), 5rem);
+  --text-headline-xl: clamp(var(--font-size-text-3xl), calc(var(--font-size-text-3xl) + (var(--font-size-text-4xl) - var(--font-size-text-3xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-4xl));
+  --text-headline-lg: clamp(var(--font-size-text-2xl), calc(var(--font-size-text-2xl) + (var(--font-size-text-3xl) - var(--font-size-text-2xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-3xl));
+  --text-headline-base: clamp(var(--font-size-text-xl), calc(var(--font-size-text-xl) + (var(--font-size-text-2xl) - var(--font-size-text-xl)) * ((100vw - 375px) / 1065px)), var(--font-size-text-2xl));
+  --text-headline-sm: clamp(var(--font-size-text-lg), calc(var(--font-size-text-lg) + (var(--font-size-text-xl) - var(--font-size-text-lg)) * ((100vw - 375px) / 1065px)), var(--font-size-text-xl));
   --text-body-large: var(--font-size-text-lg);
   --text-body-base: var(--font-size-text-base);
   --text-body-small: var(--font-size-text-sm);
   --text-body-xs: var(--font-size-text-xs);
-}
-
-/*
- * Mobile mode. The Figma files do not state where mobile ends; 48rem is Tailwind's md and is an
- * assumption to confirm with the designer. Body sizes are identical in both modes.
- */
-@media (width < 48rem) {
-  :root {
-    --text-display-lg: var(--font-size-text-6xl);
-    --text-display-base: var(--font-size-text-5xl);
-    --text-display-sm: var(--font-size-text-4xl);
-    --text-headline-xl: var(--font-size-text-3xl);
-    --text-headline-lg: var(--font-size-text-2xl);
-    --text-headline-base: var(--font-size-text-xl);
-    --text-headline-sm: var(--font-size-text-lg);
-  }
 }
