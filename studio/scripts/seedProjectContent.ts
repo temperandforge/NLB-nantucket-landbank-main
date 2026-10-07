@@ -56,7 +56,7 @@ async function main() {
 
   for (const entry of CONTENT) {
     const project = await client.fetch<ProjectRow | null>(
-      `*[_type == "project" && slug.current == $slug][0]{_id, "hasImage": defined(image.asset)}`,
+      `*[_type == "property" && slug.current == $slug][0]{_id, "hasImage": defined(image.asset)}`,
       {slug: entry.slug},
     )
 

@@ -527,7 +527,7 @@
   },
   {
     "type": "type",
-    "name": "project.reference",
+    "name": "property.reference",
     "value": {
       "type": "object",
       "attributes": {
@@ -552,7 +552,7 @@
           "optional": true
         }
       },
-      "dereferencesTo": "project"
+      "dereferencesTo": "property"
     }
   },
   {
@@ -606,7 +606,7 @@
               },
               "rest": {
                 "type": "inline",
-                "name": "project.reference"
+                "name": "property.reference"
               }
             }
           },
@@ -1159,7 +1159,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "inline",
-            "name": "project.reference"
+            "name": "property.reference"
           },
           "optional": true
         },
@@ -3942,7 +3942,7 @@
     }
   },
   {
-    "name": "project",
+    "name": "property",
     "type": "document",
     "attributes": {
       "_id": {
@@ -3955,7 +3955,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "string",
-          "value": "project"
+          "value": "property"
         }
       },
       "_createdAt": {

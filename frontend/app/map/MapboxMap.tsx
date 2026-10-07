@@ -13,13 +13,13 @@ import {
   RESOURCE_SLUG,
   toLngLat,
   type MapSettings,
-  type Project,
+  type Property,
 } from './types'
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? ''
 
 interface MapboxMapProps {
-  projects: Project[]
+  projects: Property[]
   settings: MapSettings | null
 }
 
@@ -38,7 +38,7 @@ function escapeHtml(value: string): string {
  * Every interpolated value is escaped: these come from the CMS, and setHTML would otherwise let
  * a stray angle bracket in a description break the markup.
  */
-function buildPopupHtml(project: Project): string {
+function buildPopupHtml(project: Property): string {
   const resources = projectSlugs(project.resources)
 
   const accessible = resources.includes(RESOURCE_SLUG.handicapAccessible)
