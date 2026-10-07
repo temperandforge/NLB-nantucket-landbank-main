@@ -52,7 +52,6 @@ export default function MultiSelect({field, id, value, error, onChange, onBlur}:
     setOpen(false)
     setActive(-1)
     if (returnFocus) trigger.current?.focus()
-    onBlur()
   }
 
   function toggle(option: string) {
@@ -106,16 +105,27 @@ export default function MultiSelect({field, id, value, error, onChange, onBlur}:
         ref={wrapper}
         className="relative"
         onBlur={(event) => {
-          if (open && !wrapper.current?.contains(event.relatedTarget as Node | null)) closeList(false)
+          // Focus left the control entirely (open or not): close and let the form validate.
+          if (!wrapper.current?.contains(event.relatedTarget as Node | null)) {
+            closeList(false)
+            onBlur()
+          }
         }}
       >
         <button
           ref={trigger}
           id={id}
           type="button"
+          // Select-only combobox. Focus moves to the list while it is open, a deliberate departure
+          // from the APG pattern (which keeps focus here); combobox still fits because the trigger
+          // is the control that names the value, opens the popup and carries required/invalid.
+          role="combobox"
+          aria-labelledby={`${id}-label ${id}-value`}
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-controls={open ? listId : undefined}
+          aria-required={field.required || undefined}
+          aria-invalid={error ? true : undefined}
           aria-describedby={describedBy(id, field, error)}
           // Safari and Firefox on macOS do not focus a clicked button, so the list's blur would see no
           // related target and close it just before this click reopened it.
@@ -126,7 +136,9 @@ export default function MultiSelect({field, id, value, error, onChange, onBlur}:
             chosen.length === 0 ? 'form-control-empty' : ''
           }`}
         >
-          <span className="truncate">{summary}</span>
+          <span id={`${id}-value`} className="truncate">
+            {summary}
+          </span>
           <ChevronDownIcon className="size-6 shrink-0 text-on-background" />
         </button>
         {open && (
