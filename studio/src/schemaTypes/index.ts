@@ -1,6 +1,12 @@
 import {menu} from './documents/menu'
 import {page} from './documents/page'
 import {project} from './documents/project'
+import {article} from './documents/article'
+import {commissioner} from './documents/commissioner'
+import {event} from './documents/event'
+import {faq} from './documents/faq'
+import {staffMember} from './documents/staffMember'
+import {department, faqCategory, newsCategory} from './documents/taxonomies'
 import {propertyType} from './documents/propertyType'
 import {resource} from './documents/resource'
 import {heroVideo} from './objects/heroVideo'
@@ -42,6 +48,15 @@ export const schemaTypes = [
   page,
   menu,
   project,
+  article,
+  event,
+  staffMember,
+  commissioner,
+  faq,
+  // Categorisation for the above - referenced, so the client can extend them without a deploy
+  newsCategory,
+  department,
+  faqCategory,
   // Categorisation for projects - referenced, so the client can extend either without a deploy
   propertyType,
   resource,

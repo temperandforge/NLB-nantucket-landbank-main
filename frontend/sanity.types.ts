@@ -405,6 +405,164 @@ export type PropertyType = {
   slug: Slug
 }
 
+export type NewsCategory = {
+  _id: string
+  _type: 'newsCategory'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  order?: number
+}
+
+export type FaqCategoryReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'faqCategory'
+}
+
+export type Faq = {
+  _id: string
+  _type: 'faq'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  question: string
+  answer: BlockContent
+  category?: FaqCategoryReference
+  order?: number
+}
+
+export type FaqCategory = {
+  _id: string
+  _type: 'faqCategory'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  order?: number
+}
+
+export type Commissioner = {
+  _id: string
+  _type: 'commissioner'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  title?: string
+  startDate?: string
+  headshot?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  order?: number
+}
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop'
+  top: number
+  bottom: number
+  left: number
+  right: number
+}
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot'
+  x: number
+  y: number
+  height: number
+  width: number
+}
+
+export type DepartmentReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'department'
+}
+
+export type StaffMember = {
+  _id: string
+  _type: 'staffMember'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  title?: string
+  department?: DepartmentReference
+  headshot?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  order?: number
+}
+
+export type Department = {
+  _id: string
+  _type: 'department'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  order?: number
+}
+
+export type Event = {
+  _id: string
+  _type: 'event'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  start: string
+  end?: string
+  location?: string
+  description?: string
+}
+
+export type NewsCategoryReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'newsCategory'
+}
+
+export type Article = {
+  _id: string
+  _type: 'article'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  date: string
+  image: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  categories?: Array<
+    {
+      _key: string
+    } & NewsCategoryReference
+  >
+  link?: Link
+}
+
 export type PropertyTypeReference = {
   _ref: string
   _type: 'reference'
@@ -456,22 +614,6 @@ export type Geopoint = {
   lat?: number
   lng?: number
   alt?: number
-}
-
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop'
-  top: number
-  bottom: number
-  left: number
-  right: number
-}
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot'
-  x: number
-  y: number
-  height: number
-  width: number
 }
 
 export type ProjectSettings = {
@@ -909,12 +1051,23 @@ export type AllSanitySchemaTypes =
   | Resource
   | Slug
   | PropertyType
+  | NewsCategory
+  | FaqCategoryReference
+  | Faq
+  | FaqCategory
+  | Commissioner
+  | SanityImageCrop
+  | SanityImageHotspot
+  | DepartmentReference
+  | StaffMember
+  | Department
+  | Event
+  | NewsCategoryReference
+  | Article
   | PropertyTypeReference
   | ResourceReference
   | Project
   | Geopoint
-  | SanityImageCrop
-  | SanityImageHotspot
   | ProjectSettings
   | MenuReference
   | Footer

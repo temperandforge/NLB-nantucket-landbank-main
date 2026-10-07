@@ -1,12 +1,16 @@
 import {
+  CalendarIcon,
   CogIcon,
   DocumentsIcon,
+  DocumentTextIcon,
   DropIcon,
   EarthGlobeIcon,
   FolderIcon,
+  HelpCircleIcon,
   MenuIcon,
   PinIcon,
   TagIcon,
+  UsersIcon,
 } from '@sanity/icons'
 import type {StructureBuilder, StructureResolver} from 'sanity/structure'
 import pluralize from 'pluralize-esm'
@@ -38,6 +42,15 @@ const DISABLED_TYPES = [
   'propertyType',
   'resource',
   'projectSettings',
+  // Handled explicitly below: news, events, people and FAQs.
+  'article',
+  'newsCategory',
+  'event',
+  'staffMember',
+  'commissioner',
+  'department',
+  'faq',
+  'faqCategory',
   // Internal to sanity-plugin-media. Tags are managed inside the Media tool, so listing them at
   // the root would just be a dead end for an editor.
   'media.tag',
@@ -73,6 +86,44 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
                 .child(
                   S.document().schemaType('projectSettings').documentId('projectSettings'),
                 ),
+            ]),
+        ),
+      S.listItem()
+        .title('News')
+        .icon(DocumentTextIcon)
+        .child(
+          S.list()
+            .title('News')
+            .items([
+              S.documentTypeListItem('article').title('Articles').icon(DocumentTextIcon),
+              S.divider(),
+              S.documentTypeListItem('newsCategory').title('News Categories').icon(TagIcon),
+            ]),
+        ),
+      S.documentTypeListItem('event').title('Events').icon(CalendarIcon),
+      S.listItem()
+        .title('People')
+        .icon(UsersIcon)
+        .child(
+          S.list()
+            .title('People')
+            .items([
+              S.documentTypeListItem('staffMember').title('Staff').icon(UsersIcon),
+              S.documentTypeListItem('commissioner').title('Commissioners').icon(UsersIcon),
+              S.divider(),
+              S.documentTypeListItem('department').title('Departments').icon(TagIcon),
+            ]),
+        ),
+      S.listItem()
+        .title('FAQs')
+        .icon(HelpCircleIcon)
+        .child(
+          S.list()
+            .title('FAQs')
+            .items([
+              S.documentTypeListItem('faq').title('FAQs').icon(HelpCircleIcon),
+              S.divider(),
+              S.documentTypeListItem('faqCategory').title('FAQ Categories').icon(TagIcon),
             ]),
         ),
       S.divider(),
