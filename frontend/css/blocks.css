@@ -1,0 +1,117 @@
+/**
+ * Page-builder block styles ported from the nlb-v2 WordPress theme (assets/src/main.css and each
+ * blocks/<name>/style.css). Tokens live in tokens.css; this file adds only what the blocks need
+ * and tokens.css does not have.
+ *
+ * Source of the fluid heading scale: the theme's architecture.md "Typography". Linear through
+ * (375px, mobile) and (1440px, desktop), extrapolated to 1920px for the ceiling.
+ */
+
+@theme {
+  /* Section padding. The theme names these section-p-*; section-p-sm (64px) is in globals.css. */
+  --spacing-section-p-md: 96px;
+  --spacing-section-p-lg: 128px;
+  --spacing-section-p-xl: 160px;
+}
+
+@utility heading-base {
+  font-family: var(--font-primary);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+}
+
+@utility text-h1 {
+  @apply heading-base;
+  font-size: clamp(2.5rem, 1.7738rem + 3.0986vw, 5.4921rem);
+}
+
+@utility text-h2 {
+  @apply heading-base;
+  font-size: clamp(2.1875rem, 1.6593rem + 2.2535vw, 4.3636rem);
+}
+
+@utility text-h3 {
+  @apply heading-base;
+  font-size: clamp(1.9375rem, 1.5854rem + 1.5023vw, 3.3882rem);
+}
+
+@utility text-h4 {
+  @apply heading-base;
+  font-size: clamp(1.75rem, 1.5299rem + 0.939vw, 2.6567rem);
+}
+
+@utility text-h5 {
+  @apply heading-base;
+  font-size: clamp(1.5625rem, 1.4525rem + 0.4695vw, 2.0158rem);
+}
+
+@utility text-h6 {
+  @apply heading-base;
+  font-size: clamp(1.375rem, 1.331rem + 0.1878vw, 1.5563rem);
+}
+
+/**
+ * Fluid horizontal section padding: 1.5rem at 375px, 2.5rem at 1440px (matches the 40px global
+ * margin exactly), extrapolated for the 1920px ceiling.
+ */
+:root {
+  --tf-x: clamp(1.5rem, 1.1479rem + 1.5023vw, 2.9507rem);
+}
+
+@utility tf-px {
+  padding-inline: var(--tf-x);
+}
+
+@utility tf-max-w {
+  @apply max-w-[90rem] mx-auto;
+}
+
+/* Hero - Image: decorative line art inside the light card, cropped by the card's overflow. */
+.hero-image__lines {
+  background: url('/images/blocks/hero-secondary-lines.svg') center / 220% no-repeat;
+  opacity: 0.35;
+}
+
+/**
+ * Hero - Secondary. The panel colour and the line-art stroke are tuned per variant in the theme
+ * (cream stroke at ~70% on green, brown stroke at ~40% on brown), so the art is two SVGs.
+ * #5F8154 is the theme's own value for the Lowlands panel; the nearest token, lowlands-800, is
+ * #63795b.
+ */
+.hero-secondary__panel--lowlands {
+  background-color: #5f8154;
+}
+
+.hero-secondary__panel--moody-moor {
+  background-color: var(--color-moody-moor-500);
+}
+
+.hero-secondary__lines {
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.hero-secondary__lines--lowlands {
+  background-image: url('/images/blocks/hero-secondary-lines-lowlands.svg');
+  opacity: 0.6;
+}
+
+.hero-secondary__lines--moody-moor {
+  background-image: url('/images/blocks/hero-secondary-lines.svg');
+  opacity: 0.4;
+}
+
+.hero-tertiary__lines {
+  background: url('/images/blocks/hero-tertiary-lines.svg') center / cover no-repeat;
+}
+
+/* Image Carousel: scroll-snap is not expressible as utilities alone. */
+.image-carousel__track {
+  scroll-snap-type: x mandatory;
+}
+
+.image-carousel__slide {
+  scroll-snap-align: start;
+}

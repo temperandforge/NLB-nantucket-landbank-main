@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './tokens.css';
+@import './blocks.css';
 
 @plugin "@tailwindcss/typography";
 
