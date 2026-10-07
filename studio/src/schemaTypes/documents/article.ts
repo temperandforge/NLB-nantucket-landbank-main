@@ -4,8 +4,8 @@ import {defineArrayMember, defineField, defineType} from 'sanity'
 import {imageWithAltField} from '../objects/blockFields'
 
 /**
- * A news item. It has no page of its own yet (per-item pages are slice 3), so `link` is where a
- * tile goes, if anywhere: an external article, or later a page. With no link the tile is plain.
+ * A news item, with a page of its own at /news/<slug>. `link` is an optional override for where
+ * its news tile goes (an external story); with no link the tile goes to the article's page.
  */
 export const article = defineType({
   name: 'article',
@@ -34,6 +34,12 @@ export const article = defineType({
       validation: (rule) => rule.required(),
     }),
     imageWithAltField({required: true}),
+    defineField({
+      name: 'body',
+      title: 'Body',
+      type: 'blockContent',
+      description: 'The article text. Paragraphs, images, Heading 3-6 and anchor links are available.',
+    }),
     defineField({
       name: 'categories',
       title: 'Categories',

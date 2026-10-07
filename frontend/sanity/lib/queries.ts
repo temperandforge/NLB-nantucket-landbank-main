@@ -155,6 +155,20 @@ const markDefsFields = /* groq */ `
   }
 `
 
+/** What a news tile needs. Shared by the News Preview block and the article page's "more news". */
+const articleCardFields = /* groq */ `
+  _id,
+  title,
+  "slug": slug.current,
+  date,
+  image,
+  link{
+    ...,
+    ${linkReference}
+  },
+  "categories": categories[]->{"slug": slug.current, title}
+`
+
 /**
  * The page builder's sections. Blocks marked "Hide this block" are dropped here, so their content
  * never reaches a visitor's browser; $includeHidden is true only in draft mode (Presentation),
@@ -206,15 +220,7 @@ const pageBuilderFields = /* groq */ `
         ${linkReference}
       },
       "articles": *[_type == "article" && defined(slug.current)] | order(date desc) [0...12] {
-        _id,
-        title,
-        date,
-        image,
-        link{
-          ...,
-          ${linkReference}
-        },
-        "categories": categories[]->{"slug": slug.current, title}
+        ${articleCardFields}
       }
     },
     _type == "eventsPreview" => {
@@ -374,4 +380,42 @@ export const sitemapData = defineQuery(`
 export const pagesSlugs = defineQuery(`
   *[_type == "page" && defined(slug.current) && !coalesce(pathOnly, false)]
   {"slug": ${pagePath}}
+`)
+
+export const articleQuery = defineQuery(`
+  *[_type == "article" && slug.current == $slug][0]{
+    _id,
+    _type,
+    title,
+    "slug": slug.current,
+    date,
+    image,
+    "categories": categories[]->{"slug": slug.current, title},
+    body[]{
+      ...,
+      _type == "anchorLinks" => {
+        links[]{
+          ...,
+          ${linkFields}
+        }
+      },
+      ${markDefsFields}
+    }
+  }
+`)
+
+/** The latest articles other than the one being read. */
+export const moreNewsQuery = defineQuery(`
+  *[_type == "article" && defined(slug.current) && slug.current != $slug]
+    | order(date desc) [0...3] {
+    ${articleCardFields}
+  }
+`)
+
+export const articleSlugs = defineQuery(`
+  *[_type == "article" && defined(slug.current)]{"slug": slug.current}
+`)
+
+export const articleSitemapData = defineQuery(`
+  *[_type == "article" && defined(slug.current)]{_updatedAt, "slug": slug.current}
 `)
