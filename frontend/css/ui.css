@@ -270,7 +270,7 @@
 .rich-text-basic {
   color: var(--rich-text-color, var(--color-on-background));
   font-family: var(--font-sans);
-  font-size: var(--text-body-base);
+  font-size: var(--rich-text-size, var(--text-body-base));
   line-height: 1.6;
 }
 

@@ -10,13 +10,13 @@ type Faq = NonNullable<BlockProps<'faqList'>['block']['ungrouped']>[number]
 
 function FaqRows({faqs}: {faqs: Faq[]}) {
   return (
-    <div className="flex w-full flex-col items-start gap-5">
+    <div className="flex w-full flex-col items-start gap-3">
       {faqs.map((faq) => (
         <FaqItem key={faq._id} question={faq.question}>
           {faq.answer && (
             <CustomPortableText
               variant="basic"
-              className="[--rich-text-color:var(--color-on-surface-dark)]"
+              className="[--rich-text-color:var(--color-on-background)] [--rich-text-size:14px]"
               value={faq.answer as PortableTextBlock[]}
             />
           )}
@@ -41,11 +41,20 @@ export default function FaqList({block}: BlockProps<'faqList'>) {
         height={284}
         className="pointer-events-none absolute top-48 left-1/2 z-0 w-[150%] max-w-none -translate-x-1/2"
       />
-      <div className="relative z-10 mx-auto flex w-full max-w-[85rem] flex-col items-start gap-10 lg:flex-row lg:flex-wrap lg:justify-between">
-        {block.heading && (
-          <h2 className="text-headline-xl leading-none text-on-background">{block.heading}</h2>
+      <div className="relative z-10 mx-auto flex w-full max-w-[85rem] flex-col items-start gap-10 lg:flex-row lg:justify-between">
+        {(block.heading || block.description) && (
+          <div className="flex w-full flex-col items-start gap-6 lg:w-[318px] lg:shrink-0">
+            {block.heading && (
+              <h2 className="w-full text-headline-2xl text-on-background">{block.heading}</h2>
+            )}
+            {block.description && (
+              <p className="w-full font-sans text-body-large leading-[1.6] text-on-background">
+                {block.description}
+              </p>
+            )}
+          </div>
         )}
-        <div className="flex max-w-[42rem] flex-col items-start gap-16">
+        <div className="flex w-full flex-col items-start gap-16 lg:w-[668px] lg:shrink-0">
           {ungrouped.length > 0 && (
             <div className="flex w-full flex-col items-start gap-6">
               <FaqRows faqs={ungrouped} />

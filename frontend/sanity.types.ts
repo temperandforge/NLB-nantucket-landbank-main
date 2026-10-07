@@ -128,6 +128,7 @@ export type PeopleGrid = {
 export type FaqList = {
   _type: 'faqList'
   heading?: string
+  description?: string
   disabled?: boolean
 }
 
@@ -1506,6 +1507,7 @@ export type GetPageQueryResult = {
         _key: string
         _type: 'faqList'
         heading?: string
+        description?: string
         disabled?: boolean
         ungrouped: Array<{
           _id: string
@@ -2080,6 +2082,7 @@ export type LandingPageQueryResult = {
         _key: string
         _type: 'faqList'
         heading?: string
+        description?: string
         disabled?: boolean
         ungrouped: Array<{
           _id: string

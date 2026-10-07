@@ -14,7 +14,7 @@ export default function FaqItem({question, children}: {question: string; childre
   const answerId = useId()
 
   return (
-    <div className="flex w-full flex-col items-start gap-8 overflow-clip rounded bg-surface-dark p-6 text-left">
+    <div className="flex w-full flex-col items-start gap-3 overflow-clip rounded bg-surface-dark p-6 text-left">
       <h4 className="w-full">
         <button
           type="button"
@@ -31,7 +31,11 @@ export default function FaqItem({question, children}: {question: string; childre
           )}
         </button>
       </h4>
-      <div id={answerId} hidden={!open} className="w-full">
+      <div
+        id={answerId}
+        hidden={!open}
+        className="w-full rounded bg-warm-neutral-50 px-[31px] py-[26px]"
+      >
         {children}
       </div>
     </div>

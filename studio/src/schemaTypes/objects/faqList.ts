@@ -12,7 +12,16 @@ export const faqList = defineBlock({
   title: 'FAQ List',
   type: 'object',
   icon: HelpCircleIcon,
-  fields: [defineField({name: 'heading', title: 'Heading', type: 'string', initialValue: 'FAQs'})],
+  fields: [
+    defineField({name: 'heading', title: 'Heading', type: 'string', initialValue: 'FAQs'}),
+    defineField({
+      name: 'description',
+      title: 'Description',
+      type: 'text',
+      rows: 2,
+      description: 'Shown under the heading, e.g. "Have questions? No worries, we have the answers."',
+    }),
+  ],
   preview: {
     select: {title: 'heading'},
     prepare: ({title}) => ({title: title || 'Untitled', subtitle: 'FAQ List'}),
