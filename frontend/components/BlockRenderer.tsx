@@ -2,6 +2,8 @@ import React from 'react'
 
 import BasicLeftRightText from '@/components/blocks/BasicLeftRightText'
 import Hero from '@/components/blocks/Hero'
+import ImageCarousel from '@/components/blocks/ImageCarousel'
+import Timeline from '@/components/blocks/Timeline'
 import HeroImage from '@/components/blocks/HeroImage'
 import HeroSecondary from '@/components/blocks/HeroSecondary'
 import HeroTertiary from '@/components/blocks/HeroTertiary'
@@ -28,6 +30,8 @@ const Blocks = {
   heroSecondary: HeroSecondary,
   heroTertiary: HeroTertiary,
   basicLeftRightText: BasicLeftRightText,
+  imageCarousel: ImageCarousel,
+  timeline: Timeline,
 } as BlocksType
 
 /**

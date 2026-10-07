@@ -159,6 +159,8 @@ export const page = defineType({
         {type: 'heroSecondary'},
         {type: 'heroTertiary'},
         {type: 'basicLeftRightText'},
+        {type: 'imageCarousel'},
+        {type: 'timeline'},
       ],
       hidden: ({document}) => Boolean(document?.pathOnly),
       options: {

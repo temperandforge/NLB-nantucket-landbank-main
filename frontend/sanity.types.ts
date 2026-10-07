@@ -15,6 +15,22 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: ../sanity.schema.json
+export type SanityImageAssetReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
+}
+
+export type CarouselImageImage = {
+  asset?: SanityImageAssetReference
+  media?: unknown // Unable to locate the referenced type "carouselImage.image.media" in schema
+  hotspot?: SanityImageHotspot
+  crop?: SanityImageCrop
+  alt: string
+  _type: 'image'
+}
+
 export type SocialLink = {
   _type: 'socialLink'
   platform: 'facebook' | 'instagram' | 'linkedin' | 'x' | 'youtube'
@@ -68,6 +84,28 @@ export type Link = {
   openInNewTab?: boolean
 }
 
+export type Timeline = {
+  _type: 'timeline'
+  entries?: Array<{
+    year: string
+    title: string
+    description?: string
+    _type: 'timelineEntry'
+    _key: string
+  }>
+}
+
+export type ImageCarousel = {
+  _type: 'imageCarousel'
+  eyebrow?: string
+  images?: Array<{
+    image: CarouselImageImage
+    caption?: string
+    _type: 'carouselImage'
+    _key: string
+  }>
+}
+
 export type BasicLeftRightText = {
   _type: 'basicLeftRightText'
   eyebrow?: string
@@ -83,13 +121,6 @@ export type HeroTertiary = {
   eyebrow?: string
   heading?: string
   body?: string
-}
-
-export type SanityImageAssetReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
 }
 
 export type HeroSecondary = {
@@ -452,6 +483,12 @@ export type Page = {
     | ({
         _key: string
       } & BasicLeftRightText)
+    | ({
+        _key: string
+      } & ImageCarousel)
+    | ({
+        _key: string
+      } & Timeline)
   >
 }
 
@@ -692,6 +729,8 @@ export type SanityImageAsset = {
 }
 
 export type AllSanitySchemaTypes =
+  | SanityImageAssetReference
+  | CarouselImageImage
   | SocialLink
   | InfoLine
   | InfoColumn
@@ -699,9 +738,10 @@ export type AllSanitySchemaTypes =
   | MenuGroup
   | PageReference
   | Link
+  | Timeline
+  | ImageCarousel
   | BasicLeftRightText
   | HeroTertiary
-  | SanityImageAssetReference
   | HeroSecondary
   | HeroImage
   | Hero
@@ -1095,6 +1135,28 @@ export type GetPageQueryResult = {
         autoplay?: boolean
         videoUrl: string | null
       }
+    | {
+        _key: string
+        _type: 'imageCarousel'
+        eyebrow?: string
+        images?: Array<{
+          image: CarouselImageImage
+          caption?: string
+          _type: 'carouselImage'
+          _key: string
+        }>
+      }
+    | {
+        _key: string
+        _type: 'timeline'
+        entries?: Array<{
+          year: string
+          title: string
+          description?: string
+          _type: 'timelineEntry'
+          _key: string
+        }>
+      }
   > | null
 } | null
 
@@ -1259,6 +1321,28 @@ export type LandingPageQueryResult = {
         alt: string
         autoplay?: boolean
         videoUrl: string | null
+      }
+    | {
+        _key: string
+        _type: 'imageCarousel'
+        eyebrow?: string
+        images?: Array<{
+          image: CarouselImageImage
+          caption?: string
+          _type: 'carouselImage'
+          _key: string
+        }>
+      }
+    | {
+        _key: string
+        _type: 'timeline'
+        entries?: Array<{
+          year: string
+          title: string
+          description?: string
+          _type: 'timelineEntry'
+          _key: string
+        }>
       }
   > | null
 } | null
