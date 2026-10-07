@@ -17,7 +17,7 @@ export default function ArticleView({
   shareLabel = 'Share',
 }: {
   article: NonNullable<ArticleQueryResult>
-  /** The wording below comes from Single Page Settings; these are the design's own defaults. */
+  /** The wording below comes from the Single News Page settings; these are the design's own defaults. */
   eyebrow?: string
   publishedLabel?: string
   shareLabel?: string

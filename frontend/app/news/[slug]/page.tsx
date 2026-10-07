@@ -9,7 +9,7 @@ import {
   articleQuery,
   articleSlugs,
   moreNewsQuery,
-  singleSettingsQuery,
+  singleNewsPageQuery,
 } from '@/sanity/lib/queries'
 import {DereferencedLink} from '@/sanity/lib/types'
 import {linkResolver, realHref, resolveOpenGraphImage} from '@/sanity/lib/utils'
@@ -50,14 +50,14 @@ export default async function NewsArticlePage(props: PageProps<'/news/[slug]'>) 
   const {slug} = await props.params
   const [{data: article}, {data: settings}] = await Promise.all([
     sanityFetch({query: articleQuery, params: {slug}}),
-    sanityFetch({query: singleSettingsQuery}),
+    sanityFetch({query: singleNewsPageQuery}),
   ])
 
   // No article at this slug: a real 404, never a 200 placeholder.
   if (!article?._id) notFound()
 
   // Related articles need this article's categories, so they are fetched once it is known.
-  const moreSettings = settings?.articleMoreNews
+  const moreSettings = settings?.moreNews
   const showMore = !moreSettings?.disabled
   const {data: more} = showMore
     ? await sanityFetch({
@@ -74,15 +74,15 @@ export default async function NewsArticlePage(props: PageProps<'/news/[slug]'>) 
     <>
       <ArticleView
         article={article}
-        eyebrow={settings?.articleEyebrow || undefined}
-        publishedLabel={settings?.articlePublishedLabel || undefined}
-        shareLabel={settings?.articleShareLabel || undefined}
+        eyebrow={settings?.eyebrow || undefined}
+        publishedLabel={settings?.publishedLabel || undefined}
+        shareLabel={settings?.shareLabel || undefined}
       />
       {showMore && (
         <NewsPreviewView
           heading={moreSettings ? moreSettings.heading : 'Nantucket News'}
           articles={more.slice(0, count)}
-          // The call to action is whatever Single Page Settings says; with no text there is no tile.
+          // The call to action is whatever the Single News Page settings say; with no text there is no tile.
           cta={{heading: moreSettings?.ctaHeading, label: moreSettings?.ctaLabel, href: ctaHref}}
         />
       )}

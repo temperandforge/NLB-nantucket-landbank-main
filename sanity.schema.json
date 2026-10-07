@@ -3951,7 +3951,7 @@
     }
   },
   {
-    "name": "singleSettings",
+    "name": "singleNewsPage",
     "type": "document",
     "attributes": {
       "_id": {
@@ -3964,7 +3964,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "string",
-          "value": "singleSettings"
+          "value": "singleNewsPage"
         }
       },
       "_createdAt": {
@@ -3985,28 +3985,28 @@
           "type": "string"
         }
       },
-      "articleEyebrow": {
+      "eyebrow": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
         "optional": true
       },
-      "articlePublishedLabel": {
+      "publishedLabel": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
         "optional": true
       },
-      "articleShareLabel": {
+      "shareLabel": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
         "optional": true
       },
-      "articleMoreNews": {
+      "moreNews": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",

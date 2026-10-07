@@ -32,7 +32,7 @@ import pluralize from 'pluralize-esm'
 // explicitly above/below or are internal to a plugin.
 const DISABLED_TYPES = [
   'settings',
-  'singleSettings',
+  'singleNewsPage',
   'page',
   'assist.instruction.context',
   // Handled explicitly under Globals below.
@@ -145,17 +145,17 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
                 .title('Menus')
                 .icon(MenuIcon)
                 .child(S.documentTypeList('menu').title('Menus')),
+              // The content every news article page shares (wording and the "more news" section).
+              S.listItem()
+                .title('Single News Page')
+                .icon(DocumentTextIcon)
+                .child(S.document().schemaType('singleNewsPage').documentId('singleNewsPage')),
             ]),
         ),
       // Site Settings: global config with no page/route of its own.
       S.listItem()
         .title('Site Settings')
         .child(S.document().schemaType('settings').documentId('siteSettings'))
-        .icon(CogIcon),
-      // Single Page Settings: the content every single template (today the news article) shares.
-      S.listItem()
-        .title('Single Page Settings')
-        .child(S.document().schemaType('singleSettings').documentId('singleSettings'))
         .icon(CogIcon),
       // Anything not explicitly handled above still shows up here automatically.
       ...S.documentTypeListItems()

@@ -668,16 +668,16 @@ export type Geopoint = {
   alt?: number
 }
 
-export type SingleSettings = {
+export type SingleNewsPage = {
   _id: string
-  _type: 'singleSettings'
+  _type: 'singleNewsPage'
   _createdAt: string
   _updatedAt: string
   _rev: string
-  articleEyebrow?: string
-  articlePublishedLabel?: string
-  articleShareLabel?: string
-  articleMoreNews?: NewsPreview
+  eyebrow?: string
+  publishedLabel?: string
+  shareLabel?: string
+  moreNews?: NewsPreview
 }
 
 export type ProjectSettings = {
@@ -1153,7 +1153,7 @@ export type AllSanitySchemaTypes =
   | ResourceReference
   | Project
   | Geopoint
-  | SingleSettings
+  | SingleNewsPage
   | ProjectSettings
   | MenuReference
   | Footer
@@ -2639,13 +2639,13 @@ export type MoreNewsQueryResult = Array<{
 }>
 
 // Source: sanity/lib/queries.ts
-// Variable: singleSettingsQuery
-// Query: *[_type == "singleSettings" && _id == "singleSettings"][0]{    articleEyebrow,    articlePublishedLabel,    articleShareLabel,    articleMoreNews{      ...,      ctaLink{        ...,          _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }    }  }
-export type SingleSettingsQueryResult = {
-  articleEyebrow: string | null
-  articlePublishedLabel: string | null
-  articleShareLabel: string | null
-  articleMoreNews: {
+// Variable: singleNewsPageQuery
+// Query: *[_type == "singleNewsPage" && _id == "singleNewsPage"][0]{    eyebrow,    publishedLabel,    shareLabel,    moreNews{      ...,      ctaLink{        ...,          _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }    }  }
+export type SingleNewsPageQueryResult = {
+  eyebrow: string | null
+  publishedLabel: string | null
+  shareLabel: string | null
+  moreNews: {
     _type: 'newsPreview'
     heading?: string
     count: number
@@ -2692,7 +2692,7 @@ declare module '@sanity/client' {
     '\n  *[_type == "page" && defined(slug.current) && !coalesce(pathOnly, false)]\n  {"slug": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}\n': PagesSlugsResult
     '\n  *[_type == "article" && slug.current == $slug][0]{\n    _id,\n    _type,\n    title,\n    "slug": slug.current,\n    date,\n    image,\n    "categories": categories[]->{"slug": slug.current, title},\n    // The article\'s own category documents, to find related articles.\n    "categoryIds": categories[]._ref,\n    body[]{\n      ...,\n      _type == "anchorLinks" => {\n        links[]{\n          ...,\n          \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n        }\n      },\n      \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n    }\n  }\n': ArticleQueryResult
     '\n  *[_type == "article" && defined(slug.current) && slug.current != $slug]\n    | order(count(coalesce(categories, [])[_ref in $categoryIds]) desc, date desc) [0...12] {\n    \n  _id,\n  title,\n  "slug": slug.current,\n  date,\n  image,\n  link{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  },\n  "categories": categories[]->{"slug": slug.current, title}\n\n  }\n': MoreNewsQueryResult
-    '\n  *[_type == "singleSettings" && _id == "singleSettings"][0]{\n    articleEyebrow,\n    articlePublishedLabel,\n    articleShareLabel,\n    articleMoreNews{\n      ...,\n      ctaLink{\n        ...,\n        \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n    }\n  }\n': SingleSettingsQueryResult
+    '\n  *[_type == "singleNewsPage" && _id == "singleNewsPage"][0]{\n    eyebrow,\n    publishedLabel,\n    shareLabel,\n    moreNews{\n      ...,\n      ctaLink{\n        ...,\n        \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n    }\n  }\n': SingleNewsPageQueryResult
     '\n  *[_type == "article" && defined(slug.current)]{"slug": slug.current}\n': ArticleSlugsResult
     '\n  *[_type == "article" && defined(slug.current)]{_updatedAt, "slug": slug.current}\n': ArticleSitemapDataResult
   }

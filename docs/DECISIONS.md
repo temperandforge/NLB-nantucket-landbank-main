@@ -787,17 +787,18 @@ edits, and prints each change first.
 The Figma node the theme cites no longer exists and the Design System node was not readable, so the
 page is the Staff page's header and a three-column grid of the existing commissioner cards.
 
-## 12. Single page settings and related news
+## 12. The single news page and related news
 
-### 12.1 Content every single template shares lives in one settings document
+### 12.1 What every news article page shares lives in one settings document
 
 **Status:** Implemented
 
-`singleSettings` (Studio: Single Page Settings, fixed id) holds what all single templates share, as
-opposed to one article's own content. Today: the news article's label above the title, its
-"Published:" and "Share" labels, and the "more news" section (the News Preview block's own fields,
-including its "Hide this block" setting). Other singles get their own section when they have pages.
-Every field is optional: the article page falls back to the design's wording.
+`singleNewsPage` (Studio: Globals > Single News Page, fixed id) holds what all news article pages
+share, as opposed to one article's own content: the label above the title, the "Published:" and
+"Share" labels, and the "more news" section (the News Preview block's own fields, including its
+"Hide this block" setting). Other single templates (events, projects) get their own settings
+document when they have pages. Every field is optional: the article page falls back to the design's
+wording.
 
 ### 12.2 "More news" ranks by shared categories and never includes the current article
 

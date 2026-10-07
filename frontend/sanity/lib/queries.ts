@@ -411,7 +411,7 @@ export const articleQuery = defineQuery(`
  * it first (the more they share, the earlier), then the latest of the rest. Ranked by a count of
  * shared categories, not filtered, so a thin category is topped up instead of left short. The
  * count is null for an article with no categories (null does not compare with numbers), hence the
- * coalesce. Up to 12 come back; the page shows as many as Single Page Settings asks for.
+ * coalesce. Up to 12 come back; the page shows as many as the Single News Page settings ask for.
  */
 export const moreNewsQuery = defineQuery(`
   *[_type == "article" && defined(slug.current) && slug.current != $slug]
@@ -420,13 +420,13 @@ export const moreNewsQuery = defineQuery(`
   }
 `)
 
-/** Content shared by every single template (a singleton, so matched on its type and fixed id). */
-export const singleSettingsQuery = defineQuery(`
-  *[_type == "singleSettings" && _id == "singleSettings"][0]{
-    articleEyebrow,
-    articlePublishedLabel,
-    articleShareLabel,
-    articleMoreNews{
+/** Content shared by every news article page (a singleton, so matched on its type and fixed id). */
+export const singleNewsPageQuery = defineQuery(`
+  *[_type == "singleNewsPage" && _id == "singleNewsPage"][0]{
+    eyebrow,
+    publishedLabel,
+    shareLabel,
+    moreNews{
       ...,
       ctaLink{
         ...,
