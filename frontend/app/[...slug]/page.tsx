@@ -68,6 +68,12 @@ export async function generateMetadata(props: PageProps<'/[...slug]'>): Promise<
   } satisfies Metadata
 }
 
+/**
+ * Revalidate hourly: an event drops off the Events Preview once it ends, which is worked out when
+ * the page is fetched, so a static page would otherwise keep a past event until the next edit.
+ */
+export const revalidate = 3600
+
 export default async function Page(props: PageProps<'/[...slug]'>) {
   const {slug} = await props.params
   // Hidden blocks are shown (with a badge) only while an editor is previewing in Presentation.

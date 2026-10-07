@@ -199,6 +199,38 @@ const pageBuilderFields = /* groq */ `
         ${linkFields}
       }
     },
+    _type == "newsPreview" => {
+      ...,
+      ctaLink{
+        ...,
+        ${linkReference}
+      },
+      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) [0...12] {
+        _id,
+        title,
+        date,
+        image,
+        link{
+          ...,
+          ${linkReference}
+        },
+        "categories": categories[]->{"slug": slug.current, title}
+      }
+    },
+    _type == "eventsPreview" => {
+      ...,
+      "events": *[
+        _type == "event" && defined(start)
+        && dateTime(coalesce(end, start)) >= dateTime(now())
+      ] | order(start asc) [0...12] {
+        _id,
+        title,
+        start,
+        end,
+        location,
+        description
+      }
+    },
     _type == "downloadBlock" => {
       ...,
       downloads[]{

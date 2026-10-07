@@ -19,6 +19,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return {title: page?.name} satisfies Metadata
 }
 
+/**
+ * Revalidate hourly: an event drops off the Events Preview once it ends, which is worked out when
+ * the page is fetched, so a static page would otherwise keep a past event until the next edit.
+ */
+export const revalidate = 3600
+
 export default async function Page() {
   // Hidden blocks are shown (with a badge) only while an editor is previewing in Presentation.
   const {isEnabled: includeHidden} = await draftMode()

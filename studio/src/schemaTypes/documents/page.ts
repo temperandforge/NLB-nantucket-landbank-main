@@ -14,6 +14,8 @@ import {imageCarousel} from '../objects/imageCarousel'
 import {jumpNavContent} from '../objects/jumpNavContent'
 import {mapTeaser} from '../objects/mapTeaser'
 import {missionStatement} from '../objects/missionStatement'
+import {eventsPreview} from '../objects/eventsPreview'
+import {newsPreview} from '../objects/newsPreview'
 import {timeline} from '../objects/timeline'
 import {buildPagePath, MAX_PAGE_DEPTH, slugifySegment} from '../../lib/pageHierarchy'
 
@@ -26,6 +28,7 @@ const pageBuilderBlocks = [
   contactForm,
   ctaContact,
   downloadBlock,
+  eventsPreview,
   hero,
   heroImage,
   heroSecondary,
@@ -35,6 +38,7 @@ const pageBuilderBlocks = [
   jumpNavContent,
   mapTeaser,
   missionStatement,
+  newsPreview,
   timeline,
 ]
   .sort((a, b) => (a.title ?? a.name).localeCompare(b.title ?? b.name))

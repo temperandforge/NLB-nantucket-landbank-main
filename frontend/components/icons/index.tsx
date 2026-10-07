@@ -155,3 +155,47 @@ export function DownloadIcon({className}: IconProps) {
     </svg>
   )
 }
+
+/** Clock, from nlb-design's events preview. 24 x 24. */
+export function ClockIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <circle cx="12" cy="13" r="8" stroke="currentColor" strokeWidth="2" />
+      <path
+        d="M12 9V13L14.5 14.5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M9 2H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+/** Map pin, from nlb-design's events preview. 24 x 24. */
+export function MapPinIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <path
+        d="M12 22C12 22 19 15.4183 19 10C19 5.58172 15.866 2 12 2C8.13401 2 5 5.58172 5 10C5 15.4183 12 22 12 22Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="10" r="2.5" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  )
+}
+
+/** Large arrow pointing down and right, from nlb-design's news preview call to action. 70 x 69. */
+export function ArrowDownRightIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 70 69" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <path
+        d="M57.9762 61.5984L0 4.70981L4.79985 0L62.776 56.8886L62.776 2.32783L69.5978 2.35491L69.5978 68.2922L2.39991 68.2922L2.37231 61.5984L57.9762 61.5984Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
