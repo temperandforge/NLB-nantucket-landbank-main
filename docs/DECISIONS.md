@@ -852,6 +852,36 @@ Figma. One source value looks wrong and was migrated as is: the commissioner Nei
 validation) fits the FAQs and news, which are still to import
 ([#11](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/11)).
 
+## 14. The WordPress FAQ migration
+
+### 14.1 FAQs follow the people pattern, with the answers converted to Portable Text
+
+**Status:** Tooling implemented; import not yet run (waiting on a go-ahead for the dataset write)
+
+`studio/scripts/wordpress/`: `extractFaqs.sh` (read-only; queries the tables directly so it does not
+depend on the theme registering `faq_category`), `faqs.ts` (pure transform, checked by
+`verifyFaqsTransform.mts`), `importWordpressFaqs.ts` (drafts only, `--dry`, `--remove-samples`) and
+`verifyWordpressFaqs.ts`. A category is matched on its slug, a FAQ on its question; an existing
+document is never edited. Each import writes its own `faqs-import-*.json` report, so it does not
+overwrite the people report.
+
+**Answers are converted, not stored as HTML.** The converter handles paragraphs, headings, block
+quotes, lists, bold, italic, links and line breaks. H1/H2 become H3 (the editor offers no higher);
+images, tables and embeds, and site-relative links (the editor's URL check rejects them), are
+dropped and reported. Keys derive from the WordPress id, so a re-run produces the same blocks.
+
+**Ordering.** Every `menu_order` on the site is 0, so a FAQ's order is its position by WordPress id
+within its category; categories follow the ACF `term_order` on the term (General FAQs, then Form
+Filing). A FAQ in several categories takes the earliest-ordered one.
+
+**Source quirks.** Only 1 of the 6 published FAQs has an answer in WordPress; the rest import with an
+empty answer, which Studio's required-field check flags until an editor writes one. The previous
+theme's `nlb_faq` posts are test content and are not migrated.
+
+**Samples.** `--remove-samples` deletes the sample FAQs and the `general` and `empty-category`
+categories from the Phase B seed before matching (one sample shares a question with a real FAQ).
+The `form-filing` category already exists and is reused as it stands.
+
 ## Known outstanding items
 
 Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-design.md):
