@@ -1,7 +1,7 @@
 import {ThListIcon} from '@sanity/icons'
-import {defineArrayMember, defineField, defineType} from 'sanity'
+import {defineArrayMember, defineField} from 'sanity'
 
-import {altTextField, headingLevelField} from './blockFields'
+import {altTextField, defineBlock, headingLevelField} from './blockFields'
 
 /**
  * A heading with a sticky section nav on the left and long-form content on the right. The nav is
@@ -9,7 +9,7 @@ import {altTextField, headingLevelField} from './blockFields'
  * H1 and H2 are not offered in the content because the block's own heading is the page-level
  * heading and H3 must unambiguously mean "a section of the nav".
  */
-export const jumpNavContent = defineType({
+export const jumpNavContent = defineBlock({
   name: 'jumpNavContent',
   title: 'Jump Nav Content',
   type: 'object',

@@ -1,10 +1,10 @@
 import {ImagesIcon} from '@sanity/icons'
-import {defineArrayMember, defineField, defineType} from 'sanity'
+import {defineArrayMember, defineField} from 'sanity'
 
-import {eyebrowField, imageWithAltField} from './blockFields'
+import {defineBlock, eyebrowField, imageWithAltField} from './blockFields'
 
 /** A horizontally scrolling row of captioned images. */
-export const imageCarousel = defineType({
+export const imageCarousel = defineBlock({
   name: 'imageCarousel',
   title: 'Image Carousel',
   type: 'object',

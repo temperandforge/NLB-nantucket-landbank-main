@@ -1,11 +1,13 @@
 import {PinIcon} from '@sanity/icons'
-import {defineField, defineType} from 'sanity'
+import {defineField} from 'sanity'
+
+import {defineBlock} from './blockFields'
 
 /**
  * A short teaser for the interactive map. The preview area is a placeholder, as in the theme; a
  * live preview is tracked as deferred work.
  */
-export const mapTeaser = defineType({
+export const mapTeaser = defineBlock({
   name: 'mapTeaser',
   title: 'Map Teaser',
   type: 'object',

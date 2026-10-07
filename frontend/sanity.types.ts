@@ -100,12 +100,14 @@ export type Link = {
 export type ContactForm = {
   _type: 'contactForm'
   heading?: string
+  disabled?: boolean
 }
 
 export type MapTeaser = {
   _type: 'mapTeaser'
   heading?: string
   body?: string
+  disabled?: boolean
 }
 
 export type DownloadBlock = {
@@ -116,6 +118,7 @@ export type DownloadBlock = {
     _type: 'download'
     _key: string
   }>
+  disabled?: boolean
 }
 
 export type Timeline = {
@@ -127,6 +130,7 @@ export type Timeline = {
     _type: 'timelineEntry'
     _key: string
   }>
+  disabled?: boolean
 }
 
 export type ImageCarousel = {
@@ -138,6 +142,7 @@ export type ImageCarousel = {
     _type: 'carouselImage'
     _key: string
   }>
+  disabled?: boolean
 }
 
 export type JumpNavContent = {
@@ -173,6 +178,7 @@ export type JumpNavContent = {
         _key: string
       }
   >
+  disabled?: boolean
 }
 
 export type BasicLeftRightText = {
@@ -183,6 +189,7 @@ export type BasicLeftRightText = {
   body?: BlockContent
   button?: Button
   rightContent?: BlockContent
+  disabled?: boolean
 }
 
 export type HeroTertiary = {
@@ -190,6 +197,7 @@ export type HeroTertiary = {
   eyebrow?: string
   heading?: string
   body?: string
+  disabled?: boolean
 }
 
 export type HeroSecondary = {
@@ -204,7 +212,8 @@ export type HeroSecondary = {
     alt?: string
     _type: 'image'
   }
-  variant?: 'lowlands' | 'moody-moor'
+  variant?: 'lowlands' | 'moody-moor' | 'light-brown'
+  disabled?: boolean
 }
 
 export type HeroImage = {
@@ -219,6 +228,7 @@ export type HeroImage = {
     alt?: string
     _type: 'image'
   }
+  disabled?: boolean
 }
 
 export type Hero = {
@@ -234,6 +244,7 @@ export type Hero = {
     alt?: string
     _type: 'image'
   }
+  disabled?: boolean
 }
 
 export type HeroVideo = {
@@ -252,6 +263,7 @@ export type HeroVideo = {
   }
   alt: string
   autoplay?: boolean
+  disabled?: boolean
 }
 
 export type BlockContentTextOnly = Array<{
@@ -281,7 +293,7 @@ export type BlockContent = Array<
         _type: 'span'
         _key: string
       }>
-      style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
+      style?: 'normal' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
       listItem?: 'bullet' | 'number'
       markDefs?: Array<{
         linkType?: 'href' | 'page'
@@ -530,7 +542,13 @@ export type Page = {
   pageBuilder?: Array<
     | ({
         _key: string
-      } & HeroVideo)
+      } & BasicLeftRightText)
+    | ({
+        _key: string
+      } & ContactForm)
+    | ({
+        _key: string
+      } & DownloadBlock)
     | ({
         _key: string
       } & Hero)
@@ -545,25 +563,19 @@ export type Page = {
       } & HeroTertiary)
     | ({
         _key: string
-      } & BasicLeftRightText)
-    | ({
-        _key: string
-      } & JumpNavContent)
+      } & HeroVideo)
     | ({
         _key: string
       } & ImageCarousel)
     | ({
         _key: string
-      } & Timeline)
-    | ({
-        _key: string
-      } & DownloadBlock)
+      } & JumpNavContent)
     | ({
         _key: string
       } & MapTeaser)
     | ({
         _key: string
-      } & ContactForm)
+      } & Timeline)
   >
 }
 
@@ -1055,7 +1067,7 @@ export type MapSettingsQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: getPageQuery
-// Query: *[_type == 'page' && slug.current == $leaf && !coalesce(pathOnly, false)]{      _id,  _type,  name,  slug,  "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),    pageBuilder[]{    ...,    _type == "heroVideo" => {      ...,      "videoUrl": video.asset->url    },    _type == "basicLeftRightText" => {      ...,      body[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      },      rightContent[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      },      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "downloadBlock" => {      ...,      downloads[]{        ...,        "fileUrl": file.asset->url,        "fileName": file.asset->originalFilename      }    },    _type == "jumpNavContent" => {      ...,      content[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },  }  }[path == $path][0]
+// Query: *[_type == 'page' && slug.current == $leaf && !coalesce(pathOnly, false)]{      _id,  _type,  name,  slug,  "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),    pageBuilder[$includeHidden || !coalesce(disabled, false)]{    ...,    _type == "heroVideo" => {      ...,      "videoUrl": video.asset->url    },    _type == "basicLeftRightText" => {      ...,      body[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      },      rightContent[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      },      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "downloadBlock" => {      ...,      downloads[]{        ...,        "fileUrl": file.asset->url,        "fileName": file.asset->originalFilename      }    },    _type == "jumpNavContent" => {      ...,      content[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },  }  }[path == $path][0]
 export type GetPageQueryResult = {
   _id: string
   _type: 'page'
@@ -1077,7 +1089,7 @@ export type GetPageQueryResult = {
                 _type: 'span'
                 _key: string
               }>
-              style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+              style?: 'blockquote' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
               listItem?: 'bullet' | 'number'
               markDefs: Array<{
                 linkType?: 'href' | 'page'
@@ -1121,7 +1133,7 @@ export type GetPageQueryResult = {
                 _type: 'span'
                 _key: string
               }>
-              style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+              style?: 'blockquote' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
               listItem?: 'bullet' | 'number'
               markDefs: Array<{
                 linkType?: 'href' | 'page'
@@ -1146,11 +1158,13 @@ export type GetPageQueryResult = {
               markDefs: null
             }
         > | null
+        disabled?: boolean
       }
     | {
         _key: string
         _type: 'contactForm'
         heading?: string
+        disabled?: boolean
       }
     | {
         _key: string
@@ -1163,6 +1177,7 @@ export type GetPageQueryResult = {
           fileUrl: string | null
           fileName: string | null
         }> | null
+        disabled?: boolean
       }
     | {
         _key: string
@@ -1178,6 +1193,7 @@ export type GetPageQueryResult = {
           alt?: string
           _type: 'image'
         }
+        disabled?: boolean
       }
     | {
         _key: string
@@ -1192,6 +1208,7 @@ export type GetPageQueryResult = {
           alt?: string
           _type: 'image'
         }
+        disabled?: boolean
       }
     | {
         _key: string
@@ -1206,7 +1223,8 @@ export type GetPageQueryResult = {
           alt?: string
           _type: 'image'
         }
-        variant?: 'lowlands' | 'moody-moor'
+        variant?: 'light-brown' | 'lowlands' | 'moody-moor'
+        disabled?: boolean
       }
     | {
         _key: string
@@ -1214,6 +1232,7 @@ export type GetPageQueryResult = {
         eyebrow?: string
         heading?: string
         body?: string
+        disabled?: boolean
       }
     | {
         _key: string
@@ -1232,6 +1251,7 @@ export type GetPageQueryResult = {
         }
         alt: string
         autoplay?: boolean
+        disabled?: boolean
         videoUrl: string | null
       }
     | {
@@ -1244,6 +1264,7 @@ export type GetPageQueryResult = {
           _type: 'carouselImage'
           _key: string
         }>
+        disabled?: boolean
       }
     | {
         _key: string
@@ -1283,12 +1304,14 @@ export type GetPageQueryResult = {
               markDefs: null
             }
         > | null
+        disabled?: boolean
       }
     | {
         _key: string
         _type: 'mapTeaser'
         heading?: string
         body?: string
+        disabled?: boolean
       }
     | {
         _key: string
@@ -1300,13 +1323,14 @@ export type GetPageQueryResult = {
           _type: 'timelineEntry'
           _key: string
         }>
+        disabled?: boolean
       }
   > | null
 } | null
 
 // Source: sanity/lib/queries.ts
 // Variable: landingPageQuery
-// Query: *[    _type == "page" && !coalesce(pathOnly, false)    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref  ][0]{      _id,  _type,  name,  slug,  "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),    pageBuilder[]{    ...,    _type == "heroVideo" => {      ...,      "videoUrl": video.asset->url    },    _type == "basicLeftRightText" => {      ...,      body[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      },      rightContent[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      },      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "downloadBlock" => {      ...,      downloads[]{        ...,        "fileUrl": file.asset->url,        "fileName": file.asset->originalFilename      }    },    _type == "jumpNavContent" => {      ...,      content[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },  }  }
+// Query: *[    _type == "page" && !coalesce(pathOnly, false)    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref  ][0]{      _id,  _type,  name,  slug,  "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),    pageBuilder[$includeHidden || !coalesce(disabled, false)]{    ...,    _type == "heroVideo" => {      ...,      "videoUrl": video.asset->url    },    _type == "basicLeftRightText" => {      ...,      body[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      },      rightContent[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      },      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "downloadBlock" => {      ...,      downloads[]{        ...,        "fileUrl": file.asset->url,        "fileName": file.asset->originalFilename      }    },    _type == "jumpNavContent" => {      ...,      content[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },  }  }
 export type LandingPageQueryResult = {
   _id: string
   _type: 'page'
@@ -1328,7 +1352,7 @@ export type LandingPageQueryResult = {
                 _type: 'span'
                 _key: string
               }>
-              style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+              style?: 'blockquote' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
               listItem?: 'bullet' | 'number'
               markDefs: Array<{
                 linkType?: 'href' | 'page'
@@ -1372,7 +1396,7 @@ export type LandingPageQueryResult = {
                 _type: 'span'
                 _key: string
               }>
-              style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+              style?: 'blockquote' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
               listItem?: 'bullet' | 'number'
               markDefs: Array<{
                 linkType?: 'href' | 'page'
@@ -1397,11 +1421,13 @@ export type LandingPageQueryResult = {
               markDefs: null
             }
         > | null
+        disabled?: boolean
       }
     | {
         _key: string
         _type: 'contactForm'
         heading?: string
+        disabled?: boolean
       }
     | {
         _key: string
@@ -1414,6 +1440,7 @@ export type LandingPageQueryResult = {
           fileUrl: string | null
           fileName: string | null
         }> | null
+        disabled?: boolean
       }
     | {
         _key: string
@@ -1429,6 +1456,7 @@ export type LandingPageQueryResult = {
           alt?: string
           _type: 'image'
         }
+        disabled?: boolean
       }
     | {
         _key: string
@@ -1443,6 +1471,7 @@ export type LandingPageQueryResult = {
           alt?: string
           _type: 'image'
         }
+        disabled?: boolean
       }
     | {
         _key: string
@@ -1457,7 +1486,8 @@ export type LandingPageQueryResult = {
           alt?: string
           _type: 'image'
         }
-        variant?: 'lowlands' | 'moody-moor'
+        variant?: 'light-brown' | 'lowlands' | 'moody-moor'
+        disabled?: boolean
       }
     | {
         _key: string
@@ -1465,6 +1495,7 @@ export type LandingPageQueryResult = {
         eyebrow?: string
         heading?: string
         body?: string
+        disabled?: boolean
       }
     | {
         _key: string
@@ -1483,6 +1514,7 @@ export type LandingPageQueryResult = {
         }
         alt: string
         autoplay?: boolean
+        disabled?: boolean
         videoUrl: string | null
       }
     | {
@@ -1495,6 +1527,7 @@ export type LandingPageQueryResult = {
           _type: 'carouselImage'
           _key: string
         }>
+        disabled?: boolean
       }
     | {
         _key: string
@@ -1534,12 +1567,14 @@ export type LandingPageQueryResult = {
               markDefs: null
             }
         > | null
+        disabled?: boolean
       }
     | {
         _key: string
         _type: 'mapTeaser'
         heading?: string
         body?: string
+        disabled?: boolean
       }
     | {
         _key: string
@@ -1551,6 +1586,7 @@ export type LandingPageQueryResult = {
           _type: 'timelineEntry'
           _key: string
         }>
+        disabled?: boolean
       }
   > | null
 } | null
@@ -1580,8 +1616,8 @@ declare module '@sanity/client' {
     '\n  *[_type == "project" && defined(slug.current)] | order(name asc) {\n    _id,\n    name,\n    "slug": slug.current,\n    boundaryId,\n    location,\n    description,\n    link,\n    "image": image{"url": asset->url, alt},\n    "propertyTypes": propertyTypes[]->{"slug": slug.current, title},\n    "resources": resources[]->{"slug": slug.current, title}\n  }\n': ProjectsQueryResult
     '{\n  "propertyTypes": *[_type == "propertyType" && defined(slug.current)] | order(title asc){\n    "slug": slug.current,\n    title\n  },\n  "resources": *[_type == "resource" && defined(slug.current)] | order(title asc){\n    "slug": slug.current,\n    title\n  }\n}': MapFiltersQueryResult
     '\n  *[_type == "projectSettings" && _id == "projectSettings"][0]{\n    eyebrow,\n    heading,\n    intro,\n    "boundaryDataUrl": boundaryData.asset->url,\n    "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),\n    "trailsDataUrl": trailsData.asset->url,\n    defaultCenter,\n    defaultZoom\n  }\n': MapSettingsQueryResult
-    '\n  *[_type == \'page\' && slug.current == $leaf && !coalesce(pathOnly, false)]{\n    \n  _id,\n  _type,\n  name,\n  slug,\n  "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  \n  pageBuilder[]{\n    ...,\n    _type == "heroVideo" => {\n      ...,\n      "videoUrl": video.asset->url\n    },\n    _type == "basicLeftRightText" => {\n      ...,\n      body[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      },\n      rightContent[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      },\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "downloadBlock" => {\n      ...,\n      downloads[]{\n        ...,\n        "fileUrl": file.asset->url,\n        "fileName": file.asset->originalFilename\n      }\n    },\n    _type == "jumpNavContent" => {\n      ...,\n      content[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n  }\n\n\n  }[path == $path][0]\n': GetPageQueryResult
-    '\n  *[\n    _type == "page" && !coalesce(pathOnly, false)\n    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref\n  ][0]{\n    \n  _id,\n  _type,\n  name,\n  slug,\n  "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  \n  pageBuilder[]{\n    ...,\n    _type == "heroVideo" => {\n      ...,\n      "videoUrl": video.asset->url\n    },\n    _type == "basicLeftRightText" => {\n      ...,\n      body[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      },\n      rightContent[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      },\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "downloadBlock" => {\n      ...,\n      downloads[]{\n        ...,\n        "fileUrl": file.asset->url,\n        "fileName": file.asset->originalFilename\n      }\n    },\n    _type == "jumpNavContent" => {\n      ...,\n      content[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n  }\n\n\n  }\n': LandingPageQueryResult
+    '\n  *[_type == \'page\' && slug.current == $leaf && !coalesce(pathOnly, false)]{\n    \n  _id,\n  _type,\n  name,\n  slug,\n  "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  \n  pageBuilder[$includeHidden || !coalesce(disabled, false)]{\n    ...,\n    _type == "heroVideo" => {\n      ...,\n      "videoUrl": video.asset->url\n    },\n    _type == "basicLeftRightText" => {\n      ...,\n      body[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      },\n      rightContent[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      },\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "downloadBlock" => {\n      ...,\n      downloads[]{\n        ...,\n        "fileUrl": file.asset->url,\n        "fileName": file.asset->originalFilename\n      }\n    },\n    _type == "jumpNavContent" => {\n      ...,\n      content[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n  }\n\n\n  }[path == $path][0]\n': GetPageQueryResult
+    '\n  *[\n    _type == "page" && !coalesce(pathOnly, false)\n    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref\n  ][0]{\n    \n  _id,\n  _type,\n  name,\n  slug,\n  "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  \n  pageBuilder[$includeHidden || !coalesce(disabled, false)]{\n    ...,\n    _type == "heroVideo" => {\n      ...,\n      "videoUrl": video.asset->url\n    },\n    _type == "basicLeftRightText" => {\n      ...,\n      body[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      },\n      rightContent[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      },\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "downloadBlock" => {\n      ...,\n      downloads[]{\n        ...,\n        "fileUrl": file.asset->url,\n        "fileName": file.asset->originalFilename\n      }\n    },\n    _type == "jumpNavContent" => {\n      ...,\n      content[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n  }\n\n\n  }\n': LandingPageQueryResult
     '\n  *[\n    _type == "page" && defined(slug.current) && !coalesce(pathOnly, false)\n  ] {\n    _type,\n    _updatedAt,\n    "slug": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  }\n': SitemapDataResult
     '\n  *[_type == "page" && defined(slug.current) && !coalesce(pathOnly, false)]\n  {"slug": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}\n': PagesSlugsResult
   }

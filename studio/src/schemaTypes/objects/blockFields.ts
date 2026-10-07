@@ -1,4 +1,4 @@
-import {defineField} from 'sanity'
+import {defineField, defineType, type ObjectDefinition} from 'sanity'
 
 /** The small uppercase label above a heading. Optional everywhere in the theme. */
 export const eyebrowField = () =>
@@ -63,3 +63,47 @@ export const headingLevelField = (initial: 'h1' | 'h2') =>
     initialValue: initial,
     description: 'Use H1 only once per page.',
   })
+
+const settingsFieldset = {
+  name: 'settings',
+  title: 'Settings',
+  options: {collapsible: true, collapsed: true},
+}
+
+/**
+ * Defines a page-builder block. Adds the "Hide this block" setting and marks hidden blocks in the
+ * Studio list, so every block gets them the same way. A hidden block stays in the page with its
+ * content but is not shown on the live site (see the pageBuilder projection in queries.ts); in
+ * Presentation it is shown with a "Hidden" badge so editors can still see and select it.
+ */
+export function defineBlock(config: ObjectDefinition) {
+  const preview = config.preview
+  return defineType({
+    ...config,
+    fieldsets: [...(config.fieldsets ?? []), settingsFieldset],
+    fields: [
+      ...config.fields,
+      defineField({
+        name: 'disabled',
+        title: 'Hide this block',
+        type: 'boolean',
+        fieldset: 'settings',
+        initialValue: false,
+        description:
+          'Keeps the block in the page but does not show it on the site. Use it to take a block out without deleting it.',
+      }),
+    ],
+    preview: preview && {
+      ...preview,
+      select: {...preview.select, disabled: 'disabled'},
+      prepare: (selection, viewOptions) => {
+        const {disabled, ...rest} = selection
+        const base = preview.prepare ? preview.prepare(rest, viewOptions) : {title: 'Block'}
+        return {
+          ...base,
+          subtitle: disabled ? ['Hidden', base.subtitle].filter(Boolean).join(' · ') : base.subtitle,
+        }
+      },
+    },
+  })
+}

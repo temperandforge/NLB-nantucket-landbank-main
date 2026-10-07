@@ -1,11 +1,13 @@
-import {defineField, defineType} from 'sanity'
 import {PlayIcon} from '@sanity/icons'
+import {defineField} from 'sanity'
+
+import {defineBlock} from './blockFields'
 
 /**
  * Full-bleed hero video, edge to edge beneath the site header. Figma: Nav_Hero_01 (1440 x 800).
  * Plays automatically, muted and looping, which is the only way browsers allow autoplay.
  */
-export const heroVideo = defineType({
+export const heroVideo = defineBlock({
   name: 'heroVideo',
   title: 'Hero Video',
   type: 'object',

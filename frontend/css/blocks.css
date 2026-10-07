@@ -87,6 +87,10 @@
   background-color: var(--color-moody-moor-500);
 }
 
+.hero-secondary__panel--light-brown {
+  background-color: var(--color-primary);
+}
+
 .hero-secondary__lines {
   background-position: center;
   background-size: cover;
@@ -99,6 +103,11 @@
 }
 
 .hero-secondary__lines--moody-moor {
+  background-image: url('/images/blocks/hero-secondary-lines.svg');
+  opacity: 0.4;
+}
+
+.hero-secondary__lines--light-brown {
   background-image: url('/images/blocks/hero-secondary-lines.svg');
   opacity: 0.4;
 }

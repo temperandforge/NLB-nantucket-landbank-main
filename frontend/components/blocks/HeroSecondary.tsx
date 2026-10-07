@@ -1,9 +1,23 @@
+import {stegaClean} from 'next-sanity'
+
 import BlockImage from './BlockImage'
 import Eyebrow from './Eyebrow'
 import {BlockProps} from './types'
 
+const TEXT = {
+  lowlands: {eyebrow: 'text-warm-neutral-50', body: 'text-warm-neutral-50'},
+  'moody-moor': {eyebrow: 'text-warm-neutral-50', body: 'text-warm-neutral-50'},
+  // Light panel: dark text, and the larger body size from the Figma page header.
+  'light-brown': {
+    eyebrow: 'text-moody-moor-600',
+    body: 'text-moody-moor-600 text-body-large leading-[1.6]',
+  },
+}
+
 export default function HeroSecondary({block, pageName}: BlockProps<'heroSecondary'>) {
-  const variant = block.variant === 'moody-moor' ? 'moody-moor' : 'lowlands'
+  // stegaClean: in Presentation the value carries invisible stega characters.
+  const chosen = stegaClean(block.variant)
+  const variant = chosen === 'moody-moor' || chosen === 'light-brown' ? chosen : 'lowlands'
   const eyebrow = block.eyebrow || pageName
   return (
     <section className="w-full">
@@ -18,9 +32,9 @@ export default function HeroSecondary({block, pageName}: BlockProps<'heroSeconda
                 aria-hidden="true"
               />
               {eyebrow && (
-                <Eyebrow className="relative z-10 text-warm-neutral-50 mb-3">{eyebrow}</Eyebrow>
+                <Eyebrow className={`relative z-10 mb-3 ${TEXT[variant].eyebrow}`}>{eyebrow}</Eyebrow>
               )}
-              {block.body && <p className="relative z-10 text-warm-neutral-50">{block.body}</p>}
+              {block.body && <p className={`relative z-10 ${TEXT[variant].body}`}>{block.body}</p>}
             </div>
             <BlockImage
               image={block.image}

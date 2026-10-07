@@ -453,6 +453,13 @@
             "type": "string"
           },
           "optional": true
+        },
+        "disabled": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
         }
       }
     }
@@ -481,6 +488,13 @@
           "type": "objectAttribute",
           "value": {
             "type": "string"
+          },
+          "optional": true
+        },
+        "disabled": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
           },
           "optional": true
         }
@@ -542,6 +556,13 @@
                 }
               }
             }
+          },
+          "optional": true
+        },
+        "disabled": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
           },
           "optional": true
         }
@@ -611,6 +632,13 @@
             }
           },
           "optional": true
+        },
+        "disabled": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
         }
       }
     }
@@ -677,6 +705,13 @@
                 }
               }
             }
+          },
+          "optional": true
+        },
+        "disabled": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
           },
           "optional": true
         }
@@ -937,6 +972,13 @@
             }
           },
           "optional": true
+        },
+        "disabled": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
         }
       }
     }
@@ -1008,6 +1050,13 @@
             "name": "blockContent"
           },
           "optional": true
+        },
+        "disabled": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
         }
       }
     }
@@ -1043,6 +1092,13 @@
           "type": "objectAttribute",
           "value": {
             "type": "string"
+          },
+          "optional": true
+        },
+        "disabled": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
           },
           "optional": true
         }
@@ -1142,8 +1198,19 @@
               {
                 "type": "string",
                 "value": "moody-moor"
+              },
+              {
+                "type": "string",
+                "value": "light-brown"
               }
             ]
+          },
+          "optional": true
+        },
+        "disabled": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
           },
           "optional": true
         }
@@ -1230,6 +1297,13 @@
             }
           },
           "optional": false
+        },
+        "disabled": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
         }
       }
     }
@@ -1319,6 +1393,13 @@
                 }
               }
             }
+          },
+          "optional": true
+        },
+        "disabled": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
           },
           "optional": true
         }
@@ -1424,6 +1505,13 @@
           "optional": false
         },
         "autoplay": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        },
+        "disabled": {
           "type": "objectAttribute",
           "value": {
             "type": "boolean"
@@ -1678,14 +1766,6 @@
                     {
                       "type": "string",
                       "value": "normal"
-                    },
-                    {
-                      "type": "string",
-                      "value": "h1"
-                    },
-                    {
-                      "type": "string",
-                      "value": "h2"
                     },
                     {
                       "type": "string",
@@ -3158,7 +3238,37 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "heroVideo"
+                  "name": "basicLeftRightText"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "contactForm"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "downloadBlock"
                 }
               },
               {
@@ -3233,22 +3343,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "basicLeftRightText"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
-                  "name": "jumpNavContent"
+                  "name": "heroVideo"
                 }
               },
               {
@@ -3278,22 +3373,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "timeline"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
-                  "name": "downloadBlock"
+                  "name": "jumpNavContent"
                 }
               },
               {
@@ -3323,7 +3403,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "contactForm"
+                  "name": "timeline"
                 }
               }
             ]

@@ -1,8 +1,10 @@
 import {DownloadIcon} from '@sanity/icons'
-import {defineArrayMember, defineField, defineType} from 'sanity'
+import {defineArrayMember, defineField} from 'sanity'
+
+import {defineBlock} from './blockFields'
 
 /** A list of downloadable files. */
-export const downloadBlock = defineType({
+export const downloadBlock = defineBlock({
   name: 'downloadBlock',
   title: 'Download Block',
   type: 'object',

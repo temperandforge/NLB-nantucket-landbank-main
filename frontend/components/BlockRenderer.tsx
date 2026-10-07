@@ -48,15 +48,23 @@ const Blocks = {
 export default function BlockRenderer({block, index, pageId, pageType, pageName}: BlockProps) {
   // Block does exist
   if (typeof Blocks[block._type] !== 'undefined') {
+    // Only reaches here for a hidden block in draft mode: the query drops it everywhere else.
+    const hidden = Boolean(block.disabled)
     return (
       <div
         key={block._key}
+        className={hidden ? 'relative' : undefined}
         data-sanity={dataAttr({
           id: pageId,
           type: pageType,
           path: `pageBuilder[_key=="${block._key}"]`,
         }).toString()}
       >
+        {hidden && (
+          <span className="absolute left-3 top-3 z-50 rounded bg-black/75 px-2 py-1 font-mono text-xs uppercase tracking-widest text-white">
+            Hidden
+          </span>
+        )}
         {React.createElement(Blocks[block._type], {
           key: block._key,
           block: block,

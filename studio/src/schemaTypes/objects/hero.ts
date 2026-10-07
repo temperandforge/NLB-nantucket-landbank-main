@@ -1,10 +1,10 @@
 import {ImageIcon} from '@sanity/icons'
-import {defineField, defineType} from 'sanity'
+import {defineField} from 'sanity'
 
-import {eyebrowField, imageWithAltField} from './blockFields'
+import {defineBlock, eyebrowField, imageWithAltField} from './blockFields'
 
 /** Centred hero: eyebrow, heading, intro and a wide image. */
-export const hero = defineType({
+export const hero = defineBlock({
   name: 'hero',
   title: 'Hero',
   type: 'object',

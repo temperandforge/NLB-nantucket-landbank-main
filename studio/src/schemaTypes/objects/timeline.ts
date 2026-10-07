@@ -1,8 +1,10 @@
 import {ClockIcon} from '@sanity/icons'
-import {defineArrayMember, defineField, defineType} from 'sanity'
+import {defineArrayMember, defineField} from 'sanity'
+
+import {defineBlock} from './blockFields'
 
 /** Curated milestones in a horizontally scrolling row. */
-export const timeline = defineType({
+export const timeline = defineBlock({
   name: 'timeline',
   title: 'Timeline',
   type: 'object',

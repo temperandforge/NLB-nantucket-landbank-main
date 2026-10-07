@@ -1,14 +1,14 @@
 import {SplitHorizontalIcon} from '@sanity/icons'
-import {defineField, defineType} from 'sanity'
+import {defineField} from 'sanity'
 
-import {eyebrowField, headingLevelField} from './blockFields'
+import {defineBlock, eyebrowField, headingLevelField} from './blockFields'
 
 /**
  * Two columns. The left is sticky and holds the eyebrow, heading, text and an optional button;
  * the right is free-form content (text, lists, images). The theme's right column could also hold
  * a Gravity Forms block; forms are deferred, so it cannot here.
  */
-export const basicLeftRightText = defineType({
+export const basicLeftRightText = defineBlock({
   name: 'basicLeftRightText',
   title: 'Basic - Left Right Text',
   type: 'object',

@@ -1,4 +1,5 @@
 import type {Metadata} from 'next'
+import {draftMode} from 'next/headers'
 import {notFound} from 'next/navigation'
 
 import PageView from '@/components/PageView'
@@ -24,8 +25,11 @@ function toSegments(path: string): string[] {
  * The query narrows on the leaf slug and then matches the full assembled path, so both are
  * needed. An empty segment list cannot match a page and is treated as not found.
  */
-function toQueryParams(segments: string[]): {leaf: string; path: string} {
-  return {leaf: segments[segments.length - 1] ?? '', path: segments.join('/')}
+function toQueryParams(
+  segments: string[],
+  includeHidden = false,
+): {leaf: string; path: string; includeHidden: boolean} {
+  return {leaf: segments[segments.length - 1] ?? '', path: segments.join('/'), includeHidden}
 }
 
 /**
@@ -66,8 +70,10 @@ export async function generateMetadata(props: PageProps<'/[...slug]'>): Promise<
 
 export default async function Page(props: PageProps<'/[...slug]'>) {
   const {slug} = await props.params
+  // Hidden blocks are shown (with a badge) only while an editor is previewing in Presentation.
+  const {isEnabled: includeHidden} = await draftMode()
   const [{data: page}] = await Promise.all([
-    sanityFetch({query: getPageQuery, params: toQueryParams(slug)}),
+    sanityFetch({query: getPageQuery, params: toQueryParams(slug, includeHidden)}),
   ])
 
   // No page at this path - including a pathOnly grouping segment like /about-us, which the query

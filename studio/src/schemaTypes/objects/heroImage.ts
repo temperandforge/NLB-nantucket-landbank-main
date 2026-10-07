@@ -1,14 +1,14 @@
 import {ImageIcon} from '@sanity/icons'
-import {defineField, defineType} from 'sanity'
+import {defineField} from 'sanity'
 
-import {eyebrowField, imageWithAltField} from './blockFields'
+import {defineBlock, eyebrowField, imageWithAltField} from './blockFields'
 
 /**
  * Full-bleed photo with a light card holding the eyebrow and headline. All three fields are
  * required: the theme fell back to placeholder copy and the page's featured image, and a Sanity
  * page has neither.
  */
-export const heroImage = defineType({
+export const heroImage = defineBlock({
   name: 'heroImage',
   title: 'Hero - Image',
   type: 'object',

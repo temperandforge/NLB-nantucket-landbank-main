@@ -200,6 +200,8 @@ async function main() {
       ],
     },
     {_type: 'mapTeaser', _key: key(), heading: 'Map teaser', body: 'A short line above the map preview placeholder.'},
+    // Hidden: must be absent on the live site and badged in Presentation.
+    {_type: 'mapTeaser', _key: key(), heading: 'Hidden map teaser', body: 'Should only appear in Presentation, with a Hidden badge.', disabled: true},
     {_type: 'contactForm', _key: key(), heading: 'Contact form'},
 
     // Empty states: every optional field empty. These must render without error or junk.

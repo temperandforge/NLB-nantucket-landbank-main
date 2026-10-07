@@ -156,11 +156,13 @@ const markDefsFields = /* groq */ `
 `
 
 /**
- * The page builder's sections. Each block type that holds a reference, a file or Portable Text
+ * The page builder's sections. Blocks marked "Hide this block" are dropped here, so their content
+ * never reaches a visitor's browser; $includeHidden is true only in draft mode (Presentation),
+ * where hidden blocks are shown with a badge. Each block type that holds a reference, a file or Portable Text
  * adds a branch here; plain fields come through the spread.
  */
 const pageBuilderFields = /* groq */ `
-  pageBuilder[]{
+  pageBuilder[$includeHidden || !coalesce(disabled, false)]{
     ...,
     _type == "heroVideo" => {
       ...,

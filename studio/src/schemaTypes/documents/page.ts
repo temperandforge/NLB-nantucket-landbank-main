@@ -1,7 +1,40 @@
 import {defineField, defineType} from 'sanity'
 import {DocumentIcon} from '@sanity/icons'
 
+import {basicLeftRightText} from '../objects/basicLeftRightText'
+import {contactForm} from '../objects/contactForm'
+import {downloadBlock} from '../objects/downloadBlock'
+import {hero} from '../objects/hero'
+import {heroImage} from '../objects/heroImage'
+import {heroSecondary} from '../objects/heroSecondary'
+import {heroTertiary} from '../objects/heroTertiary'
+import {heroVideo} from '../objects/heroVideo'
+import {imageCarousel} from '../objects/imageCarousel'
+import {jumpNavContent} from '../objects/jumpNavContent'
+import {mapTeaser} from '../objects/mapTeaser'
+import {timeline} from '../objects/timeline'
 import {buildPagePath, MAX_PAGE_DEPTH, slugifySegment} from '../../lib/pageHierarchy'
+
+/**
+ * Every block a page can hold. Sorted by title when the Studio loads, so the "Add item" menu is
+ * always alphabetical: a new block only needs adding to this list.
+ */
+const pageBuilderBlocks = [
+  basicLeftRightText,
+  contactForm,
+  downloadBlock,
+  hero,
+  heroImage,
+  heroSecondary,
+  heroTertiary,
+  heroVideo,
+  imageCarousel,
+  jumpNavContent,
+  mapTeaser,
+  timeline,
+]
+  .sort((a, b) => (a.title ?? a.name).localeCompare(b.title ?? b.name))
+  .map((block) => ({type: block.name}))
 
 /**
  * Page schema.  Define and edit the fields for the 'page' content type.
@@ -152,23 +185,22 @@ export const page = defineType({
       group: 'content',
       title: 'Page builder',
       type: 'array',
-      of: [
-        {type: 'heroVideo'},
-        {type: 'hero'},
-        {type: 'heroImage'},
-        {type: 'heroSecondary'},
-        {type: 'heroTertiary'},
-        {type: 'basicLeftRightText'},
-        {type: 'jumpNavContent'},
-        {type: 'imageCarousel'},
-        {type: 'timeline'},
-        {type: 'downloadBlock'},
-        {type: 'mapTeaser'},
-        {type: 'contactForm'},
-      ],
+      of: pageBuilderBlocks,
       hidden: ({document}) => Boolean(document?.pathOnly),
       options: {
-        insertMenu: {filter: true},
+        insertMenu: {
+          filter: true,
+          // List is the default; the grid shows a preview image per block, read from
+          // studio/static/page-builder-thumbnails/<block name>.webp (716 x 369).
+          views: [
+            {name: 'list'},
+            {
+              name: 'grid',
+              previewImageUrl: (schemaTypeName) =>
+                `/static/page-builder-thumbnails/${schemaTypeName}.webp`,
+            },
+          ],
+        },
       },
     }),
   ],

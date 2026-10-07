@@ -1,10 +1,10 @@
 import {TextIcon} from '@sanity/icons'
-import {defineField, defineType} from 'sanity'
+import {defineField} from 'sanity'
 
-import {eyebrowField} from './blockFields'
+import {defineBlock, eyebrowField} from './blockFields'
 
 /** Text-only hero: eyebrow and heading on the left, intro on the right, over line art. */
-export const heroTertiary = defineType({
+export const heroTertiary = defineBlock({
   name: 'heroTertiary',
   title: 'Hero - Tertiary',
   type: 'object',
