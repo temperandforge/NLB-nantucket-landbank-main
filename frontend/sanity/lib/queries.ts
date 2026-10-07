@@ -267,7 +267,7 @@ const pageBuilderFields = /* groq */ `
         name,
         title,
         headshot,
-        "department": department->{"slug": slug.current, title}
+        "department": department->{"slug": slug.current, title, order}
       },
       "commissioners": *[_type == "commissioner" && ^.source == "commissioners"] | order(order asc, name asc) {
         _id,

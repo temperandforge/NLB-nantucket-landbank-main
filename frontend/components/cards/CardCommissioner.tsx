@@ -7,7 +7,7 @@ export default function CardCommissioner({person}: {person: CommissionerItem}) {
   const since = formatMonthYear(person.startDate)
   return (
     <div className="flex w-full max-w-[448px] flex-col items-start gap-3">
-      <div className="relative aspect-[448/556] w-full shrink-0 overflow-clip rounded bg-dusty-heath-800">
+      <div className="relative aspect-[448/556] w-full shrink-0 overflow-clip rounded bg-on-background-tonal">
         <BlockImage
           image={person.headshot ? {...person.headshot, alt: person.name} : null}
           width={896}

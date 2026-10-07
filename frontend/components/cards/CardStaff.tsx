@@ -9,7 +9,7 @@ export default function CardStaff({person}: {person: StaffItem}) {
   return (
     <div className="flex w-full max-w-[331px] flex-col items-start gap-3">
       <div className="flex w-full flex-col items-start overflow-clip rounded">
-        <div className="relative aspect-[304/380] w-full shrink-0 bg-dusty-heath-800">
+        <div className="relative aspect-[304/380] w-full shrink-0 bg-on-background-tonal">
           <BlockImage
             image={person.headshot ? {...person.headshot, alt: person.name} : null}
             width={662}
