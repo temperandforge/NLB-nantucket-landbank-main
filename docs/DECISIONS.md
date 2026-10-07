@@ -813,6 +813,45 @@ no destination until the news archive exists
 ([#11](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/11)), so the settings
 default to no call to action.
 
+## 13. Job listings
+
+### 13.1 Jobs are documents; the block lists them all
+
+**Status:** Implemented, apply links outstanding ([#16](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/16))
+
+`job` documents (Studio: Jobs) hold the title, a `department` reference (the same options staff use,
+shown as the tag), description, location, employment type, apply link (the shared `link`) and
+`order`. The Job Listings block holds only an eyebrow and heading and shows every job, like the FAQ
+List; with no jobs it renders nothing. Location and employment type are free text, not taxonomies,
+until the client needs to filter by them. The description is clamped to two lines, as in the design.
+`studio/scripts/seedJobs.ts` seeds the three designed jobs and adds the block to Connect With Us as a
+draft. Their apply links are `#`.
+
+## 13. The WordPress people migration
+
+### 13.1 Staff and commissioners were migrated by a repeatable, read-only-source script
+
+**Status:** Implemented (run 2026-10-07; the people are drafts until published)
+
+`studio/scripts/wordpress/`: `extractPeople.sh` (read-only; snapshots the local WordPress site to a
+git-ignored `people.json`), `people.ts` (a pure transform, checked by `verifyPeopleTransform.mts`),
+`importWordpressPeople.ts` (drafts only, `--dry`, `--remove-samples`) and `verifyWordpressPeople.ts`
+(compares Sanity back to the source). Photos are uploaded from the uploads folder on disk. A person is
+matched on its name within its type and an existing document is never edited, so re-running is safe.
+Per the project rule there are no explicit ids; a report maps each WordPress id to its Sanity id.
+
+**Source quirks handled:** the department assignments are stored on the previous theme's `nlb_staff`
+posts, not on the current `staff` posts (the same people, joined by name); the taxonomy is called
+`department` in the database although the theme code says `staff_department`; titles carry HTML
+entities; commissioners' "Term Date" is free text such as "May 2027", so the schema's `termDate` is a
+string shown as entered. Two staff (Dean Belanger, Michael Hurff) have no photo in WordPress and none in
+Figma. One source value looks wrong and was migrated as is: the commissioner Neil Paterson has the title
+"Executive Director".
+
+**Implication:** the same pattern (extract, pure transform with a check, idempotent draft import,
+validation) fits the FAQs and news, which are still to import
+([#11](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/11)).
+
 ## Known outstanding items
 
 Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-design.md):
