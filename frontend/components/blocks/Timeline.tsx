@@ -1,23 +1,19 @@
-import TimelineTrack from './TimelineTrack'
+import TimelineSlider, {type TimelineEvent} from './TimelineSlider'
 import {BlockProps} from './types'
 
+/**
+ * Connector-line heights reproduce the Figma design's organic, non-uniform rhythm. Derived from
+ * the entry's position (cycling), never authored or stored.
+ */
+const LINE_LENGTHS = [220, 333, 239, 279, 184, 301, 210, 349, 197, 265]
+
 export default function Timeline({block}: BlockProps<'timeline'>) {
-  const entries = block.entries ?? []
-  return (
-    <section className="w-full">
-      <div className="max-w-[1360px] mx-auto px-10 py-16">
-        {entries.length > 0 && (
-          <TimelineTrack>
-            {entries.map((entry) => (
-              <li key={entry._key} className="flex-none w-56 border-l border-dusty-heath-600 pl-3">
-                <span className="block text-h3">{entry.year}</span>
-                <h3 className="text-h6 my-2">{entry.title}</h3>
-                {entry.description && <p className="text-moody-moor-600">{entry.description}</p>}
-              </li>
-            ))}
-          </TimelineTrack>
-        )}
-      </div>
-    </section>
-  )
+  const events: TimelineEvent[] = (block.entries ?? []).map((entry, index) => ({
+    year: entry.year,
+    title: entry.title,
+    description: entry.description ?? '',
+    lineLength: LINE_LENGTHS[index % LINE_LENGTHS.length],
+  }))
+  if (events.length === 0) return null
+  return <TimelineSlider events={events} />
 }
