@@ -70,6 +70,7 @@ export type MenuLink = {
   _type: 'menuLink'
   label: string
   link: Link
+  group?: string
 }
 
 export type MenuGroup = {
@@ -740,11 +741,31 @@ export type ProjectSettings = {
   defaultZoom?: number
 }
 
+export type SiteBanner = {
+  _id: string
+  _type: 'siteBanner'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  enabled?: boolean
+  message?: string
+  link?: Link
+}
+
 export type MenuReference = {
   _ref: string
   _type: 'reference'
   _weak?: boolean
   [internalGroqTypeReferenceTo]?: 'menu'
+}
+
+export type Header = {
+  _id: string
+  _type: 'header'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  mainMenu: MenuReference
 }
 
 export type Footer = {
@@ -1200,7 +1221,9 @@ export type AllSanitySchemaTypes =
   | Geopoint
   | SingleNewsPage
   | ProjectSettings
+  | SiteBanner
   | MenuReference
+  | Header
   | Footer
   | Menu
   | Settings

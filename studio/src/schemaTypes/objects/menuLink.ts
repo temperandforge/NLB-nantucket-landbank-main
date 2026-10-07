@@ -7,7 +7,8 @@ import {LinkIcon} from '@sanity/icons'
  * authoring stays consistent with the rest of the Studio.
  *
  * Used as a leaf both at the top level of a menu and inside a menuGroup's submenu. Menu
- * nesting is deliberately capped at two levels (menuGroup -> menuLink); see menuGroup.ts.
+ * nesting is deliberately capped at two levels (menuGroup -> menuLink); see menuGroup.ts. The
+ * header's dropdown column headings are the optional `group` string below, not a third level.
  */
 
 export const menuLink = defineType({
@@ -28,6 +29,13 @@ export const menuLink = defineType({
       title: 'Link',
       type: 'link',
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'group',
+      title: 'Column heading',
+      type: 'string',
+      description:
+        'Optional. In a dropdown, consecutive links with the same heading appear together under it (e.g. "Purpose"). Leave empty for a plain list. Ignored in the footer.',
     }),
   ],
   preview: {

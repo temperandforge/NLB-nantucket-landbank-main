@@ -24,6 +24,8 @@ import {imageCarousel} from './objects/imageCarousel'
 import {timeline} from './objects/timeline'
 import {settings} from './singletons/settings'
 import {footer} from './singletons/footer'
+import {header} from './singletons/header'
+import {siteBanner} from './singletons/siteBanner'
 import {projectSettings} from './singletons/projectSettings'
 import {singleNewsPage} from './singletons/singleNewsPage'
 import {link} from './objects/link'
@@ -52,6 +54,8 @@ export const schemaTypes = [
   // Singletons
   settings,
   footer,
+  header,
+  siteBanner,
   projectSettings,
   singleNewsPage,
   // Documents

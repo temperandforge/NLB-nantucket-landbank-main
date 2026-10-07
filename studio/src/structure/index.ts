@@ -1,4 +1,5 @@
 import {
+  BellIcon,
   CalendarIcon,
   CaseIcon,
   CogIcon,
@@ -25,8 +26,8 @@ import pluralize from 'pluralize-esm'
  * e.g. Home, About Us. Site Settings sits outside it - global config with no page of its own.
  *
  * Globals holds content that appears on every page rather than on a page of its own: the
- * Footer singleton and the reusable Menus it references. The header menu will join it here
- * without needing a schema change.
+ * Footer singleton and the reusable Menus it references. The Header and Site Banner singletons
+ * sit beside it.
  */
 
 // Types removed from the automatic top-level list, either because they are handled
@@ -38,6 +39,8 @@ const DISABLED_TYPES = [
   'assist.instruction.context',
   // Handled explicitly under Globals below.
   'footer',
+  'header',
+  'siteBanner',
   'menu',
   // Handled explicitly under Projects below.
   'project',
@@ -140,6 +143,14 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
           S.list()
             .title('Globals')
             .items([
+              S.listItem()
+                .title('Header')
+                .icon(FolderIcon)
+                .child(S.document().schemaType('header').documentId('header')),
+              S.listItem()
+                .title('Site Banner')
+                .icon(BellIcon)
+                .child(S.document().schemaType('siteBanner').documentId('siteBanner')),
               S.listItem()
                 .title('Footer')
                 .icon(FolderIcon)
