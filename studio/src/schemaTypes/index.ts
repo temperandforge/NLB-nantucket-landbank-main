@@ -24,6 +24,7 @@ import {timeline} from './objects/timeline'
 import {settings} from './singletons/settings'
 import {footer} from './singletons/footer'
 import {projectSettings} from './singletons/projectSettings'
+import {singleSettings} from './singletons/singleSettings'
 import {link} from './objects/link'
 import {anchorLinks} from './objects/anchorLinks'
 import {peopleGrid} from './objects/peopleGrid'
@@ -49,6 +50,7 @@ export const schemaTypes = [
   settings,
   footer,
   projectSettings,
+  singleSettings,
   // Documents
   page,
   menu,

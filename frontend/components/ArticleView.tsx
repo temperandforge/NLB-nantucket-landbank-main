@@ -10,7 +10,18 @@ import type {ArticleQueryResult} from '@/sanity.types'
  * A news article (Figma: news_content_desktop). Everything but the title is optional and simply
  * absent when missing: a category that was unpublished dereferences to null.
  */
-export default function ArticleView({article}: {article: NonNullable<ArticleQueryResult>}) {
+export default function ArticleView({
+  article,
+  eyebrow = 'Nantucket News',
+  publishedLabel = 'Published:',
+  shareLabel = 'Share',
+}: {
+  article: NonNullable<ArticleQueryResult>
+  /** The wording below comes from Single Page Settings; these are the design's own defaults. */
+  eyebrow?: string
+  publishedLabel?: string
+  shareLabel?: string
+}) {
   const categories = (article.categories ?? []).flatMap((c) => (c?.title ? [{key: c.slug ?? c.title, label: c.title}] : []))
   const date = formatDate(article.date)
 
@@ -22,7 +33,7 @@ export default function ArticleView({article}: {article: NonNullable<ArticleQuer
       />
       <div className="relative z-10 flex w-full max-w-[820px] flex-col items-start gap-16">
         <p className="whitespace-nowrap font-mono text-body-small leading-[1.6] tracking-wide text-on-background uppercase">
-          Nantucket News
+          {eyebrow}
         </p>
         <div className="flex w-full flex-col items-start gap-10">
           <div className="flex w-full flex-col items-start gap-3">
@@ -36,7 +47,7 @@ export default function ArticleView({article}: {article: NonNullable<ArticleQuer
             )}
             {date && (
               <p className="font-sans text-body-large leading-[1.6] text-on-background-subtle">
-                Published: {date}
+                {publishedLabel} {date}
               </p>
             )}
           </div>
@@ -49,7 +60,7 @@ export default function ArticleView({article}: {article: NonNullable<ArticleQuer
             />
           )}
         </div>
-        <ShareLinks />
+        <ShareLinks label={shareLabel} />
       </div>
     </article>
   )

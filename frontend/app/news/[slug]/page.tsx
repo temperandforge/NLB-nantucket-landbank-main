@@ -5,8 +5,14 @@ import {toPlainText, type PortableTextBlock} from 'next-sanity'
 import ArticleView from '@/components/ArticleView'
 import NewsPreviewView from '@/components/blocks/NewsPreviewView'
 import {sanityFetch} from '@/sanity/lib/live'
-import {articleQuery, articleSlugs, moreNewsQuery} from '@/sanity/lib/queries'
-import {resolveOpenGraphImage} from '@/sanity/lib/utils'
+import {
+  articleQuery,
+  articleSlugs,
+  moreNewsQuery,
+  singleSettingsQuery,
+} from '@/sanity/lib/queries'
+import {DereferencedLink} from '@/sanity/lib/types'
+import {linkResolver, realHref, resolveOpenGraphImage} from '@/sanity/lib/utils'
 
 /**
  * A news article page, /news/<slug>. A static route, so it wins over the catch-all that owns CMS
@@ -42,19 +48,44 @@ export async function generateMetadata(props: PageProps<'/news/[slug]'>): Promis
 
 export default async function NewsArticlePage(props: PageProps<'/news/[slug]'>) {
   const {slug} = await props.params
-  const [{data: article}, {data: more}] = await Promise.all([
+  const [{data: article}, {data: settings}] = await Promise.all([
     sanityFetch({query: articleQuery, params: {slug}}),
-    sanityFetch({query: moreNewsQuery, params: {slug}}),
+    sanityFetch({query: singleSettingsQuery}),
   ])
 
   // No article at this slug: a real 404, never a 200 placeholder.
   if (!article?._id) notFound()
 
+  // Related articles need this article's categories, so they are fetched once it is known.
+  const moreSettings = settings?.articleMoreNews
+  const showMore = !moreSettings?.disabled
+  const {data: more} = showMore
+    ? await sanityFetch({
+        query: moreNewsQuery,
+        params: {slug, categoryIds: article.categoryIds ?? []},
+      })
+    : {data: []}
+  const count = Math.min(Math.max(moreSettings?.count ?? 3, 1), 12)
+  const ctaHref = realHref(
+    moreSettings?.ctaLink ? linkResolver(moreSettings.ctaLink as DereferencedLink) : null,
+  )
+
   return (
     <>
-      <ArticleView article={article} />
-      {/* No call to action tile: its destination, the news archive, does not exist yet (#11). */}
-      <NewsPreviewView heading="Nantucket News" articles={more} cta={null} />
+      <ArticleView
+        article={article}
+        eyebrow={settings?.articleEyebrow || undefined}
+        publishedLabel={settings?.articlePublishedLabel || undefined}
+        shareLabel={settings?.articleShareLabel || undefined}
+      />
+      {showMore && (
+        <NewsPreviewView
+          heading={moreSettings ? moreSettings.heading : 'Nantucket News'}
+          articles={more.slice(0, count)}
+          // The call to action is whatever Single Page Settings says; with no text there is no tile.
+          cta={{heading: moreSettings?.ctaHeading, label: moreSettings?.ctaLabel, href: ctaHref}}
+        />
+      )}
     </>
   )
 }

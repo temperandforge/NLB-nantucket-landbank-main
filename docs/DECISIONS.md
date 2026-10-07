@@ -787,6 +787,31 @@ edits, and prints each change first.
 The Figma node the theme cites no longer exists and the Design System node was not readable, so the
 page is the Staff page's header and a three-column grid of the existing commissioner cards.
 
+## 12. Single page settings and related news
+
+### 12.1 Content every single template shares lives in one settings document
+
+**Status:** Implemented
+
+`singleSettings` (Studio: Single Page Settings, fixed id) holds what all single templates share, as
+opposed to one article's own content. Today: the news article's label above the title, its
+"Published:" and "Share" labels, and the "more news" section (the News Preview block's own fields,
+including its "Hide this block" setting). Other singles get their own section when they have pages.
+Every field is optional: the article page falls back to the design's wording.
+
+### 12.2 "More news" ranks by shared categories and never includes the current article
+
+**Status:** Implemented
+
+`moreNewsQuery` excludes the article being read and orders by how many categories each other article
+shares with it, then newest first, so same-category articles come first and a thin category is
+topped up with the latest others. It ranks rather than filters, so the section is not left short.
+The count of shared categories is wrapped in `coalesce` because it is null for an article with no
+categories, and null does not compare with numbers (it let the date decide). The call to action has
+no destination until the news archive exists
+([#11](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/11)), so the settings
+default to no call to action.
+
 ## Known outstanding items
 
 Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-design.md):

@@ -13,7 +13,7 @@ const BUTTON =
  * address, so it is left out. Everything reads the current address in the browser when clicked, so
  * nothing is computed on the server and no site URL setting is needed.
  */
-export default function ShareLinks() {
+export default function ShareLinks({label = 'Share'}: {label?: string}) {
   const [status, setStatus] = useState('')
 
   function share(network: ShareNetwork) {
@@ -33,7 +33,7 @@ export default function ShareLinks() {
 
   return (
     <div className="flex w-full flex-col items-center gap-3">
-      <p className="text-center font-mono text-body-base leading-[1.6] text-on-background">Share</p>
+      <p className="text-center font-mono text-body-base leading-[1.6] text-on-background">{label}</p>
       <div className="flex items-center gap-4">
         <button type="button" onClick={copy} aria-label="Copy link" className={BUTTON}>
           <LinkAltIcon className="size-6" />

@@ -391,6 +391,8 @@ export const articleQuery = defineQuery(`
     date,
     image,
     "categories": categories[]->{"slug": slug.current, title},
+    // The article's own category documents, to find related articles.
+    "categoryIds": categories[]._ref,
     body[]{
       ...,
       _type == "anchorLinks" => {
@@ -404,11 +406,33 @@ export const articleQuery = defineQuery(`
   }
 `)
 
-/** The latest articles other than the one being read. */
+/**
+ * The articles to show under the one being read: never that one, those that share a category with
+ * it first (the more they share, the earlier), then the latest of the rest. Ranked by a count of
+ * shared categories, not filtered, so a thin category is topped up instead of left short. The
+ * count is null for an article with no categories (null does not compare with numbers), hence the
+ * coalesce. Up to 12 come back; the page shows as many as Single Page Settings asks for.
+ */
 export const moreNewsQuery = defineQuery(`
   *[_type == "article" && defined(slug.current) && slug.current != $slug]
-    | order(date desc) [0...3] {
+    | order(count(coalesce(categories, [])[_ref in $categoryIds]) desc, date desc) [0...12] {
     ${articleCardFields}
+  }
+`)
+
+/** Content shared by every single template (a singleton, so matched on its type and fixed id). */
+export const singleSettingsQuery = defineQuery(`
+  *[_type == "singleSettings" && _id == "singleSettings"][0]{
+    articleEyebrow,
+    articlePublishedLabel,
+    articleShareLabel,
+    articleMoreNews{
+      ...,
+      ctaLink{
+        ...,
+        ${linkReference}
+      }
+    }
   }
 `)
 
