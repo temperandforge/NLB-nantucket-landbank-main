@@ -216,13 +216,21 @@ and the discrepancy flagged.
 ## Deferred work (a GitHub issue each, linked here before merge)
 
 - Email notification of submissions, including provider choice and per-form recipients.
-- Submission retention: an auto-delete window for stored personal data.
-- File upload fields.
-- Splitting `formSubmission` access by Studio role.
+  Issue: #17. Issue #12 (no submission backend) is closed by this work except for email.
+- Submission retention: an auto-delete window for stored personal data. Issue: #18.
+- File upload fields. Issue: #19.
+- Splitting `formSubmission` access by Studio role. Issue: #20.
+- **Where the rate-limit counter lives.** v1 ships a best-effort, in-memory per-IP limiter in the
+  route handler. On serverless hosting each instance has its own counter, so it only slows a single
+  abuser; the honeypot and Turnstile are the real defences. A shared store (for example Vercel KV
+  or Upstash) is chosen once the deployment target is settled. Issue: #21.
+- **Scoping the write token to creating submissions only.** v1 uses a general server-only
+  `SANITY_WRITE_TOKEN` (Editor role), used only in the route handler and never exposed to the
+  client or to Studio. Whether Sanity can issue a create-only, `formSubmission`-only token on this
+  plan, or whether the writes should move behind a Sanity Function, is investigated separately.
+  Issue: #22.
 
-## Open points for the plan
+## Notes
 
-- Where the rate-limit counter lives, given the deployment target.
-- Whether `SANITY_WRITE_TOKEN` can be scoped to a create-only role on this plan.
 - A native `<select>` limits styling of the open list; the spec accepts this for single selects and
   uses the custom listbox only for multi-select.
