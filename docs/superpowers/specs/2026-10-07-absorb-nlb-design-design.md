@@ -83,8 +83,10 @@ from the same Figma variables, so differences are reported and resolved, not sil
 - Taxonomies, as referenced documents so the client can extend them without a deploy:
   `newsCategory`, `department`, `faqCategory`. The slug is the stable key, the title is the label.
 
-**Cards** in `frontend/components/cards/`: `CardNews`, `CardStaff`, `CardCommissioner`,
-`CardProject`. Their types derive from the generated query types. `CardProject` renders the
+**Cards** in `frontend/components/cards/`: `CardStaff`, `CardCommissioner`, `CardProject`. Their
+types derive from the generated query types. `CardNews` is **not** ported: `nlb-design`'s
+`NewsPreview` draws its own tiles and nothing uses a news card until the news archive (slice 3,
+[#11](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/11)). `CardProject` renders the
 existing map `project` documents, with property types and resources as its tags, so this repo
 keeps a single "project". The theme's separate work-"project" type is not carried over.
 

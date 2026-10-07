@@ -14,6 +14,8 @@
  * content-addressed, so re-running reuses them). Idempotent: if a page with that slug exists in
  * any state, it does nothing. It never overwrites or edits an existing page.
  *
+ * Run seedPhaseBContent.ts first so the Phase B blocks have documents to show.
+ *
  * Block fields change over time: an existing gallery is not updated (this script never edits a
  * page), so remove it with --remove and seed again to pick up new or changed blocks.
  * --remove deletes the gallery page (draft and published) after printing what it will delete.
@@ -314,6 +316,32 @@ async function main() {
       entries: [{_key: key(), _type: 'timelineEntry', year: '1983', title: 'The only milestone', description: 'One slide.'}],
     },
 
+    {
+      _type: 'newsPreview',
+      _key: key(),
+      heading: 'Nantucket News',
+      count: 2,
+      ctaHeading: 'Check out what is happening with the latest NLB news.',
+      ctaLabel: 'View all news',
+      ctaLink: {_type: 'link', linkType: 'href', href: '/map'},
+    },
+    {
+      // The call to action link points at no page: the tile must be plain, not a dead link.
+      _type: 'newsPreview',
+      _key: key(),
+      heading: 'News with an unresolvable call to action',
+      count: 3,
+      ctaHeading: 'This tile is not a link.',
+      ctaLabel: 'Should not be a link',
+      ctaLink: {_type: 'link', linkType: 'page'},
+    },
+    {_type: 'eventsPreview', _key: key(), eyebrow: 'Events - Upcoming', count: 2},
+    {_type: 'eventsPreview', _key: key(), eyebrow: 'Events - one only', count: 1},
+    {_type: 'faqList', _key: key(), heading: 'FAQs'},
+    {_type: 'peopleGrid', _key: key(), heading: 'Staff', source: 'staff'},
+    {_type: 'peopleGrid', _key: key(), heading: 'Commissioners', source: 'commissioners'},
+    {_type: 'projectGrid', _key: key(), heading: 'Properties'},
+
     // Empty states: every optional field empty. These must render without error or junk.
     {_type: 'hero', _key: key()},
     {_type: 'heroSecondary', _key: key()},
@@ -337,6 +365,11 @@ async function main() {
     {_type: 'downloadBlock', _key: key()},
     {_type: 'mapTeaser', _key: key()},
     {_type: 'contactForm', _key: key()},
+    {_type: 'newsPreview', _key: key(), count: 2},
+    {_type: 'eventsPreview', _key: key(), count: 2},
+    {_type: 'faqList', _key: key()},
+    {_type: 'peopleGrid', _key: key(), source: 'staff'},
+    {_type: 'projectGrid', _key: key()},
   ]
 
   const doc = {

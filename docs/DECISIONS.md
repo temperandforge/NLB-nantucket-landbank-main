@@ -631,6 +631,68 @@ utilities were removed and their users moved to `text-headline-*` by visual size
 field), and gains an **Anchor links** item: a stack of link rows, each a label, a link and an arrow
 or download icon, 16px apart.
 
+## 9. Phase B: content types and data-driven blocks
+
+Design: [the absorption spec](superpowers/specs/2026-10-07-absorb-nlb-design-design.md), Phase B.
+
+### 9.1 Content is documents, categories are referenced documents
+
+**Status:** Implemented
+
+`article`, `event`, `staffMember`, `commissioner` and `faq` are documents; `newsCategory`,
+`department` and `faqCategory` are the referenced taxonomies (slug is the key, title the label,
+`order` sets the display order). `nlb-design`'s `CardStaff` hard-coded three department labels;
+here the tag is the department document's title.
+
+**Why:** The client extends categories without a deploy; restating them in code would drift.
+
+**Implication:** A reference to an unpublished taxonomy dereferences to null, so every consumer
+filters nulls.
+
+### 9.2 "Upcoming" is computed, in New York time, and the pages revalidate hourly
+
+**Status:** Implemented
+
+The events query keeps events whose end (or start, with no end) is not yet past `now()`. All dates
+and times are shown in `America/New_York` by `frontend/sanity/lib/dates.ts`, checked by
+`frontend/scripts/verifyDates.mts` (also under another `TZ`). The landing page and the catch-all
+route set `revalidate = 3600`, so a past event drops off without a content edit.
+
+**Why:** Nothing about an event being upcoming is stored, and a statically rendered page would
+otherwise keep a past event until the next edit.
+
+### 9.3 Articles take an optional link until they have pages
+
+**Status:** Implemented
+
+`article.link` is the shared link object. A news tile is a link only when it resolves; otherwise it
+is a plain tile. Per-article pages, filters and pagination are slice 3
+([#11](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/11)).
+
+### 9.4 The FAQ accordion is a heading, a button and a sibling answer
+
+**Status:** Implemented
+
+`nlb-design` nested a paragraph inside a button, which is invalid HTML. Here the heading wraps a
+button (`aria-expanded`, `aria-controls`) and the answer is a sibling `div`, `hidden` when closed.
+Answers are rich text.
+
+### 9.5 `CardProject` renders the existing map projects
+
+**Status:** Implemented
+
+One "project" in this repo: the map property. Its tags are its property types and resources. The
+WordPress theme's separate work-"project" type is not carried over. `CardNews` is not ported (no
+consumer); see the spec.
+
+### 9.6 Assumptions to confirm with the designer
+
+**Status:** Implemented, to confirm ([#14](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/14))
+
+`nlb-design` has the cards but no archive pages, so the grid column counts (staff 4, commissioners
+3, projects 4), commissioners shown as "Since Month YYYY", and the "No upcoming events right now."
+message are assumptions.
+
 ## Known outstanding items
 
 Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-design.md):
