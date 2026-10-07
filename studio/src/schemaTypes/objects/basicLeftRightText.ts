@@ -63,7 +63,10 @@ export const basicLeftRightText = defineBlock({
     }),
   ],
   preview: {
-    select: {title: 'heading'},
-    prepare: ({title}) => ({title: title || 'Untitled', subtitle: 'Basic - Left Right Text'}),
+    select: {title: 'heading', eyebrow: 'eyebrow'},
+    prepare: ({title, eyebrow}) => ({
+      title: title || eyebrow || 'No heading yet',
+      subtitle: 'Basic - Left Right Text',
+    }),
   },
 })

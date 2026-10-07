@@ -19,7 +19,7 @@ export const heroTertiary = defineBlock({
     defineField({name: 'body', title: 'Intro', type: 'text', rows: 4}),
   ],
   preview: {
-    select: {title: 'heading'},
-    prepare: ({title}) => ({title: title || 'Untitled', subtitle: 'Hero - Tertiary'}),
+    select: {title: 'heading', eyebrow: 'eyebrow'},
+    prepare: ({title, eyebrow}) => ({title: title || eyebrow || 'No heading yet', subtitle: 'Hero - Tertiary'}),
   },
 })

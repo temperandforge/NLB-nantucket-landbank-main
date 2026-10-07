@@ -17,7 +17,7 @@ export const mapTeaser = defineBlock({
     defineField({name: 'body', title: 'Body', type: 'text', rows: 3}),
   ],
   preview: {
-    select: {title: 'heading'},
-    prepare: ({title}) => ({title: title || 'Untitled', subtitle: 'Map Teaser'}),
+    select: {title: 'heading', body: 'body'},
+    prepare: ({title, body}) => ({title: title || body || 'No heading yet', subtitle: 'Map Teaser'}),
   },
 })

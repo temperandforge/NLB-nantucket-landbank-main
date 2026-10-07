@@ -45,7 +45,15 @@ export const jumpNavContent = defineBlock({
     }),
   ],
   preview: {
-    select: {title: 'heading'},
-    prepare: ({title}) => ({title: title || 'Untitled', subtitle: 'Jump Nav Content'}),
+    select: {title: 'heading', content: 'content'},
+    prepare: ({title, content}) => {
+      // With no heading of its own, show the first section heading, which is what the nav starts with.
+      const firstSection = (content as Array<{style?: string; children?: Array<{text?: string}>}> | undefined)
+        ?.find((block) => block.style === 'h2')
+        ?.children?.map((child) => child.text ?? '')
+        .join('')
+        .trim()
+      return {title: title || firstSection || 'No heading yet', subtitle: 'Jump Nav Content'}
+    },
   },
 })

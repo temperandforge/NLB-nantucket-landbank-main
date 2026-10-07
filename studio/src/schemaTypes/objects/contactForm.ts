@@ -23,6 +23,6 @@ export const contactForm = defineBlock({
   ],
   preview: {
     select: {title: 'heading'},
-    prepare: ({title}) => ({title: title || 'Untitled', subtitle: 'Contact Form'}),
+    prepare: ({title}) => ({title: title || 'No heading yet', subtitle: 'Contact Form'}),
   },
 })
