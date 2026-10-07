@@ -889,6 +889,35 @@ theme's `nlb_faq` posts are test content and are not migrated.
 categories from the Phase B seed before matching (one sample shares a question with a real FAQ).
 The `form-filing` category already exists and is reused as it stands.
 
+## 15. The property type and the Properties archive
+
+### 15.1 `property` replaced `project`, and the archive is a block
+
+**Status:** Code implemented; the dataset migration and the page seed are not run until the user says so
+
+The client wants properties to be the map's document, so `property` replaced `project` (same
+fields; the Studio title is "Property"). `studio/scripts/migrateProjectsToProperties.ts` copies each
+project into a property **in the same publish state** (150 published, 2 with a draft when it was
+written), matched by slug, never editing an existing property, refusing to run if anything other
+than a project references a project, and leaving the `project` documents in place
+([#26](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/26) to delete them once
+the map is verified). `verifyPropertyMigration.ts` compares the two sets.
+
+The archive is a **Property Archive block** on an ordinary page (seeded as a draft
+`explore/properties` by `seedPropertiesPage.ts`), so its address is its slug and parent. It has two
+dropdown filters, Property Type and Resources, built from the types and resources the properties
+use; **any** checked option within a group matches and **every** group with a choice must hold. The
+choice is kept in the address as `?type=a,b&resource=c`. The filter functions live in
+`frontend/sanity/lib/archiveFilter.ts` with the other archive filters and are checked by
+`frontend/scripts/verifyPropertyFilter.mts`. A card with no image shows **Default property image**
+from Site Settings, or the staff cards' neutral box when that is unset.
+
+**Not done:** property detail pages ([#23](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/23)),
+renaming the Project blocks ([#24](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/24)),
+pagination or search ([#25](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/25)).
+Spec: [properties archive design](superpowers/specs/2026-10-07-properties-archive-design.md); plan:
+[properties archive plan](superpowers/plans/2026-10-07-properties-archive.md).
+
 ## Known outstanding items
 
 Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-design.md):

@@ -33,22 +33,24 @@ Design docs live in [docs/superpowers/specs/](docs/superpowers/specs/).
 - **A taxonomy's slug is its stable key; its title is the label.** URL filters use the slug, so
   renaming a title is safe and changing a slug breaks shared links.
 
-## Projects and the map
+## Properties and the map
 
-- **`project` is a Land Bank property** — the things on the interactive map. It replaced the
-  hardcoded `frontend/app/map/properties.ts`.
-- **Boundary geometry is not stored per project.** One GeoJSON FeatureCollection on
-  `projectSettings.boundaryData` holds every boundary; a project stores only `boundaryId`.
+- **`property` is a Land Bank property** — the things on the interactive map and the Properties
+  archive. It replaced the `project` type (migrated by `studio/scripts/migrateProjectsToProperties.ts`),
+  which replaced the hardcoded `frontend/app/map/properties.ts`. The page-builder blocks are still
+  named `projectGrid` and `projectPreview`; they read properties.
+- **Boundary geometry is not stored per property.** One GeoJSON FeatureCollection on
+  `projectSettings.boundaryData` holds every boundary; a property stores only `boundaryId`.
 - **Which feature property holds the identifier is configurable** (`boundaryIdProperty`). The file
   is the client's, so never hardcode a key like `MAP_ID`.
-- **Replacing the boundary file does not re-point any project.** Re-check assignments afterwards;
+- **Replacing the boundary file does not re-point any property.** Re-check assignments afterwards;
   the `boundaryId` input flags a value that is no longer in the file.
 - **Nothing draws until Mapbox fires `load`.** That needs the style request to `api.mapbox.com` to
   succeed, so a dev server without `NEXT_PUBLIC_MAPBOX_TOKEN` shows an empty canvas with controls.
   An empty map is not evidence the data is wrong — verify map *data* separately from *rendering*.
-- **A project's marker and its boundary must share one feature id.** Hover linkage uses
-  `setFeatureState`; deriving the id from a separate index over only projects that have geometry
-  makes hovering highlight the wrong polygon as soon as one project has no boundary.
+- **A property's marker and its boundary must share one feature id.** Hover linkage uses
+  `setFeatureState`; deriving the id from a separate index over only properties that have geometry
+  makes hovering highlight the wrong polygon as soon as one property has no boundary.
 
 ## Page URLs
 
