@@ -57,7 +57,7 @@ One object type, `formField`, with a `fieldType` list and a shared base:
 - `required` (boolean)
 - `width` ("full" or "half"): half fills one cell of a 2-column section. Ignored in a 1-column
   section.
-- `showIf` (optional): `{field: <name of an earlier choice field>, equals: <option value>}`.
+- `showIf` (optional): `{field: <name of an earlier choice field>, equals: <option text>}`.
 
 Types and their extras:
 
@@ -75,7 +75,8 @@ shared documents: they are form content, not site taxonomy.
 ### Validation (Studio)
 
 - `name` unique per form.
-- `showIf.field` must name a field that appears earlier in the form and is a dropdown (`select`), multi-select, checkbox group or radio group; `showIf.equals` must be one of its option values.
+- `showIf.field` must name a field that appears earlier in the form and is a dropdown (`select`),
+  multi-select, checkbox group or radio group; `showIf.equals` must be one of its option text values.
 - A required field with a `showIf` is required only while it is shown; hidden fields are never
   validated, so a hidden required field cannot block submission.
 
@@ -163,8 +164,9 @@ and the discrepancy flagged.
 
 - **Honeypot**: a visually hidden text field, `tabindex="-1"` and `aria-hidden`, with
   `autocomplete="off"`. A filled value is accepted silently (200) and discarded, so bots get no signal.
-- **Rate limit**: per-IP limit in the route handler (in-memory, capped, oldest entry evicted; see #21). The store must work on the host (decided in the
-  plan; an in-memory limit is not reliable on serverless).
+- **Rate limit**: per-IP limit in the route handler. The interim implementation is in-memory, capped,
+  and evicts the oldest entry; it is per instance, so it is not reliable on serverless. #21 will
+  choose a shared store once the host is settled.
 - **Turnstile**: shown when the site key is configured; the server verifies the token when the secret
   is configured. With no keys (local dev) it is skipped and the form works. Turnstile's widget is
   rendered in a way that keeps tab order sensible and has an accessible label.

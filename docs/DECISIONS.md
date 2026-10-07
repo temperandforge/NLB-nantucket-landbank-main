@@ -886,7 +886,10 @@ The `form-filing` category already exists and is reused as it stands.
 
 ### 15.1 A form is a document of sections of typed fields
 
-**Status:** Implemented
+**Status:** Implemented; type-checked and linted but not yet verified in a browser (see 15.5)
+
+**Verified:** schema and generated types (`tsc`, typegen), lint, and `verifyForms.ts` (run with zero
+forms present, so vacuous). Not verified: rendering of either placement.
 
 `form` has `sections[]`, each with an optional heading, a column count, and `formField` objects
 (one type with a `fieldType`). A form is placed by reference: embedded in Basic Left Right Text's
@@ -902,7 +905,11 @@ earlier answers and any show-if that names it (Studio flags the show-if).
 
 ### 15.2 Validation is shared and always repeated on the server
 
-**Status:** Implemented
+**Status:** Implemented; logic checked, route not exercised against a live dataset (see 15.5)
+
+**Verified:** type-check, lint, the node check script `verifyFormLogic.mts` for the pure logic
+(validation, visibility, listbox keys, rate limit), and code review of the route. Not verified: a
+live request, Turnstile, or a stored submission.
 
 `frontend/sanity/lib/forms.ts` decides visibility and validity for both the browser (`FormRenderer`)
 and `POST /api/forms/[formId]`. The route re-reads the **published** form and keeps only the answers
@@ -914,7 +921,10 @@ rate-limits per IP, drops honeypot hits silently with a 200, verifies Turnstile 
 
 ### 15.3 Submissions are stored, not emailed (yet)
 
-**Status:** Implemented; email deferred
+**Status:** Implemented; email deferred; not yet exercised against a live dataset (see 15.5)
+
+**Verified:** schema type-check and code review. Not verified: a stored submission, or the weak
+reference, against a real dataset with the write token.
 
 `formSubmission` documents hold a snapshot of each question and answer, with a weak reference to
 the form, written with a server-only `SANITY_WRITE_TOKEN`. Deferred, each with an issue: email
@@ -925,7 +935,11 @@ is closed by the storage work, except for email.
 
 ### 15.4 Accessibility choices that differ from the obvious
 
-**Status:** Implemented
+**Status:** Implemented; type-checked and linted but not yet verified in a browser (see 15.5)
+
+**Verified:** type-check, lint, `verifyFormLogic.mts` (listbox key handling) and code review. Not
+verified: keyboard, focus and screen-reader behaviour, focus-ring contrast, or the ARIA wiring in a
+browser.
 
 - **Focus on form controls adds an outline to the design system's border.** The Input's focus state
   is a 1px `border-light` border, below 3:1 contrast, so focus also draws a 2px `border-dark`
