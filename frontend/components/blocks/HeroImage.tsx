@@ -1,30 +1,38 @@
+import Image from 'next/image'
+
 import BlockImage from './BlockImage'
 import Eyebrow from './Eyebrow'
 import {BlockProps} from './types'
 
 export default function HeroImage({block}: BlockProps<'heroImage'>) {
   return (
-    <section className="relative overflow-hidden w-full min-h-[34.0625rem] md:min-h-[41.875rem]">
+    <div className="relative flex w-full overflow-clip tf-px pt-s3 pb-s9">
       <BlockImage
         image={block.image}
         width={1920}
         sizes="100vw"
         fill
-        className="absolute inset-0 w-full h-full object-cover"
+        className="pointer-events-none absolute inset-0 size-full object-cover"
       />
-      <div className="pt-gap-lg pb-section-p-xl relative tf-px">
-        <div className="tf-max-w">
-          <div className="relative overflow-hidden rounded bg-warm-neutral-50 p-6 min-h-[24.0625rem] w-full md:w-[43.25rem] flex flex-col justify-between">
-            <div className="hero-image__lines absolute inset-0 pointer-events-none" aria-hidden="true" />
-            {block.eyebrow && (
-              <Eyebrow className="relative z-10 text-moody-moor-600">{block.eyebrow}</Eyebrow>
-            )}
-            {block.heading && (
-              <h1 className="relative z-10 text-h2 text-moody-moor-600">{block.heading}</h1>
-            )}
-          </div>
+      <div className="relative z-10 tf-max-w">
+        <div className="relative flex h-[380px] w-full flex-col items-start justify-between overflow-clip rounded bg-background p-5 sm:w-[680px] sm:p-10">
+          <Image
+            src="/images/blocks/decorative-line-hero.svg"
+            alt=""
+            aria-hidden="true"
+            fill
+            className="pointer-events-none absolute inset-y-[-30%] inset-x-[-60%] z-0 size-auto object-contain opacity-60"
+          />
+          {block.eyebrow && (
+            <Eyebrow className="relative z-10 text-on-background">{block.eyebrow}</Eyebrow>
+          )}
+          {block.heading && (
+            <h1 className="relative z-10 w-full text-headline-xl text-on-background [text-wrap:pretty]">
+              {block.heading}
+            </h1>
+          )}
         </div>
       </div>
-    </section>
+    </div>
   )
 }

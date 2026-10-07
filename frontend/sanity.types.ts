@@ -212,6 +212,7 @@ export type HeroTertiary = {
   _type: 'heroTertiary'
   eyebrow?: string
   heading?: string
+  headingLevel?: 'h1' | 'h2'
   body?: string
   disabled?: boolean
 }
@@ -1238,6 +1239,7 @@ export type GetPageQueryResult = {
         _type: 'heroTertiary'
         eyebrow?: string
         heading?: string
+        headingLevel?: 'h1' | 'h2'
         body?: string
         disabled?: boolean
       }
@@ -1488,6 +1490,7 @@ export type LandingPageQueryResult = {
         _type: 'heroTertiary'
         eyebrow?: string
         heading?: string
+        headingLevel?: 'h1' | 'h2'
         body?: string
         disabled?: boolean
       }

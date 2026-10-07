@@ -1,22 +1,33 @@
+import Image from 'next/image'
+import {stegaClean} from 'next-sanity'
+
 import Eyebrow from './Eyebrow'
 import {BlockProps} from './types'
 
 export default function HeroTertiary({block}: BlockProps<'heroTertiary'>) {
+  // stegaClean: in Presentation the value carries invisible characters.
+  const Heading = stegaClean(block.headingLevel) === 'h2' ? 'h2' : 'h1'
+
   return (
-    <section className="w-full overflow-hidden">
-      <div className="relative py-section-p-sm tf-px">
-        <div className="tf-max-w">
-          <div className="hero-tertiary__lines absolute inset-0 -z-10" aria-hidden="true" />
-          <div className="flex flex-wrap items-start justify-between gap-6 lg:grid lg:gap-6 lg:grid-cols-12 lg:items-center">
-            <div className="flex flex-col gap-6 lg:col-span-5">
-              {block.eyebrow && <Eyebrow className="text-moody-moor-700 mb-0">{block.eyebrow}</Eyebrow>}
-              {block.heading && <h1 className="text-h1 mb-0 text-moody-moor-500">{block.heading}</h1>}
-            </div>
-            {block.body && (
-              <p className="text-moody-moor-600 lg:col-span-6 lg:col-start-7">{block.body}</p>
-            )}
-          </div>
+    <section className="relative w-full overflow-clip bg-background tf-px py-s3">
+      <div className="relative flex w-full flex-wrap items-start justify-between gap-10 tf-max-w">
+        <Image
+          src="/images/blocks/decorative-line-hero-tertiary.svg"
+          alt=""
+          aria-hidden="true"
+          width={6072}
+          height={4934}
+          className="pointer-events-none absolute top-1/2 left-0 z-0 w-[104vw]! max-w-none -translate-y-[49%]"
+        />
+        <div className="relative z-10 flex max-w-[34.5rem] flex-col items-start gap-6 text-on-background">
+          {block.eyebrow && <Eyebrow className="whitespace-nowrap">{block.eyebrow}</Eyebrow>}
+          {block.heading && <Heading className="text-headline-2xl leading-[1.05]">{block.heading}</Heading>}
         </div>
+        {block.body && (
+          <p className="relative z-10 max-w-[42rem] pt-0 font-sans text-body-base leading-[1.6] text-on-background md:pt-[2.875rem]">
+            {block.body}
+          </p>
+        )}
       </div>
     </section>
   )

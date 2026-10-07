@@ -67,12 +67,6 @@
   @apply max-w-[90rem] mx-auto;
 }
 
-/* Hero - Image: decorative line art inside the light card, cropped by the card's overflow. */
-.hero-image__lines {
-  background: url('/images/blocks/hero-secondary-lines.svg') center / 220% no-repeat;
-  opacity: 0.35;
-}
-
 /**
  * Hero - Secondary. The panel colour and the line-art stroke are tuned per variant in the theme
  * (cream stroke at ~70% on green, brown stroke at ~40% on brown), so the art is two SVGs.
@@ -108,12 +102,8 @@
 }
 
 .hero-secondary__lines--light-brown {
-  background-image: url('/images/blocks/hero-secondary-lines.svg');
-  opacity: 0.4;
-}
-
-.hero-tertiary__lines {
-  background: url('/images/blocks/hero-tertiary-lines.svg') center / cover no-repeat;
+  background-image: url('/images/blocks/decorative-line-hero.svg');
+  opacity: 0.6;
 }
 
 /* Image Carousel: scroll-snap is not expressible as utilities alone. */

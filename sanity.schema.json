@@ -1216,6 +1216,23 @@
           },
           "optional": true
         },
+        "headingLevel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "h1"
+              },
+              {
+                "type": "string",
+                "value": "h2"
+              }
+            ]
+          },
+          "optional": true
+        },
         "body": {
           "type": "objectAttribute",
           "value": {

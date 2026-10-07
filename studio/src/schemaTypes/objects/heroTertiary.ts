@@ -1,9 +1,12 @@
 import {TextIcon} from '@sanity/icons'
 import {defineField} from 'sanity'
 
-import {defineBlock, eyebrowField} from './blockFields'
+import {defineBlock, eyebrowField, headingLevelField} from './blockFields'
 
-/** Text-only hero: eyebrow and heading on the left, intro on the right, over line art. */
+/**
+ * Text-only header: eyebrow and heading on the left, intro on the right, over line art. Set the
+ * heading to H2 for a section intro further down a page (nlb-design's Section Intro).
+ */
 export const heroTertiary = defineBlock({
   name: 'heroTertiary',
   title: 'Hero - Tertiary',
@@ -12,6 +15,7 @@ export const heroTertiary = defineBlock({
   fields: [
     eyebrowField(),
     defineField({name: 'heading', title: 'Heading', type: 'string'}),
+    headingLevelField('h1'),
     defineField({name: 'body', title: 'Intro', type: 'text', rows: 4}),
   ],
   preview: {
