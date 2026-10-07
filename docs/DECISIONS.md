@@ -747,6 +747,46 @@ pin, a card for one featured `project`, and a button. Figma's absolute positions
 percentages of the map panel's width at `md:` and up, and a stacked layout below: an assumption to
 check.
 
+## 11. The staff, commissioner and FAQ archives
+
+Design: [the archives spec](superpowers/specs/2026-10-07-staff-commissioner-faq-archives-design.md).
+
+### 11.1 An archive is an ordinary page built from blocks
+
+**Status:** Implemented
+
+Staff, Commissioners and FAQs are CMS pages (a header block plus the People Grid or FAQ List), seeded
+as drafts under About Us by `studio/scripts/seedArchivePages.ts`. Each one's address is its own slug
+and parent, so it can be changed per archive at any time in Studio. Links that point at a page by
+reference follow the move; old bookmarked addresses do not, which needs redirects
+([#9](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/9)). No Site Settings
+entry per archive: nothing in code needs to find an archive page.
+
+### 11.2 Department tabs come from the staff, and the choice lives in the address
+
+**Status:** Implemented
+
+The People Grid's tabs are derived from the staff on the block (`frontend/sanity/lib/staffFilter.ts`,
+checked by `frontend/scripts/verifyStaffFilter.mts`): one per department with at least one member, in
+the department's `order`. The chosen department is `?department=<slug>`, read with `useSearchParams`
+and changed with the History API, so a filtered view can be shared without a server request. The
+server render is "All".
+
+### 11.3 The footer links are wired by a guarded script
+
+**Status:** Implemented, to run once the pages are published
+
+`studio/scripts/linkArchivePagesInMenus.ts` changes only the Footer Menu's About Us > Staff and FAQs
+links that are still `#`. It refuses to write if a page is unpublished or the menu has unpublished
+edits, and prints each change first.
+
+### 11.4 The Commissioners page uses the theme's layout
+
+**Status:** Implemented, to confirm ([#15](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/15))
+
+The Figma node the theme cites no longer exists and the Design System node was not readable, so the
+page is the Staff page's header and a three-column grid of the existing commissioner cards.
+
 ## Known outstanding items
 
 Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-design.md):
