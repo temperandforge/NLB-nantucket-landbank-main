@@ -8,9 +8,17 @@
  *
  */
 
-import {PortableText, type PortableTextComponents, type PortableTextBlock} from 'next-sanity'
+import {
+  PortableText,
+  stegaClean,
+  type PortableTextComponents,
+  type PortableTextBlock,
+} from 'next-sanity'
 import ResolvedLink from '@/components/ResolvedLink'
 import Image from '@/components/SanityImage'
+import LinkRow from '@/components/ui/LinkRow'
+import {DereferencedLink} from '@/sanity/lib/types'
+import {linkResolver} from '@/sanity/lib/utils'
 
 export default function CustomPortableText({
   className,
@@ -24,6 +32,42 @@ export default function CustomPortableText({
 }) {
   const components: PortableTextComponents = {
     types: {
+      anchorLinks: ({value}) => {
+        type Row = {
+          _key: string
+          label?: string
+          icon?: string
+          link?: DereferencedLink
+        }
+        const rows = ((value?.links ?? []) as Row[]).flatMap((row) => {
+          // A row needs a label and a link that resolves; anything else would be a dead row.
+          const href = row.link ? linkResolver(row.link) : null
+          if (!row.label || !href) return []
+          return [
+            {
+              key: row._key,
+              label: row.label,
+              href,
+              icon: stegaClean(row.icon) === 'download' ? ('download' as const) : ('link' as const),
+              newTab: Boolean(row.link?.openInNewTab),
+            },
+          ]
+        })
+        if (rows.length === 0) return null
+        return (
+          <div className="flex flex-col gap-4">
+            {rows.map((row) => (
+              <LinkRow
+                key={row.key}
+                label={row.label}
+                href={row.href}
+                icon={row.icon}
+                newTab={row.newTab}
+              />
+            ))}
+          </div>
+        )
+      },
       image: ({value}) => {
         if (!value?.asset?._ref) {
           return null

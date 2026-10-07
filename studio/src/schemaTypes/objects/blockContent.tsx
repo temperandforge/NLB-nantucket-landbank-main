@@ -98,5 +98,6 @@ export const blockContent = defineType({
       },
       fields: [altTextField()],
     }),
+    defineArrayMember({type: 'anchorLinks'}),
   ],
 })

@@ -170,17 +170,15 @@ const pageBuilderFields = /* groq */ `
     },
     _type == "basicLeftRightText" => {
       ...,
-      body[]{
-        ...,
-        ${markDefsFields}
-      },
       rightContent[]{
         ...,
+        _type == "anchorLinks" => {
+          links[]{
+            ...,
+            ${linkFields}
+          }
+        },
         ${markDefsFields}
-      },
-      button{
-        ...,
-        ${linkFields}
       }
     },
     _type == "downloadBlock" => {

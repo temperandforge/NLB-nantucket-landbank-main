@@ -19,6 +19,7 @@ import {settings} from './singletons/settings'
 import {footer} from './singletons/footer'
 import {projectSettings} from './singletons/projectSettings'
 import {link} from './objects/link'
+import {anchorLinks} from './objects/anchorLinks'
 import {menuGroup} from './objects/menuGroup'
 import {menuLink} from './objects/menuLink'
 import {infoColumn} from './objects/infoColumn'
@@ -59,6 +60,7 @@ export const schemaTypes = [
   mapTeaser,
   contactForm,
   link,
+  anchorLinks,
   // Menu building blocks - menuGroup nests menuLink, capped at two levels
   menuGroup,
   menuLink,
