@@ -229,7 +229,7 @@ async function main() {
   await ensure('commissioner', 'name', 'Jordan Example', {
     name: 'Jordan Example',
     title: 'Chair',
-    startDate: '2019-01-15',
+    termDate: 'May 2027',
     order: 10,
   })
   await ensure('commissioner', 'name', 'Riley Sample', {

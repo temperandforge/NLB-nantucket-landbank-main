@@ -1,10 +1,8 @@
 import BlockImage from '@/components/blocks/BlockImage'
-import {formatMonthYear} from '@/sanity/lib/dates'
 
 import type {CommissionerItem} from './types'
 
 export default function CardCommissioner({person}: {person: CommissionerItem}) {
-  const since = formatMonthYear(person.startDate)
   return (
     <div className="flex w-full max-w-[448px] flex-col items-start gap-3">
       <div className="relative aspect-[448/556] w-full shrink-0 overflow-clip rounded bg-on-background-tonal">
@@ -23,9 +21,9 @@ export default function CardCommissioner({person}: {person: CommissionerItem}) {
             {person.title}
           </p>
         )}
-        {since && (
+        {person.termDate && (
           <p className="w-full font-sans text-body-base leading-[1.6] tracking-normal text-on-background-subtle opacity-60">
-            Since {since}
+            {person.termDate}
           </p>
         )}
       </div>

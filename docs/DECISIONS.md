@@ -696,7 +696,7 @@ consumer); see the spec.
 **Status:** Implemented, to confirm ([#14](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/14))
 
 `nlb-design` has the cards but no archive pages, so the grid column counts (staff 4, commissioners
-3, projects 4), commissioners shown as "Since Month YYYY", and the "No upcoming events right now."
+3, projects 4), and the "No upcoming events right now."
 message are assumptions.
 
 ## 10. News article pages and the map teaser

@@ -10,7 +10,6 @@ import {
   currentHour,
   eventParts,
   formatDate,
-  formatMonthYear,
   SITE_TIME_ZONE,
 } from '../sanity/lib/dates.ts'
 
@@ -37,8 +36,6 @@ same(formatDate(''), '', 'an empty date is empty')
 same(formatDate(null), '', 'a null date is empty')
 same(formatDate('2026-13-40'), '', 'an impossible date is empty')
 same(formatDate('not a date'), '', 'a non-date is empty')
-same(formatMonthYear('2019-01-15'), 'January 2019', 'formats month and year')
-same(formatMonthYear(undefined), '', 'no start date is empty')
 
 // 14:30Z on 4 Aug 2026 is 10:30 in New York (EDT, UTC-4).
 same(

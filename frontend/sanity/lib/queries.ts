@@ -273,7 +273,7 @@ const pageBuilderFields = /* groq */ `
         _id,
         name,
         title,
-        startDate,
+        termDate,
         headshot
       }
     },

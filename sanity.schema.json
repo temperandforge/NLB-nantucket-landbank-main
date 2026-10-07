@@ -3068,7 +3068,7 @@
         },
         "optional": true
       },
-      "startDate": {
+      "termDate": {
         "type": "objectAttribute",
         "value": {
           "type": "string"

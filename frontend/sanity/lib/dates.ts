@@ -1,21 +1,6 @@
 /** Everything the site shows is in this zone, whatever zone the server runs in. */
 export const SITE_TIME_ZONE = 'America/New_York'
 
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-]
-
 /**
  * The start of the current hour, as an ISO string. The events query takes it as `$now`, so its
  * fetch cache key changes every hour: the fetch is cached with no expiry (next-sanity), so without
@@ -41,12 +26,6 @@ function parseDate(value: string | null | undefined) {
 export function formatDate(value: string | null | undefined): string {
   const date = parseDate(value)
   return date ? `${date.month}/${date.day}/${date.year}` : ''
-}
-
-/** "August 2019" from a Sanity `date`. */
-export function formatMonthYear(value: string | null | undefined): string {
-  const date = parseDate(value)
-  return date ? `${MONTHS[Number(date.month) - 1]} ${date.year}` : ''
 }
 
 function part(date: Date, options: Intl.DateTimeFormatOptions) {

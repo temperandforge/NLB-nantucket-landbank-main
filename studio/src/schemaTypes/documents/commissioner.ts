@@ -11,10 +11,10 @@ export const commissioner = defineType({
     defineField({name: 'name', title: 'Name', type: 'string', validation: (rule) => rule.required()}),
     defineField({name: 'title', title: 'Role', type: 'string', description: 'e.g. Chair.'}),
     defineField({
-      name: 'startDate',
-      title: 'Serving since',
-      type: 'date',
-      description: 'Shown as "Since Month YYYY".',
+      name: 'termDate',
+      title: 'Term date',
+      type: 'string',
+      description: 'Shown under the role exactly as entered, e.g. "May 2027".',
     }),
     defineField({
       name: 'headshot',
