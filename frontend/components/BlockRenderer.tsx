@@ -2,6 +2,9 @@ import React from 'react'
 
 import BasicLeftRightText from '@/components/blocks/BasicLeftRightText'
 import Hero from '@/components/blocks/Hero'
+import ContactForm from '@/components/blocks/ContactForm'
+import DownloadBlock from '@/components/blocks/DownloadBlock'
+import MapTeaser from '@/components/blocks/MapTeaser'
 import JumpNavContent from '@/components/blocks/JumpNavContent'
 import ImageCarousel from '@/components/blocks/ImageCarousel'
 import Timeline from '@/components/blocks/Timeline'
@@ -34,6 +37,9 @@ const Blocks = {
   jumpNavContent: JumpNavContent,
   imageCarousel: ImageCarousel,
   timeline: Timeline,
+  downloadBlock: DownloadBlock,
+  mapTeaser: MapTeaser,
+  contactForm: ContactForm,
 } as BlocksType
 
 /**

@@ -181,6 +181,14 @@ const pageBuilderFields = /* groq */ `
         ${linkFields}
       }
     },
+    _type == "downloadBlock" => {
+      ...,
+      downloads[]{
+        ...,
+        "fileUrl": file.asset->url,
+        "fileName": file.asset->originalFilename
+      }
+    },
     _type == "jumpNavContent" => {
       ...,
       content[]{

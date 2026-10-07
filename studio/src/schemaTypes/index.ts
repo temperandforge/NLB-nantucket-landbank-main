@@ -10,6 +10,9 @@ import {heroSecondary} from './objects/heroSecondary'
 import {heroTertiary} from './objects/heroTertiary'
 import {basicLeftRightText} from './objects/basicLeftRightText'
 import {jumpNavContent} from './objects/jumpNavContent'
+import {downloadBlock} from './objects/downloadBlock'
+import {mapTeaser} from './objects/mapTeaser'
+import {contactForm} from './objects/contactForm'
 import {imageCarousel} from './objects/imageCarousel'
 import {timeline} from './objects/timeline'
 import {settings} from './singletons/settings'
@@ -52,6 +55,9 @@ export const schemaTypes = [
   jumpNavContent,
   imageCarousel,
   timeline,
+  downloadBlock,
+  mapTeaser,
+  contactForm,
   link,
   // Menu building blocks - menuGroup nests menuLink, capped at two levels
   menuGroup,

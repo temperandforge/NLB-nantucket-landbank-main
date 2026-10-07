@@ -162,6 +162,9 @@ export const page = defineType({
         {type: 'jumpNavContent'},
         {type: 'imageCarousel'},
         {type: 'timeline'},
+        {type: 'downloadBlock'},
+        {type: 'mapTeaser'},
+        {type: 'contactForm'},
       ],
       hidden: ({document}) => Boolean(document?.pathOnly),
       options: {
