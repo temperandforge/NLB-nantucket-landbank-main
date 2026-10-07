@@ -4,6 +4,7 @@ import {redirect} from 'next/navigation'
 
 import PageView from '@/components/PageView'
 import {sanityFetch} from '@/sanity/lib/live'
+import {currentHour} from '@/sanity/lib/dates'
 import {landingPageQuery} from '@/sanity/lib/queries'
 
 /**
@@ -13,7 +14,7 @@ import {landingPageQuery} from '@/sanity/lib/queries'
 export async function generateMetadata(): Promise<Metadata> {
   const {data: page} = await sanityFetch({
     query: landingPageQuery,
-    params: {includeHidden: false},
+    params: {includeHidden: false, now: currentHour()},
     stega: false,
   })
   return {title: page?.name} satisfies Metadata
@@ -28,7 +29,7 @@ export const revalidate = 3600
 export default async function Page() {
   // Hidden blocks are shown (with a badge) only while an editor is previewing in Presentation.
   const {isEnabled: includeHidden} = await draftMode()
-  const {data: page} = await sanityFetch({query: landingPageQuery, params: {includeHidden}})
+  const {data: page} = await sanityFetch({query: landingPageQuery, params: {includeHidden, now: currentHour()}})
   if (!page?._id) redirect('/map')
   return <PageView page={page} />
 }

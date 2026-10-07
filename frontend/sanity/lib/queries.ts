@@ -221,7 +221,7 @@ const pageBuilderFields = /* groq */ `
       ...,
       "events": *[
         _type == "event" && defined(start)
-        && dateTime(coalesce(end, start)) >= dateTime(now())
+        && dateTime(coalesce(end, start)) >= dateTime($now)
       ] | order(start asc) [0...12] {
         _id,
         title,
@@ -233,7 +233,7 @@ const pageBuilderFields = /* groq */ `
     },
     _type == "faqList" => {
       ...,
-      "ungrouped": *[_type == "faq" && !defined(category)] | order(order asc, question asc) {
+      "ungrouped": *[_type == "faq" && !defined(category->_id)] | order(order asc, question asc) {
         _id,
         question,
         answer[]{

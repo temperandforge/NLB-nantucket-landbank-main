@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import {ArrowDownRightIcon} from '@/components/icons'
 import {DereferencedLink} from '@/sanity/lib/types'
-import {linkResolver} from '@/sanity/lib/utils'
+import {linkResolver, realHref} from '@/sanity/lib/utils'
 import {formatDate} from '@/sanity/lib/dates'
 
 import BlockImage from './BlockImage'
@@ -30,7 +30,7 @@ function Tile({
 
 export default function NewsPreview({block}: BlockProps<'newsPreview'>) {
   const articles = (block.articles ?? []).slice(0, block.count ?? 2)
-  const ctaHref = block.ctaLink ? linkResolver(block.ctaLink as DereferencedLink) : null
+  const ctaHref = realHref(block.ctaLink ? linkResolver(block.ctaLink as DereferencedLink) : null)
   const showCta = Boolean(block.ctaHeading || block.ctaLabel)
   if (articles.length === 0 && !showCta) return null
 
@@ -42,7 +42,7 @@ export default function NewsPreview({block}: BlockProps<'newsPreview'>) {
         )}
         <div className="grid w-full grid-cols-1 gap-px border border-border-light bg-border-light md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => {
-            const href = article.link ? linkResolver(article.link as DereferencedLink) : null
+            const href = realHref(article.link ? linkResolver(article.link as DereferencedLink) : null)
             // A category whose document was unpublished dereferences to null.
             const category = (article.categories ?? []).find((c) => c?.title)?.title
             const date = formatDate(article.date)

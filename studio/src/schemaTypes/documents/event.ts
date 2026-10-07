@@ -21,12 +21,14 @@ export const event = defineType({
       name: 'start',
       title: 'Starts',
       type: 'datetime',
+      options: {displayTimeZone: 'America/New_York', allowTimeZoneSwitch: false},
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'end',
       title: 'Ends',
       type: 'datetime',
+      options: {displayTimeZone: 'America/New_York', allowTimeZoneSwitch: false},
       description: 'Optional. An event stays listed until it ends (or, with no end, until it starts).',
       validation: (rule) =>
         rule.custom((end, context) => {

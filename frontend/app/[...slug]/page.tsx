@@ -4,6 +4,7 @@ import {notFound} from 'next/navigation'
 
 import PageView from '@/components/PageView'
 import {sanityFetch} from '@/sanity/lib/live'
+import {currentHour} from '@/sanity/lib/dates'
 import {getPageQuery, pagesSlugs} from '@/sanity/lib/queries'
 
 /**
@@ -28,8 +29,13 @@ function toSegments(path: string): string[] {
 function toQueryParams(
   segments: string[],
   includeHidden = false,
-): {leaf: string; path: string; includeHidden: boolean} {
-  return {leaf: segments[segments.length - 1] ?? '', path: segments.join('/'), includeHidden}
+): {leaf: string; path: string; includeHidden: boolean; now: string} {
+  return {
+    leaf: segments[segments.length - 1] ?? '',
+    path: segments.join('/'),
+    includeHidden,
+    now: currentHour(),
+  }
 }
 
 /**

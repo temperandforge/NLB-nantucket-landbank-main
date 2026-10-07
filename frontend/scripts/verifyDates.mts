@@ -6,7 +6,13 @@
  * Imports the real helpers, not a copy. Everything is shown in America/New_York whatever time zone
  * this machine runs in. Exits non-zero on failure.
  */
-import {eventParts, formatDate, formatMonthYear, SITE_TIME_ZONE} from '../sanity/lib/dates.ts'
+import {
+  currentHour,
+  eventParts,
+  formatDate,
+  formatMonthYear,
+  SITE_TIME_ZONE,
+} from '../sanity/lib/dates.ts'
 
 let failed = false
 function check(condition: boolean, message: string) {
@@ -75,5 +81,23 @@ same(
 same(eventParts('nonsense'), null, 'an invalid start is null')
 same(eventParts(null), null, 'a missing start is null')
 same(eventParts('2026-08-04T14:30:00.000Z', 'nonsense')?.time, '10:30 am', 'an invalid end is ignored')
+
+// The "upcoming" query takes the current hour as a parameter, so its fetch cache key changes every
+// hour. Without that, the cached response (fetched with no expiry) would outlive the page's own
+// hourly revalidation and a past event would never drop off.
+same(
+  currentHour(new Date('2026-08-04T14:59:59.999Z')),
+  '2026-08-04T14:00:00.000Z',
+  'the current hour is the start of the hour',
+)
+same(
+  currentHour(new Date('2026-08-04T14:00:00.000Z')),
+  currentHour(new Date('2026-08-04T14:59:59.999Z')),
+  'the value is stable within an hour',
+)
+check(
+  currentHour(new Date('2026-08-04T14:59:59.999Z')) !== currentHour(new Date('2026-08-04T15:00:00.000Z')),
+  'the value changes when the hour changes',
+)
 
 if (failed) process.exit(1)

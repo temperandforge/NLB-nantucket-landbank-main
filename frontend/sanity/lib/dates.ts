@@ -16,6 +16,18 @@ const MONTHS = [
   'December',
 ]
 
+/**
+ * The start of the current hour, as an ISO string. The events query takes it as `$now`, so its
+ * fetch cache key changes every hour: the fetch is cached with no expiry (next-sanity), so without
+ * this the cached answer would outlive the page's own hourly revalidation and a past event would
+ * never drop off. An event is therefore up to an hour late leaving the list.
+ */
+export function currentHour(now: Date = new Date()): string {
+  const hour = new Date(now)
+  hour.setUTCMinutes(0, 0, 0)
+  return hour.toISOString()
+}
+
 function parseDate(value: string | null | undefined) {
   if (!value) return null
   const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value)

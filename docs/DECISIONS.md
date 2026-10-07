@@ -649,17 +649,23 @@ here the tag is the department document's title.
 **Implication:** A reference to an unpublished taxonomy dereferences to null, so every consumer
 filters nulls.
 
-### 9.2 "Upcoming" is computed, in New York time, and the pages revalidate hourly
+### 9.2 "Upcoming" is computed, in New York time, and refreshes hourly
 
 **Status:** Implemented
 
-The events query keeps events whose end (or start, with no end) is not yet past `now()`. All dates
-and times are shown in `America/New_York` by `frontend/sanity/lib/dates.ts`, checked by
-`frontend/scripts/verifyDates.mts` (also under another `TZ`). The landing page and the catch-all
-route set `revalidate = 3600`, so a past event drops off without a content edit.
+The events query keeps events whose end (or start, with no end) is not before `$now`, which the
+page passes as the start of the current hour (`currentHour()` in `frontend/sanity/lib/dates.ts`).
+All dates and times are shown in `America/New_York` (event datetimes are also entered in it:
+`displayTimeZone` on the Studio fields), checked by `frontend/scripts/verifyDates.mts` (also under
+another `TZ`). The landing page and the catch-all route set `revalidate = 3600`.
 
-**Why:** Nothing about an event being upcoming is stored, and a statically rendered page would
-otherwise keep a past event until the next edit.
+**Why the parameter:** next-sanity caches its fetches with no expiry, and a route's `revalidate`
+does not override a fetch's own setting, so `now()` inside the query would be frozen at whatever
+Sanity answered first. Putting the hour in the params changes the cache key every hour, so the next
+hourly regeneration asks again. An ended event can therefore stay up to an hour late.
+
+**Implication:** Nothing about an event being upcoming is stored. Any other time-relative query
+needs the same treatment.
 
 ### 9.3 Articles take an optional link until they have pages
 

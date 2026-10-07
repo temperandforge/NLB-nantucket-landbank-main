@@ -1,5 +1,6 @@
 import BlockImage from '@/components/blocks/BlockImage'
 import Tag from '@/components/ui/Tag'
+import {realHref} from '@/sanity/lib/utils'
 
 import type {ProjectItem} from './types'
 
@@ -37,8 +38,9 @@ export default function CardProject({project}: {project: ProjectItem}) {
     </div>
   )
   // The project's own link, when it has one; otherwise a plain card, never a dead anchor.
-  return project.link ? (
-    <a href={project.link} className="block w-full max-w-[322px]">
+  const href = realHref(project.link)
+  return href ? (
+    <a href={href} className="block w-full max-w-[322px]">
       {card}
     </a>
   ) : (
