@@ -20,6 +20,8 @@ import {moveActive, typeaheadMatch} from '../sanity/lib/listbox.ts'
 import {
   isRateLimited,
   RATE_LIMIT_MAX,
+  RATE_LIMIT_MAX_KEYS,
+  rateLimitKeyCount,
   RATE_LIMIT_WINDOW_MS,
   resetRateLimit,
 } from '../sanity/lib/formRateLimit.ts'
@@ -168,16 +170,17 @@ console.log('validateForm')
 }
 {
   const optConstructor: FormLike = {
-    sections: [
-      {fields: [field({name: 'constructor', fieldType: 'text', label: 'C'})]},
-    ],
+    sections: [{fields: [field({name: 'constructor', fieldType: 'text', label: 'C'})]}],
   }
   const {errors: errOpt, clean: cleanOpt} = validateForm(optConstructor, {})
   check(
     Object.keys(errOpt).length === 0,
     'optional field named constructor with empty values has no error (own lookup returns undefined)',
   )
-  check(Object.keys(cleanOpt).length === 0, 'optional constructor field with empty values stores nothing')
+  check(
+    Object.keys(cleanOpt).length === 0,
+    'optional constructor field with empty values stores nothing',
+  )
   const reqConstructor: FormLike = {
     sections: [
       {fields: [field({name: 'constructor', fieldType: 'text', label: 'C', required: true})]},
@@ -222,7 +225,10 @@ console.log('answerRows')
   check(rows[0].name === 'first' && rows[0].label === 'First name', 'rows follow field order')
   const extras = rows.find((r) => r.name === 'extras')
   check(extras?.value === 'One, Three', 'a list is stored as its labels joined with ", "')
-  check(rows.every((r) => typeof r.value === 'string' && r._key === r.name), 'rows are strings with a key')
+  check(
+    rows.every((r) => typeof r.value === 'string' && r._key === r.name),
+    'rows are strings with a key',
+  )
 }
 
 console.log('listbox')
@@ -245,13 +251,53 @@ console.log('rate limit')
   resetRateLimit()
   const t0 = 1_000_000
   const results = Array.from({length: RATE_LIMIT_MAX + 1}, (_, i) => isRateLimited('ip-a', t0 + i))
-  check(results.slice(0, RATE_LIMIT_MAX).every((r) => r === false), 'the first attempts are allowed')
+  check(
+    results.slice(0, RATE_LIMIT_MAX).every((r) => r === false),
+    'the first attempts are allowed',
+  )
   check(results[RATE_LIMIT_MAX] === true, 'the next attempt is blocked')
   check(isRateLimited('ip-b', t0) === false, 'another key is independent')
   check(
     isRateLimited('ip-a', t0 + RATE_LIMIT_WINDOW_MS + RATE_LIMIT_MAX + 1) === false,
     'allowed again once the window has passed',
   )
+}
+
+console.log('rate limit key cap')
+{
+  resetRateLimit()
+  const t0 = 2_000_000
+  isRateLimited('old', t0)
+  let maxSeen = 0
+  for (let i = 0; i < RATE_LIMIT_MAX_KEYS + 500; i++) {
+    isRateLimited(`spoofed-${i}`, t0 + 1 + i)
+    maxSeen = Math.max(maxSeen, rateLimitKeyCount())
+  }
+  check(maxSeen <= RATE_LIMIT_MAX_KEYS, 'the key count never exceeds the cap')
+  const tRecent = t0 + RATE_LIMIT_MAX_KEYS + 1000
+  for (let i = 0; i < RATE_LIMIT_MAX; i++) isRateLimited('recent', tRecent)
+  for (let i = 0; i < RATE_LIMIT_MAX_KEYS; i++) isRateLimited(`more-${i}`, tRecent + 1 + i)
+  check(rateLimitKeyCount() <= RATE_LIMIT_MAX_KEYS, 'the cap holds after more keys arrive')
+  // 'recent' was touched after 'old' and the first flood, so the oldest keys go first.
+  check(
+    isRateLimited('old', tRecent + RATE_LIMIT_MAX_KEYS + 2) === false,
+    'an old key was evicted (fresh allowance)',
+  )
+}
+
+console.log('rate limit eviction order')
+{
+  resetRateLimit()
+  const t0 = 3_000_000
+  // 'recent' is the first key inserted and exhausts its allowance, then is touched again late, so
+  // only recency order keeps it from being the oldest entry.
+  for (let i = 0; i < RATE_LIMIT_MAX; i++) isRateLimited('recent', t0 + i)
+  for (let i = 0; i < RATE_LIMIT_MAX_KEYS - 1; i++) isRateLimited(`fill-${i}`, t0 + 100 + i)
+  check(isRateLimited('recent', t0 + 10_000) === true, 'the key is limited when touched again')
+  for (let i = 0; i < 10; i++) isRateLimited(`overflow-${i}`, t0 + 20_000 + i)
+  check(rateLimitKeyCount() <= RATE_LIMIT_MAX_KEYS, 'still within the cap')
+  check(isRateLimited('recent', t0 + 30_000) === true, 'a recently active key is not evicted')
+  check(isRateLimited('fill-0', t0 + 30_001) === false, 'an older key was evicted instead')
 }
 
 process.exit(failed ? 1 : 0)
