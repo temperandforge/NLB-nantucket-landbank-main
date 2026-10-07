@@ -26,6 +26,8 @@ import {footer} from './singletons/footer'
 import {projectSettings} from './singletons/projectSettings'
 import {link} from './objects/link'
 import {anchorLinks} from './objects/anchorLinks'
+import {peopleGrid} from './objects/peopleGrid'
+import {projectGrid} from './objects/projectGrid'
 import {faqList} from './objects/faqList'
 import {newsPreview} from './objects/newsPreview'
 import {eventsPreview} from './objects/eventsPreview'
@@ -84,6 +86,8 @@ export const schemaTypes = [
   missionStatement,
   newsPreview,
   faqList,
+  peopleGrid,
+  projectGrid,
   eventsPreview,
   ctaContact,
   // Menu building blocks - menuGroup nests menuLink, capped at two levels

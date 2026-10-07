@@ -16,6 +16,8 @@ import {mapTeaser} from '../objects/mapTeaser'
 import {missionStatement} from '../objects/missionStatement'
 import {eventsPreview} from '../objects/eventsPreview'
 import {faqList} from '../objects/faqList'
+import {peopleGrid} from '../objects/peopleGrid'
+import {projectGrid} from '../objects/projectGrid'
 import {newsPreview} from '../objects/newsPreview'
 import {timeline} from '../objects/timeline'
 import {buildPagePath, MAX_PAGE_DEPTH, slugifySegment} from '../../lib/pageHierarchy'
@@ -41,6 +43,8 @@ const pageBuilderBlocks = [
   mapTeaser,
   missionStatement,
   newsPreview,
+  peopleGrid,
+  projectGrid,
   timeline,
 ]
   .sort((a, b) => (a.title ?? a.name).localeCompare(b.title ?? b.name))

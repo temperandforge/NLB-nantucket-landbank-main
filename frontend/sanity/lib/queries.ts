@@ -254,6 +254,35 @@ const pageBuilderFields = /* groq */ `
         }
       }[count(faqs) > 0]
     },
+    _type == "peopleGrid" => {
+      ...,
+      "staff": *[_type == "staffMember" && ^.source == "staff"] | order(order asc, name asc) {
+        _id,
+        name,
+        title,
+        headshot,
+        "department": department->{"slug": slug.current, title}
+      },
+      "commissioners": *[_type == "commissioner" && ^.source == "commissioners"] | order(order asc, name asc) {
+        _id,
+        name,
+        title,
+        startDate,
+        headshot
+      }
+    },
+    _type == "projectGrid" => {
+      ...,
+      "projects": *[_type == "project" && defined(slug.current)] | order(name asc) {
+        _id,
+        name,
+        description,
+        image,
+        link,
+        "propertyTypes": propertyTypes[]->{"slug": slug.current, title},
+        "resources": resources[]->{"slug": slug.current, title}
+      }
+    },
     _type == "downloadBlock" => {
       ...,
       downloads[]{
