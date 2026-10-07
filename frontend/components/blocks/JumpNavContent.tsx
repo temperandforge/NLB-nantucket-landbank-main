@@ -1,4 +1,4 @@
-import type {PortableTextBlock} from 'next-sanity'
+import {stegaClean, type PortableTextBlock} from 'next-sanity'
 
 import CustomPortableText from '@/components/PortableText'
 import {buildJumpNav} from '@/sanity/lib/jumpNav'
@@ -6,7 +6,8 @@ import {buildJumpNav} from '@/sanity/lib/jumpNav'
 import {BlockProps} from './types'
 
 export default function JumpNavContent({block}: BlockProps<'jumpNavContent'>) {
-  const Heading = block.headingLevel === 'h2' ? 'h2' : 'h1'
+  // stegaClean: see BasicLeftRightText.
+  const Heading = stegaClean(block.headingLevel) === 'h2' ? 'h2' : 'h1'
   const content = block.content ?? []
   const {items, idByKey} = buildJumpNav(content)
 

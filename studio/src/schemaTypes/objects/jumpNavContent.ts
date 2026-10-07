@@ -1,7 +1,7 @@
 import {ThListIcon} from '@sanity/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
-import {headingLevelField} from './blockFields'
+import {altTextField, headingLevelField} from './blockFields'
 
 /**
  * A heading with a sticky section nav on the left and long-form content on the right. The nav is
@@ -38,7 +38,7 @@ export const jumpNavContent = defineType({
           ],
           marks: {annotations: [{type: 'link'}]},
         }),
-        defineArrayMember({type: 'image', options: {hotspot: true}}),
+        defineArrayMember({type: 'image', options: {hotspot: true}, fields: [altTextField()]}),
       ],
     }),
   ],

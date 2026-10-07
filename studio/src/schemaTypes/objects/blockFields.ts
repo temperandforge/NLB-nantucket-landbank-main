@@ -10,6 +10,23 @@ export const eyebrowField = () =>
   })
 
 /**
+ * The alt text field for an image. Required whenever the image has an asset, so an image cannot be
+ * published announced as decorative by accident.
+ */
+export const altTextField = () =>
+  defineField({
+    name: 'alt',
+    title: 'Alt text',
+    type: 'string',
+    description: 'Describe the image for people using a screen reader.',
+    validation: (rule) =>
+      rule.custom((value, context) => {
+        const image = context.parent as {asset?: unknown} | undefined
+        return image?.asset && !value ? 'Alt text is required when an image is set' : true
+      }),
+  })
+
+/**
  * An image with the alt text stored on the image itself, so it travels with the asset reference
  * in a query. Required where the block makes no sense without it.
  */
@@ -23,15 +40,7 @@ export const imageWithAltField = ({
     title,
     type: 'image',
     options: {hotspot: true},
-    fields: [
-      defineField({
-        name: 'alt',
-        title: 'Alt text',
-        type: 'string',
-        description: 'Describe the image for people using a screen reader.',
-        validation: required ? (rule) => rule.required() : undefined,
-      }),
-    ],
+    fields: [altTextField()],
     validation: required ? (rule) => rule.required() : undefined,
   })
 

@@ -27,7 +27,7 @@ export type CarouselImageImage = {
   media?: unknown // Unable to locate the referenced type "carouselImage.image.media" in schema
   hotspot?: SanityImageHotspot
   crop?: SanityImageCrop
-  alt: string
+  alt?: string
   _type: 'image'
 }
 
@@ -168,6 +168,7 @@ export type JumpNavContent = {
         media?: unknown
         hotspot?: SanityImageHotspot
         crop?: SanityImageCrop
+        alt?: string
         _type: 'image'
         _key: string
       }
@@ -200,7 +201,7 @@ export type HeroSecondary = {
     media?: unknown
     hotspot?: SanityImageHotspot
     crop?: SanityImageCrop
-    alt: string
+    alt?: string
     _type: 'image'
   }
   variant?: 'lowlands' | 'moody-moor'
@@ -215,7 +216,7 @@ export type HeroImage = {
     media?: unknown
     hotspot?: SanityImageHotspot
     crop?: SanityImageCrop
-    alt: string
+    alt?: string
     _type: 'image'
   }
 }
@@ -299,6 +300,7 @@ export type BlockContent = Array<
       media?: unknown
       hotspot?: SanityImageHotspot
       crop?: SanityImageCrop
+      alt?: string
       _type: 'image'
       _key: string
     }
@@ -1094,6 +1096,7 @@ export type GetPageQueryResult = {
               media?: unknown
               hotspot?: SanityImageHotspot
               crop?: SanityImageCrop
+              alt?: string
               _type: 'image'
               _key: string
               markDefs: null
@@ -1137,6 +1140,7 @@ export type GetPageQueryResult = {
               media?: unknown
               hotspot?: SanityImageHotspot
               crop?: SanityImageCrop
+              alt?: string
               _type: 'image'
               _key: string
               markDefs: null
@@ -1185,7 +1189,7 @@ export type GetPageQueryResult = {
           media?: unknown
           hotspot?: SanityImageHotspot
           crop?: SanityImageCrop
-          alt: string
+          alt?: string
           _type: 'image'
         }
       }
@@ -1199,7 +1203,7 @@ export type GetPageQueryResult = {
           media?: unknown
           hotspot?: SanityImageHotspot
           crop?: SanityImageCrop
-          alt: string
+          alt?: string
           _type: 'image'
         }
         variant?: 'lowlands' | 'moody-moor'
@@ -1273,6 +1277,7 @@ export type GetPageQueryResult = {
               media?: unknown
               hotspot?: SanityImageHotspot
               crop?: SanityImageCrop
+              alt?: string
               _type: 'image'
               _key: string
               markDefs: null
@@ -1342,6 +1347,7 @@ export type LandingPageQueryResult = {
               media?: unknown
               hotspot?: SanityImageHotspot
               crop?: SanityImageCrop
+              alt?: string
               _type: 'image'
               _key: string
               markDefs: null
@@ -1385,6 +1391,7 @@ export type LandingPageQueryResult = {
               media?: unknown
               hotspot?: SanityImageHotspot
               crop?: SanityImageCrop
+              alt?: string
               _type: 'image'
               _key: string
               markDefs: null
@@ -1433,7 +1440,7 @@ export type LandingPageQueryResult = {
           media?: unknown
           hotspot?: SanityImageHotspot
           crop?: SanityImageCrop
-          alt: string
+          alt?: string
           _type: 'image'
         }
       }
@@ -1447,7 +1454,7 @@ export type LandingPageQueryResult = {
           media?: unknown
           hotspot?: SanityImageHotspot
           crop?: SanityImageCrop
-          alt: string
+          alt?: string
           _type: 'image'
         }
         variant?: 'lowlands' | 'moody-moor'
@@ -1521,6 +1528,7 @@ export type LandingPageQueryResult = {
               media?: unknown
               hotspot?: SanityImageHotspot
               crop?: SanityImageCrop
+              alt?: string
               _type: 'image'
               _key: string
               markDefs: null

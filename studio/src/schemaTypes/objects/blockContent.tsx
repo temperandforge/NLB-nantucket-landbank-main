@@ -1,5 +1,6 @@
 import {defineArrayMember, defineType, defineField} from 'sanity'
 import type {Link} from '../../../sanity.types'
+import {altTextField} from './blockFields'
 
 /**
  * This is the schema definition for the rich text fields used for
@@ -85,6 +86,7 @@ export const blockContent = defineType({
       options: {
         hotspot: true,
       },
+      fields: [altTextField()],
     }),
   ],
 })

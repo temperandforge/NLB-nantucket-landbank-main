@@ -1,4 +1,4 @@
-import type {PortableTextBlock} from 'next-sanity'
+import {stegaClean, type PortableTextBlock} from 'next-sanity'
 
 import CustomPortableText from '@/components/PortableText'
 import ResolvedLink from '@/components/ResolvedLink'
@@ -9,7 +9,9 @@ import Eyebrow from './Eyebrow'
 import {BlockProps} from './types'
 
 export default function BasicLeftRightText({block}: BlockProps<'basicLeftRightText'>) {
-  const isH1 = block.headingLevel === 'h1'
+  // stegaClean: in Presentation the value carries invisible stega characters, so a plain
+  // comparison would always fail.
+  const isH1 = stegaClean(block.headingLevel) === 'h1'
   const Heading = isH1 ? 'h1' : 'h2'
   const button = block.button
   // A button needs both its text and a link that resolves. A page reference left empty, or
