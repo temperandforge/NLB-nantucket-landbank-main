@@ -211,6 +211,12 @@ const pageBuilderFields = /* groq */ `
       ...,
       content[]{
         ...,
+        _type == "anchorLinks" => {
+          links[]{
+            ...,
+            ${linkFields}
+          }
+        },
         ${markDefsFields}
       }
     },

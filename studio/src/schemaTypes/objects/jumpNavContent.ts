@@ -40,6 +40,7 @@ export const jumpNavContent = defineBlock({
           marks: {annotations: [{type: 'link'}]},
         }),
         defineArrayMember({type: 'image', options: {hotspot: true}, fields: [altTextField()]}),
+        defineArrayMember({type: 'anchorLinks'}),
       ],
     }),
   ],

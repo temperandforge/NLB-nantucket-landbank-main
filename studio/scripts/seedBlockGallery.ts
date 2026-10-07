@@ -215,6 +215,26 @@ async function main() {
         text('Accents and punctuation are stripped from the id.'),
         text('A sub heading', 'h3'),
         text('Not part of the nav.'),
+        {
+          _type: 'anchorLinks',
+          _key: key(),
+          links: [
+            {
+              _type: 'anchorLink',
+              _key: key(),
+              label: 'A link row inside a jump nav section',
+              icon: 'link',
+              link: {_type: 'link', linkType: 'href', href: '/map'},
+            },
+            {
+              _type: 'anchorLink',
+              _key: key(),
+              label: 'A download row inside a jump nav section',
+              icon: 'download',
+              link: {_type: 'link', linkType: 'href', href: '/map'},
+            },
+          ],
+        },
       ],
     },
     {
