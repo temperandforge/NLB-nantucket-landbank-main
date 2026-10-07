@@ -47,6 +47,7 @@ function RenderSections({
           block={block}
           pageId={page._id}
           pageType={page._type}
+          pageName={page.name ?? undefined}
         />
       ))}
     </div>

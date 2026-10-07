@@ -152,19 +152,16 @@ export const page = defineType({
       group: 'content',
       title: 'Page builder',
       type: 'array',
-      of: [{type: 'heroVideo'}],
+      of: [
+        {type: 'heroVideo'},
+        {type: 'hero'},
+        {type: 'heroImage'},
+        {type: 'heroSecondary'},
+        {type: 'heroTertiary'},
+      ],
       hidden: ({document}) => Boolean(document?.pathOnly),
       options: {
-        insertMenu: {
-          // Configure the "Add Item" menu to display a thumbnail preview of the content type. https://www.sanity.io/docs/studio/array-type#efb1fe03459d
-          views: [
-            {
-              name: 'grid',
-              previewImageUrl: (schemaTypeName) =>
-                `/static/page-builder-thumbnails/${schemaTypeName}.webp`,
-            },
-          ],
-        },
+        insertMenu: {filter: true},
       },
     }),
   ],

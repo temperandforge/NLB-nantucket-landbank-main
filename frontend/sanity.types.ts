@@ -68,11 +68,11 @@ export type Link = {
   openInNewTab?: boolean
 }
 
-export type SanityFileAssetReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'sanity.fileAsset'
+export type HeroTertiary = {
+  _type: 'heroTertiary'
+  eyebrow?: string
+  heading?: string
+  body?: string
 }
 
 export type SanityImageAssetReference = {
@@ -80,6 +80,57 @@ export type SanityImageAssetReference = {
   _type: 'reference'
   _weak?: boolean
   [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
+}
+
+export type HeroSecondary = {
+  _type: 'heroSecondary'
+  eyebrow?: string
+  body?: string
+  image: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt: string
+    _type: 'image'
+  }
+  variant?: 'lowlands' | 'moody-moor'
+}
+
+export type HeroImage = {
+  _type: 'heroImage'
+  eyebrow: string
+  heading: string
+  image: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt: string
+    _type: 'image'
+  }
+}
+
+export type Hero = {
+  _type: 'hero'
+  eyebrow?: string
+  heading?: string
+  body?: string
+  image?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+}
+
+export type SanityFileAssetReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'sanity.fileAsset'
 }
 
 export type HeroVideo = {
@@ -369,13 +420,25 @@ export type Page = {
   _updatedAt: string
   _rev: string
   name: string
-  parent?: PageReference
   slug: Slug
+  parent?: PageReference
   pathOnly?: boolean
   pageBuilder?: Array<
-    {
-      _key: string
-    } & HeroVideo
+    | ({
+        _key: string
+      } & HeroVideo)
+    | ({
+        _key: string
+      } & Hero)
+    | ({
+        _key: string
+      } & HeroImage)
+    | ({
+        _key: string
+      } & HeroSecondary)
+    | ({
+        _key: string
+      } & HeroTertiary)
   >
 }
 
@@ -623,8 +686,12 @@ export type AllSanitySchemaTypes =
   | MenuGroup
   | PageReference
   | Link
-  | SanityFileAssetReference
+  | HeroTertiary
   | SanityImageAssetReference
+  | HeroSecondary
+  | HeroImage
+  | Hero
+  | SanityFileAssetReference
   | HeroVideo
   | BlockContentTextOnly
   | BlockContent
@@ -854,62 +921,168 @@ export type MapSettingsQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: getPageQuery
-// Query: *[_type == 'page' && slug.current == $leaf && !coalesce(pathOnly, false)]{      _id,  _type,  name,  slug,  "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),  "pageBuilder": pageBuilder[]{    ...,    _type == "heroVideo" => {      ...,      "videoUrl": video.asset->url    },  }  }[path == $path][0]
+// Query: *[_type == 'page' && slug.current == $leaf && !coalesce(pathOnly, false)]{      _id,  _type,  name,  slug,  "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),    pageBuilder[]{    ...,    _type == "heroVideo" => {      ...,      "videoUrl": video.asset->url    },  }  }[path == $path][0]
 export type GetPageQueryResult = {
   _id: string
   _type: 'page'
   name: string
   slug: Slug
   path: string | null
-  pageBuilder: Array<{
-    _key: string
-    _type: 'heroVideo'
-    video: {
-      asset?: SanityFileAssetReference
-      media?: unknown
-      _type: 'file'
-    }
-    poster: {
-      asset?: SanityImageAssetReference
-      media?: unknown
-      hotspot?: SanityImageHotspot
-      crop?: SanityImageCrop
-      _type: 'image'
-    }
-    alt: string
-    autoplay?: boolean
-    videoUrl: string | null
-  }> | null
+  pageBuilder: Array<
+    | {
+        _key: string
+        _type: 'hero'
+        eyebrow?: string
+        heading?: string
+        body?: string
+        image?: {
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          alt?: string
+          _type: 'image'
+        }
+      }
+    | {
+        _key: string
+        _type: 'heroImage'
+        eyebrow: string
+        heading: string
+        image: {
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          alt: string
+          _type: 'image'
+        }
+      }
+    | {
+        _key: string
+        _type: 'heroSecondary'
+        eyebrow?: string
+        body?: string
+        image: {
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          alt: string
+          _type: 'image'
+        }
+        variant?: 'lowlands' | 'moody-moor'
+      }
+    | {
+        _key: string
+        _type: 'heroTertiary'
+        eyebrow?: string
+        heading?: string
+        body?: string
+      }
+    | {
+        _key: string
+        _type: 'heroVideo'
+        video: {
+          asset?: SanityFileAssetReference
+          media?: unknown
+          _type: 'file'
+        }
+        poster: {
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          _type: 'image'
+        }
+        alt: string
+        autoplay?: boolean
+        videoUrl: string | null
+      }
+  > | null
 } | null
 
 // Source: sanity/lib/queries.ts
 // Variable: landingPageQuery
-// Query: *[    _type == "page" && !coalesce(pathOnly, false)    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref  ][0]{      _id,  _type,  name,  slug,  "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),  "pageBuilder": pageBuilder[]{    ...,    _type == "heroVideo" => {      ...,      "videoUrl": video.asset->url    },  }  }
+// Query: *[    _type == "page" && !coalesce(pathOnly, false)    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref  ][0]{      _id,  _type,  name,  slug,  "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),    pageBuilder[]{    ...,    _type == "heroVideo" => {      ...,      "videoUrl": video.asset->url    },  }  }
 export type LandingPageQueryResult = {
   _id: string
   _type: 'page'
   name: string
   slug: Slug
   path: string | null
-  pageBuilder: Array<{
-    _key: string
-    _type: 'heroVideo'
-    video: {
-      asset?: SanityFileAssetReference
-      media?: unknown
-      _type: 'file'
-    }
-    poster: {
-      asset?: SanityImageAssetReference
-      media?: unknown
-      hotspot?: SanityImageHotspot
-      crop?: SanityImageCrop
-      _type: 'image'
-    }
-    alt: string
-    autoplay?: boolean
-    videoUrl: string | null
-  }> | null
+  pageBuilder: Array<
+    | {
+        _key: string
+        _type: 'hero'
+        eyebrow?: string
+        heading?: string
+        body?: string
+        image?: {
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          alt?: string
+          _type: 'image'
+        }
+      }
+    | {
+        _key: string
+        _type: 'heroImage'
+        eyebrow: string
+        heading: string
+        image: {
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          alt: string
+          _type: 'image'
+        }
+      }
+    | {
+        _key: string
+        _type: 'heroSecondary'
+        eyebrow?: string
+        body?: string
+        image: {
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          alt: string
+          _type: 'image'
+        }
+        variant?: 'lowlands' | 'moody-moor'
+      }
+    | {
+        _key: string
+        _type: 'heroTertiary'
+        eyebrow?: string
+        heading?: string
+        body?: string
+      }
+    | {
+        _key: string
+        _type: 'heroVideo'
+        video: {
+          asset?: SanityFileAssetReference
+          media?: unknown
+          _type: 'file'
+        }
+        poster: {
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          _type: 'image'
+        }
+        alt: string
+        autoplay?: boolean
+        videoUrl: string | null
+      }
+  > | null
 } | null
 
 // Source: sanity/lib/queries.ts
@@ -937,8 +1110,8 @@ declare module '@sanity/client' {
     '\n  *[_type == "project" && defined(slug.current)] | order(name asc) {\n    _id,\n    name,\n    "slug": slug.current,\n    boundaryId,\n    location,\n    description,\n    link,\n    "image": image{"url": asset->url, alt},\n    "propertyTypes": propertyTypes[]->{"slug": slug.current, title},\n    "resources": resources[]->{"slug": slug.current, title}\n  }\n': ProjectsQueryResult
     '{\n  "propertyTypes": *[_type == "propertyType" && defined(slug.current)] | order(title asc){\n    "slug": slug.current,\n    title\n  },\n  "resources": *[_type == "resource" && defined(slug.current)] | order(title asc){\n    "slug": slug.current,\n    title\n  }\n}': MapFiltersQueryResult
     '\n  *[_type == "projectSettings" && _id == "projectSettings"][0]{\n    eyebrow,\n    heading,\n    intro,\n    "boundaryDataUrl": boundaryData.asset->url,\n    "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),\n    "trailsDataUrl": trailsData.asset->url,\n    defaultCenter,\n    defaultZoom\n  }\n': MapSettingsQueryResult
-    '\n  *[_type == \'page\' && slug.current == $leaf && !coalesce(pathOnly, false)]{\n    \n  _id,\n  _type,\n  name,\n  slug,\n  "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  "pageBuilder": pageBuilder[]{\n    ...,\n    _type == "heroVideo" => {\n      ...,\n      "videoUrl": video.asset->url\n    },\n  }\n\n  }[path == $path][0]\n': GetPageQueryResult
-    '\n  *[\n    _type == "page" && !coalesce(pathOnly, false)\n    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref\n  ][0]{\n    \n  _id,\n  _type,\n  name,\n  slug,\n  "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  "pageBuilder": pageBuilder[]{\n    ...,\n    _type == "heroVideo" => {\n      ...,\n      "videoUrl": video.asset->url\n    },\n  }\n\n  }\n': LandingPageQueryResult
+    '\n  *[_type == \'page\' && slug.current == $leaf && !coalesce(pathOnly, false)]{\n    \n  _id,\n  _type,\n  name,\n  slug,\n  "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  \n  pageBuilder[]{\n    ...,\n    _type == "heroVideo" => {\n      ...,\n      "videoUrl": video.asset->url\n    },\n  }\n\n\n  }[path == $path][0]\n': GetPageQueryResult
+    '\n  *[\n    _type == "page" && !coalesce(pathOnly, false)\n    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref\n  ][0]{\n    \n  _id,\n  _type,\n  name,\n  slug,\n  "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  \n  pageBuilder[]{\n    ...,\n    _type == "heroVideo" => {\n      ...,\n      "videoUrl": video.asset->url\n    },\n  }\n\n\n  }\n': LandingPageQueryResult
     '\n  *[\n    _type == "page" && defined(slug.current) && !coalesce(pathOnly, false)\n  ] {\n    _type,\n    _updatedAt,\n    "slug": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  }\n': SitemapDataResult
     '\n  *[_type == "page" && defined(slug.current) && !coalesce(pathOnly, false)]\n  {"slug": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}\n': PagesSlugsResult
   }

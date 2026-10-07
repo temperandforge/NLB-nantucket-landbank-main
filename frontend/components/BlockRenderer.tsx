@@ -1,5 +1,9 @@
 import React from 'react'
 
+import Hero from '@/components/blocks/Hero'
+import HeroImage from '@/components/blocks/HeroImage'
+import HeroSecondary from '@/components/blocks/HeroSecondary'
+import HeroTertiary from '@/components/blocks/HeroTertiary'
 import HeroVideo from '@/components/HeroVideo'
 import {dataAttr} from '@/sanity/lib/utils'
 import {PageBuilderSection} from '@/sanity/lib/types'
@@ -9,6 +13,7 @@ type BlockProps = {
   block: PageBuilderSection
   pageId: string
   pageType: string
+  pageName?: string
 }
 
 type BlocksType = {
@@ -17,12 +22,16 @@ type BlocksType = {
 
 const Blocks = {
   heroVideo: HeroVideo,
+  hero: Hero,
+  heroImage: HeroImage,
+  heroSecondary: HeroSecondary,
+  heroTertiary: HeroTertiary,
 } as BlocksType
 
 /**
  * Used by the <PageBuilder>, this component renders a the component that matches the block type.
  */
-export default function BlockRenderer({block, index, pageId, pageType}: BlockProps) {
+export default function BlockRenderer({block, index, pageId, pageType, pageName}: BlockProps) {
   // Block does exist
   if (typeof Blocks[block._type] !== 'undefined') {
     return (
@@ -40,6 +49,7 @@ export default function BlockRenderer({block, index, pageId, pageType}: BlockPro
           index: index,
           pageId: pageId,
           pageType: pageType,
+          pageName: pageName,
         })}
       </div>
     )

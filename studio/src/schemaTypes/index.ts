@@ -4,6 +4,10 @@ import {project} from './documents/project'
 import {propertyType} from './documents/propertyType'
 import {resource} from './documents/resource'
 import {heroVideo} from './objects/heroVideo'
+import {hero} from './objects/hero'
+import {heroImage} from './objects/heroImage'
+import {heroSecondary} from './objects/heroSecondary'
+import {heroTertiary} from './objects/heroTertiary'
 import {settings} from './singletons/settings'
 import {footer} from './singletons/footer'
 import {projectSettings} from './singletons/projectSettings'
@@ -36,6 +40,10 @@ export const schemaTypes = [
   blockContent,
   blockContentTextOnly,
   heroVideo,
+  hero,
+  heroImage,
+  heroSecondary,
+  heroTertiary,
   link,
   // Menu building blocks - menuGroup nests menuLink, capped at two levels
   menuGroup,

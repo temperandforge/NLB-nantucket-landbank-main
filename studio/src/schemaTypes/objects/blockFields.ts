@@ -1,0 +1,56 @@
+import {defineField} from 'sanity'
+
+/** The small uppercase label above a heading. Optional everywhere in the theme. */
+export const eyebrowField = () =>
+  defineField({
+    name: 'eyebrow',
+    title: 'Eyebrow',
+    type: 'string',
+    description: 'Short label shown in small capitals above the heading.',
+  })
+
+/**
+ * An image with the alt text stored on the image itself, so it travels with the asset reference
+ * in a query. Required where the block makes no sense without it.
+ */
+export const imageWithAltField = ({
+  name = 'image',
+  title = 'Image',
+  required = false,
+}: {name?: string; title?: string; required?: boolean} = {}) =>
+  defineField({
+    name,
+    title,
+    type: 'image',
+    options: {hotspot: true},
+    fields: [
+      defineField({
+        name: 'alt',
+        title: 'Alt text',
+        type: 'string',
+        description: 'Describe the image for people using a screen reader.',
+        validation: required ? (rule) => rule.required() : undefined,
+      }),
+    ],
+    validation: required ? (rule) => rule.required() : undefined,
+  })
+
+/**
+ * The semantic level of a block's heading. A page with no hero above needs one real H1, so this
+ * is an accessibility decision rather than a style choice.
+ */
+export const headingLevelField = (initial: 'h1' | 'h2') =>
+  defineField({
+    name: 'headingLevel',
+    title: 'Heading level',
+    type: 'string',
+    options: {
+      list: [
+        {title: 'H1 (the page’s main heading)', value: 'h1'},
+        {title: 'H2', value: 'h2'},
+      ],
+      layout: 'radio',
+    },
+    initialValue: initial,
+    description: 'Use H1 only once per page.',
+  })

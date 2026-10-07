@@ -143,6 +143,32 @@ export const mapSettingsQuery = defineQuery(`
   }
 `)
 
+/** Projects a Portable Text field and resolves page references inside its link annotations. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const portableText = (field: string) => /* groq */ `
+  ${field}[]{
+    ...,
+    markDefs[]{
+      ...,
+      ${linkReference}
+    }
+  }
+`
+
+/**
+ * The page builder's sections. Each block type that holds a reference, a file or Portable Text
+ * adds a branch here; plain fields come through the spread.
+ */
+const pageBuilderFields = /* groq */ `
+  pageBuilder[]{
+    ...,
+    _type == "heroVideo" => {
+      ...,
+      "videoUrl": video.asset->url
+    },
+  }
+`
+
 /**
  * The projection shared by every query that renders a page, so a page looked up by path and the
  * landing page chosen in Site Settings come back in the same shape.
@@ -153,13 +179,7 @@ const pageFields = /* groq */ `
   name,
   slug,
   "path": ${pagePath},
-  "pageBuilder": pageBuilder[]{
-    ...,
-    _type == "heroVideo" => {
-      ...,
-      "videoUrl": video.asset->url
-    },
-  }
+  ${pageBuilderFields}
 `
 
 /**
