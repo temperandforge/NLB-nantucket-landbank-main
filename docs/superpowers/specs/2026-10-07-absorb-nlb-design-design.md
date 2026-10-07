@@ -130,6 +130,10 @@ keeps a single "project". The theme's separate work-"project" type is not carrie
 - The Figma nodes for the anchor-links design (`2668:7765`, `2668:12795`) are not readable through
   the Figma tool. Phase A builds it from `nlb-design`'s `link-item` and the 16px spacing given in
   the request, and verifies it against a screenshot from the user.
+- Follow-up issues: design tokens to confirm with the designer
+  ([#14](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/14)) and a visual
+  comparison of the reworked blocks against Figma in Presentation
+  ([#15](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/15)).
 
 ## Verification
 

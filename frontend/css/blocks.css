@@ -2,9 +2,6 @@
  * Page-builder block styles ported from the nlb-v2 WordPress theme (assets/src/main.css and each
  * blocks/<name>/style.css). Tokens live in tokens.css; this file adds only what the blocks need
  * and tokens.css does not have.
- *
- * Source of the fluid heading scale: the theme's architecture.md "Typography". Linear through
- * (375px, mobile) and (1440px, desktop), extrapolated to 1920px for the ceiling.
  */
 
 @theme {
@@ -12,43 +9,6 @@
   --spacing-section-p-md: 96px;
   --spacing-section-p-lg: 128px;
   --spacing-section-p-xl: 160px;
-}
-
-@utility heading-base {
-  font-family: var(--font-primary);
-  font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.05em;
-}
-
-@utility text-h1 {
-  @apply heading-base;
-  font-size: clamp(2.5rem, 1.7738rem + 3.0986vw, 5.4921rem);
-}
-
-@utility text-h2 {
-  @apply heading-base;
-  font-size: clamp(2.1875rem, 1.6593rem + 2.2535vw, 4.3636rem);
-}
-
-@utility text-h3 {
-  @apply heading-base;
-  font-size: clamp(1.9375rem, 1.5854rem + 1.5023vw, 3.3882rem);
-}
-
-@utility text-h4 {
-  @apply heading-base;
-  font-size: clamp(1.75rem, 1.5299rem + 0.939vw, 2.6567rem);
-}
-
-@utility text-h5 {
-  @apply heading-base;
-  font-size: clamp(1.5625rem, 1.4525rem + 0.4695vw, 2.0158rem);
-}
-
-@utility text-h6 {
-  @apply heading-base;
-  font-size: clamp(1.375rem, 1.331rem + 0.1878vw, 1.5563rem);
 }
 
 /**

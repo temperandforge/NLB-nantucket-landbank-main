@@ -577,6 +577,60 @@ and `lowlands` tokens. The theme's `warm-neutral-800` (#4b4234) maps to `moody-m
 (#533b28), which is noticeably redder. The Lowlands hero panel keeps the theme's `#5F8154` rather
 than `lowlands-800` (#63795b).
 
+## 8. Absorbing nlb-design
+
+The standalone `nlb-design` project (a Next.js build of the Figma designs with hard-coded content)
+is absorbed as Sanity-driven blocks. Design: [the absorption spec](superpowers/specs/2026-10-07-absorb-nlb-design-design.md).
+Its docs now live in [design/](design/README.md).
+
+### 8.1 Where nlb-design and a theme-ported block overlap, nlb-design wins
+
+**Status:** Implemented (Phase A)
+
+Basic - Left Right Text, Hero - Tertiary (with an H2 option standing in for nlb-design's Section
+Intro), Hero - Image (nlb-design's Hero Quaternary) and Timeline (its History Slider) take
+nlb-design's design. Mission Statement and CTA Contact are new blocks.
+
+**Why:** nlb-design is the newer, Figma-faithful build; the theme port was a stopgap.
+
+**Implication:** Don't consult the WordPress theme for these blocks. Phase B (cards, news and
+events previews, FAQ, people and project grids, with their content types) is still to do.
+
+### 8.2 The headline system was replaced, not added to
+
+**Status:** Implemented
+
+`--text-display-*` and `--text-headline-*` in `tokens.css` are nlb-design's fluid clamps (plus
+`--text-headline-2xl`), and the `text-headline-*` utilities carry the serif heading style (-0.05em,
+1.1). `--tracking-wide` is 2px; tags and eyebrows use it. The slice 1 `text-h1`..`text-h6`
+utilities were removed and their users moved to `text-headline-*` by visual size.
+
+**Why:** Three parallel heading scales would have drifted. One scale, from Figma.
+
+**Implication:** The footer's `text-headline-base` now also gets the heading style. Its explicit
+`leading-[1.3]` still wins, but it gains -0.05em tracking: check it against the design
+([#14](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/14)).
+
+### 8.3 Differences kept on purpose
+
+**Status:** Implemented, to confirm with the designer ([#14](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/14))
+
+- Hover overlays: nlb-design uses translucent mixes, `tokens.css` has solid hexes. The UI CSS uses
+  its own `--ui-hover-darker` / `--ui-hover-lighter` and leaves `--color-hover-*` alone.
+- `tf-px` keeps this repo's clamp, not nlb-design's.
+- Basic - Left Right Text buttons are Primary, Secondary or Ghost (the design system's button
+  styles, Primary by default): the Figma links given did not specify one.
+- The light-brown Hero - Secondary uses nlb-design's `decorative-line-hero.svg`, the closest local
+  match to the Figma vector.
+
+### 8.4 Rich text offers H3-H6, and anchor links
+
+**Status:** Implemented
+
+`blockContent` no longer offers H1 or H2 (a page's main heading belongs to the block's heading
+field), and gains an **Anchor links** item: a stack of link rows, each a label, a link and an arrow
+or download icon, 16px apart.
+
 ## Known outstanding items
 
 Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-design.md):

@@ -14,6 +14,8 @@
  * content-addressed, so re-running reuses them). Idempotent: if a page with that slug exists in
  * any state, it does nothing. It never overwrites or edits an existing page.
  *
+ * Block fields change over time: an existing gallery is not updated (this script never edits a
+ * page), so remove it with --remove and seed again to pick up new or changed blocks.
  * --remove deletes the gallery page (draft and published) after printing what it will delete.
  * --publish makes the gallery publicly visible on the live site until it is removed: only use it
  * when that is acceptable. --dry prints the plan without writing, and combines with --remove.
@@ -136,21 +138,67 @@ async function main() {
     {
       _type: 'basicLeftRightText',
       _key: key(),
-      eyebrow: 'Basic - Left Right Text',
-      heading: 'Left column heading',
+      eyebrow: 'Property transfers',
+      heading: 'Getting started with property transfers',
       headingLevel: 'h2',
-      body: [text('Left column body text that stays in view while the right column scrolls.')],
-      button: {
-        _type: 'button',
-        buttonText: 'A real link',
-        link: {_type: 'link', linkType: 'href', href: '/map'},
-      },
+      buttons: [
+        {
+          _type: 'blockButton',
+          _key: key(),
+          label: 'Primary button',
+          variant: 'primary',
+          link: {_type: 'link', linkType: 'href', href: '/map'},
+        },
+        {
+          _type: 'blockButton',
+          _key: key(),
+          label: 'Secondary button',
+          variant: 'secondary',
+          link: {_type: 'link', linkType: 'href', href: '/map'},
+        },
+        {
+          _type: 'blockButton',
+          _key: key(),
+          label: 'Ghost button',
+          variant: 'ghost',
+          link: {_type: 'link', linkType: 'href', href: '/map'},
+        },
+      ],
       rightContent: [
-        text('Right column heading', 'h3'),
-        text('Right column paragraph.'),
+        text('How it works', 'h3'),
+        text('Everything you need to complete your property transfer is on our site.'),
+        text('Basic transfer forms', 'h3'),
+        text('Every transaction begins with Form 1, which is required for all transfers.'),
         bullet('First list item'),
         bullet('Second list item'),
-        {...imageValue(pond, 'Long Pond'), _key: key()},
+        {
+          _type: 'anchorLinks',
+          _key: key(),
+          links: [
+            {
+              _type: 'anchorLink',
+              _key: key(),
+              label: 'A link row with the arrow icon',
+              icon: 'link',
+              link: {_type: 'link', linkType: 'href', href: '/map'},
+            },
+            {
+              _type: 'anchorLink',
+              _key: key(),
+              label: 'A download row with the download icon',
+              icon: 'download',
+              link: {_type: 'link', linkType: 'href', href: '/map'},
+            },
+            {
+              // A page link with no page chosen: must not render a row.
+              _type: 'anchorLink',
+              _key: key(),
+              label: 'Should not appear',
+              icon: 'link',
+              link: {_type: 'link', linkType: 'page'},
+            },
+          ],
+        },
       ],
     },
     {
@@ -183,13 +231,14 @@ async function main() {
     {
       _type: 'timeline',
       _key: key(),
-      entries: [
-        {_key: key(), _type: 'timelineEntry', year: '1983', title: 'First milestone', description: 'What happened.'},
-        {_key: key(), _type: 'timelineEntry', year: '1990', title: 'Second milestone', description: 'What happened next.'},
-        {_key: key(), _type: 'timelineEntry', year: '2001', title: 'Third milestone'},
-        {_key: key(), _type: 'timelineEntry', year: '2015', title: 'Fourth milestone', description: 'And more.'},
-        {_key: key(), _type: 'timelineEntry', year: '2024', title: 'Fifth milestone', description: 'Today.'},
-      ],
+      // Twelve entries: more than the ten connector line lengths, so they cycle.
+      entries: Array.from({length: 12}, (_, i) => ({
+        _key: key(),
+        _type: 'timelineEntry',
+        year: String(1980 + i * 4),
+        title: `Milestone ${i + 1}`,
+        description: i % 3 === 2 ? undefined : 'What happened on this date on Nantucket.',
+      })),
     },
     {
       _type: 'downloadBlock',
@@ -203,6 +252,47 @@ async function main() {
     // Hidden: must be absent on the live site and badged in Presentation.
     {_type: 'mapTeaser', _key: key(), heading: 'Hidden map teaser', body: 'Should only appear in Presentation, with a Hidden badge.', disabled: true},
     {_type: 'contactForm', _key: key(), heading: 'Contact form'},
+    {
+      _type: 'heroTertiary',
+      _key: key(),
+      eyebrow: 'Hero - Tertiary, H2',
+      heading: 'A section intro',
+      headingLevel: 'h2',
+      body: 'The same layout with an H2, used further down a page.',
+    },
+    {
+      _type: 'heroSecondary',
+      _key: key(),
+      eyebrow: 'Conservation',
+      body: 'Light brown variant: a light panel with the larger body size.',
+      variant: 'light-brown',
+      image: imageValue(jetties, 'Jetties Beach'),
+    },
+    {
+      _type: 'missionStatement',
+      _key: key(),
+      eyebrow: 'Our mission',
+      heading: 'Preserving Nantucket’s open spaces for the public while adapting to the island’s needs with balance, simplicity, and care.',
+      links: [
+        {_type: 'missionLink', _key: key(), label: 'Agriculture', link: {_type: 'link', linkType: 'href', href: '/map'}},
+        {_type: 'missionLink', _key: key(), label: 'Conservation', link: {_type: 'link', linkType: 'href', href: '/map'}},
+        {_type: 'missionLink', _key: key(), label: 'Should not appear', link: {_type: 'link', linkType: 'page'}},
+      ],
+    },
+    {
+      _type: 'ctaContact',
+      _key: key(),
+      heading: 'Contact Us',
+      body: 'Have a question, need more information, or not sure where to start? Reach out.',
+      button: {_type: 'button', buttonText: 'Reach out', link: {_type: 'link', linkType: 'href', href: '/map'}},
+      desktopImage: {_type: 'image', asset: ref(beach)},
+      mobileImage: {_type: 'image', asset: ref(beach)},
+    },
+    {
+      _type: 'timeline',
+      _key: key(),
+      entries: [{_key: key(), _type: 'timelineEntry', year: '1983', title: 'The only milestone', description: 'One slide.'}],
+    },
 
     // Empty states: every optional field empty. These must render without error or junk.
     {_type: 'hero', _key: key()},
@@ -213,8 +303,14 @@ async function main() {
       _key: key(),
       heading: 'Empty state: button with no link',
       // Text but a page link with no page chosen: it must not render a button.
-      button: {_type: 'button', buttonText: 'Should not appear', link: {_type: 'link', linkType: 'page'}},
+      buttons: [
+        {_type: 'blockButton', _key: key(), label: 'Should not appear', variant: 'primary', link: {_type: 'link', linkType: 'page'}},
+      ],
+      // An anchor links item with zero links renders nothing.
+      rightContent: [{_type: 'anchorLinks', _key: key(), links: []}],
     },
+    {_type: 'missionStatement', _key: key(), heading: 'Empty state: a statement with no links.'},
+    {_type: 'ctaContact', _key: key()},
     {_type: 'jumpNavContent', _key: key()},
     {_type: 'imageCarousel', _key: key()},
     {_type: 'timeline', _key: key()},
