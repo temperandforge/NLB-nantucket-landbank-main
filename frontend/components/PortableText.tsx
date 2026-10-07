@@ -39,7 +39,7 @@ export default function CustomPortableText({
   /** Block _key -> id for H2 section headings, so a jump nav can link to them. */
   sectionIds?: Record<string, string>
   /** `prose` uses Tailwind Typography; `basic` uses the nlb-design rich-text styles. */
-  variant?: 'prose' | 'basic'
+  variant?: 'prose' | 'basic' | 'article'
 }) {
   const components: PortableTextComponents = {
     types: {
@@ -77,16 +77,17 @@ export default function CustomPortableText({
         if (!value?.asset?._ref) {
           return null
         }
-
+        const isArticle = variant === 'article'
         return (
-          <figure className="my-8">
+          <figure className={isArticle ? '' : 'my-8'}>
             <Image
               id={value.asset._ref}
               alt={value.alt || ''}
-              width={672}
+              width={isArticle ? 1640 : 672}
+              sizes={isArticle ? '(min-width: 820px) 820px, 100vw' : undefined}
               crop={value.crop}
               mode="cover"
-              className="rounded-sm"
+              className={isArticle ? 'h-[362px] w-full rounded object-cover' : 'rounded-sm'}
             />
           </figure>
         )
@@ -166,7 +167,9 @@ export default function CustomPortableText({
       className={
         variant === 'basic'
           ? `rich-text-basic ${className ?? ''}`
-          : `prose-a:text-brand prose dark:prose-invert ${className}`
+          : variant === 'article'
+            ? `rich-text-article ${className ?? ''}`
+            : `prose-a:text-brand prose dark:prose-invert ${className}`
       }
     >
       <PortableText components={components} value={value} />

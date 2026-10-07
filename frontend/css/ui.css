@@ -332,3 +332,69 @@
 .map-teaser__lines {
   background: url('/images/blocks/map-teaser-lines.svg') 0 -541px / 10381.64px 1369.495px no-repeat;
 }
+
+/* Article body (Figma news template, 1910:14865): body text, 20px between paragraphs, 40px around
+   an image, headings from the headline scale. */
+.rich-text-article {
+  color: var(--color-on-background);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-base);
+  line-height: 1.6;
+}
+
+.rich-text-article > * + * {
+  margin-top: 1.25rem;
+}
+
+.rich-text-article > figure {
+  margin-block: 2.5rem;
+}
+
+.rich-text-article > :first-child {
+  margin-top: 0;
+}
+
+.rich-text-article > h3,
+.rich-text-article > h4,
+.rich-text-article > h5,
+.rich-text-article > h6 {
+  margin-top: 2.5rem;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+}
+
+.rich-text-article > h3 {
+  font-size: var(--text-headline-lg);
+}
+
+.rich-text-article > h4 {
+  font-size: var(--text-headline-base);
+}
+
+.rich-text-article > h5,
+.rich-text-article > h6 {
+  font-size: var(--text-headline-sm);
+}
+
+.rich-text-article a:not(.link-item--inactive) {
+  text-decoration: underline;
+}
+
+.rich-text-article ul,
+.rich-text-article ol {
+  padding-left: 1.5rem;
+}
+
+.rich-text-article ul {
+  list-style: disc;
+}
+
+.rich-text-article ol {
+  list-style: decimal;
+}
+
+.article-curve {
+  background: url('/images/blocks/article-curve.svg') center / 100% 100% no-repeat;
+}
