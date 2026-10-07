@@ -882,6 +882,94 @@ theme's `nlb_faq` posts are test content and are not migrated.
 categories from the Phase B seed before matching (one sample shares a question with a real FAQ).
 The `form-filing` category already exists and is reused as it stands.
 
+## 15. Forms
+
+### 15.1 A form is a document of sections of typed fields
+
+**Status:** Implemented
+
+`form` has `sections[]`, each with an optional heading, a column count, and `formField` objects
+(one type with a `fieldType`). A form is placed by reference: embedded in Basic Left Right Text's
+right-column rich text (`blockContentWithForm`), or chosen on a Contact Form block. Options are
+plain strings, and the stored answer is the option text. A show-if may target a dropdown,
+multi-select, checkbox group or radio group.
+
+**Why:** Both Figma layouts, and any later form, are the same shape; editors can extend forms
+without a deploy.
+
+**Implication:** Choice answers are stored as the option text, so renaming an option detaches
+earlier answers and any show-if that names it (Studio flags the show-if).
+
+### 15.2 Validation is shared and always repeated on the server
+
+**Status:** Implemented
+
+`frontend/sanity/lib/forms.ts` decides visibility and validity for both the browser (`FormRenderer`)
+and `POST /api/forms/[formId]`. The route re-reads the **published** form and keeps only the answers
+the form asks for. It rejects form ids that do not match `/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/` (404),
+rate-limits per IP, drops honeypot hits silently with a 200, verifies Turnstile when
+`TURNSTILE_SECRET_KEY` is set, and reports a failed Sanity read as a 500.
+
+**Why:** A visitor's JSON is untrusted. One implementation means the two cannot disagree.
+
+### 15.3 Submissions are stored, not emailed (yet)
+
+**Status:** Implemented; email deferred
+
+`formSubmission` documents hold a snapshot of each question and answer, with a weak reference to
+the form, written with a server-only `SANITY_WRITE_TOKEN`. Deferred, each with an issue: email
+notification (#17), retention (#18), file uploads (#19), role-based access to submissions (#20).
+Interim: the in-memory per-IP rate limiter, which is per instance, capped and evicts the oldest
+entry (#21), and the general-purpose write token (#22). Issue #12 (the contact form had no backend)
+is closed by the storage work, except for email.
+
+### 15.4 Accessibility choices that differ from the obvious
+
+**Status:** Implemented
+
+- **Focus on form controls adds an outline to the design system's border.** The Input's focus state
+  is a 1px `border-light` border, below 3:1 contrast, so focus also draws a 2px `border-dark`
+  outline.
+- **Radio groups** put `role="radiogroup"` on the fieldset; `required` and `invalid` are exposed
+  only there. Choice inputs are named by their field (`name` is the field name).
+- **Checkbox groups** carry the `*` in the legend and their error through `aria-describedby`.
+- **The multi-select trigger** is `role="combobox"`; focus moves into a listbox while it is open.
+- **No native `maxLength`.** Validation and the counter report overflow instead of silently
+  truncating typed text.
+- **Icons.** Time fields use the Figma clock-2 icon (`Clock2Icon`). The design system has no radio
+  icons, so radios use circle icons drawn to match the square ones.
+
+### 15.5 Verification still to do by a person
+
+**Status:** Not yet run (needs seeded, published forms, a dev server and the write token)
+
+The browser and keyboard pass, and the live POST checks, were not run. To do:
+
+1. Seed the forms: `cd studio && npx sanity exec scripts/seedForms.ts --with-user-token -- --dry`,
+   read the plan, then run it again without `--dry`.
+2. Publish the forms and place them on pages (a Contact Form block with "Contact Us", and a Basic
+   Left Right Text block with a form in the right column).
+3. Run `cd studio && npx sanity exec scripts/verifyForms.ts --with-user-token`.
+4. Set `SANITY_WRITE_TOKEN` (and optionally the Turnstile keys) in `frontend/.env.local`, then start
+   the dev server.
+5. Keyboard-only pass at desktop and mobile widths:
+   - Tab reaches every control in visual order, never the honeypot, and a focus indicator shows on
+     every stop including radios and checkboxes; a radio group is one tab stop.
+   - Space and arrows operate checkboxes and radios; the native select opens with Alt+ArrowDown or
+     Space and chooses with arrows and Enter.
+   - Multi-select: Enter, Space and ArrowDown open it with focus in the list; Up/Down/Home/End move;
+     typing a letter jumps; Space toggles; Tab closes it and moves on. Escape returns focus to the
+     trigger with no validation flash.
+   - Tab order after a show-if toggles: "Yes" inserts the dependent field after the radio, "No"
+     removes it, and submitting with it hidden does not report it.
+   - A failed submit focuses the first invalid field, the alert announces the count, each error is
+     read with its field (`aria-invalid`, `aria-describedby`, `aria-required`), and a valid answer
+     clears its error.
+   - A double submit makes one request; the button reads "Sending…" and is disabled in between.
+   - Compare each Input state with the design system node `499-209`.
+6. POST against the route: a 422 (invalid answers), a 429 (rate limit), a honeypot hit (200, nothing
+   stored), and a valid submission stored with the weak `form` reference.
+
 ## Known outstanding items
 
 Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-design.md):

@@ -47,7 +47,7 @@ Not a singleton, so Sanity generates its `_id` (project rule).
 
 ### Field types
 
-Each is an array member object with a shared base:
+One object type, `formField`, with a `fieldType` list and a shared base:
 
 - `label` (string, required)
 - `name` (slug-like key, auto-derived from the label, unique within the form, required): the stable
@@ -65,18 +65,17 @@ Types and their extras:
 | --- | --- |
 | `text`, `email`, `phone`, `number` | `placeholder` |
 | `textarea` | `placeholder`, `maxLength` (shows the "0/250" counter) |
-| `select`, `multiSelect` | `placeholder`, `options[]` (`label`, `value`) |
+| `select`, `multiSelect` | `placeholder`, `options[]` (plain strings; the chosen text is stored) |
 | `date`, `time` | none (native pickers) |
-| `checkboxGroup`, `radioGroup` | `options[]` (`label`, `value`) |
+| `checkboxGroup`, `radioGroup` | `options[]` (plain strings; the chosen text is stored) |
 
-Option `value` defaults to a slug of the label. Choice categories are authored per field, not
+Choice categories are authored per field, not
 shared documents: they are form content, not site taxonomy.
 
 ### Validation (Studio)
 
 - `name` unique per form.
-- `showIf.field` must name a field that appears earlier in the form and is a `select`, `radioGroup`
-  or `checkboxGroup`; `showIf.equals` must be one of its option values.
+- `showIf.field` must name a field that appears earlier in the form and is a dropdown (`select`), multi-select, checkbox group or radio group; `showIf.equals` must be one of its option values.
 - A required field with a `showIf` is required only while it is shown; hidden fields are never
   validated, so a hidden required field cannot block submission.
 
@@ -153,7 +152,7 @@ and the discrepancy flagged.
 1. `FormRenderer` validates on blur (after first touch) and on submit. A failed submit moves focus to
    the first invalid field and shows a summary `role="alert"`.
 2. POST `/api/forms/[formId]` with `{values, turnstileToken, honeypot}`.
-3. The route handler fetches the form from Sanity (never trusting the client's copy), evaluates
+3. The route handler rejects a malformed form id (`/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/`, 404), then fetches the published form from Sanity (never trusting the client's copy), evaluates
    `showIf`, re-validates every shown field (required, type, option membership, `maxLength`), drops
    hidden fields' values, then creates a `formSubmission` with the server-only token.
 4. Success replaces the form with `successMessage` (focus moved to it, announced via `role="status"`).
@@ -164,7 +163,7 @@ and the discrepancy flagged.
 
 - **Honeypot**: a visually hidden text field, `tabindex="-1"` and `aria-hidden`, with
   `autocomplete="off"`. A filled value is accepted silently (200) and discarded, so bots get no signal.
-- **Rate limit**: per-IP limit in the route handler. The store must work on the host (decided in the
+- **Rate limit**: per-IP limit in the route handler (in-memory, capped, oldest entry evicted; see #21). The store must work on the host (decided in the
   plan; an in-memory limit is not reliable on serverless).
 - **Turnstile**: shown when the site key is configured; the server verifies the token when the secret
   is configured. With no keys (local dev) it is skipped and the form works. Turnstile's widget is
