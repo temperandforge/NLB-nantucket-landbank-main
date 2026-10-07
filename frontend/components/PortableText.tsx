@@ -86,6 +86,8 @@ export default function CustomPortableText({
               width={isArticle ? 1640 : 672}
               sizes={isArticle ? '(min-width: 820px) 820px, 100vw' : undefined}
               crop={value.crop}
+              // The article crops every image to a strip, so honour the editor's focal point.
+              hotspot={isArticle ? value.hotspot : undefined}
               mode="cover"
               className={isArticle ? 'h-[362px] w-full rounded object-cover' : 'rounded-sm'}
             />

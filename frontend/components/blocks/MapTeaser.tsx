@@ -17,8 +17,8 @@ export default function MapTeaser({block}: BlockProps<'mapTeaser'>) {
 
   return (
     <section className="w-full bg-background tf-px py-10">
-      <div className="tf-max-w flex flex-col md:flex-row">
-        <div className="relative flex min-h-[28rem] flex-1 flex-col justify-between gap-16 overflow-clip bg-accent-primary p-10 md:h-[620px] md:min-h-0">
+      <div className="tf-max-w flex flex-col lg:flex-row">
+        <div className="relative flex min-h-[28rem] flex-1 flex-col justify-between gap-16 overflow-clip bg-accent-primary p-10 lg:h-[620px] lg:min-h-0">
           <div className="map-teaser__lines pointer-events-none absolute inset-0" aria-hidden="true" />
           {block.eyebrow && (
             <Eyebrow className="relative z-10 text-on-accent-primary">{block.eyebrow}</Eyebrow>
@@ -31,7 +31,7 @@ export default function MapTeaser({block}: BlockProps<'mapTeaser'>) {
           </div>
         </div>
 
-        <div className="relative min-h-[34rem] flex-1 overflow-clip bg-surface-dark md:h-[620px] md:min-h-0">
+        <div className="relative min-h-[34rem] flex-1 overflow-clip bg-surface-dark lg:h-[620px] lg:min-h-0">
           <Image
             src="/images/blocks/map-outline.svg"
             alt=""
@@ -46,10 +46,10 @@ export default function MapTeaser({block}: BlockProps<'mapTeaser'>) {
             aria-hidden="true"
             width={40}
             height={46}
-            className="pointer-events-none absolute left-[32.8%] top-[346px] h-[46.2237px] w-[40px] max-w-none"
+            className="pointer-events-none absolute left-[223px] top-[346px] h-[46.2237px] w-[40px] max-w-none"
           />
           {project?.name && (
-            <div className="absolute left-1/2 top-[93px] w-[262px] -translate-x-1/2 overflow-clip rounded-[6px] drop-shadow-[0_8px_10px_rgba(0,0,0,0.04)] md:left-[39.5%] md:translate-x-0">
+            <div className="absolute left-1/2 top-[93px] w-[262px] -translate-x-1/2 overflow-clip rounded-[6px] drop-shadow-[0_8px_10px_rgba(0,0,0,0.04)] lg:left-[39.5%] lg:translate-x-0">
               <div className="relative h-[134px] w-full bg-dusty-heath-800">
                 <BlockImage
                   image={project.image}
@@ -72,7 +72,7 @@ export default function MapTeaser({block}: BlockProps<'mapTeaser'>) {
               label={block.button?.buttonText ?? ''}
               href={buttonHref}
               rightIcon
-              className="absolute bottom-5 right-5 md:bottom-[43px] md:right-[10%]"
+              className="absolute bottom-5 right-5 lg:bottom-[43px] lg:right-10"
             />
           )}
         </div>
