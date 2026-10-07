@@ -893,7 +893,7 @@ The `form-filing` category already exists and is reused as it stands.
 
 ### 15.1 `property` replaced `project`, and the archive is a block
 
-**Status:** Implemented. The migration ran on 2026-10-07 (150 properties created, 2 with a draft; validation passed) and is safe to re-run (it skips every slug). The page seed is not run until the user says so.
+**Status:** Implemented. The migration ran on 2026-10-07 (150 properties created, 2 with a draft; validation passed) and is safe to re-run (it skips every slug). The page seed ran on 2026-10-07: draft `explore/properties` exists, to be published by the user.
 
 **Note:** the dataset also holds an older draft `property` ("Surfside Beach", slug `a`, created 2026-07-21 under the previous content model). The migration did not create or touch it; delete it in Studio if it is not wanted.
 
