@@ -267,21 +267,27 @@ console.log('rate limit key cap')
 {
   resetRateLimit()
   const t0 = 2_000_000
-  isRateLimited('old', t0)
+  const total = RATE_LIMIT_MAX_KEYS + 500
+  // 'old' exhausts its allowance first, so it is limited unless it has been evicted.
+  for (let i = 0; i < RATE_LIMIT_MAX; i++) isRateLimited('old', t0)
+  check(isRateLimited('old', t0 + 1) === true, 'the old key is limited before the flood')
   let maxSeen = 0
-  for (let i = 0; i < RATE_LIMIT_MAX_KEYS + 500; i++) {
-    isRateLimited(`spoofed-${i}`, t0 + 1 + i)
+  for (let i = 0; i < total; i++) {
+    // The last flood key makes RATE_LIMIT_MAX hits, so it is limited unless it has been evicted.
+    const hitsForKey = i === total - 1 ? RATE_LIMIT_MAX : 1
+    for (let h = 0; h < hitsForKey; h++) isRateLimited(`spoofed-${i}`, t0 + 2 + i)
     maxSeen = Math.max(maxSeen, rateLimitKeyCount())
   }
+  const tAfter = t0 + 2 + total
   check(maxSeen <= RATE_LIMIT_MAX_KEYS, 'the key count never exceeds the cap')
-  const tRecent = t0 + RATE_LIMIT_MAX_KEYS + 1000
-  for (let i = 0; i < RATE_LIMIT_MAX; i++) isRateLimited('recent', tRecent)
-  for (let i = 0; i < RATE_LIMIT_MAX_KEYS; i++) isRateLimited(`more-${i}`, tRecent + 1 + i)
-  check(rateLimitKeyCount() <= RATE_LIMIT_MAX_KEYS, 'the cap holds after more keys arrive')
-  // 'recent' was touched after 'old' and the first flood, so the oldest keys go first.
+  check(rateLimitKeyCount() === RATE_LIMIT_MAX_KEYS, 'the key count sits at the cap')
   check(
-    isRateLimited('old', tRecent + RATE_LIMIT_MAX_KEYS + 2) === false,
-    'an old key was evicted (fresh allowance)',
+    isRateLimited(`spoofed-${total - 1}`, tAfter) === true,
+    'the newest key survives the flood and is still limited',
+  )
+  check(
+    isRateLimited('old', tAfter + 1) === false,
+    'the oldest key was evicted and gets a fresh allowance',
   )
 }
 
@@ -289,15 +295,17 @@ console.log('rate limit eviction order')
 {
   resetRateLimit()
   const t0 = 3_000_000
-  // 'recent' is the first key inserted and exhausts its allowance, then is touched again late, so
-  // only recency order keeps it from being the oldest entry.
+  // 'recent' is inserted first and exhausts its allowance, then is touched again late, so only
+  // recency order keeps it from being the oldest entry. 'fill-0' is the oldest after it.
   for (let i = 0; i < RATE_LIMIT_MAX; i++) isRateLimited('recent', t0 + i)
-  for (let i = 0; i < RATE_LIMIT_MAX_KEYS - 1; i++) isRateLimited(`fill-${i}`, t0 + 100 + i)
+  for (let i = 0; i < RATE_LIMIT_MAX; i++) isRateLimited('fill-0', t0 + 100)
+  for (let i = 1; i < RATE_LIMIT_MAX_KEYS - 1; i++) isRateLimited(`fill-${i}`, t0 + 100 + i)
+  check(rateLimitKeyCount() === RATE_LIMIT_MAX_KEYS, 'the cache is exactly full')
   check(isRateLimited('recent', t0 + 10_000) === true, 'the key is limited when touched again')
   for (let i = 0; i < 10; i++) isRateLimited(`overflow-${i}`, t0 + 20_000 + i)
   check(rateLimitKeyCount() <= RATE_LIMIT_MAX_KEYS, 'still within the cap')
   check(isRateLimited('recent', t0 + 30_000) === true, 'a recently active key is not evicted')
-  check(isRateLimited('fill-0', t0 + 30_001) === false, 'an older key was evicted instead')
+  check(isRateLimited('fill-0', t0 + 30_001) === false, 'an older limited key was evicted instead')
 }
 
 process.exit(failed ? 1 : 0)
