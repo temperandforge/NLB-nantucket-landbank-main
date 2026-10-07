@@ -28,6 +28,14 @@ const normalize = (value: string) => value.replace(/\s+/g, ' ').trim().toLowerCa
 type FaqDoc = {_id: string; question?: string; order?: number; category?: string; answer?: unknown[]}
 type CategoryDoc = {_id: string; slug?: string; title?: string}
 
+/** JSON with object keys sorted: the API returns keys in its own order, which is not a difference. */
+const canonical = (value: unknown): string =>
+  JSON.stringify(value, (_key, v) =>
+    v && typeof v === 'object' && !Array.isArray(v)
+      ? Object.fromEntries(Object.entries(v as Record<string, unknown>).sort(([a], [b]) => a.localeCompare(b)))
+      : v,
+  )
+
 let failures = 0
 function check(ok: boolean, message: string): boolean {
   if (ok) console.log(`  ok   ${message}`)
@@ -76,7 +84,7 @@ async function main() {
     const expectedCategory = faq.categorySlug ? categoryIdBySlug.get(faq.categorySlug) : undefined
     check(doc.category === expectedCategory, `  category is ${faq.categorySlug ?? 'none'}`)
     check(
-      JSON.stringify(doc.answer ?? []) === JSON.stringify(faq.answer),
+      canonical(doc.answer ?? []) === canonical(faq.answer),
       `  answer matches the conversion (${faq.answer.length} block(s))`,
     )
     check(

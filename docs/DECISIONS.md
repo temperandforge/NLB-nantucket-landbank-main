@@ -856,7 +856,7 @@ validation) fits the FAQs and news, which are still to import
 
 ### 14.1 FAQs follow the people pattern, with the answers converted to Portable Text
 
-**Status:** Tooling implemented; import not yet run (waiting on a go-ahead for the dataset write)
+**Status:** Implemented (run 2026-10-07; the FAQs are drafts until published)
 
 `studio/scripts/wordpress/`: `extractFaqs.sh` (read-only; queries the tables directly so it does not
 depend on the theme registering `faq_category`), `faqs.ts` (pure transform, checked by
