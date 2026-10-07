@@ -48,6 +48,7 @@ const menuItemFields = /* groq */ `
     children[]{
       _key,
       label,
+      group,
       ${linkFields}
     }
   }
@@ -87,6 +88,29 @@ export const footerQuery = defineQuery(`
     "legalMenu": legalMenu->{
       ${menuFields}
     },
+  }
+`)
+
+/**
+ * The site header. Matched on _type and the fixed singleton id, like footerQuery. The main menu
+ * is null when the reference is unset or points at an unpublished menu - the header degrades.
+ */
+export const headerQuery = defineQuery(`
+  *[_type == "header" && _id == "header"][0]{
+    "mainMenu": mainMenu->{
+      ${menuFields}
+    }
+  }
+`)
+
+/**
+ * The site banner. Returns nothing unless it is switched on, so a disabled banner costs the
+ * frontend no branch.
+ */
+export const siteBannerQuery = defineQuery(`
+  *[_type == "siteBanner" && _id == "siteBanner" && enabled == true][0]{
+    message,
+    ${linkFields}
   }
 `)
 

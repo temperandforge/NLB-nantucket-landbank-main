@@ -1295,7 +1295,7 @@ export type SettingsQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: footerQuery
-// Query: *[_type == "footer" && _id == "footer"][0]{    newsletterHeading,    organizationName,    infoColumns[]{      _key,      heading,      lines[]{        _key,        text,        href      }    },    socialLinks[]{      _key,      platform,      url    },    "footerMenu": footerMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,        link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }    }  }  }    },    "legalMenu": legalMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,        link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }    }  }  }    },  }
+// Query: *[_type == "footer" && _id == "footer"][0]{    newsletterHeading,    organizationName,    infoColumns[]{      _key,      heading,      lines[]{        _key,        text,        href      }    },    socialLinks[]{      _key,      platform,      url    },    "footerMenu": footerMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,      group,        link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }    }  }  }    },    "legalMenu": legalMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,      group,        link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }    }  }  }    },  }
 export type FooterQueryResult = {
   newsletterHeading: string
   organizationName: string
@@ -1324,6 +1324,7 @@ export type FooterQueryResult = {
           children: Array<{
             _key: string
             label: string
+            group: string | null
             link: {
               _type: 'link'
               linkType?: 'href' | 'page'
@@ -1358,6 +1359,7 @@ export type FooterQueryResult = {
           children: Array<{
             _key: string
             label: string
+            group: string | null
             link: {
               _type: 'link'
               linkType?: 'href' | 'page'
@@ -1380,6 +1382,61 @@ export type FooterQueryResult = {
           }
         }
     >
+  } | null
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: headerQuery
+// Query: *[_type == "header" && _id == "header"][0]{    "mainMenu": mainMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,      group,        link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }    }  }  }    }  }
+export type HeaderQueryResult = {
+  mainMenu: {
+    _id: string
+    title: string
+    items: Array<
+      | {
+          _key: string
+          _type: 'menuGroup'
+          label: string
+          children: Array<{
+            _key: string
+            label: string
+            group: string | null
+            link: {
+              _type: 'link'
+              linkType?: 'href' | 'page'
+              href?: string
+              page: string | null
+              openInNewTab?: boolean
+            }
+          }>
+        }
+      | {
+          _key: string
+          _type: 'menuLink'
+          label: string
+          link: {
+            _type: 'link'
+            linkType?: 'href' | 'page'
+            href?: string
+            page: string | null
+            openInNewTab?: boolean
+          }
+        }
+    >
+  }
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: siteBannerQuery
+// Query: *[_type == "siteBanner" && _id == "siteBanner" && enabled == true][0]{    message,      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }  }
+export type SiteBannerQueryResult = {
+  message: string | null
+  link: {
+    _type: 'link'
+    linkType?: 'href' | 'page'
+    href?: string
+    page: string | null
+    openInNewTab?: boolean
   } | null
 } | null
 
@@ -2876,7 +2933,9 @@ import '@sanity/client'
 declare module '@sanity/client' {
   interface SanityQueries {
     '*[_type == "settings"][0]': SettingsQueryResult
-    '\n  *[_type == "footer" && _id == "footer"][0]{\n    newsletterHeading,\n    organizationName,\n    infoColumns[]{\n      _key,\n      heading,\n      lines[]{\n        _key,\n        text,\n        href\n      }\n    },\n    socialLinks[]{\n      _key,\n      platform,\n      url\n    },\n    "footerMenu": footerMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n    "legalMenu": legalMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n  }\n': FooterQueryResult
+    '\n  *[_type == "footer" && _id == "footer"][0]{\n    newsletterHeading,\n    organizationName,\n    infoColumns[]{\n      _key,\n      heading,\n      lines[]{\n        _key,\n        text,\n        href\n      }\n    },\n    socialLinks[]{\n      _key,\n      platform,\n      url\n    },\n    "footerMenu": footerMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      group,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n    "legalMenu": legalMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      group,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n  }\n': FooterQueryResult
+    '\n  *[_type == "header" && _id == "header"][0]{\n    "mainMenu": mainMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      group,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    }\n  }\n': HeaderQueryResult
+    '\n  *[_type == "siteBanner" && _id == "siteBanner" && enabled == true][0]{\n    message,\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  }\n': SiteBannerQueryResult
     '\n  *[_type == "project" && defined(slug.current)] | order(name asc) {\n    _id,\n    name,\n    "slug": slug.current,\n    boundaryId,\n    location,\n    description,\n    link,\n    "image": image{"url": asset->url, alt},\n    "propertyTypes": propertyTypes[]->{"slug": slug.current, title},\n    "resources": resources[]->{"slug": slug.current, title}\n  }\n': ProjectsQueryResult
     '{\n  "propertyTypes": *[_type == "propertyType" && defined(slug.current)] | order(title asc){\n    "slug": slug.current,\n    title\n  },\n  "resources": *[_type == "resource" && defined(slug.current)] | order(title asc){\n    "slug": slug.current,\n    title\n  }\n}': MapFiltersQueryResult
     '\n  *[_type == "projectSettings" && _id == "projectSettings"][0]{\n    eyebrow,\n    heading,\n    intro,\n    "boundaryDataUrl": boundaryData.asset->url,\n    "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),\n    "trailsDataUrl": trailsData.asset->url,\n    defaultCenter,\n    defaultZoom\n  }\n': MapSettingsQueryResult
