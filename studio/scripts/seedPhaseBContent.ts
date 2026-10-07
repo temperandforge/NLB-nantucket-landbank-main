@@ -10,7 +10,7 @@
  * references. Idempotent: each document is matched on a natural key (slug, name, question or
  * title) among published documents and drafts, and skipped if it exists. It never edits an
  * existing document. Events are dated relative to the day it runs, so there are always upcoming
- * ones. Staff and commissioners have no headshots: the cards must show their neutral fallback.
+ * ones. References to the draft taxonomies are weak (they strengthen on publish). Staff and commissioners have no headshots: the cards must show their neutral fallback.
  */
 
 import {randomUUID} from 'node:crypto'
@@ -27,6 +27,17 @@ const client = getCliClient({apiVersion: '2025-09-25'}).withConfig({
 const DRY_RUN = process.argv.includes('--dry')
 const key = () => randomUUID().slice(0, 8)
 const ref = (id: string) => ({_type: 'reference' as const, _ref: id})
+/**
+ * A reference to a document that exists only as a draft. A normal reference is rejected ("references
+ * non-existent document"), so this is weak and becomes strong when the referencing document is
+ * published, which is what Studio itself writes.
+ */
+const weakRef = (id: string, type: string) => ({
+  _type: 'reference' as const,
+  _ref: id,
+  _weak: true,
+  _strengthenOnPublish: {type},
+})
 
 /** Published id of a document, or of a draft of it. */
 const published = (id: string) => id.replace(/^drafts\./, '')
@@ -115,7 +126,7 @@ async function main() {
     slug: slug('moorland-carbon-study'),
     date: '2026-08-02',
     image: image(pond, 'A moorland pond'),
-    categories: [{...ref(conservation), _key: key()}],
+    categories: [{...weakRef(conservation, 'newsCategory'), _key: key()}],
     link: {_type: 'link', linkType: 'href', href: '/map'},
   })
   await ensure('article', 'slug.current', 'polpis-road-farm', {
@@ -123,7 +134,7 @@ async function main() {
     slug: slug('polpis-road-farm'),
     date: '2026-07-12',
     image: image(beach, 'A sandy path through moorland'),
-    categories: [{...ref(conservation), _key: key()}],
+    categories: [{...weakRef(conservation, 'newsCategory'), _key: key()}],
     // No link: this tile must be a plain tile, not a dead anchor.
   })
   await ensure('article', 'slug.current', 'no-category-article', {
@@ -163,19 +174,19 @@ async function main() {
   await ensure('faq', 'question', 'Where can I get paper maps?', {
     question: 'Where can I get paper maps?',
     answer: [text('Paper maps are available at our office during regular office hours.')],
-    category: ref(general),
+    category: weakRef(general, 'faqCategory'),
     order: 10,
   })
   await ensure('faq', 'question', 'Does the Land Bank have a lost and found?', {
     question: 'Does the Land Bank have a lost and found?',
     answer: [text('Yes, please call our office to check on any lost items.')],
-    category: ref(general),
+    category: weakRef(general, 'faqCategory'),
     order: 20,
   })
   await ensure('faq', 'question', 'Can I process my forms by mail?', {
     question: 'Can I process my forms by mail?',
     answer: [text('Yes, forms can be mailed to our office. Please allow additional processing time.')],
-    category: ref(filing),
+    category: weakRef(filing, 'faqCategory'),
     order: 10,
   })
   await ensure('faq', 'question', 'A question with no category', {
@@ -188,13 +199,13 @@ async function main() {
   await ensure('staffMember', 'name', 'Alex Example', {
     name: 'Alex Example',
     title: 'Executive Director',
-    department: ref(admin),
+    department: weakRef(admin, 'department'),
     order: 10,
   })
   await ensure('staffMember', 'name', 'Sam Sample', {
     name: 'Sam Sample',
     title: 'Property Manager',
-    department: ref(property),
+    department: weakRef(property, 'department'),
     order: 20,
   })
   await ensure('staffMember', 'name', 'Pat Placeholder', {
