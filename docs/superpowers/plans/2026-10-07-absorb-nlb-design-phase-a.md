@@ -1756,16 +1756,25 @@ ls docs/design
 
 Add `docs/design/README.md` (new, 10 lines): says these are `nlb-design`'s docs moved in on 2026-10-07, that `docs/DECISIONS.md` is the record for this repo, and that where they conflict `DECISIONS.md` wins. Do not edit the copied files.
 
+- [ ] **Step 3a: Remove the slice 1 heading utilities**
+
+Confirm nothing uses them, then delete them:
+
+```bash
+grep -rnE "text-h[1-6]\b|heading-base" frontend/components frontend/app || echo "no users left"
+```
+
+Expected: `no users left`. Then remove the `heading-base` and `text-h1`..`text-h6` `@utility` blocks from `frontend/css/blocks.css` (leave `tf-px`, `tf-max-w`, `--tf-x` and the section-spacing theme variables). If a user remains, migrate it by visual size first (h1 -> 2xl, h2 -> xl, h3 -> lg, h4 -> base, h5/h6 -> sm).
+
 - [ ] **Step 3: Record decisions**
 
-Append a section `## 8. Absorbing nlb-design` to `docs/DECISIONS.md` (match the existing "Status / Why / Implication" format) covering: nlb-design's visuals win on overlap; the reworked and new blocks; the typography reconciliation table from this plan (new `text-headline-*` utilities, and why); hover tokens; tracking; the `tf-px` difference; and that Phase B follows.
+Append a section `## 8. Absorbing nlb-design` to `docs/DECISIONS.md` (match the existing "Status / Why / Implication" format) covering: nlb-design's visuals win on overlap; the reworked and new blocks; the typography **replacement** (fluid `--text-headline-*` and `--text-display-*`, `text-headline-*` utilities carrying the heading style, `--tracking-wide` 2px, and the removal of the slice 1 `text-h*` utilities, with the footer's `text-headline-base` now sharing the heading style); hover tokens kept separate; the `tf-px` difference; and that Phase B follows.
 
 - [ ] **Step 4: File the follow-up issues**
 
 ```bash
-gh issue list --search "typography" --state all
-gh issue create --title "Unify typography: text-h*, text-headline-* and text-headline-*" --body "Three heading systems now coexist: text-h1..h6 (WordPress theme port), the stepwise text-headline-* tokens in tokens.css (used by the footer), and text-headline-* (nlb-design). Pick one, migrate the others, and remove the rest. See docs/DECISIONS.md section 8."
-gh issue create --title "Confirm design tokens that differ between nlb-design and tokens.css" --body "Needs the designer: letter-spacing for tags and eyebrows (nlb-design 2px vs Figma-measured 1.54px), hover overlay colours (translucent mixes vs the solid hex tokens), tf-px padding clamp, and the Lowlands hero panel colour. See docs/DECISIONS.md sections 7.5 and 8."
+gh issue list --search "design tokens" --state all
+gh issue create --title "Confirm design tokens that differ between nlb-design and tokens.css" --body "Needs the designer: hover overlay colours (translucent mixes in nlb-design vs the solid hex tokens in tokens.css), the tf-px padding clamp, the Lowlands hero panel colour, the footer's heading style now that text-headline-* carries the serif heading style, and the button style for Basic - Left Right Text buttons (assumed Primary / Secondary / Ghost). See docs/DECISIONS.md sections 7.5 and 8."
 gh issue create --title "Compare reworked blocks to the Figma designs in Presentation" --body "Phase A blocks were built from nlb-design components and checked only by type-check, lint and a production build. Review the Block gallery draft in Studio Presentation at desktop and mobile widths against Figma, including the light-brown Hero - Secondary line art and the anchor link rows (Figma nodes 2668:7765 and 2668:12795 are not readable through the Figma tool)."
 ```
 
@@ -1788,4 +1797,4 @@ Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 
 - **Spec coverage:** shared UI (Tasks 1-2); `missionStatement`, `ctaContact` (7, 8); reworked `basicLeftRightText` with rich text restricted to H3-H6 and anchor links with a link/download icon at 16px spacing (3, 4); `heroTertiary` with an H2 option replacing Section Intro (5); `heroImage` as HeroQuaternary (6); `timeline` as HistorySlider with Splide (9); assets, tokens reconciliation and docs moved in (1, 10); `heroVideo` and `Footer` untouched; gallery extended and issues filed (10). Verification gate in Global Constraints and Task 10. Phase B is not touched.
 - **Names checked across tasks:** `text-headline-*`, `py-s*`, `.basic-left-right__lines`, `.mission-statement__lines`, `LinkRow`, `LinkButton`, `Tag`, `anchorLinks`, `variant: 'prose' | 'basic'`, `TimelineSlider`/`TimelineEvent` are defined where produced and used with the same signatures later.
-- **Judgement calls an executor may hit:** the ported `TimelineSlider` may trip lint (fix minimally, ledger it); generated unions may need a cast for `rightContent` into `PortableTextBlock[]`; `BlockImage` must accept the plain CTA images (Task 8); the `HeroImage` title becomes an `<h1>` where `nlb-design` used a `<p>` (ledger it).
+- **Judgement calls an executor may hit:** the footer's `NewsletterSignup` uses `text-headline-base` and picks up the heading style (serif, -0.05em): look at it and report, do not silently restyle; Basic - Left Right Text button styles are an assumption (Primary, Secondary, Ghost); the ported `TimelineSlider` may trip lint (fix minimally, ledger it); generated unions may need a cast for `rightContent` into `PortableTextBlock[]`; `BlockImage` must accept the plain CTA images (Task 8); the `HeroImage` title becomes an `<h1>` where `nlb-design` used a `<p>` (ledger it).

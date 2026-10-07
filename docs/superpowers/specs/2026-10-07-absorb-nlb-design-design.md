@@ -38,8 +38,9 @@ into `frontend/css/` following this repo's conventions (tokens named after Figma
 
 **Reworked blocks** (existing Sanity types keep their names, so no content migration)
 
-- `basicLeftRightText` takes `BasicLeftRight`'s design: eyebrow and heading on the left; the right
-  is rich text. The theme's left-column body text and button are removed.
+- `basicLeftRightText` takes `BasicLeftRight`'s design: eyebrow and heading on the left, with an
+  optional repeater of **buttons** under them (label, link, and a Primary, Secondary or Ghost
+  style); the right is rich text. The theme's left-column body text and single button are removed.
   - Rich text offers Normal, H3-H6 and Quote only (H1 and H2 are already removed from
     `blockContent`).
   - Rich text gains an **anchor links** item: a repeater of rows, each with a label, a link and an
@@ -56,6 +57,13 @@ into `frontend/css/` following this repo's conventions (tokens named after Figma
 
 **Unchanged:** `heroSecondary` (including its light-brown variant), `jumpNavContent`,
 `imageCarousel`, `downloadBlock`, `mapTeaser`, `contactForm`.
+
+**Typography is replaced, not added to.** This repo's stepwise `--text-display-*` and
+`--text-headline-*` become `nlb-design`'s fluid clamps (plus `--text-headline-2xl`), the
+`text-headline-*` utilities carry the serif heading style, and `--tracking-wide` becomes 2px (tags
+and eyebrows use it). The slice 1 `text-h1`..`text-h6` utilities are removed and their users moved
+to `text-headline-*` by visual size. The footer's `text-headline-base` now shares the heading
+style and is flagged for a design check.
 
 **Moved in:** decorative line art, `icon-download.svg`, `icon-arrow-right.svg` and the chevrons into
 `frontend/public/`; images and the video it uses only if a block needs them; its `docs/`
