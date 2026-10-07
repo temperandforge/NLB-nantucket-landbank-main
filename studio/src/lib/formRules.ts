@@ -34,6 +34,13 @@ export function findFormProblems(form: RuleForm): FieldProblem[] {
 
   fields.forEach((field, index) => {
     const name = field.name?.current
+    if (name && !/^[a-z0-9][a-z0-9_-]*$/.test(name)) {
+      problems.push({
+        fieldKey: field._key,
+        path: 'name',
+        message: `The key "${name}" may only use lowercase letters, numbers, hyphens and underscores (it is used in element ids and stored answers)`,
+      })
+    }
     if (name) {
       if (seen.has(name)) {
         problems.push({

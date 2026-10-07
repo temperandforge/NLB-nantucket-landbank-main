@@ -933,6 +933,17 @@ Interim: the in-memory per-IP rate limiter, which is per instance, capped and ev
 entry (#21), and the general-purpose write token (#22). Issue #12 (the contact form had no backend)
 is closed by the storage work, except for email.
 
+**Requires action before go-live (OPEN, the project owner's decision).** Submissions are written to
+the content dataset, and `npx sanity dataset visibility get production` returned `public` on
+2026-10-07. While it is public, anyone who knows the project id can query stored submissions
+(names, emails, phones, addresses) through the Sanity API. Before any real form is published the
+dataset must be made private (the frontend already sends its read token), or submissions must go to
+a separate private dataset. Related to #20: in draft mode, the browser token used for live preview
+can read submissions.
+
+Turnstile: set both `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`, or neither. With
+only the secret set, every submission fails the captcha check.
+
 ### 15.4 Accessibility choices that differ from the obvious
 
 **Status:** Implemented; type-checked and linted but not yet verified in a browser (see 15.5)
@@ -959,14 +970,16 @@ browser.
 
 The browser and keyboard pass, and the live POST checks, were not run. To do:
 
-1. Seed the forms: `cd studio && npx sanity exec scripts/seedForms.ts --with-user-token -- --dry`,
+1. **Decide dataset visibility (OPEN, project owner).** See the requirement under 15.3: submissions
+   must not go live while the dataset is public.
+2. Seed the forms: `cd studio && npx sanity exec scripts/seedForms.ts --with-user-token -- --dry`,
    read the plan, then run it again without `--dry`.
-2. Publish the forms and place them on pages (a Contact Form block with "Contact Us", and a Basic
+3. Publish the forms and place them on pages (a Contact Form block with "Contact Us", and a Basic
    Left Right Text block with a form in the right column).
-3. Run `cd studio && npx sanity exec scripts/verifyForms.ts --with-user-token`.
-4. Set `SANITY_WRITE_TOKEN` (and optionally the Turnstile keys) in `frontend/.env.local`, then start
+4. Run `cd studio && npx sanity exec scripts/verifyForms.ts --with-user-token`.
+5. Set `SANITY_WRITE_TOKEN` (and, if using Turnstile, both `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`, or neither: with only the secret set every submission fails the captcha check) in `frontend/.env.local`, then start
    the dev server.
-5. Keyboard-only pass at desktop and mobile widths:
+6. Keyboard-only pass at desktop and mobile widths:
    - Tab reaches every control in visual order, never the honeypot, and a focus indicator shows on
      every stop including radios and checkboxes; a radio group is one tab stop.
    - Space and arrows operate checkboxes and radios; the native select opens with Alt+ArrowDown or
@@ -981,8 +994,13 @@ The browser and keyboard pass, and the live POST checks, were not run. To do:
      clears its error.
    - A double submit makes one request; the button reads "Sending…" and is disabled in between.
    - Compare each Input state with the design system node `499-209`.
-6. POST against the route: a 422 (invalid answers), a 429 (rate limit), a honeypot hit (200, nothing
+7. POST against the route: a 422 (invalid answers), a 429 (rate limit), a honeypot hit (200, nothing
    stored), and a valid submission stored with the weak `form` reference.
+8. Needs a real browser: the multi-select Escape-focus path, and the Turnstile case with two forms
+   on one page.
+
+A form that exists only as a draft resolves in Presentation but cannot be submitted there: the route
+reads published forms only and answers 404.
 
 ## Known outstanding items
 

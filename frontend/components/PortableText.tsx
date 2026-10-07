@@ -96,9 +96,7 @@ export default function CustomPortableText({
         )
       },
       formEmbed: ({value}) => (
-        <div className="my-10 w-full">
-          <FormView form={value?.form} />
-        </div>
+        <FormView form={value?.form} className="my-10 w-full" />
       ),
     },
     block: {

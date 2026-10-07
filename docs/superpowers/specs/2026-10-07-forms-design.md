@@ -52,7 +52,7 @@ One object type, `formField`, with a `fieldType` list and a shared base:
 - `label` (string, required)
 - `name` (slug-like key, auto-derived from the label, unique within the form, required): the stable
   key stored on submissions. Renaming a label does not change it; changing a `name` orphans old
-  submissions' keys, so Studio warns on edit.
+  submissions' keys; the field's description says so (there is no warning on edit).
 - `helperText` (string)
 - `required` (boolean)
 - `width` ("full" or "half"): half fills one cell of a 2-column section. Ignored in a 1-column
@@ -94,8 +94,9 @@ Created only by the route handler. Read-only in Studio.
 
 ### Blocks
 
-- **`contactForm`**: keep `heading`; add `details` (rich text, text-only, for phone, fax and
-  email) and `form` (reference, optional). Existing heading-only blocks continue to render.
+- **`contactForm`**: keep `heading`; add `details` (standard rich text, `blockContent`, for
+  phone, fax and email, so they can be linked with `mailto:` and `tel:` through the existing link
+  mark; editors can therefore also add images or anchor links there, which is accepted) and `form` (reference, optional). Existing heading-only blocks continue to render.
   Because `form` is optional, a block with no form renders the left column only, with no
   placeholder text.
 - **`basicLeftRightText`**: `rightContent` switches to a new rich-text type that is
@@ -116,8 +117,8 @@ Created only by the route handler. Read-only in Studio.
 
 Under `frontend/components/ui/form/`:
 
-- `Field` (label, helper, error wiring), `TextInput`, `Textarea`, `Select`, `MultiSelect`,
-  `DateInput`, `TimeInput`, `CheckboxGroup`, `RadioGroup`.
+- `Field` (label, helper, error wiring), `TextInput` (text, email, phone, number, date and time),
+  `Textarea`, `NativeSelect`, `MultiSelect`, `ChoiceGroup` (checkbox and radio groups).
 - `FormRenderer` (client component): owns values and errors, evaluates `showIf`, validates, submits.
 - `FormEmbed`: server component that renders `FormRenderer` for a portable-text `formEmbed`.
   `ContactForm` and `FormEmbed` share `FormRenderer`.
@@ -153,8 +154,8 @@ and the discrepancy flagged.
 1. `FormRenderer` validates on blur (after first touch) and on submit. A failed submit moves focus to
    the first invalid field and shows a summary `role="alert"`.
 2. POST `/api/forms/[formId]` with `{values, turnstileToken, honeypot}`.
-3. The route handler rejects a malformed form id (`/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/`, 404), then fetches the published form from Sanity (never trusting the client's copy), evaluates
-   `showIf`, re-validates every shown field (required, type, option membership, `maxLength`), drops
+3. The route handler rejects a malformed form id (`/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/`, 404), then fetches the published form from Sanity (never trusting the
+   client's copy), evaluates `showIf`, re-validates every shown field (required, type, option membership, `maxLength`), drops
    hidden fields' values, then creates a `formSubmission` with the server-only token.
 4. Success replaces the form with `successMessage` (focus moved to it, announced via `role="status"`).
    Errors return field-level messages mapped by `name`, or a generic failure message with the
@@ -175,14 +176,15 @@ and the discrepancy flagged.
 
 - `SANITY_WRITE_TOKEN` (server only, a role limited to creating `formSubmission` documents where
   Sanity permits).
-- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`.
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`. Set both or neither: with only the
+  secret set, every submission fails the captcha check.
 
 ## Keyboard and screen-reader accessibility
 
 - Use native elements wherever they exist: `<input>`, `<textarea>`, `<select>`, checkbox, radio and
   `<fieldset>`/`<legend>` for groups. Tab order is DOM order.
-- **Multi-select (custom listbox)**: the trigger is a button with `aria-haspopup="listbox"` and
-  `aria-expanded`.
+- **Multi-select (custom listbox)**: the trigger is a `role="combobox"` button that opens a
+  listbox (see DECISIONS 15.4), with `aria-haspopup="listbox"` and `aria-expanded`.
   - Enter, Space or ArrowDown opens it; focus moves into the list.
   - Up/Down move between options, Home/End jump to the first and last, and typing a character jumps
     to a match.

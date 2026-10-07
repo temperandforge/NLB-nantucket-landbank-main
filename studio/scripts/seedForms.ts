@@ -10,9 +10,18 @@
  * drafts and skipped if one exists (Sanity generates the id). It never edits an existing form and
  * never touches pages, so place the forms in Studio.
  *
- * Content still to be supplied by the client: the Property Use form's Event type, Preferred
- * location, Entertainment and Transportation options are labelled "Option 1/2/3" samples, and
- * Country and State/Province are plain text fields because the Figma shows no option lists.
+ * Deliberate deviation from the Figma: the five single-field sections (Event type, Preferred
+ * location, Entertainment, Transportation, Contact topic) render the field label instead of the
+ * Figma's mono section heading, so validation messages and stored `answers[].label` name the
+ * question. The Figma's "Select one" / "Select all that apply" is the placeholder.
+ *
+ * OUTSTANDING / UNCONFIRMED client content:
+ * - The Event type, Preferred location, Entertainment and Transportation options are
+ *   "Option 1/2/3" samples.
+ * - Country and State/Province are plain text fields because the Figma shows no option lists.
+ * - The Property Use Message `maxLength` of 1000 is not from the Figma.
+ * - The "Caterer’s name" show-if on catering = Yes is inferred from the design, not shown in it.
+ * - Contact topic is a native single select; the Figma draws a menu with check rows.
  */
 
 import {randomUUID} from 'node:crypto'
@@ -33,7 +42,7 @@ const slugify = (text: string) =>
     .replace(/^-|-$/g, '')
 
 type Extra = {
-  /** Overrides the slug-of-label `name`, for fields whose label (e.g. "Select one") is not unique. */
+  /** Overrides the slug-of-label `name` with a stable, explicit key. */
   key?: string
   placeholder?: string
   helperText?: string
@@ -89,11 +98,21 @@ const FORMS = [
         field('text', 'City', {width: 'half'}),
         field('text', 'Zip code', {width: 'half'}),
       ]),
-      section('Event type', 1, [
-        field('select', 'Select one', {key: 'event-type', options: SAMPLE, required: true}),
+      section(undefined, 1, [
+        field('select', 'Event type', {
+          key: 'event-type',
+          placeholder: 'Select one',
+          options: SAMPLE,
+          required: true,
+        }),
       ]),
-      section('Preferred location', 1, [
-        field('select', 'Select one', {key: 'preferred-location', options: SAMPLE, required: true}),
+      section(undefined, 1, [
+        field('select', 'Preferred location', {
+          key: 'preferred-location',
+          placeholder: 'Select one',
+          options: SAMPLE,
+          required: true,
+        }),
       ]),
       section('Event details', 2, [
         field('date', 'Date', {width: 'half'}),
@@ -120,16 +139,18 @@ const FORMS = [
           showIf: {field: 'will-there-be-catering', equals: 'Yes'},
         }),
       ]),
-      section('Entertainment', 1, [
-        field('multiSelect', 'Select all that apply', {
+      section(undefined, 1, [
+        field('multiSelect', 'Entertainment', {
           key: 'entertainment',
+          placeholder: 'Select all that apply',
           options: SAMPLE,
           required: true,
         }),
       ]),
-      section('Transportation', 1, [
-        field('multiSelect', 'Select all that apply', {
+      section(undefined, 1, [
+        field('multiSelect', 'Transportation', {
           key: 'transportation',
+          placeholder: 'Select all that apply',
           options: SAMPLE,
           required: true,
         }),
@@ -150,9 +171,10 @@ const FORMS = [
         field('email', 'Email', {required: true, width: 'half'}),
         field('phone', 'Phone', {required: true, width: 'half'}),
       ]),
-      section('Choose a topic', 1, [
-        field('select', 'Select one', {
+      section(undefined, 1, [
+        field('select', 'Topic', {
           key: 'topic',
+          placeholder: 'Select one',
           required: true,
           options: [
             'General Inquiry',

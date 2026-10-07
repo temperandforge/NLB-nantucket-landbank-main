@@ -60,7 +60,7 @@ export const formField = defineType({
       title: 'Key',
       type: 'slug',
       description:
-        'Identifies this field on stored submissions. Generated from the label; leave it alone once the form is live, because changing it detaches earlier answers.',
+        'Identifies this field on stored submissions. Filled by the Generate button from the label, and must be generated before publishing. Leave it alone once the form is live, because changing it detaches earlier answers.',
       options: {
         source: (_doc, {parent}) => (parent as {label?: string})?.label ?? '',
         isUnique: () => true,
@@ -93,7 +93,7 @@ export const formField = defineType({
       title: 'Maximum length',
       type: 'number',
       description: 'Shows a character counter under the field.',
-      hidden: ({parent}) => !['text', 'textarea'].includes((parent as Parent)?.fieldType ?? ''),
+      hidden: ({parent}) => (parent as Parent)?.fieldType !== 'textarea',
       validation: (rule) => rule.integer().min(1),
     }),
     defineField({name: 'required', title: 'Required', type: 'boolean', initialValue: false}),

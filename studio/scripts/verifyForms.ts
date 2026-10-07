@@ -50,7 +50,7 @@ async function main() {
   )
   for (const {page, ids} of refs) {
     for (const id of ids) {
-      const found = await client.fetch<number>(`count(*[_id == $id])`, {id})
+      const found = await client.fetch<number>(`count(*[_id == $id && _type == "form"])`, {id})
       check(found > 0, `${page}: form ${id} is published`)
     }
   }
