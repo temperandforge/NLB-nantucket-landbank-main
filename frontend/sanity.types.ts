@@ -203,7 +203,7 @@ export type JumpNavContent = {
           _type: 'span'
           _key: string
         }>
-        style?: 'normal' | 'h3' | 'h4' | 'h5' | 'h6'
+        style?: 'normal' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
         listItem?: 'bullet' | 'number'
         markDefs?: Array<
           {
@@ -1363,7 +1363,7 @@ export type GetPageQueryResult = {
                 _type: 'span'
                 _key: string
               }>
-              style?: 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+              style?: 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
               listItem?: 'bullet' | 'number'
               markDefs: Array<{
                 _key: string
@@ -1665,7 +1665,7 @@ export type LandingPageQueryResult = {
                 _type: 'span'
                 _key: string
               }>
-              style?: 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+              style?: 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
               listItem?: 'bullet' | 'number'
               markDefs: Array<{
                 _key: string

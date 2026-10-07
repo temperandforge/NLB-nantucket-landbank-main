@@ -82,6 +82,52 @@ export type MenuGroup = {
   >
 }
 
+export type CtaContact = {
+  _type: 'ctaContact'
+  heading?: string
+  body?: string
+  button?: Button
+  desktopImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  mobileImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  disabled?: boolean
+}
+
+export type MissionStatement = {
+  _type: 'missionStatement'
+  eyebrow?: string
+  heading: string
+  links?: Array<{
+    label: string
+    link?: Link
+    _type: 'missionLink'
+    _key: string
+  }>
+  disabled?: boolean
+}
+
+export type AnchorLinks = {
+  _type: 'anchorLinks'
+  links?: Array<{
+    label: string
+    link?: Link
+    icon?: 'link' | 'download'
+    _type: 'anchorLink'
+    _key: string
+  }>
+}
+
 export type PageReference = {
   _ref: string
   _type: 'reference'
@@ -100,12 +146,14 @@ export type Link = {
 export type ContactForm = {
   _type: 'contactForm'
   heading?: string
+  disabled?: boolean
 }
 
 export type MapTeaser = {
   _type: 'mapTeaser'
   heading?: string
   body?: string
+  disabled?: boolean
 }
 
 export type DownloadBlock = {
@@ -116,6 +164,7 @@ export type DownloadBlock = {
     _type: 'download'
     _key: string
   }>
+  disabled?: boolean
 }
 
 export type Timeline = {
@@ -127,6 +176,7 @@ export type Timeline = {
     _type: 'timelineEntry'
     _key: string
   }>
+  disabled?: boolean
 }
 
 export type ImageCarousel = {
@@ -138,6 +188,7 @@ export type ImageCarousel = {
     _type: 'carouselImage'
     _key: string
   }>
+  disabled?: boolean
 }
 
 export type JumpNavContent = {
@@ -173,6 +224,7 @@ export type JumpNavContent = {
         _key: string
       }
   >
+  disabled?: boolean
 }
 
 export type BasicLeftRightText = {
@@ -180,16 +232,24 @@ export type BasicLeftRightText = {
   eyebrow?: string
   heading?: string
   headingLevel?: 'h1' | 'h2'
-  body?: BlockContent
-  button?: Button
+  buttons?: Array<{
+    label: string
+    link?: Link
+    variant?: 'primary' | 'secondary' | 'ghost'
+    _type: 'blockButton'
+    _key: string
+  }>
   rightContent?: BlockContent
+  disabled?: boolean
 }
 
 export type HeroTertiary = {
   _type: 'heroTertiary'
   eyebrow?: string
   heading?: string
+  headingLevel?: 'h1' | 'h2'
   body?: string
+  disabled?: boolean
 }
 
 export type HeroSecondary = {
@@ -204,7 +264,8 @@ export type HeroSecondary = {
     alt?: string
     _type: 'image'
   }
-  variant?: 'lowlands' | 'moody-moor'
+  variant?: 'lowlands' | 'moody-moor' | 'light-brown'
+  disabled?: boolean
 }
 
 export type HeroImage = {
@@ -219,6 +280,7 @@ export type HeroImage = {
     alt?: string
     _type: 'image'
   }
+  disabled?: boolean
 }
 
 export type Hero = {
@@ -234,6 +296,7 @@ export type Hero = {
     alt?: string
     _type: 'image'
   }
+  disabled?: boolean
 }
 
 export type HeroVideo = {
@@ -252,6 +315,7 @@ export type HeroVideo = {
   }
   alt: string
   autoplay?: boolean
+  disabled?: boolean
 }
 
 export type BlockContentTextOnly = Array<{
@@ -281,7 +345,7 @@ export type BlockContent = Array<
         _type: 'span'
         _key: string
       }>
-      style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
+      style?: 'normal' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
       listItem?: 'bullet' | 'number'
       markDefs?: Array<{
         linkType?: 'href' | 'page'
@@ -304,6 +368,9 @@ export type BlockContent = Array<
       _type: 'image'
       _key: string
     }
+  | ({
+      _key: string
+    } & AnchorLinks)
 >
 
 export type Button = {
@@ -530,7 +597,16 @@ export type Page = {
   pageBuilder?: Array<
     | ({
         _key: string
-      } & HeroVideo)
+      } & BasicLeftRightText)
+    | ({
+        _key: string
+      } & ContactForm)
+    | ({
+        _key: string
+      } & CtaContact)
+    | ({
+        _key: string
+      } & DownloadBlock)
     | ({
         _key: string
       } & Hero)
@@ -545,25 +621,22 @@ export type Page = {
       } & HeroTertiary)
     | ({
         _key: string
-      } & BasicLeftRightText)
-    | ({
-        _key: string
-      } & JumpNavContent)
+      } & HeroVideo)
     | ({
         _key: string
       } & ImageCarousel)
     | ({
         _key: string
-      } & Timeline)
-    | ({
-        _key: string
-      } & DownloadBlock)
+      } & JumpNavContent)
     | ({
         _key: string
       } & MapTeaser)
     | ({
         _key: string
-      } & ContactForm)
+      } & MissionStatement)
+    | ({
+        _key: string
+      } & Timeline)
   >
 }
 
@@ -813,6 +886,9 @@ export type AllSanitySchemaTypes =
   | InfoColumn
   | MenuLink
   | MenuGroup
+  | CtaContact
+  | MissionStatement
+  | AnchorLinks
   | PageReference
   | Link
   | ContactForm

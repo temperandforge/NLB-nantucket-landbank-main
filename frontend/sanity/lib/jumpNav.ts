@@ -13,8 +13,8 @@ export function slugify(text: string): string {
 }
 
 /**
- * Derives a jump nav from a Portable Text body: every H3 is a section. Returns the nav rows and
- * an id for each H3 keyed by its block _key, so the heading renderer and the nav agree. Ids are
+ * Derives a jump nav from a Portable Text body: every H2 is a section. Returns the nav rows and
+ * an id for each H2 keyed by its block _key, so the heading renderer and the nav agree. Ids are
  * unique within the block; a heading with no text still gets an id (so its anchor exists) but no
  * nav row.
  */
@@ -24,7 +24,7 @@ export function buildJumpNav(blocks: ReadonlyArray<BlockLike> | null | undefined
   const used = new Set<string>()
 
   for (const block of blocks ?? []) {
-    if (block._type !== 'block' || block.style !== 'h3') continue
+    if (block._type !== 'block' || block.style !== 'h2') continue
     const text = (block.children ?? [])
       .map((child) => child.text ?? '')
       .join('')

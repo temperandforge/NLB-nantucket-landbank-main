@@ -553,12 +553,12 @@ content. Hero-secondary's eyebrow still falls back to the page name.
 
 **Status:** Implemented
 
-`jumpNavContent` builds its left-hand nav from the content's H3 headings. Ids come from
+`jumpNavContent` builds its left-hand nav from the content's H2 headings. Ids come from
 `frontend/sanity/lib/jumpNav.ts` and are checked by `frontend/scripts/verifyJumpNav.mts`.
 
 **Why:** Editors maintain the content once, and the nav cannot drift from it.
 
-**Implication:** H1 and H2 are not offered inside the content, so H3 always means a nav section.
+**Implication:** H1 is not offered inside the content, so H2 always means a nav section; H3 and below nest inside it. (Changed from H3 on 2026-10-07: the editor now offers H2.)
 
 ### 7.4 GROQ fragments are constants, not functions
 

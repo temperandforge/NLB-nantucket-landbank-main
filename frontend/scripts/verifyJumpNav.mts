@@ -17,10 +17,10 @@ function check(condition: boolean, message: string) {
   }
 }
 
-const h3 = (key: string, ...texts: string[]) => ({
+const h2 = (key: string, ...texts: string[]) => ({
   _key: key,
   _type: 'block',
-  style: 'h3',
+  style: 'h2',
   children: texts.map((text) => ({text})),
 })
 
@@ -28,26 +28,26 @@ check(slugify('Getting There') === 'getting-there', 'slugify lowercases and hyph
 check(slugify('Café & Bar!') === 'cafe-bar', 'slugify strips accents and punctuation')
 check(slugify('  --  ') === '', 'slugify of only punctuation is empty')
 
-const dup = buildJumpNav([h3('a', 'Parking'), h3('b', 'Parking'), h3('c', 'Parking')])
+const dup = buildJumpNav([h2('a', 'Parking'), h2('b', 'Parking'), h2('c', 'Parking')])
 check(
   dup.items.map((i) => i.id).join(',') === 'parking,parking-2,parking-3',
   'duplicate headings get -2, -3 suffixes',
 )
 check(dup.idByKey.b === 'parking-2', 'ids are keyed by block _key for the heading renderer')
 
-const empty = buildJumpNav([h3('a', '   '), h3('b', 'After')])
+const empty = buildJumpNav([h2('a', '   '), h2('b', 'After')])
 check(empty.items.length === 1 && empty.items[0].text === 'After', 'empty headings get no nav row')
 check(empty.idByKey.a === 'section', 'empty headings still get an id')
 
 const mixed = buildJumpNav([
   {_key: 'p', _type: 'block', style: 'normal', children: [{text: 'Body'}]},
-  {_key: 'h', _type: 'block', style: 'h4', children: [{text: 'Sub'}]},
+  {_key: 'h', _type: 'block', style: 'h3', children: [{text: 'Sub'}]},
   {_key: 'i', _type: 'image'},
-  h3('x', 'Real', ' heading'),
+  h2('x', 'Real', ' heading'),
 ])
 check(
   mixed.items.length === 1 && mixed.items[0].text === 'Real heading',
-  'only h3 blocks count; spans are joined',
+  'only h2 blocks count (an h3 does not); spans are joined',
 )
 
 check(buildJumpNav(null).items.length === 0, 'null input yields no items')

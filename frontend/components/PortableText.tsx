@@ -31,13 +31,13 @@ type AnchorLinkRow = NonNullable<
 export default function CustomPortableText({
   className,
   value,
-  h3Ids,
+  sectionIds,
   variant = 'prose',
 }: {
   className?: string
   value: PortableTextBlock[]
-  /** Block _key -> id for H3 headings, so a jump nav can link to them. */
-  h3Ids?: Record<string, string>
+  /** Block _key -> id for H2 section headings, so a jump nav can link to them. */
+  sectionIds?: Record<string, string>
   /** `prose` uses Tailwind Typography; `basic` uses the nlb-design rich-text styles. */
   variant?: 'prose' | 'basic'
 }) {
@@ -93,11 +93,6 @@ export default function CustomPortableText({
       },
     },
     block: {
-      h3: ({children, value}) => (
-        <h3 id={value?._key ? h3Ids?.[value._key] : undefined} className="scroll-mt-10">
-          {children}
-        </h3>
-      ),
       h1: ({children, value}) => (
         // Add an anchor to the h1
         <h1 className="group relative">
@@ -124,6 +119,14 @@ export default function CustomPortableText({
         </h1>
       ),
       h2: ({children, value}) => {
+        // In a jump nav, an H2 is a section and takes the id its nav link points at.
+        if (sectionIds) {
+          return (
+            <h2 id={value?._key ? sectionIds[value._key] : undefined} className="scroll-mt-10">
+              {children}
+            </h2>
+          )
+        }
         // Add an anchor to the h2
         return (
           <h2 className="group relative">

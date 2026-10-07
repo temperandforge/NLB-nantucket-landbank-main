@@ -33,7 +33,7 @@ export default function JumpNavContent({block}: BlockProps<'jumpNavContent'>) {
         </div>
         <div className="flex flex-col gap-10">
           {content.length > 0 && (
-            <CustomPortableText value={content as PortableTextBlock[]} h3Ids={idByKey} />
+            <CustomPortableText value={content as PortableTextBlock[]} sectionIds={idByKey} />
           )}
         </div>
       </div>
