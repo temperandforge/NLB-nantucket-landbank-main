@@ -16,6 +16,7 @@ import {
 } from 'next-sanity'
 import ResolvedLink from '@/components/ResolvedLink'
 import Image from '@/components/SanityImage'
+import FormView from '@/components/ui/form/FormView'
 import LinkRow from '@/components/ui/LinkRow'
 import {ExtractPageBuilderType} from '@/sanity/lib/types'
 import {linkResolver} from '@/sanity/lib/utils'
@@ -94,6 +95,11 @@ export default function CustomPortableText({
           </figure>
         )
       },
+      formEmbed: ({value}) => (
+        <div className="my-10 w-full">
+          <FormView form={value?.form} />
+        </div>
+      ),
     },
     block: {
       h1: ({children, value}) => (
