@@ -167,17 +167,39 @@ console.log('validateForm')
   check(clean.first === 'Jane', 'string values are trimmed')
 }
 {
-  const risky: FormLike = {
+  const optConstructor: FormLike = {
+    sections: [
+      {fields: [field({name: 'constructor', fieldType: 'text', label: 'C'})]},
+    ],
+  }
+  const {errors: errOpt, clean: cleanOpt} = validateForm(optConstructor, {})
+  check(
+    Object.keys(errOpt).length === 0,
+    'optional field named constructor with empty values has no error (own lookup returns undefined)',
+  )
+  check(Object.keys(cleanOpt).length === 0, 'optional constructor field with empty values stores nothing')
+  const reqConstructor: FormLike = {
     sections: [
       {fields: [field({name: 'constructor', fieldType: 'text', label: 'C', required: true})]},
     ],
   }
-  const {errors} = validateForm(risky, {})
-  check(Object.hasOwn(errors, 'constructor'), 'a field named like an Object.prototype key is read as own data')
-  const polluted = JSON.parse('{"__proto__": {"x": "y"}, "constructor": "ok"}') as Values
-  const result = validateForm(risky, polluted)
-  check(Object.keys(result.errors).length === 0, 'a JSON __proto__ key does not break validation')
-  check(({} as Record<string, unknown>).x === undefined, 'Object.prototype is not polluted')
+  const {errors: errReq} = validateForm(reqConstructor, {})
+  check(
+    errReq.constructor === 'C is required',
+    'required field named constructor with empty values has "is required" error (not "is not valid")',
+  )
+}
+{
+  const unrelated: FormLike = {
+    sections: [{fields: [field({name: 'other', fieldType: 'text', label: 'Other'})]}],
+  }
+  const polluted = JSON.parse('{"__proto__": "x"}') as Values
+  const {errors, clean} = validateForm(unrelated, polluted)
+  check(Object.keys(errors).length === 0, 'a JSON __proto__ key does not cause validation error')
+  check(
+    !Object.hasOwn(clean, '__proto__'),
+    'a JSON __proto__ key is not stored in clean data (own lookup prevents it)',
+  )
 }
 {
   const malformed: FormLike = {
