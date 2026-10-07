@@ -31,10 +31,10 @@ export const heroSecondary = defineType({
     }),
   ],
   preview: {
-    select: {title: 'eyebrow', subtitle: 'body', media: 'image'},
-    prepare: ({title, subtitle, media}) => ({
-      title: title || 'Hero - Secondary',
-      subtitle: subtitle || 'Hero - Secondary',
+    select: {eyebrow: 'eyebrow', body: 'body', media: 'image'},
+    prepare: ({eyebrow, body, media}) => ({
+      title: eyebrow || body || 'Untitled',
+      subtitle: 'Hero - Secondary',
       media,
     }),
   },

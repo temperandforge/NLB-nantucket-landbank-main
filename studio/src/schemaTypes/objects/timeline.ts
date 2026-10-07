@@ -40,7 +40,7 @@ export const timeline = defineType({
     }),
   ],
   preview: {
-    select: {entries: 'entries'},
-    prepare: ({entries}) => ({title: 'Timeline', subtitle: `${entries?.length ?? 0} entries`}),
+    select: {entries: 'entries', first: 'entries.0.title'},
+    prepare: ({entries, first}) => ({title: first || 'Untitled', subtitle: `Timeline · ${entries?.length ?? 0} entries`}),
   },
 })

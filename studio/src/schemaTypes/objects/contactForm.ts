@@ -21,6 +21,6 @@ export const contactForm = defineType({
   ],
   preview: {
     select: {title: 'heading'},
-    prepare: ({title}) => ({title: title || 'Contact Form', subtitle: 'Contact Form'}),
+    prepare: ({title}) => ({title: title || 'Untitled', subtitle: 'Contact Form'}),
   },
 })

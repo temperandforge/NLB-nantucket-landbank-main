@@ -34,8 +34,8 @@ export const imageCarousel = defineType({
   preview: {
     select: {title: 'eyebrow', images: 'images'},
     prepare: ({title, images}) => ({
-      title: title || 'Image Carousel',
-      subtitle: `${images?.length ?? 0} images`,
+      title: title || 'Untitled',
+      subtitle: `Image Carousel · ${images?.length ?? 0} images`,
     }),
   },
 })

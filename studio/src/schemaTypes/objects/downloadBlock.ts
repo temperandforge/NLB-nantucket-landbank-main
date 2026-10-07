@@ -36,10 +36,10 @@ export const downloadBlock = defineType({
     }),
   ],
   preview: {
-    select: {downloads: 'downloads'},
-    prepare: ({downloads}) => ({
-      title: 'Download Block',
-      subtitle: `${downloads?.length ?? 0} files`,
+    select: {downloads: 'downloads', first: 'downloads.0.label'},
+    prepare: ({downloads, first}) => ({
+      title: first || 'Untitled',
+      subtitle: `Download Block · ${downloads?.length ?? 0} files`,
     }),
   },
 })

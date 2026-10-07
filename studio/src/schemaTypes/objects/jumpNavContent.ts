@@ -44,6 +44,6 @@ export const jumpNavContent = defineType({
   ],
   preview: {
     select: {title: 'heading'},
-    prepare: ({title}) => ({title: title || 'Jump Nav Content', subtitle: 'Jump Nav Content'}),
+    prepare: ({title}) => ({title: title || 'Untitled', subtitle: 'Jump Nav Content'}),
   },
 })

@@ -15,10 +15,7 @@ export const heroTertiary = defineType({
     defineField({name: 'body', title: 'Intro', type: 'text', rows: 4}),
   ],
   preview: {
-    select: {title: 'heading', subtitle: 'eyebrow'},
-    prepare: ({title, subtitle}) => ({
-      title: title || 'Hero - Tertiary',
-      subtitle: subtitle || 'Hero - Tertiary',
-    }),
+    select: {title: 'heading'},
+    prepare: ({title}) => ({title: title || 'Untitled', subtitle: 'Hero - Tertiary'}),
   },
 })

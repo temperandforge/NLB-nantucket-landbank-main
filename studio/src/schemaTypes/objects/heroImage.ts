@@ -24,11 +24,7 @@ export const heroImage = defineType({
     imageWithAltField({required: true}),
   ],
   preview: {
-    select: {title: 'heading', subtitle: 'eyebrow', media: 'image'},
-    prepare: ({title, subtitle, media}) => ({
-      title: title || 'Hero - Image',
-      subtitle: subtitle || 'Hero - Image',
-      media,
-    }),
+    select: {title: 'heading', media: 'image'},
+    prepare: ({title, media}) => ({title: title || 'Untitled', subtitle: 'Hero - Image', media}),
   },
 })

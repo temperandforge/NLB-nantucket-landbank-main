@@ -27,10 +27,7 @@ export const basicLeftRightText = defineType({
     defineField({name: 'rightContent', title: 'Right column', type: 'blockContent'}),
   ],
   preview: {
-    select: {title: 'heading', subtitle: 'eyebrow'},
-    prepare: ({title, subtitle}) => ({
-      title: title || 'Basic - Left Right Text',
-      subtitle: subtitle || 'Basic - Left Right Text',
-    }),
+    select: {title: 'heading'},
+    prepare: ({title}) => ({title: title || 'Untitled', subtitle: 'Basic - Left Right Text'}),
   },
 })

@@ -16,6 +16,6 @@ export const mapTeaser = defineType({
   ],
   preview: {
     select: {title: 'heading'},
-    prepare: ({title}) => ({title: title || 'Map Teaser', subtitle: 'Map Teaser'}),
+    prepare: ({title}) => ({title: title || 'Untitled', subtitle: 'Map Teaser'}),
   },
 })
