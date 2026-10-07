@@ -1,7 +1,10 @@
 import Image from '@/components/SanityImage'
 import {ExtractPageBuilderType} from '@/sanity/lib/types'
 
-type ImageValue = NonNullable<ExtractPageBuilderType<'hero'>['image']>
+// The CTA's background photos are decorative and have no alt field, so they are a separate shape.
+type ImageValue =
+  | NonNullable<ExtractPageBuilderType<'hero'>['image']>
+  | NonNullable<ExtractPageBuilderType<'ctaContact'>['desktopImage']>
 
 /**
  * A page-builder image. Renders nothing when the asset reference is missing (an image whose asset
@@ -26,7 +29,7 @@ export default function BlockImage({
   return (
     <Image
       id={image.asset._ref}
-      alt={image.alt ?? ''}
+      alt={('alt' in image ? image.alt : undefined) ?? ''}
       width={width}
       hotspot={image.hotspot}
       crop={image.crop}

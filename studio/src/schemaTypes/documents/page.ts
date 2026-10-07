@@ -3,6 +3,7 @@ import {DocumentIcon} from '@sanity/icons'
 
 import {basicLeftRightText} from '../objects/basicLeftRightText'
 import {contactForm} from '../objects/contactForm'
+import {ctaContact} from '../objects/ctaContact'
 import {downloadBlock} from '../objects/downloadBlock'
 import {hero} from '../objects/hero'
 import {heroImage} from '../objects/heroImage'
@@ -12,6 +13,7 @@ import {heroVideo} from '../objects/heroVideo'
 import {imageCarousel} from '../objects/imageCarousel'
 import {jumpNavContent} from '../objects/jumpNavContent'
 import {mapTeaser} from '../objects/mapTeaser'
+import {missionStatement} from '../objects/missionStatement'
 import {timeline} from '../objects/timeline'
 import {buildPagePath, MAX_PAGE_DEPTH, slugifySegment} from '../../lib/pageHierarchy'
 
@@ -22,6 +24,7 @@ import {buildPagePath, MAX_PAGE_DEPTH, slugifySegment} from '../../lib/pageHiera
 const pageBuilderBlocks = [
   basicLeftRightText,
   contactForm,
+  ctaContact,
   downloadBlock,
   hero,
   heroImage,
@@ -31,6 +34,7 @@ const pageBuilderBlocks = [
   imageCarousel,
   jumpNavContent,
   mapTeaser,
+  missionStatement,
   timeline,
 ]
   .sort((a, b) => (a.title ?? a.name).localeCompare(b.title ?? b.name))

@@ -185,6 +185,20 @@ const pageBuilderFields = /* groq */ `
         ${markDefsFields}
       }
     },
+    _type == "missionStatement" => {
+      ...,
+      links[]{
+        ...,
+        ${linkFields}
+      }
+    },
+    _type == "ctaContact" => {
+      ...,
+      button{
+        ...,
+        ${linkFields}
+      }
+    },
     _type == "downloadBlock" => {
       ...,
       downloads[]{

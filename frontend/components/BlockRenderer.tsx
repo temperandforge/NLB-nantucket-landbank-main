@@ -2,6 +2,8 @@ import React from 'react'
 
 import BasicLeftRightText from '@/components/blocks/BasicLeftRightText'
 import Hero from '@/components/blocks/Hero'
+import CtaContact from '@/components/blocks/CtaContact'
+import MissionStatement from '@/components/blocks/MissionStatement'
 import ContactForm from '@/components/blocks/ContactForm'
 import DownloadBlock from '@/components/blocks/DownloadBlock'
 import MapTeaser from '@/components/blocks/MapTeaser'
@@ -40,6 +42,8 @@ const Blocks = {
   downloadBlock: DownloadBlock,
   mapTeaser: MapTeaser,
   contactForm: ContactForm,
+  ctaContact: CtaContact,
+  missionStatement: MissionStatement,
 } as BlocksType
 
 /**
