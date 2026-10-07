@@ -24,11 +24,14 @@ export default function CustomPortableText({
   className,
   value,
   h3Ids,
+  variant = 'prose',
 }: {
   className?: string
   value: PortableTextBlock[]
   /** Block _key -> id for H3 headings, so a jump nav can link to them. */
   h3Ids?: Record<string, string>
+  /** `prose` uses Tailwind Typography; `basic` uses the nlb-design rich-text styles. */
+  variant?: 'prose' | 'basic'
 }) {
   const components: PortableTextComponents = {
     types: {
@@ -154,7 +157,13 @@ export default function CustomPortableText({
   }
 
   return (
-    <div className={`prose-a:text-brand prose dark:prose-invert ${className}`}>
+    <div
+      className={
+        variant === 'basic'
+          ? `rich-text-basic ${className ?? ''}`
+          : `prose-a:text-brand prose dark:prose-invert ${className}`
+      }
+    >
       <PortableText components={components} value={value} />
     </div>
   )

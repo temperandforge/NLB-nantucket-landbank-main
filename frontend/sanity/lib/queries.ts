@@ -170,6 +170,10 @@ const pageBuilderFields = /* groq */ `
     },
     _type == "basicLeftRightText" => {
       ...,
+      buttons[]{
+        ...,
+        ${linkFields}
+      },
       rightContent[]{
         ...,
         _type == "anchorLinks" => {

@@ -1,51 +1,54 @@
 import {stegaClean, type PortableTextBlock} from 'next-sanity'
 
 import CustomPortableText from '@/components/PortableText'
-import ResolvedLink from '@/components/ResolvedLink'
+import ButtonLink from '@/components/ui/ButtonLink'
 import {DereferencedLink} from '@/sanity/lib/types'
 import {linkResolver} from '@/sanity/lib/utils'
 
 import Eyebrow from './Eyebrow'
 import {BlockProps} from './types'
 
+const BUTTON_VARIANTS = ['primary', 'secondary', 'ghost'] as const
+
 export default function BasicLeftRightText({block}: BlockProps<'basicLeftRightText'>) {
-  // stegaClean: in Presentation the value carries invisible stega characters, so a plain
-  // comparison would always fail.
-  const isH1 = stegaClean(block.headingLevel) === 'h1'
-  const Heading = isH1 ? 'h1' : 'h2'
-  const button = block.button
-  // A button needs both its text and a link that resolves. A page reference left empty, or
-  // pointing at an unpublished page, resolves to nothing and must not render as a dead button.
-  const buttonLink = button?.link as DereferencedLink | undefined
-  const showButton = Boolean(button?.buttonText && buttonLink && linkResolver(buttonLink))
+  // stegaClean: in Presentation the value carries invisible characters.
+  const Heading = stegaClean(block.headingLevel) === 'h1' ? 'h1' : 'h2'
+  // A button needs a label and a link that resolves; anything else would be a dead button.
+  const buttons = (block.buttons ?? []).flatMap((button) => {
+    const href = button.link ? linkResolver(button.link as DereferencedLink) : null
+    if (!button.label || !href) return []
+    const chosen = stegaClean(button.variant)
+    const variant = BUTTON_VARIANTS.find((v) => v === chosen) ?? 'primary'
+    return [{key: button._key, label: button.label, href, variant, newTab: Boolean(button.link?.openInNewTab)}]
+  })
 
   return (
-    <section className="w-full">
-      <div className={`${isH1 ? 'py-section-p-lg' : 'py-section-p-md'} tf-px`}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-24 tf-max-w">
-          <div className="md:sticky md:top-10 self-start">
-            {block.eyebrow && <Eyebrow className="text-moody-moor-700 mb-3">{block.eyebrow}</Eyebrow>}
-            {block.heading && <Heading className="text-h4 mb-6 text-pretty">{block.heading}</Heading>}
-            {block.body && (
-              <CustomPortableText
-                className="text-moody-moor-600 mb-6"
-                value={block.body as PortableTextBlock[]}
-              />
-            )}
-            {showButton && buttonLink && (
-              <ResolvedLink
-                link={buttonLink}
-                className="inline-flex items-center gap-3 px-5 py-4 bg-dusty-heath-800 hover:bg-dusty-heath-600 rounded font-mono text-moody-moor-600 no-underline"
-              >
-                {button?.buttonText}
-              </ResolvedLink>
-            )}
-          </div>
-          <div>
-            {block.rightContent && (
-              <CustomPortableText value={block.rightContent as PortableTextBlock[]} />
-            )}
-          </div>
+    <section className="relative w-full overflow-clip bg-background tf-px py-s6">
+      <div className="basic-left-right__lines pointer-events-none absolute inset-0 z-0" aria-hidden="true" />
+      <div className="relative z-10 flex w-full flex-col gap-20 tf-max-w md:flex-row md:items-start">
+        <div className="flex w-full flex-col items-start gap-10 md:flex-1">
+          {block.eyebrow && <Eyebrow className="text-on-background">{block.eyebrow}</Eyebrow>}
+          {block.heading && (
+            <Heading className="w-full text-headline-xl text-on-background text-balance">{block.heading}</Heading>
+          )}
+          {buttons.length > 0 && (
+            <div className="flex flex-wrap gap-4">
+              {buttons.map((button) => (
+                <ButtonLink
+                  key={button.key}
+                  label={button.label}
+                  href={button.href}
+                  variant={button.variant}
+                  newTab={button.newTab}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="flex w-full flex-col items-start md:flex-1">
+          {block.rightContent && (
+            <CustomPortableText variant="basic" value={block.rightContent as PortableTextBlock[]} />
+          )}
         </div>
       </div>
     </section>

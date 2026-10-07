@@ -264,3 +264,65 @@
 .mission-statement__lines {
   background: url('/images/blocks/decorative-line-mission.svg') center / cover no-repeat;
 }
+
+/* Rich text in Basic - Left Right Text (nlb-design BasicLeftRight): sections 64px apart, a
+   heading 24px above its text, link rows 16px apart (set on the anchor-links wrapper). */
+.rich-text-basic {
+  color: var(--color-on-background);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-base);
+  line-height: 1.6;
+}
+
+.rich-text-basic > * + * {
+  margin-top: 1.5rem;
+}
+
+.rich-text-basic > h3,
+.rich-text-basic > h4,
+.rich-text-basic > h5,
+.rich-text-basic > h6 {
+  margin-top: 4rem;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+}
+
+.rich-text-basic > h3 {
+  font-size: var(--text-headline-lg);
+}
+
+.rich-text-basic > h4 {
+  font-size: var(--text-headline-base);
+}
+
+.rich-text-basic > h5,
+.rich-text-basic > h6 {
+  font-size: var(--text-headline-sm);
+}
+
+.rich-text-basic > :first-child {
+  margin-top: 0;
+}
+
+.rich-text-basic > div:has(> a.link-item--inactive) {
+  margin-top: 4rem;
+}
+
+.rich-text-basic a:not(.link-item--inactive) {
+  text-decoration: underline;
+}
+
+.rich-text-basic ul,
+.rich-text-basic ol {
+  padding-left: 1.5rem;
+}
+
+.rich-text-basic ul {
+  list-style: disc;
+}
+
+.rich-text-basic ol {
+  list-style: decimal;
+}
