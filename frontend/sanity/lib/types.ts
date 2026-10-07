@@ -26,3 +26,9 @@ export type FooterMenuItem = FooterMenuData['items'][number]
 export type FooterMenuLeaf = Extract<FooterMenuItem, {_type: 'menuLink'}>
 export type FooterInfoColumnData = NonNullable<FooterData['infoColumns']>[number]
 export type FooterSocialLinkData = NonNullable<FooterData['socialLinks']>[number]
+
+/**
+ * A form as the page renders it, derived from the query result so it cannot drift from the
+ * projection. Null when the reference is missing or unpublished.
+ */
+export type FormContent = NonNullable<ExtractPageBuilderType<'contactForm'>['form']>

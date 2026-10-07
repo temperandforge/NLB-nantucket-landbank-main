@@ -1,0 +1,153 @@
+/*
+ * Form controls. Source of truth: Figma Design System, Input (499-209): inactive, hover, focus,
+ * filled, error and text area. The other field types reuse the same shell.
+ *
+ * Deliberate departure: the design's focus state is a 1px --color-border-light border, which is
+ * well under 3:1 against the page, so focus also draws a 2px --color-border-dark outline.
+ */
+@layer components {
+  .form-label,
+  .form-helper {
+    font-family: var(--font-sans);
+    font-size: var(--text-body-small);
+    line-height: 1.6;
+    color: var(--color-on-background-subtle);
+  }
+  .form-label-error,
+  .form-helper-error {
+    color: var(--color-error);
+  }
+
+  /* A group's question: the mono body style, as in the design. */
+  .form-legend,
+  .form-section-heading {
+    font-family: var(--font-mono);
+    font-size: var(--text-body-base);
+    line-height: 1.6;
+    color: var(--color-on-background);
+    padding: 0;
+  }
+
+  .form-control {
+    display: block;
+    width: 100%;
+    height: 3rem;
+    padding: 0 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background-color: var(--color-input);
+    color: var(--color-on-input);
+    font-family: var(--font-sans);
+    font-size: var(--text-body-base);
+    line-height: 1.6;
+    text-align: left;
+  }
+  .form-control::placeholder {
+    color: var(--color-on-input-placeholder);
+  }
+  .form-control:hover:not(:disabled) {
+    background-color: var(--color-background);
+  }
+  .form-control:focus-visible {
+    background-color: var(--color-background);
+    border-color: var(--color-border-light);
+    outline: 2px solid var(--color-border-dark);
+    outline-offset: 2px;
+  }
+  .form-control[aria-invalid='true'] {
+    background-color: var(--color-background);
+    border-color: var(--color-error);
+  }
+  /* An unfilled select or multi-select reads as a placeholder. */
+  .form-control-empty {
+    color: var(--color-on-input-placeholder);
+  }
+
+  .form-textarea {
+    height: auto;
+    min-height: 10.8125rem;
+    padding: 0.75rem;
+    resize: vertical;
+  }
+
+  .form-select {
+    appearance: none;
+    padding-right: 2.75rem;
+  }
+
+  /* Native date and time inputs keep their picker; the design's icon sits over it. */
+  .form-icon-field {
+    position: relative;
+  }
+  .form-icon-field input::-webkit-calendar-picker-indicator {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  /* Checkbox and radio rows. The native input stays in the tab order, visually replaced. */
+  .form-choice {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: var(--text-body-base);
+    color: var(--color-on-background);
+  }
+  .form-choice-box {
+    display: inline-flex;
+    flex: none;
+    border-radius: 2px;
+  }
+  .form-choice input:focus-visible + .form-choice-box {
+    outline: 2px solid var(--color-border-dark);
+    outline-offset: 2px;
+  }
+
+  /* The multi-select's open list (Figma: menu in Contact Us). */
+  .form-menu {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 0.25rem);
+    left: 0;
+    width: 100%;
+    max-height: 18rem;
+    overflow: auto;
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+    background-color: var(--color-surface-light);
+    color: var(--color-on-surface-light);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+    list-style: none;
+    margin: 0;
+  }
+  .form-menu:focus-visible {
+    outline: 2px solid var(--color-border-dark);
+    outline-offset: 2px;
+  }
+  .form-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: var(--text-body-base);
+  }
+  .form-option[data-active='true'] {
+    background-color: var(--color-input);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .form-control,
+    .form-choice-box {
+      transition: none;
+    }
+  }
+}

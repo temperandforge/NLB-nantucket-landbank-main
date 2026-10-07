@@ -15,6 +15,11 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: ../sanity.schema.json
+export type ShowIf = {
+  field?: string
+  equals?: string
+}
+
 export type SanityImageAssetReference = {
   _ref: string
   _type: 'reference'
@@ -82,6 +87,43 @@ export type MenuGroup = {
   >
 }
 
+export type FormReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'form'
+}
+
+export type FormEmbed = {
+  _type: 'formEmbed'
+  form: FormReference
+}
+
+export type FormField = {
+  _type: 'formField'
+  fieldType:
+    | 'text'
+    | 'email'
+    | 'phone'
+    | 'number'
+    | 'textarea'
+    | 'select'
+    | 'multiSelect'
+    | 'date'
+    | 'time'
+    | 'checkboxGroup'
+    | 'radioGroup'
+  label: string
+  name: Slug
+  helperText?: string
+  placeholder?: string
+  options?: Array<string>
+  maxLength?: number
+  required?: boolean
+  width?: 'full' | 'half'
+  showIf?: ShowIf
+}
+
 export type CtaContact = {
   _type: 'ctaContact'
   heading?: string
@@ -101,6 +143,71 @@ export type CtaContact = {
     crop?: SanityImageCrop
     _type: 'image'
   }
+  disabled?: boolean
+}
+
+export type EventsPreview = {
+  _type: 'eventsPreview'
+  eyebrow?: string
+  count: number
+  disabled?: boolean
+}
+
+export type ProjectReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'project'
+}
+
+export type ProjectPreview = {
+  _type: 'projectPreview'
+  eyebrow?: string
+  body?: string
+  button?: Button
+  projects?: Array<
+    {
+      _key: string
+    } & ProjectReference
+  >
+  disabled?: boolean
+}
+
+export type ProjectGrid = {
+  _type: 'projectGrid'
+  heading?: string
+  disabled?: boolean
+}
+
+export type PeopleGrid = {
+  _type: 'peopleGrid'
+  heading?: string
+  source: 'staff' | 'commissioners'
+  showFilters?: boolean
+  disabled?: boolean
+}
+
+export type JobListings = {
+  _type: 'jobListings'
+  eyebrow?: string
+  heading?: string
+  disabled?: boolean
+}
+
+export type FaqList = {
+  _type: 'faqList'
+  heading?: string
+  description?: string
+  disabled?: boolean
+}
+
+export type NewsPreview = {
+  _type: 'newsPreview'
+  heading?: string
+  count: number
+  ctaHeading?: string
+  ctaLabel?: string
+  ctaLink?: Link
   disabled?: boolean
 }
 
@@ -146,13 +253,19 @@ export type Link = {
 export type ContactForm = {
   _type: 'contactForm'
   heading?: string
+  headingLevel?: 'h1' | 'h2'
+  details?: BlockContent
+  form?: FormReference
   disabled?: boolean
 }
 
 export type MapTeaser = {
   _type: 'mapTeaser'
+  eyebrow?: string
   heading?: string
   body?: string
+  featuredProject?: ProjectReference
+  button?: Button
   disabled?: boolean
 }
 
@@ -185,6 +298,7 @@ export type ImageCarousel = {
   images?: Array<{
     image: CarouselImageImage
     caption?: string
+    link?: Link
     _type: 'carouselImage'
     _key: string
   }>
@@ -203,7 +317,7 @@ export type JumpNavContent = {
           _type: 'span'
           _key: string
         }>
-        style?: 'normal' | 'h3' | 'h4' | 'h5' | 'h6'
+        style?: 'normal' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
         listItem?: 'bullet' | 'number'
         markDefs?: Array<
           {
@@ -223,6 +337,9 @@ export type JumpNavContent = {
         _type: 'image'
         _key: string
       }
+    | ({
+        _key: string
+      } & AnchorLinks)
   >
   disabled?: boolean
 }
@@ -239,7 +356,7 @@ export type BasicLeftRightText = {
     _type: 'blockButton'
     _key: string
   }>
-  rightContent?: BlockContent
+  rightContent?: BlockContentWithForm
   disabled?: boolean
 }
 
@@ -317,6 +434,45 @@ export type HeroVideo = {
   autoplay?: boolean
   disabled?: boolean
 }
+
+export type BlockContentWithForm = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>
+        text?: string
+        _type: 'span'
+        _key: string
+      }>
+      style?: 'normal' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
+      listItem?: 'bullet' | 'number'
+      markDefs?: Array<{
+        linkType?: 'href' | 'page'
+        href?: string
+        page?: PageReference
+        openInNewTab?: boolean
+        _type: 'link'
+        _key: string
+      }>
+      level?: number
+      _type: 'block'
+      _key: string
+    }
+  | {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      alt?: string
+      _type: 'image'
+      _key: string
+    }
+  | ({
+      _key: string
+    } & AnchorLinks)
+  | ({
+      _key: string
+    } & FormEmbed)
+>
 
 export type BlockContentTextOnly = Array<{
   children?: Array<{
@@ -405,6 +561,221 @@ export type PropertyType = {
   slug: Slug
 }
 
+export type NewsCategory = {
+  _id: string
+  _type: 'newsCategory'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  order?: number
+}
+
+export type FormSubmission = {
+  _id: string
+  _type: 'formSubmission'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  form?: FormReference
+  formTitle?: string
+  submittedAt?: string
+  status?: 'new' | 'reviewed'
+  answers?: Array<{
+    name?: string
+    label?: string
+    value?: string
+    _type: 'answer'
+    _key: string
+  }>
+}
+
+export type Form = {
+  _id: string
+  _type: 'form'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  submitLabel?: string
+  successMessage: string
+  sections: Array<{
+    heading?: string
+    columns?: 1 | 2
+    fields: Array<
+      {
+        _key: string
+      } & FormField
+    >
+    _type: 'formSection'
+    _key: string
+  }>
+}
+
+export type DepartmentReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'department'
+}
+
+export type Job = {
+  _id: string
+  _type: 'job'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  department?: DepartmentReference
+  description?: string
+  location?: string
+  employmentType?: string
+  applyLink?: Link
+  order?: number
+}
+
+export type FaqCategoryReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'faqCategory'
+}
+
+export type Faq = {
+  _id: string
+  _type: 'faq'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  question: string
+  answer: BlockContent
+  category?: FaqCategoryReference
+  order?: number
+}
+
+export type FaqCategory = {
+  _id: string
+  _type: 'faqCategory'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  order?: number
+}
+
+export type Commissioner = {
+  _id: string
+  _type: 'commissioner'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  title?: string
+  termDate?: string
+  headshot?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  order?: number
+}
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop'
+  top: number
+  bottom: number
+  left: number
+  right: number
+}
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot'
+  x: number
+  y: number
+  height: number
+  width: number
+}
+
+export type StaffMember = {
+  _id: string
+  _type: 'staffMember'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  title?: string
+  department?: DepartmentReference
+  headshot?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  order?: number
+}
+
+export type Department = {
+  _id: string
+  _type: 'department'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  order?: number
+}
+
+export type Event = {
+  _id: string
+  _type: 'event'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  start: string
+  end?: string
+  location?: string
+  description?: string
+}
+
+export type NewsCategoryReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'newsCategory'
+}
+
+export type Article = {
+  _id: string
+  _type: 'article'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  date: string
+  image: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  body?: BlockContent
+  categories?: Array<
+    {
+      _key: string
+    } & NewsCategoryReference
+  >
+  link?: Link
+}
+
 export type PropertyTypeReference = {
   _ref: string
   _type: 'reference'
@@ -458,20 +829,16 @@ export type Geopoint = {
   alt?: number
 }
 
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop'
-  top: number
-  bottom: number
-  left: number
-  right: number
-}
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot'
-  x: number
-  y: number
-  height: number
-  width: number
+export type SingleNewsPage = {
+  _id: string
+  _type: 'singleNewsPage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  eyebrow?: string
+  publishedLabel?: string
+  shareLabel?: string
+  moreNews?: NewsPreview
 }
 
 export type ProjectSettings = {
@@ -609,6 +976,12 @@ export type Page = {
       } & DownloadBlock)
     | ({
         _key: string
+      } & EventsPreview)
+    | ({
+        _key: string
+      } & FaqList)
+    | ({
+        _key: string
       } & Hero)
     | ({
         _key: string
@@ -627,6 +1000,9 @@ export type Page = {
       } & ImageCarousel)
     | ({
         _key: string
+      } & JobListings)
+    | ({
+        _key: string
       } & JumpNavContent)
     | ({
         _key: string
@@ -634,6 +1010,18 @@ export type Page = {
     | ({
         _key: string
       } & MissionStatement)
+    | ({
+        _key: string
+      } & NewsPreview)
+    | ({
+        _key: string
+      } & PeopleGrid)
+    | ({
+        _key: string
+      } & ProjectGrid)
+    | ({
+        _key: string
+      } & ProjectPreview)
     | ({
         _key: string
       } & Timeline)
@@ -877,6 +1265,7 @@ export type SanityImageAsset = {
 }
 
 export type AllSanitySchemaTypes =
+  | ShowIf
   | SanityImageAssetReference
   | CarouselImageImage
   | SanityFileAssetReference
@@ -886,7 +1275,18 @@ export type AllSanitySchemaTypes =
   | InfoColumn
   | MenuLink
   | MenuGroup
+  | FormReference
+  | FormEmbed
+  | FormField
   | CtaContact
+  | EventsPreview
+  | ProjectReference
+  | ProjectPreview
+  | ProjectGrid
+  | PeopleGrid
+  | JobListings
+  | FaqList
+  | NewsPreview
   | MissionStatement
   | AnchorLinks
   | PageReference
@@ -903,18 +1303,34 @@ export type AllSanitySchemaTypes =
   | HeroImage
   | Hero
   | HeroVideo
+  | BlockContentWithForm
   | BlockContentTextOnly
   | BlockContent
   | Button
   | Resource
   | Slug
   | PropertyType
+  | NewsCategory
+  | FormSubmission
+  | Form
+  | DepartmentReference
+  | Job
+  | FaqCategoryReference
+  | Faq
+  | FaqCategory
+  | Commissioner
+  | SanityImageCrop
+  | SanityImageHotspot
+  | StaffMember
+  | Department
+  | Event
+  | NewsCategoryReference
+  | Article
   | PropertyTypeReference
   | ResourceReference
   | Project
   | Geopoint
-  | SanityImageCrop
-  | SanityImageHotspot
+  | SingleNewsPage
   | ProjectSettings
   | MenuReference
   | Footer

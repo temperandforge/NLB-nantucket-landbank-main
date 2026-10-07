@@ -47,17 +47,17 @@ Not a singleton, so Sanity generates its `_id` (project rule).
 
 ### Field types
 
-Each is an array member object with a shared base:
+One object type, `formField`, with a `fieldType` list and a shared base:
 
 - `label` (string, required)
 - `name` (slug-like key, auto-derived from the label, unique within the form, required): the stable
   key stored on submissions. Renaming a label does not change it; changing a `name` orphans old
-  submissions' keys, so Studio warns on edit.
+  submissions' keys; the field's description says so (there is no warning on edit).
 - `helperText` (string)
 - `required` (boolean)
 - `width` ("full" or "half"): half fills one cell of a 2-column section. Ignored in a 1-column
   section.
-- `showIf` (optional): `{field: <name of an earlier choice field>, equals: <option value>}`.
+- `showIf` (optional): `{field: <name of an earlier choice field>, equals: <option text>}`.
 
 Types and their extras:
 
@@ -65,18 +65,18 @@ Types and their extras:
 | --- | --- |
 | `text`, `email`, `phone`, `number` | `placeholder` |
 | `textarea` | `placeholder`, `maxLength` (shows the "0/250" counter) |
-| `select`, `multiSelect` | `placeholder`, `options[]` (`label`, `value`) |
+| `select`, `multiSelect` | `placeholder`, `options[]` (plain strings; the chosen text is stored) |
 | `date`, `time` | none (native pickers) |
-| `checkboxGroup`, `radioGroup` | `options[]` (`label`, `value`) |
+| `checkboxGroup`, `radioGroup` | `options[]` (plain strings; the chosen text is stored) |
 
-Option `value` defaults to a slug of the label. Choice categories are authored per field, not
+Choice categories are authored per field, not
 shared documents: they are form content, not site taxonomy.
 
 ### Validation (Studio)
 
 - `name` unique per form.
-- `showIf.field` must name a field that appears earlier in the form and is a `select`, `radioGroup`
-  or `checkboxGroup`; `showIf.equals` must be one of its option values.
+- `showIf.field` must name a field that appears earlier in the form and is a dropdown (`select`),
+  multi-select, checkbox group or radio group; `showIf.equals` must be one of its option text values.
 - A required field with a `showIf` is required only while it is shown; hidden fields are never
   validated, so a hidden required field cannot block submission.
 
@@ -94,8 +94,9 @@ Created only by the route handler. Read-only in Studio.
 
 ### Blocks
 
-- **`contactForm`**: keep `heading`; add `details` (rich text, text-only, for phone, fax and
-  email) and `form` (reference, optional). Existing heading-only blocks continue to render.
+- **`contactForm`**: keep `heading`; add `details` (standard rich text, `blockContent`, for
+  phone, fax and email, so they can be linked with `mailto:` and `tel:` through the existing link
+  mark; editors can therefore also add images or anchor links there, which is accepted) and `form` (reference, optional). Existing heading-only blocks continue to render.
   Because `form` is optional, a block with no form renders the left column only, with no
   placeholder text.
 - **`basicLeftRightText`**: `rightContent` switches to a new rich-text type that is
@@ -116,8 +117,8 @@ Created only by the route handler. Read-only in Studio.
 
 Under `frontend/components/ui/form/`:
 
-- `Field` (label, helper, error wiring), `TextInput`, `Textarea`, `Select`, `MultiSelect`,
-  `DateInput`, `TimeInput`, `CheckboxGroup`, `RadioGroup`.
+- `Field` (label, helper, error wiring), `TextInput` (text, email, phone, number, date and time),
+  `Textarea`, `NativeSelect`, `MultiSelect`, `ChoiceGroup` (checkbox and radio groups).
 - `FormRenderer` (client component): owns values and errors, evaluates `showIf`, validates, submits.
 - `FormEmbed`: server component that renders `FormRenderer` for a portable-text `formEmbed`.
   `ContactForm` and `FormEmbed` share `FormRenderer`.
@@ -153,8 +154,8 @@ and the discrepancy flagged.
 1. `FormRenderer` validates on blur (after first touch) and on submit. A failed submit moves focus to
    the first invalid field and shows a summary `role="alert"`.
 2. POST `/api/forms/[formId]` with `{values, turnstileToken, honeypot}`.
-3. The route handler fetches the form from Sanity (never trusting the client's copy), evaluates
-   `showIf`, re-validates every shown field (required, type, option membership, `maxLength`), drops
+3. The route handler rejects a malformed form id (`/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/`, 404), then fetches the published form from Sanity (never trusting the
+   client's copy), evaluates `showIf`, re-validates every shown field (required, type, option membership, `maxLength`), drops
    hidden fields' values, then creates a `formSubmission` with the server-only token.
 4. Success replaces the form with `successMessage` (focus moved to it, announced via `role="status"`).
    Errors return field-level messages mapped by `name`, or a generic failure message with the
@@ -164,8 +165,9 @@ and the discrepancy flagged.
 
 - **Honeypot**: a visually hidden text field, `tabindex="-1"` and `aria-hidden`, with
   `autocomplete="off"`. A filled value is accepted silently (200) and discarded, so bots get no signal.
-- **Rate limit**: per-IP limit in the route handler. The store must work on the host (decided in the
-  plan; an in-memory limit is not reliable on serverless).
+- **Rate limit**: per-IP limit in the route handler. The interim implementation is in-memory, capped,
+  and evicts the oldest entry; it is per instance, so it is not reliable on serverless. #21 will
+  choose a shared store once the host is settled.
 - **Turnstile**: shown when the site key is configured; the server verifies the token when the secret
   is configured. With no keys (local dev) it is skipped and the form works. Turnstile's widget is
   rendered in a way that keeps tab order sensible and has an accessible label.
@@ -174,14 +176,15 @@ and the discrepancy flagged.
 
 - `SANITY_WRITE_TOKEN` (server only, a role limited to creating `formSubmission` documents where
   Sanity permits).
-- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`.
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`. Set both or neither: with only the
+  secret set, every submission fails the captcha check.
 
 ## Keyboard and screen-reader accessibility
 
 - Use native elements wherever they exist: `<input>`, `<textarea>`, `<select>`, checkbox, radio and
   `<fieldset>`/`<legend>` for groups. Tab order is DOM order.
-- **Multi-select (custom listbox)**: the trigger is a button with `aria-haspopup="listbox"` and
-  `aria-expanded`.
+- **Multi-select (custom listbox)**: the trigger is a `role="combobox"` button that opens a
+  listbox (see DECISIONS 15.4), with `aria-haspopup="listbox"` and `aria-expanded`.
   - Enter, Space or ArrowDown opens it; focus moves into the list.
   - Up/Down move between options, Home/End jump to the first and last, and typing a character jumps
     to a match.

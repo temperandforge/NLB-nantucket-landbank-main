@@ -137,6 +137,11 @@ export default defineConfig({
     visionTool(),
   ],
 
+  document: {
+    // Submissions are created by the site's form route only.
+    newDocumentOptions: (prev) => prev.filter((option) => option.templateId !== 'formSubmission'),
+  },
+
   // Schema configuration, imported from ./src/schemaTypes/index.ts
   schema: {
     types: schemaTypes,

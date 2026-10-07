@@ -170,6 +170,41 @@ const articleCardFields = /* groq */ `
 `
 
 /**
+ * A form as the page renders it. `name` is the slug's string; the other field properties come
+ * through as authored. Used by the page builder and by the submit route, so the browser and the
+ * server see the same shape.
+ */
+const formProjection = /* groq */ `{
+  _id,
+  title,
+  submitLabel,
+  successMessage,
+  sections[]{
+    _key,
+    heading,
+    columns,
+    fields[]{
+      _key,
+      "name": name.current,
+      label,
+      helperText,
+      placeholder,
+      fieldType,
+      required,
+      width,
+      maxLength,
+      options,
+      showIf{field, equals}
+    }
+  }
+}`
+
+/** The published form with this id, for validating a submission. Drafts never match. */
+export const FORM_FOR_SUBMIT_QUERY = defineQuery(
+  `*[_type == "form" && _id == $id][0]${formProjection}`,
+)
+
+/**
  * The page builder's sections. Blocks marked "Hide this block" are dropped here, so their content
  * never reaches a visitor's browser; $includeHidden is true only in draft mode (Presentation),
  * where hidden blocks are shown with a badge. Each block type that holds a reference, a file or Portable Text
@@ -196,8 +231,20 @@ const pageBuilderFields = /* groq */ `
             ${linkFields}
           }
         },
+        _type == "formEmbed" => {
+          ...,
+          form->${formProjection}
+        },
         ${markDefsFields}
       }
+    },
+    _type == "contactForm" => {
+      ...,
+      details[]{
+        ...,
+        ${markDefsFields}
+      },
+      form->${formProjection}
     },
     _type == "missionStatement" => {
       ...,

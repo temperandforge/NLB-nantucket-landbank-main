@@ -6,6 +6,8 @@ import {commissioner} from './documents/commissioner'
 import {event} from './documents/event'
 import {faq} from './documents/faq'
 import {job} from './documents/job'
+import {form} from './documents/form'
+import {formSubmission} from './documents/formSubmission'
 import {staffMember} from './documents/staffMember'
 import {department, faqCategory, newsCategory} from './documents/taxonomies'
 import {propertyType} from './documents/propertyType'
@@ -33,6 +35,8 @@ import {projectGrid} from './objects/projectGrid'
 import {projectPreview} from './objects/projectPreview'
 import {faqList} from './objects/faqList'
 import {jobListings} from './objects/jobListings'
+import {formField} from './objects/formField'
+import {formEmbed} from './objects/formEmbed'
 import {newsPreview} from './objects/newsPreview'
 import {eventsPreview} from './objects/eventsPreview'
 import {missionStatement} from './objects/missionStatement'
@@ -45,6 +49,7 @@ import {socialLink} from './objects/socialLink'
 import {blockContent} from './objects/blockContent'
 import button from './objects/button'
 import {blockContentTextOnly} from './objects/blockContentTextOnly'
+import {blockContentWithForm} from './objects/blockContentWithForm'
 
 // Export an array of all the schema types.  This is used in the Sanity Studio configuration. https://www.sanity.io/docs/studio/schema-types
 
@@ -64,6 +69,8 @@ export const schemaTypes = [
   commissioner,
   faq,
   job,
+  form,
+  formSubmission,
   // Categorisation for the above - referenced, so the client can extend them without a deploy
   newsCategory,
   department,
@@ -75,6 +82,7 @@ export const schemaTypes = [
   button,
   blockContent,
   blockContentTextOnly,
+  blockContentWithForm,
   heroVideo,
   hero,
   heroImage,
@@ -98,6 +106,8 @@ export const schemaTypes = [
   projectPreview,
   eventsPreview,
   ctaContact,
+  formField,
+  formEmbed,
   // Menu building blocks - menuGroup nests menuLink, capped at two levels
   menuGroup,
   menuLink,
