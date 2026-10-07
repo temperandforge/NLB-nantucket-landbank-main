@@ -14,7 +14,7 @@ import {
   resourceOptions,
   toggleSlug,
   withSelection,
-} from '../sanity/lib/propertyFilter.ts'
+} from '../sanity/lib/archiveFilter.ts'
 
 let failed = false
 function same(actual: unknown, expected: unknown, message: string) {
