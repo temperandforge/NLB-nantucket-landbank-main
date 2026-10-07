@@ -181,6 +181,13 @@ const pageBuilderFields = /* groq */ `
         ${linkFields}
       }
     },
+    _type == "jumpNavContent" => {
+      ...,
+      content[]{
+        ...,
+        ${markDefsFields}
+      }
+    },
   }
 `
 

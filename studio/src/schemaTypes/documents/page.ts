@@ -159,6 +159,7 @@ export const page = defineType({
         {type: 'heroSecondary'},
         {type: 'heroTertiary'},
         {type: 'basicLeftRightText'},
+        {type: 'jumpNavContent'},
         {type: 'imageCarousel'},
         {type: 'timeline'},
       ],

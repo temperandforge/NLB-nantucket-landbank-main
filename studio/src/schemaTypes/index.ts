@@ -9,6 +9,7 @@ import {heroImage} from './objects/heroImage'
 import {heroSecondary} from './objects/heroSecondary'
 import {heroTertiary} from './objects/heroTertiary'
 import {basicLeftRightText} from './objects/basicLeftRightText'
+import {jumpNavContent} from './objects/jumpNavContent'
 import {imageCarousel} from './objects/imageCarousel'
 import {timeline} from './objects/timeline'
 import {settings} from './singletons/settings'
@@ -48,6 +49,7 @@ export const schemaTypes = [
   heroSecondary,
   heroTertiary,
   basicLeftRightText,
+  jumpNavContent,
   imageCarousel,
   timeline,
   link,

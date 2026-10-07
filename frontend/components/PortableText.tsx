@@ -15,9 +15,12 @@ import Image from '@/components/SanityImage'
 export default function CustomPortableText({
   className,
   value,
+  h3Ids,
 }: {
   className?: string
   value: PortableTextBlock[]
+  /** Block _key -> id for H3 headings, so a jump nav can link to them. */
+  h3Ids?: Record<string, string>
 }) {
   const components: PortableTextComponents = {
     types: {
@@ -41,6 +44,11 @@ export default function CustomPortableText({
       },
     },
     block: {
+      h3: ({children, value}) => (
+        <h3 id={value?._key ? h3Ids?.[value._key] : undefined} className="scroll-mt-10">
+          {children}
+        </h3>
+      ),
       h1: ({children, value}) => (
         // Add an anchor to the h1
         <h1 className="group relative">

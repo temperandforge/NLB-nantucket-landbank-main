@@ -2,6 +2,7 @@ import React from 'react'
 
 import BasicLeftRightText from '@/components/blocks/BasicLeftRightText'
 import Hero from '@/components/blocks/Hero'
+import JumpNavContent from '@/components/blocks/JumpNavContent'
 import ImageCarousel from '@/components/blocks/ImageCarousel'
 import Timeline from '@/components/blocks/Timeline'
 import HeroImage from '@/components/blocks/HeroImage'
@@ -30,6 +31,7 @@ const Blocks = {
   heroSecondary: HeroSecondary,
   heroTertiary: HeroTertiary,
   basicLeftRightText: BasicLeftRightText,
+  jumpNavContent: JumpNavContent,
   imageCarousel: ImageCarousel,
   timeline: Timeline,
 } as BlocksType
