@@ -102,17 +102,21 @@ New files under `studio/src/schemaTypes/objects/`, registered in `index.ts` and 
 3. `contactForm` renders a disabled "coming soon" state; there is no form backend yet.
 4. `mapTeaser` keeps the theme's empty preview box rather than a live Mapbox preview.
 5. `anchor` and `alignfull` supports are dropped.
+6. The right column of `basicLeftRightText` takes Portable Text only: the theme's inline buttons and Gravity Forms block are not available there.
+7. Carousel and timeline scroll regions are keyboard focusable (`tabIndex=0`, labelled region), which the theme's were not.
 
 ## Deferred work
 
 Each gets a GitHub issue before this slice finishes, linked here:
 
-- Slice 2 tracking: content types and archives, including the five data-driven blocks.
-- Slice 3 tracking: globals, filters and WordPress content import.
-- Contact form backend (replaces Gravity Forms).
-- Map-teaser live preview.
-
-Issue numbers: to be filled in when filed.
+- Slice 2 tracking: content types and archives, including the five data-driven blocks:
+  [#10](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/10).
+- Slice 3 tracking: globals, filters and WordPress content import:
+  [#11](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/11).
+- Contact form backend (replaces Gravity Forms):
+  [#12](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/12).
+- Map-teaser live preview:
+  [#13](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/13).
 
 ## Verification
 

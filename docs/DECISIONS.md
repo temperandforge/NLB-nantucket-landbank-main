@@ -521,6 +521,62 @@ should be read before the real run.
 
 ---
 
+## 7. Page-builder blocks
+
+Ported from the nlb-v2 WordPress theme. Design: [the blocks spec](superpowers/specs/2026-10-07-wp-blocks-migration-design.md).
+
+### 7.1 One object type and one component per block
+
+**Status:** Implemented
+
+Each block is a Sanity object type in `studio/src/schemaTypes/objects/`, listed in
+`page.pageBuilder`, rendered by `frontend/components/blocks/<Name>.tsx` and registered in
+`BlockRenderer`. Markup is ported 1:1 from the theme's `render.php`.
+
+**Why:** The page builder already worked this way for `heroVideo`, and Presentation's
+click-to-edit depends on the `data-sanity` wrapper `BlockRenderer` adds.
+
+**Implication:** Add a block by adding all three. Query branches for blocks with references, files
+or Portable Text go in `pageBuilderFields` in `queries.ts`.
+
+### 7.2 Required fields replace the theme's placeholder copy
+
+**Status:** Implemented
+
+`heroImage` requires eyebrow, heading and image, and `heroSecondary` requires its image. The theme
+fell back to "A short, punchy headline goes here." and to the page's featured image.
+
+**Why:** A Sanity page has no featured image, and placeholder copy that ships by accident reads as
+content. Hero-secondary's eyebrow still falls back to the page name.
+
+### 7.3 A jump nav is derived from the content, never authored
+
+**Status:** Implemented
+
+`jumpNavContent` builds its left-hand nav from the content's H3 headings. Ids come from
+`frontend/sanity/lib/jumpNav.ts` and are checked by `frontend/scripts/verifyJumpNav.mts`.
+
+**Why:** Editors maintain the content once, and the nav cannot drift from it.
+
+**Implication:** H1 and H2 are not offered inside the content, so H3 always means a nav section.
+
+### 7.4 GROQ fragments are constants, not functions
+
+**Status:** Implemented
+
+A function call inside a `defineQuery` template literal widens the query's type to `string`, and
+typegen's result map (keyed by the literal) no longer matches, so the result type collapses to `{}`.
+Shared fragments (`markDefsFields`, `linkFields`, `pageBuilderFields`) are plain constants.
+
+### 7.5 The theme's palette maps onto the Figma tokens
+
+**Status:** Implemented, two discrepancies to confirm with the designer
+
+The theme's `warm-neutral-*` and `brand-*` colours map to the nearest `dusty-heath`, `moody-moor`
+and `lowlands` tokens. The theme's `warm-neutral-800` (#4b4234) maps to `moody-moor-600`
+(#533b28), which is noticeably redder. The Lowlands hero panel keeps the theme's `#5F8154` rather
+than `lowlands-800` (#63795b).
+
 ## Known outstanding items
 
 Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-design.md):
