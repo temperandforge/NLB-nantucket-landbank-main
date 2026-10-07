@@ -1,6 +1,7 @@
 'use client'
 
 import {useCallback, useEffect, useId, useRef, useState, type FormEvent} from 'react'
+import {flushSync} from 'react-dom'
 
 import {ArrowRightIcon} from '@/components/icons'
 import {
@@ -26,6 +27,7 @@ const MESSAGES = {
   network: 'We could not reach the server. Check your connection and try again.',
   limited: 'Too many attempts. Please wait a few minutes and try again.',
   captcha: 'We could not verify that you are human. Please try again.',
+  changed: 'This form has changed since the page was loaded. Please reload the page and try again.',
   generic: 'Something went wrong. Please try again.',
 }
 
@@ -105,10 +107,12 @@ export default function FormRenderer({form}: {form: FormContent}) {
     setAttempted(true)
     setServerError(null)
     const found = validateForm(form, values).errors
-    setErrors(found)
+    // Commit the errors before focusing, so the control already carries aria-invalid and its message.
+    flushSync(() => setErrors(found))
     const first = shown.find((field) => found[field.name as string])
     if (first) return focusField(first.name as string)
 
+    const sent = values
     sending.current = true
     setStatus('submitting')
     try {
@@ -126,8 +130,14 @@ export default function FormRenderer({form}: {form: FormContent}) {
         errors?: Record<string, string>
       }
       if (response.status === 422 && data.errors) {
-        setErrors(data.errors)
-        const invalid = shown.find((field) => data.errors?.[field.name as string])
+        const serverErrors = data.errors
+        // The fields that were submitted, not the ones for whatever the visitor typed since.
+        const invalid = visibleFields(form, sent).find((field) => serverErrors[field.name as string])
+        flushSync(() => {
+          setErrors(serverErrors)
+          // Keys matching no field means the form changed since this page loaded.
+          if (!invalid) setServerError(MESSAGES.changed)
+        })
         if (invalid) focusField(invalid.name as string)
       } else {
         setServerError(
