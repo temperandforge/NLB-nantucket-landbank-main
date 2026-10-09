@@ -64,7 +64,7 @@ export default function DesktopNav({menu}: {menu: HeaderMenuData}) {
         if (event.relatedTarget && !rootRef.current?.contains(event.relatedTarget as Node)) setOpenKey(null)
       }}
       // Stretches to the full bar height so each <li> (and a flat panel's top-full) reaches the bar's bottom edge.
-      className="flex items-stretch gap-gap-md max-lg:hidden"
+      className="flex items-stretch self-stretch gap-gap-md max-lg:hidden"
     >
       <nav aria-label="Primary" className="flex">
         <ul className="flex items-stretch gap-gap-md">
