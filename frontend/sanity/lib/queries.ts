@@ -248,6 +248,12 @@ const pageBuilderFields = /* groq */ `
         ${articleCardFields}
       }
     },
+    _type == "newsArchive" => {
+      ...,
+      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) {
+        ${articleCardFields}
+      }
+    },
     _type == "eventsPreview" => {
       ...,
       "events": *[

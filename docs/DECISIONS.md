@@ -1003,3 +1003,13 @@ Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-desig
   With none set, `/` redirects to `/map`.
 - `studio/scripts/cleanupRemovedTypes.ts` deleted every page and all orphaned documents, and turned
   menu links to deleted pages into `#` placeholders. Re-run `seedFooterContent.ts` to recreate pages.
+
+## 16. The news archive is a page-builder block
+
+**Status:** Implemented. Pagination is not in the Figma design, so every article is listed.
+
+The News page (`our-work/news`) is an ordinary CMS page: a Hero - Tertiary header and the News
+Archive block (`newsArchive`), seeded by `studio/scripts/seedNewsPage.ts` (fills an empty page
+builder only). The block lists every article newest first, three across (one on mobile), with the
+shared `components/ui/FilterTabs` for categories and `?category=<slug>` through `useQueryFilter`,
+the same pattern as the Project Grid. Tabs come from the categories the articles actually have.

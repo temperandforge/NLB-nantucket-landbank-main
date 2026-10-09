@@ -5,6 +5,7 @@ import Hero from '@/components/blocks/Hero'
 import CtaContact from '@/components/blocks/CtaContact'
 import EventsPreview from '@/components/blocks/EventsPreview'
 import NewsPreview from '@/components/blocks/NewsPreview'
+import NewsArchive from '@/components/blocks/NewsArchive'
 import FaqList from '@/components/blocks/FaqList'
 import JobListings from '@/components/blocks/JobListings'
 import PeopleGrid from '@/components/blocks/PeopleGrid'
@@ -53,6 +54,7 @@ const Blocks = {
   ctaContact: CtaContact,
   missionStatement: MissionStatement,
   newsPreview: NewsPreview,
+  newsArchive: NewsArchive,
   eventsPreview: EventsPreview,
   faqList: FaqList,
   jobListings: JobListings,

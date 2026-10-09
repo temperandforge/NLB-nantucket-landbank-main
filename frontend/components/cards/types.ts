@@ -5,3 +5,4 @@ export type CommissionerItem = NonNullable<ExtractPageBuilderType<'peopleGrid'>[
 export type ProjectItem = NonNullable<ExtractPageBuilderType<'projectGrid'>['projects']>[number]
 export type PropertyItem = NonNullable<ExtractPageBuilderType<'propertyArchive'>['properties']>[number]
 export type PropertyDefaultImage = ExtractPageBuilderType<'propertyArchive'>['defaultImage']
+export type NewsItem = NonNullable<ExtractPageBuilderType<'newsArchive'>['articles']>[number]

@@ -91,6 +91,22 @@ export const parseProjectType = (search: string, tabs: ReadonlyArray<FilterTab>)
 export const withProjectType = (search: string, slug: string | null) =>
   withFilter(search, PROJECT_TYPE_PARAM, slug)
 
+// News, by category.
+
+export const NEWS_CATEGORY_PARAM = 'category'
+export const NEWS_FILTER_LABEL = 'Filter news by category'
+
+type WithCategories = {categories?: ReadonlyArray<Category | null> | null}
+
+/** One tab per news category that at least one article has. */
+export function newsTabs(articles: ReadonlyArray<WithCategories>): FilterTab[] {
+  return categoryTabs(articles.flatMap((article) => article.categories ?? []))
+}
+
+export function filterByNewsCategory<T extends WithCategories>(articles: T[], slug: string | null): T[] {
+  return slug ? articles.filter((a) => a.categories?.some((category) => category?.slug === slug)) : articles
+}
+
 // --- Properties archive: two groups of multi-select filters ---------------------------------
 
 export const PROPERTY_TYPE_PARAM = 'type'

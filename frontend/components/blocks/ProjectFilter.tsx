@@ -20,7 +20,9 @@ export default function ProjectFilter({projects}: {projects: ProjectItem[]}) {
   return (
     <div className="flex w-full flex-col items-start gap-16">
       <FilterTabs tabs={tabs} active={active} label={PROJECT_FILTER_LABEL} onChoose={choose} />
-      <ProjectList projects={filterByPropertyType(projects, active)} />
+      <div className="tf-px">
+        <ProjectList projects={filterByPropertyType(projects, active)} />
+      </div>
     </div>
   )
 }

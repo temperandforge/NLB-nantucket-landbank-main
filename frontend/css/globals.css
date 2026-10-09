@@ -80,3 +80,7 @@
 #mapWrap {
   height: calc(100dvh - var(--header-height) - 2.5rem);
 }
+
+body {
+  @apply bg-background;
+}

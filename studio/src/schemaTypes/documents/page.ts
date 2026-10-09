@@ -22,6 +22,7 @@ import {projectGrid} from '../objects/projectGrid'
 import {propertyArchive} from '../objects/propertyArchive'
 import {projectPreview} from '../objects/projectPreview'
 import {newsPreview} from '../objects/newsPreview'
+import {newsArchive} from '../objects/newsArchive'
 import {timeline} from '../objects/timeline'
 import {buildPagePath, MAX_PAGE_DEPTH, slugifySegment} from '../../lib/pageHierarchy'
 
@@ -46,6 +47,7 @@ const pageBuilderBlocks = [
   jumpNavContent,
   mapTeaser,
   missionStatement,
+  newsArchive,
   newsPreview,
   peopleGrid,
   projectGrid,
