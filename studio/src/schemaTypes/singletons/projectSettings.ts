@@ -7,8 +7,7 @@ import {defineField, defineType} from 'sanity'
  * Two concerns, kept in one document because they are both "the things that configure the
  * Projects section", and split into field groups so the form does not read as a grab bag:
  *
- *  - Page content: the fixed intro above the projects grid, matching the commissionersPage /
- *    staffPage pattern.
+ *  - Page content: the fixed intro above the projects grid,.
  *  - Map: the single GeoJSON file holding every property boundary, plus how to read it.
  */
 

@@ -17,7 +17,7 @@ const LINK_CLASS =
 const LABEL_CLASS = 'font-mono-tracked text-[14px] uppercase tracking-[1.54px] leading-[1.6]'
 
 /**
- * A menu item's link, as it comes back from GROQ with page/post references resolved to slugs.
+ * A menu item's link, as it comes back from GROQ with page references resolved to slugs.
  * Taken from the leaf type so it tracks the query projection.
  */
 type MenuItemLink = FooterMenuLeaf['link']

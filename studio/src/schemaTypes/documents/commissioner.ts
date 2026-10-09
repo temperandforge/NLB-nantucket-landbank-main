@@ -1,102 +1,47 @@
-import {UsersIcon} from '@sanity/icons'
+import {UserIcon} from '@sanity/icons'
 import {defineField, defineType} from 'sanity'
 
-/**
- * Commissioner schema.  Define and edit the fields for the 'commissioner' content type.
- * Commissioners appear only as cards on the Commissioners index page - there are no
- * individual profile pages, so no slug or SEO fields are needed.
- * Learn more: https://www.sanity.io/docs/studio/schema-types
- */
-
+/** A Land Bank commissioner. */
 export const commissioner = defineType({
   name: 'commissioner',
   title: 'Commissioner',
-  icon: UsersIcon,
   type: 'document',
+  icon: UserIcon,
   fields: [
+    defineField({name: 'name', title: 'Name', type: 'string', validation: (rule) => rule.required()}),
+    defineField({name: 'title', title: 'Role', type: 'string', description: 'e.g. Chair.'}),
     defineField({
-      name: 'name',
-      title: 'Name',
+      name: 'termDate',
+      title: 'Term date',
       type: 'string',
-      description: 'Full name as it should appear on the site, including any middle initial.',
-      validation: (rule) => rule.required(),
+      description: 'Shown under the role exactly as entered, e.g. "May 2027".',
     }),
     defineField({
-      name: 'picture',
-      title: 'Picture',
+      name: 'headshot',
+      title: 'Headshot',
       type: 'image',
-      description: 'Optional - the card design supports commissioners without a photo.',
-      fields: [
-        defineField({
-          name: 'alt',
-          type: 'string',
-          title: 'Alternative text',
-          description: 'Important for SEO and accessibility.',
-          validation: (rule) => {
-            // Custom validation to ensure alt text is provided if the image is present. https://www.sanity.io/docs/validation
-            return rule.custom((alt, context) => {
-              const document = context.document as {picture?: {asset?: {_ref?: string}}}
-              if (document?.picture?.asset?._ref && !alt) {
-                return 'Required'
-              }
-              return true
-            })
-          },
-        }),
-      ],
-      options: {
-        hotspot: true,
-        aiAssist: {
-          imageDescriptionField: 'alt',
-        },
-      },
+      options: {hotspot: true},
+      description: 'Shown tall (about 4:5). The person’s name is used as its alt text.',
     }),
     defineField({
-      name: 'role',
-      title: 'Role',
-      type: 'string',
-      description:
-        'Office held, written exactly as it should read on the card. Combined roles can be typed out in full, e.g. "Vice Secretary / Vice Treasurer".',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'termEndDate',
-      title: 'Term end date',
-      type: 'date',
-      description:
-        'The date this seat expires. The site displays month and year only, e.g. "May 2027".',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'displayOrder',
-      title: 'Display order',
+      name: 'order',
+      title: 'Order',
       type: 'number',
-      description:
-        'Position on the Commissioners page - lowest number first. Leave gaps (10, 20, 30) so someone can be inserted later without renumbering everyone.',
-      validation: (rule) => rule.required().integer().positive(),
+      description: 'Lower numbers come first. Ties fall back to the name.',
     }),
   ],
-  // Sort the Studio list the same way the website orders the page. https://www.sanity.io/docs/sort-orders
   orderings: [
     {
-      title: 'Display order',
-      name: 'displayOrderAsc',
-      by: [{field: 'displayOrder', direction: 'asc'}],
+      title: 'Order',
+      name: 'order',
+      by: [
+        {field: 'order', direction: 'asc'},
+        {field: 'name', direction: 'asc'},
+      ],
     },
   ],
-  // List preview configuration. https://www.sanity.io/docs/previews-list-views
   preview: {
-    select: {
-      name: 'name',
-      role: 'role',
-      picture: 'picture',
-    },
-    prepare({name, role, picture}) {
-      return {
-        title: name,
-        subtitle: role,
-        media: picture,
-      }
-    },
+    select: {title: 'name', subtitle: 'title', media: 'headshot'},
+    prepare: ({title, subtitle, media}) => ({title: title || 'Unnamed', subtitle, media}),
   },
 })

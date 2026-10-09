@@ -1,0 +1,159 @@
+/**
+ * Nantucket design tokens, from the Figma variable collections: primitives, theme and breakpoint.
+ *
+ * Tailwind v4 reads every `--<namespace>-*` variable in an @theme block and generates the
+ * matching utilities, so these need no tailwind.config: --color-lowlands-500 is bg-lowlands-500,
+ * --text-headline-lg is text-headline-lg, --color-background is bg-background.
+ *
+ * Names follow the Figma variables (color/moody-moor/500 -> --color-moody-moor-500). A trailing
+ * "*" in Figma (500*) marks the base shade of a ramp and is dropped here.
+ *
+ * Spacing is deliberately absent. The Figma scale (spacing-1 = 4px ... spacing-64 = 256px) is
+ * Tailwind's default (--spacing: 0.25rem, so p-4 = 16px), which p-*, gap-* etc. already use.
+ */
+
+/* ---- Primitives -------------------------------------------------------------------------- */
+@theme {
+  /* Families resolve through the next/font variables set in app/layout.tsx. */
+  --font-serif: var(--font-eb-garamond), ui-serif, Georgia, serif;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, monospace;
+
+  --font-weight-regular: 400;
+
+  /* Figma stores letter-spacing as a bare -2 / 0 / 2 with no unit; read as percent (em / 100). */
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.125rem;
+
+  /*
+   * The Figma font-size scale, in rem (px / 16). Named --font-size-* rather than --text-* so it
+   * does not replace Tailwind's own text-xs ... text-9xl, which other pages still use. Components
+   * use the semantic --text-* tokens below.
+   */
+  --font-size-text-xs: 0.625rem;
+  --font-size-text-sm: 0.875rem;
+  --font-size-text-base: 1rem;
+  --font-size-text-lg: 1.25rem;
+  --font-size-text-xl: 1.5rem;
+  --font-size-text-2xl: 2rem;
+  --font-size-text-3xl: 2.75rem;
+  --font-size-text-4xl: 3.6875rem;
+  --font-size-text-5xl: 5rem;
+  --font-size-text-6xl: 6.25rem;
+  --font-size-text-7xl: 7.5rem;
+
+  --color-moody-moor-100: #0e0905;
+  --color-moody-moor-200: #1d130a;
+  --color-moody-moor-300: #2b1c10;
+  --color-moody-moor-400: #3a2615;
+  --color-moody-moor-500: #482f1a;
+  --color-moody-moor-600: #533b28;
+  --color-moody-moor-700: #6d5948;
+  --color-moody-moor-800: #b6aca3;
+  --color-moody-moor-900: #dad5d1;
+
+  --color-dusty-heath-100: #2b2720;
+  --color-dusty-heath-200: #554d40;
+  --color-dusty-heath-300: #807461;
+  --color-dusty-heath-400: #aa9a81;
+  --color-dusty-heath-500: #d5c1a1;
+  --color-dusty-heath-600: #ddcdb4;
+  --color-dusty-heath-700: #e6dac7;
+  --color-dusty-heath-800: #eee6d9;
+  --color-dusty-heath-900: #f3eee5;
+  --color-dusty-heath-1000: #f8f5f0;
+  --color-dusty-heath-1100: #fdfdfb;
+
+  --color-lowlands-100: #304327;
+  --color-lowlands-200: #34492b;
+  --color-lowlands-300: #374f2e;
+  --color-lowlands-400: #455f3c;
+  --color-lowlands-500: #3d5934;
+  /* Identical to 400 in the Figma file; kept so both names resolve. */
+  --color-lowlands-600: #455f3c;
+  --color-lowlands-700: #546c4b;
+  --color-lowlands-800: #63795b;
+  --color-lowlands-900: #72866a;
+
+  --color-goldenrod-100: #937415;
+  --color-goldenrod-200: #a98618;
+  --color-goldenrod-300: #c0971b;
+  --color-goldenrod-400: #d6a91d;
+  --color-goldenrod-500: #ecbb20;
+  --color-goldenrod-600: #eec135;
+  --color-goldenrod-700: #efc74b;
+  --color-goldenrod-800: #f0ce60;
+  --color-goldenrod-900: #f2d476;
+
+  --color-utility-500: #ec4220;
+}
+
+/* ---- Theme (semantic colours, aliased to the primitives as in Figma) ---------------------- */
+@theme {
+  --color-background: var(--color-dusty-heath-1000);
+  --color-on-background-tonal: var(--color-moody-moor-900);
+  --color-on-background: var(--color-moody-moor-500);
+  --color-on-background-subtle: var(--color-moody-moor-700);
+
+  --color-primary: var(--color-dusty-heath-800);
+  --color-on-primary: var(--color-moody-moor-600);
+  --color-secondary: var(--color-goldenrod-500);
+  --color-on-secondary: var(--color-moody-moor-600);
+
+  --color-accent-primary: var(--color-moody-moor-500);
+  --color-on-accent-primary-tonal: var(--color-moody-moor-700);
+  --color-on-accent-primary: var(--color-dusty-heath-1000);
+  --color-accent-secondary: var(--color-lowlands-500);
+  --color-accent-secondary-tonal: var(--color-lowlands-800);
+  --color-on-accent-secondary: var(--color-dusty-heath-1000);
+
+  --color-tag: var(--color-dusty-heath-800);
+  --color-on-tag: var(--color-moody-moor-600);
+
+  --color-input: var(--color-dusty-heath-900);
+  --color-on-input: var(--color-moody-moor-600);
+  --color-on-input-placeholder: var(--color-moody-moor-800);
+
+  --color-border-light: var(--color-dusty-heath-500);
+  --color-border-dark: var(--color-moody-moor-500);
+  --color-border-alt: var(--color-goldenrod-500);
+
+  --color-surface-dark: var(--color-dusty-heath-900);
+  --color-on-surface-dark-tonal: var(--color-dusty-heath-600);
+  --color-on-surface-dark: var(--color-moody-moor-600);
+  --color-surface-light: var(--color-dusty-heath-1100);
+  --color-on-surface-light: var(--color-moody-moor-600);
+
+  /* Not aliased in Figma: literal values that happen to match a primitive. */
+  --color-hover-lighter: #f8f5f0;
+  --color-hover-darker: #554d40;
+  --color-hover-green: #3d5934;
+
+  --color-error: var(--color-utility-500);
+}
+
+/* ---- Type sizes (breakpoint collection) ----------------------------------------------------
+ * Fluid between the mobile (375px) and desktop (1440px) Figma values, as in nlb-design. Body
+ * sizes are identical in both modes, so they stay fixed.
+ *
+ * Written as MIN + DIFF * (100vw - 375px) / 1065, where DIFF is the unitless pixel difference
+ * between the two Figma values. nlb-design divided a length by a length, which needs CSS typed
+ * arithmetic and is invalid in older browsers (every heading would fall back to body size).
+ * frontend/scripts/verifyFluidTokens.mts checks the form and the endpoints.
+ */
+@theme {
+  --text-display-lg: clamp(6.25rem, calc(6.25rem + 20 * (100vw - 375px) / 1065), 7.5rem);
+  --text-display-base: clamp(5rem, calc(5rem + 20 * (100vw - 375px) / 1065), 6.25rem);
+  --text-display-sm: clamp(3.6875rem, calc(3.6875rem + 21 * (100vw - 375px) / 1065), 5rem);
+  /* Not a real Figma token: the design for it is missing (see nlb-design's tokens.css). */
+  --text-headline-2xl: clamp(2.6875rem, calc(2.6875rem + 37 * (100vw - 375px) / 1065), 5rem);
+  --text-headline-xl: clamp(2.75rem, calc(2.75rem + 15 * (100vw - 375px) / 1065), 3.6875rem);
+  --text-headline-lg: clamp(2rem, calc(2rem + 12 * (100vw - 375px) / 1065), 2.75rem);
+  --text-headline-base: clamp(1.5rem, calc(1.5rem + 8 * (100vw - 375px) / 1065), 2rem);
+  --text-headline-sm: clamp(1.25rem, calc(1.25rem + 4 * (100vw - 375px) / 1065), 1.5rem);
+  --text-body-large: var(--font-size-text-lg);
+  --text-body-base: var(--font-size-text-base);
+  --text-body-small: var(--font-size-text-sm);
+  --text-body-xs: var(--font-size-text-xs);
+}

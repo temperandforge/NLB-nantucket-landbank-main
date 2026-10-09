@@ -174,7 +174,7 @@ async function main() {
   console.log('\nProjects:')
   for (const spec of PROJECTS) {
     const existing = await client.fetch<string | null>(
-      `*[_type == "project" && slug.current == $slug][0]._id`,
+      `*[_type == "property" && slug.current == $slug][0]._id`,
       {slug: spec.slug},
     )
     if (existing) {
@@ -186,7 +186,7 @@ async function main() {
       continue
     }
     const created = await client.create({
-      _type: 'project',
+      _type: 'property',
       name: spec.name,
       slug: {_type: 'slug', current: spec.slug},
       propertyTypes: spec.propertyTypes.map((s) => reference(propertyTypeIds.get(s)!, `pt-${s}`)),

@@ -41,3 +41,8 @@ next-env.d.ts
 .agents
 .claude/skills
 skills.json
+# Raw WordPress extraction and import reports (names and local photo paths)
+studio/scripts/data/wordpress/
+
+# Migration reports (generated)
+studio/scripts/data/migrations/

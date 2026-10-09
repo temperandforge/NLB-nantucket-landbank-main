@@ -89,3 +89,181 @@ export function ArrowForwardIcon({className}: IconProps) {
     </svg>
   )
 }
+
+/** Arrow pointing right. Figma: Icon / Arrow right. 24 x 24. */
+export function ArrowRightIcon({className}: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      className={className}
+    >
+      <path
+        d="M5 12H19M12 19L19 12L12 5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+/** Arrow pointing left: the right arrow's own geometry, mirrored. */
+export function ArrowLeftIcon({className}: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      className={className}
+    >
+      <path
+        d="M19 12H5M12 19L5 12L12 5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+/** Download tray with arrow. Figma: Icon / Download. 24 x 24. */
+export function DownloadIcon({className}: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      className={className}
+    >
+      <path
+        d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15M17 10L12 15L7 10M12 15V3"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+/** Clock, from nlb-design's events preview. 24 x 24. */
+export function ClockIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <circle cx="12" cy="13" r="8" stroke="currentColor" strokeWidth="2" />
+      <path
+        d="M12 9V13L14.5 14.5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M9 2H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+/** Map pin, from nlb-design's events preview. 24 x 24. */
+export function MapPinIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <path
+        d="M12 22C12 22 19 15.4183 19 10C19 5.58172 15.866 2 12 2C8.13401 2 5 5.58172 5 10C5 15.4183 12 22 12 22Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="10" r="2.5" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  )
+}
+
+/** Large arrow pointing down and right, from nlb-design's news preview call to action. 70 x 69. */
+export function ArrowDownRightIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 70 69" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <path
+        d="M57.9762 61.5984L0 4.70981L4.79985 0L62.776 56.8886L62.776 2.32783L69.5978 2.35491L69.5978 68.2922L2.39991 68.2922L2.37231 61.5984L57.9762 61.5984Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
+
+/** Chevron pointing down. Figma: chevron-down. 24 x 24. */
+export function ChevronDownIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+/** Chevron pointing up. Figma: chevron-up. 24 x 24. */
+export function ChevronUpIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <path d="M18 15L12 9L6 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+/** Link, from the Figma news template's Share row (Icon / link-alt). 24 x 24. */
+export function LinkAltIcon({className}: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      className={className}
+    >
+      <path
+        d="M4.22196 19.778C4.68584 20.2425 5.23693 20.6108 5.84358 20.8617C6.45023 21.1126 7.10048 21.2411 7.75696 21.24C8.41359 21.2411 9.06398 21.1125 9.67079 20.8617C10.2776 20.6108 10.8289 20.2425 11.293 19.778L14.121 16.949L12.707 15.535L9.87896 18.364C9.31543 18.925 8.55263 19.2399 7.75746 19.2399C6.96229 19.2399 6.19949 18.925 5.63596 18.364C5.07447 17.8007 4.75917 17.0378 4.75917 16.2425C4.75917 15.4471 5.07447 14.6842 5.63596 14.121L8.46496 11.293L7.05096 9.87896L4.22196 12.707C3.28577 13.6454 2.76001 14.9169 2.76001 16.2425C2.76001 17.568 3.28577 18.8395 4.22196 19.778ZM19.778 11.293C20.7137 10.3542 21.2391 9.08288 21.2391 7.75746C21.2391 6.43204 20.7137 5.16068 19.778 4.22196C18.8395 3.28577 17.568 2.76001 16.2425 2.76001C14.9169 2.76001 13.6454 3.28577 12.707 4.22196L9.87896 7.05096L11.293 8.46496L14.121 5.63596C14.6845 5.07495 15.4473 4.75999 16.2425 4.75999C17.0376 4.75999 17.8004 5.07495 18.364 5.63596C18.9255 6.19923 19.2408 6.96213 19.2408 7.75746C19.2408 8.55279 18.9255 9.31569 18.364 9.87896L15.535 12.707L16.949 14.121L19.778 11.293Z"
+        fill="currentColor"
+      />
+      <path d="M8.46395 16.95L7.04895 15.536L15.536 7.05005L16.95 8.46505L8.46395 16.95Z" fill="currentColor" />
+    </svg>
+  )
+}
+
+/** Figma: map-pinned (2570:12334). A pin over a base, 24 x 24, drawn with a 2px stroke. */
+export function MapPinnedIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <path
+        d="M8.714 14H5.004C4.79433 14.0001 4.58999 14.0661 4.41987 14.1886C4.24976 14.3112 4.12247 14.4841 4.056 14.683L2.052 20.683C2.00176 20.8333 1.98797 20.9934 2.01175 21.1501C2.03554 21.3068 2.09623 21.4556 2.18882 21.5842C2.28141 21.7128 2.40324 21.8176 2.54428 21.8899C2.68532 21.9622 2.84152 21.9999 3 22H21C21.1584 21.9999 21.3144 21.9621 21.4554 21.8899C21.5963 21.8177 21.7181 21.713 21.8106 21.5845C21.9032 21.456 21.9639 21.3074 21.9878 21.1508C22.0117 20.9942 21.998 20.8343 21.948 20.684L19.948 14.684C19.8817 14.4848 19.7543 14.3115 19.584 14.1888C19.4136 14.066 19.209 13.9999 18.999 14H15.287M18 8C18 11.613 14.131 15.429 12.607 16.795C12.4327 16.9282 12.2194 17.0003 12 17.0003C11.7806 17.0003 11.5673 16.9282 11.393 16.795C9.87 15.429 6 11.613 6 8C6 6.4087 6.63214 4.88258 7.75736 3.75736C8.88258 2.63214 10.4087 2 12 2C13.5913 2 15.1174 2.63214 16.2426 3.75736C17.3679 4.88258 18 6.4087 18 8ZM14 8C14 9.10457 13.1046 10 12 10C10.8954 10 10 9.10457 10 8C10 6.89543 10.8954 6 12 6C13.1046 6 14 6.89543 14 8Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+/** Figma: briefcase-business (2570:12328). 24 x 24, drawn with a 2px stroke. */
+export function BriefcaseBusinessIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <path
+        d="M12 12H12.01M16 6V4C16 3.46957 15.7893 2.96086 15.4142 2.58579C15.0391 2.21071 14.5304 2 14 2H10C9.46957 2 8.96086 2.21071 8.58579 2.58579C8.21071 2.96086 8 3.46957 8 4V6M22 13C19.0328 14.959 15.5555 16.0033 12 16.0033C8.44445 16.0033 4.96721 14.959 2 13M4 6H20C21.1046 6 22 6.89543 22 8V18C22 19.1046 21.1046 20 20 20H4C2.89543 20 2 19.1046 2 18V8C2 6.89543 2.89543 6 4 6Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}

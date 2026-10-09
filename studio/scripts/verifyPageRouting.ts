@@ -17,6 +17,7 @@ import {
   buildPagePath,
   MAX_PAGE_DEPTH,
   PAGE_LOCATION_SELECT,
+  previewPathToGroq,
   PAGE_PRESENTATION_ROUTES,
 } from '../src/lib/pageHierarchy'
 
@@ -42,10 +43,11 @@ function check(condition: boolean, message: string) {
 }
 
 async function main() {
-  // Exercises the same dereferencing projection the location resolver uses, so if `parent->` in
-  // a defineLocations select were invalid GROQ, this would surface it.
+  // The location resolver's select uses preview paths ("parent.slug.current"); this checks the
+  // same fields through their GROQ equivalent. It cannot prove the preview store follows the
+  // reference - that is checked in Presentation itself.
   const select = Object.entries(PAGE_LOCATION_SELECT)
-    .map(([alias, path]) => `"${alias}": ${path}`)
+    .map(([alias, path]) => `"${alias}": ${previewPathToGroq(path)}`)
     .join(', ')
 
   const pages = await client.fetch<PageRow[]>(
@@ -60,7 +62,7 @@ async function main() {
 
   console.log('Location projection resolves the parent chain:')
   const nested = pages.filter((p) => p.parentSlug)
-  check(nested.length > 0, `${nested.length} page(s) resolved a parentSlug via "parent->slug.current"`)
+  check(nested.length > 0, `${nested.length} page(s) resolved a parentSlug via parent->slug.current`)
 
   /**
    * Presentation picks the route whose parameter count matches the URL's segment count, so only

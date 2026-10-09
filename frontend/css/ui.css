@@ -1,0 +1,400 @@
+/**
+ * Shared UI and block helpers ported from the nlb-design project (css/components/*.css and
+ * css/tokens.css). Tokens stay in tokens.css; this file adds only what the ported components
+ * need. Differences from nlb-design's tokens are listed in
+ * docs/superpowers/plans/2026-10-07-absorb-nlb-design-phase-a.md.
+ */
+
+/* ---- Fluid section spacing, nlb-design --spacing-s1..s9 (375px -> 1440px) ------------------- */
+@theme {
+  --spacing-s1: clamp(1.25rem, calc(1.25rem + 20 * (100vw - 375px) / 1065), 2.5rem); /* Hero - Tertiary top */
+  --spacing-s2: clamp(2rem, calc(2rem + 8 * (100vw - 375px) / 1065), 2.5rem); /* Hero - Secondary */
+  --spacing-s3: clamp(2.5rem, calc(2.5rem + 24 * (100vw - 375px) / 1065), 4rem); /* Hero - Tertiary, interactive map */
+  --spacing-s4: clamp(3rem, calc(3rem + 32 * (100vw - 375px) / 1065), 5rem);
+  --spacing-s5: clamp(4rem, calc(4rem + 16 * (100vw - 375px) / 1065), 5rem); /* Image Carousel */
+  --spacing-s6: clamp(4rem, calc(4rem + 32 * (100vw - 375px) / 1065), 6rem); /* Basic - Left Right Text */
+  --spacing-s7: clamp(4rem, calc(4rem + 64 * (100vw - 375px) / 1065), 8rem);
+  --spacing-s8: clamp(5rem, calc(5rem + 48 * (100vw - 375px) / 1065), 8rem);
+  --spacing-s9: clamp(5rem, calc(5rem + 80 * (100vw - 375px) / 1065), 10rem); /* Home - Mission */
+}
+
+/* ---- Headline utilities (as in nlb-design). The fluid sizes live in tokens.css. -------------- */
+@utility text-heading-base {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+}
+
+@utility text-headline-2xl {
+  @apply text-heading-base;
+  font-size: var(--text-headline-2xl);
+}
+
+@utility text-headline-xl {
+  @apply text-heading-base;
+  font-size: var(--text-headline-xl);
+}
+
+@utility text-headline-lg {
+  @apply text-heading-base;
+  font-size: var(--text-headline-lg);
+}
+
+@utility text-headline-base {
+  @apply text-heading-base;
+  font-size: var(--text-headline-base);
+}
+
+@utility text-headline-sm {
+  @apply text-heading-base;
+  font-size: var(--text-headline-sm);
+}
+
+/* ---- Hover overlays. tokens.css has solid hexes for hover-*; nlb-design uses translucent mixes. */
+:root {
+  --ui-hover-lighter: color-mix(in srgb, var(--color-dusty-heath-1000) 70%, transparent);
+  --ui-hover-darker: color-mix(in srgb, var(--color-dusty-heath-200) 8%, transparent);
+}
+
+/* ---- Tag. Letter-spacing is --tracking-wide (2px), as in nlb-design. ------------------------- */
+@utility tag-label {
+  white-space: nowrap;
+  overflow-wrap: break-word;
+  font-family: var(--font-mono);
+  font-size: var(--text-body-small);
+  line-height: 1.6;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-on-tag);
+}
+
+/* ---- Button family (Figma Design System: Button 479-1169, Icon Button 522-463, Link Button 687-587) */
+@utility button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--spacing) * 2);
+  height: 3rem;
+  padding-inline: calc(var(--spacing) * 5);
+  overflow: clip;
+  position: relative;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--text-body-base);
+  line-height: 1.6;
+  letter-spacing: var(--tracking-normal);
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@utility button-primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+
+  &:hover:not(:disabled) {
+    background-image: linear-gradient(var(--ui-hover-darker), var(--ui-hover-darker));
+  }
+}
+
+@utility button-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-on-secondary);
+
+  &:hover:not(:disabled) {
+    background-image: linear-gradient(var(--ui-hover-lighter), var(--ui-hover-lighter));
+  }
+}
+
+@utility button-ghost {
+  background-color: transparent;
+  color: var(--color-on-primary);
+
+  &:hover:not(:disabled) {
+    background-image: linear-gradient(var(--ui-hover-darker), var(--ui-hover-darker));
+  }
+}
+
+@utility icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@utility icon-button-primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+
+  &:hover:not(:disabled) {
+    background-image: linear-gradient(var(--ui-hover-darker), var(--ui-hover-darker));
+    color: var(--color-accent-secondary);
+  }
+}
+
+@utility icon-button-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-on-secondary);
+
+  &:hover:not(:disabled) {
+    background-image: linear-gradient(var(--ui-hover-lighter), var(--ui-hover-lighter));
+  }
+}
+
+@utility icon-button-ghost {
+  background-color: transparent;
+  color: var(--color-on-primary);
+
+  &:hover:not(:disabled) {
+    background-image: linear-gradient(var(--ui-hover-darker), var(--ui-hover-darker));
+  }
+}
+
+@utility link-button {
+  display: flex;
+  align-items: center;
+  height: 3rem;
+  padding-inline: calc(var(--spacing) * 5);
+  gap: calc(var(--spacing) * 2);
+  overflow: clip;
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: var(--text-body-base);
+  line-height: 1.6;
+  letter-spacing: var(--tracking-normal);
+  color: var(--color-on-primary);
+  cursor: pointer;
+
+  &:hover {
+    gap: calc(var(--spacing) * 4);
+  }
+
+  &:hover .link-button-icon {
+    color: var(--color-secondary);
+  }
+}
+
+@utility link-button-icon {
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color-on-primary);
+  transition: color 150ms ease;
+}
+
+/* ---- Link item / link row (Figma Design System 114-258, 673-1914) ------------------------------ */
+@utility link-item-base {
+  display: flex;
+  align-items: flex-end;
+  gap: calc(var(--spacing) * 4);
+  overflow: clip;
+  border-radius: 4px;
+  background-color: var(--color-surface-dark);
+  padding-block: var(--spacing-gap-sm);
+  padding-inline: var(--spacing-gap-md);
+
+  & > span,
+  & > p {
+    flex: 1 0 0%;
+    min-width: 1px;
+    word-break: break-word;
+    font-family: var(--font-mono);
+    font-size: var(--text-body-base);
+    line-height: 1.6;
+    letter-spacing: var(--tracking-normal);
+  }
+
+  & > svg {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+@utility link-item--inactive {
+  @apply link-item-base;
+
+  & > span,
+  & > p {
+    color: var(--color-on-background-subtle);
+  }
+}
+
+@utility link-item--hover {
+  @apply link-item-base;
+  background: linear-gradient(0deg, var(--ui-hover-darker) 0%, var(--ui-hover-darker) 100%),
+    var(--color-surface-dark);
+
+  & > span,
+  & > p {
+    color: var(--color-on-surface-dark);
+  }
+}
+
+/* ---- Timeline slider (ported from nlb-design history-slider.css) ------------------------------- */
+.history-slider-arrow:focus-visible {
+  outline: 2px solid var(--color-dusty-heath-300);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .history-slider .splide__list {
+    transition-duration: 0s !important;
+  }
+}
+
+/* ---- Decorative line art backgrounds ----------------------------------------------------------- */
+.basic-left-right__lines {
+  background: url('/images/blocks/decorative-line-basic-left-right.svg') center / cover no-repeat;
+}
+
+.mission-statement__lines {
+  background: url('/images/blocks/decorative-line-mission.svg') center / cover no-repeat;
+}
+
+/* Rich text in Basic - Left Right Text (nlb-design BasicLeftRight): sections 64px apart, a
+   heading 24px above its text, link rows 16px apart (set on the anchor-links wrapper). */
+.rich-text-basic {
+  color: var(--rich-text-color, var(--color-on-background));
+  font-family: var(--font-sans);
+  font-size: var(--rich-text-size, var(--text-body-base));
+  line-height: 1.6;
+}
+
+.rich-text-basic > * + * {
+  margin-top: 1.5rem;
+}
+
+.rich-text-basic > h3,
+.rich-text-basic > h4,
+.rich-text-basic > h5,
+.rich-text-basic > h6 {
+  margin-top: 4rem;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+}
+
+.rich-text-basic > h3 {
+  font-size: var(--text-headline-lg);
+}
+
+.rich-text-basic > h4 {
+  font-size: var(--text-headline-base);
+}
+
+.rich-text-basic > h5,
+.rich-text-basic > h6 {
+  font-size: var(--text-headline-sm);
+}
+
+.rich-text-basic > :first-child {
+  margin-top: 0;
+}
+
+.rich-text-basic > div:has(> a.link-item--inactive) {
+  margin-top: 4rem;
+}
+
+.rich-text-basic a:not(.link-item--inactive) {
+  text-decoration: underline;
+}
+
+.rich-text-basic ul,
+.rich-text-basic ol {
+  padding-left: 1.5rem;
+}
+
+.rich-text-basic ul {
+  list-style: disc;
+}
+
+.rich-text-basic ol {
+  list-style: decimal;
+}
+
+/* Map Teaser (Figma 1910:9569). The brown panel's line art is a very wide drawing, positioned as
+   in the design: 10381 x 1369, offset -541px from the top. */
+.map-teaser__lines {
+  background: url('/images/blocks/map-teaser-lines.svg') 0 -541px / 10381.64px 1369.495px no-repeat;
+}
+
+/* Article body (Figma news template, 1910:14865): body text, 20px between paragraphs, 40px around
+   an image, headings from the headline scale. */
+.rich-text-article {
+  color: var(--color-on-background);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-base);
+  line-height: 1.6;
+}
+
+.rich-text-article > * + * {
+  margin-top: 1.25rem;
+}
+
+.rich-text-article > figure {
+  margin-block: 2.5rem;
+}
+
+.rich-text-article > :first-child {
+  margin-top: 0;
+}
+
+.rich-text-article > h3,
+.rich-text-article > h4,
+.rich-text-article > h5,
+.rich-text-article > h6 {
+  margin-top: 2.5rem;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+}
+
+.rich-text-article > h3 {
+  font-size: var(--text-headline-lg);
+}
+
+.rich-text-article > h4 {
+  font-size: var(--text-headline-base);
+}
+
+.rich-text-article > h5,
+.rich-text-article > h6 {
+  font-size: var(--text-headline-sm);
+}
+
+.rich-text-article a:not(.link-item--inactive) {
+  text-decoration: underline;
+}
+
+.rich-text-article ul,
+.rich-text-article ol {
+  padding-left: 1.5rem;
+}
+
+.rich-text-article ul {
+  list-style: disc;
+}
+
+.rich-text-article ol {
+  list-style: decimal;
+}
+
+.article-curve {
+  background: url('/images/blocks/article-curve.svg') center / 100% 100% no-repeat;
+}

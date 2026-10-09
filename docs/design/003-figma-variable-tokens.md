@@ -1,0 +1,2 @@
+- open the variables panel
+- export each page

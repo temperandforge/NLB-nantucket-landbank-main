@@ -1,6 +1,6 @@
 import {MetadataRoute} from 'next'
 import {sanityFetch} from '@/sanity/lib/live'
-import {sitemapData} from '@/sanity/lib/queries'
+import {articleSitemapData, sitemapData} from '@/sanity/lib/queries'
 import {headers} from 'next/headers'
 
 /**
@@ -9,7 +9,7 @@ import {headers} from 'next/headers'
  */
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const allPostsAndPages = await sanityFetch({
+  const allPages = await sanityFetch({
     query: sitemapData,
   })
   const headersList = await headers()
@@ -22,39 +22,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'monthly',
   })
 
-  if (allPostsAndPages != null && allPostsAndPages.data.length != 0) {
-    let priority: number
-    let changeFrequency:
-      | 'monthly'
-      | 'always'
-      | 'hourly'
-      | 'daily'
-      | 'weekly'
-      | 'yearly'
-      | 'never'
-      | undefined
-    let url: string
-
-    for (const p of allPostsAndPages.data) {
-      switch (p._type) {
-        case 'page':
-          priority = 0.8
-          changeFrequency = 'monthly'
-          url = `${domain}/${p.slug}`
-          break
-        case 'post':
-          priority = 0.5
-          changeFrequency = 'never'
-          url = `${domain}/posts/${p.slug}`
-          break
-      }
+  if (allPages != null && allPages.data.length != 0) {
+    for (const p of allPages.data) {
       sitemap.push({
         lastModified: p._updatedAt || new Date(),
-        priority,
-        changeFrequency,
-        url,
+        priority: 0.8,
+        changeFrequency: 'monthly',
+        url: `${domain}/${p.slug}`,
       })
     }
+  }
+
+  const articles = await sanityFetch({query: articleSitemapData})
+  for (const article of articles.data) {
+    if (!article.slug) continue
+    sitemap.push({
+      lastModified: article._updatedAt || new Date(),
+      priority: 0.6,
+      changeFrequency: 'monthly',
+      url: `${domain}/news/${article.slug}`,
+    })
   }
 
   return sitemap

@@ -8,33 +8,88 @@
  *
  */
 
-import {PortableText, type PortableTextComponents, type PortableTextBlock} from 'next-sanity'
+import {
+  PortableText,
+  stegaClean,
+  type PortableTextComponents,
+  type PortableTextBlock,
+} from 'next-sanity'
 import ResolvedLink from '@/components/ResolvedLink'
 import Image from '@/components/SanityImage'
+import LinkRow from '@/components/ui/LinkRow'
+import {ExtractPageBuilderType} from '@/sanity/lib/types'
+import {linkResolver} from '@/sanity/lib/utils'
+
+/** One row of an anchor-links item, derived from the generated query result so it cannot drift. */
+type AnchorLinkRow = NonNullable<
+  Extract<
+    NonNullable<ExtractPageBuilderType<'basicLeftRightText'>['rightContent']>[number],
+    {_type: 'anchorLinks'}
+  >['links']
+>[number]
 
 export default function CustomPortableText({
   className,
   value,
+  sectionIds,
+  variant = 'prose',
 }: {
   className?: string
   value: PortableTextBlock[]
+  /** Block _key -> id for H2 section headings, so a jump nav can link to them. */
+  sectionIds?: Record<string, string>
+  /** `prose` uses Tailwind Typography; `basic` uses the nlb-design rich-text styles. */
+  variant?: 'prose' | 'basic' | 'article'
 }) {
   const components: PortableTextComponents = {
     types: {
+      anchorLinks: ({value}) => {
+        const rows = ((value?.links ?? []) as AnchorLinkRow[]).flatMap((row) => {
+          // A row needs a label and a link that resolves; anything else would be a dead row.
+          const href = row.link ? linkResolver(row.link) : null
+          if (!row.label || !href) return []
+          return [
+            {
+              key: row._key,
+              label: row.label,
+              href,
+              icon: stegaClean(row.icon) === 'download' ? ('download' as const) : ('link' as const),
+              newTab: Boolean(row.link?.openInNewTab),
+            },
+          ]
+        })
+        if (rows.length === 0) return null
+        return (
+          <div className="flex flex-col gap-4">
+            {rows.map((row) => (
+              <LinkRow
+                key={row.key}
+                label={row.label}
+                href={row.href}
+                icon={row.icon}
+                newTab={row.newTab}
+              />
+            ))}
+          </div>
+        )
+      },
       image: ({value}) => {
         if (!value?.asset?._ref) {
           return null
         }
-
+        const isArticle = variant === 'article'
         return (
-          <figure className="my-8">
+          <figure className={isArticle ? '' : 'my-8'}>
             <Image
               id={value.asset._ref}
               alt={value.alt || ''}
-              width={672}
+              width={isArticle ? 1640 : 672}
+              sizes={isArticle ? '(min-width: 820px) 820px, 100vw' : undefined}
               crop={value.crop}
+              // The article crops every image to a strip, so honour the editor's focal point.
+              hotspot={isArticle ? value.hotspot : undefined}
               mode="cover"
-              className="rounded-sm"
+              className={isArticle ? 'h-[362px] w-full rounded object-cover' : 'rounded-sm'}
             />
           </figure>
         )
@@ -67,6 +122,14 @@ export default function CustomPortableText({
         </h1>
       ),
       h2: ({children, value}) => {
+        // In a jump nav, an H2 is a section and takes the id its nav link points at.
+        if (sectionIds) {
+          return (
+            <h2 id={value?._key ? sectionIds[value._key] : undefined} className="scroll-mt-10">
+              {children}
+            </h2>
+          )
+        }
         // Add an anchor to the h2
         return (
           <h2 className="group relative">
@@ -102,7 +165,15 @@ export default function CustomPortableText({
   }
 
   return (
-    <div className={`prose-a:text-brand prose dark:prose-invert ${className}`}>
+    <div
+      className={
+        variant === 'basic'
+          ? `rich-text-basic ${className ?? ''}`
+          : variant === 'article'
+            ? `rich-text-article ${className ?? ''}`
+            : `prose-a:text-brand prose dark:prose-invert ${className}`
+      }
+    >
       <PortableText components={components} value={value} />
     </div>
   )

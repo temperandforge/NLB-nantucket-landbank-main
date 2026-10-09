@@ -50,16 +50,37 @@ export const PAGE_PRESENTATION_ROUTES = [
 /**
  * The fields a page's location resolver needs in order to assemble its URL. Kept here so the
  * projection and the depth limit stay in step.
+ *
+ * These are document-preview paths, not GROQ: Presentation reads them through the preview store,
+ * which follows a reference when a path crosses one ("parent.slug.current"). GROQ's `->` is NOT
+ * understood there - it is read as part of a field name, so the value comes back undefined and the
+ * URL silently loses its ancestors (a nested page previewed at "/conservation").
  */
 export const PAGE_LOCATION_SELECT = {
   name: 'name',
   slug: 'slug.current',
   pathOnly: 'pathOnly',
-  parentSlug: 'parent->slug.current',
-  grandparentSlug: 'parent->parent->slug.current',
+  parentSlug: 'parent.slug.current',
+  grandparentSlug: 'parent.parent.slug.current',
 } as const
 
 /** Assemble a page URL from its own slug and its ancestors', nearest ancestor last. */
 export function buildPagePath(segments: (string | null | undefined)[]): string {
   return segments.filter(Boolean).join('/')
+}
+
+/** Turn a page name into a single URL segment: lowercase, hyphenated, no slashes. */
+export function slugifySegment(input: string): string {
+  return input
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/[\s-]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 96)
+}
+
+/** The GROQ equivalent of a preview path above, for scripts that query the dataset directly. */
+export function previewPathToGroq(path: string): string {
+  return path.replace(/parent\./g, 'parent->')
 }

@@ -1,7 +1,60 @@
 import {defineField, defineType} from 'sanity'
 import {DocumentIcon} from '@sanity/icons'
 
-import {buildPagePath, MAX_PAGE_DEPTH} from '../../lib/pageHierarchy'
+import {basicLeftRightText} from '../objects/basicLeftRightText'
+import {contactForm} from '../objects/contactForm'
+import {ctaContact} from '../objects/ctaContact'
+import {downloadBlock} from '../objects/downloadBlock'
+import {hero} from '../objects/hero'
+import {heroImage} from '../objects/heroImage'
+import {heroSecondary} from '../objects/heroSecondary'
+import {heroTertiary} from '../objects/heroTertiary'
+import {heroVideo} from '../objects/heroVideo'
+import {imageCarousel} from '../objects/imageCarousel'
+import {jumpNavContent} from '../objects/jumpNavContent'
+import {mapTeaser} from '../objects/mapTeaser'
+import {missionStatement} from '../objects/missionStatement'
+import {eventsPreview} from '../objects/eventsPreview'
+import {faqList} from '../objects/faqList'
+import {jobListings} from '../objects/jobListings'
+import {peopleGrid} from '../objects/peopleGrid'
+import {projectGrid} from '../objects/projectGrid'
+import {propertyArchive} from '../objects/propertyArchive'
+import {projectPreview} from '../objects/projectPreview'
+import {newsPreview} from '../objects/newsPreview'
+import {timeline} from '../objects/timeline'
+import {buildPagePath, MAX_PAGE_DEPTH, slugifySegment} from '../../lib/pageHierarchy'
+
+/**
+ * Every block a page can hold. Sorted by title when the Studio loads, so the "Add item" menu is
+ * always alphabetical: a new block only needs adding to this list.
+ */
+const pageBuilderBlocks = [
+  basicLeftRightText,
+  contactForm,
+  ctaContact,
+  downloadBlock,
+  eventsPreview,
+  faqList,
+  hero,
+  heroImage,
+  heroSecondary,
+  heroTertiary,
+  heroVideo,
+  imageCarousel,
+  jobListings,
+  jumpNavContent,
+  mapTeaser,
+  missionStatement,
+  newsPreview,
+  peopleGrid,
+  projectGrid,
+  projectPreview,
+  propertyArchive,
+  timeline,
+]
+  .sort((a, b) => (a.title ?? a.name).localeCompare(b.title ?? b.name))
+  .map((block) => ({type: block.name}))
 
 /**
  * Page schema.  Define and edit the fields for the 'page' content type.
@@ -43,50 +96,25 @@ function publishedId(id: string): string {
 
 export const page = defineType({
   name: 'page',
-  title: 'Flexible Page',
+  title: 'Page',
   type: 'document',
   icon: DocumentIcon,
+  groups: [
+    {name: 'content', title: 'Content', default: true},
+    {name: 'settings', title: 'Settings'},
+  ],
   fields: [
     defineField({
       name: 'name',
+      group: 'content',
       title: 'Name',
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
 
     defineField({
-      name: 'parent',
-      title: 'Parent page',
-      type: 'reference',
-      to: [{type: 'page'}],
-      description:
-        'Optional. Nests this page under another one in the URL. Leave empty for a top-level page. The parent must be published, or this page’s URL will break.',
-      validation: (Rule) =>
-        Rule.custom(async (value, context) => {
-          const ref = (value as {_ref?: string} | undefined)?._ref
-          if (!ref) return true
-
-          const selfId = publishedId(context.document?._id ?? '')
-          if (publishedId(ref) === selfId) return 'A page cannot be its own parent.'
-
-          const client = context.getClient({apiVersion: '2025-09-25'})
-          const chain = (await ancestorIds(client, ref)).map(publishedId)
-
-          // A cycle would make path computation non-terminating.
-          if (chain.includes(selfId)) {
-            return 'This would create a loop - the chosen page is already below this one.'
-          }
-          // chain excludes the parent itself, so its length is the parent's own ancestor count.
-          // parent + its ancestors + this page must stay within MAX_PAGE_DEPTH.
-          if (chain.length + 2 > MAX_PAGE_DEPTH) {
-            return `Pages can be nested ${MAX_PAGE_DEPTH} levels deep at most. Choose a parent nearer the top.`
-          }
-          return true
-        }),
-    }),
-
-    defineField({
       name: 'slug',
+      group: 'settings',
       title: 'Slug',
       type: 'slug',
       description:
@@ -126,19 +154,45 @@ export const page = defineType({
         source: 'name',
         maxLength: 96,
         // Slashes are stripped: a slug is one segment, and nesting comes from 'parent'.
-        slugify: (input) =>
-          input
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9\s-]/g, '')
-            .replace(/[\s-]+/g, '-')
-            .replace(/^-|-$/g, '')
-            .slice(0, 96),
+        slugify: slugifySegment,
       },
     }),
 
     defineField({
+      name: 'parent',
+      group: 'settings',
+      title: 'Parent page',
+      type: 'reference',
+      to: [{type: 'page'}],
+      description:
+        'Optional. Nests this page under another one in the URL. Leave empty for a top-level page. The parent must be published, or this page’s URL will break.',
+      validation: (Rule) =>
+        Rule.custom(async (value, context) => {
+          const ref = (value as {_ref?: string} | undefined)?._ref
+          if (!ref) return true
+
+          const selfId = publishedId(context.document?._id ?? '')
+          if (publishedId(ref) === selfId) return 'A page cannot be its own parent.'
+
+          const client = context.getClient({apiVersion: '2025-09-25'})
+          const chain = (await ancestorIds(client, ref)).map(publishedId)
+
+          // A cycle would make path computation non-terminating.
+          if (chain.includes(selfId)) {
+            return 'This would create a loop - the chosen page is already below this one.'
+          }
+          // chain excludes the parent itself, so its length is the parent's own ancestor count.
+          // parent + its ancestors + this page must stay within MAX_PAGE_DEPTH.
+          if (chain.length + 2 > MAX_PAGE_DEPTH) {
+            return `Pages can be nested ${MAX_PAGE_DEPTH} levels deep at most. Choose a parent nearer the top.`
+          }
+          return true
+        }),
+    }),
+
+    defineField({
       name: 'pathOnly',
+      group: 'settings',
       title: 'Path segment only (no page of its own)',
       type: 'boolean',
       initialValue: false,
@@ -147,33 +201,19 @@ export const page = defineType({
     }),
 
     defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-      // Not required for a path-only page: it is never rendered, so it has no heading to show.
-      hidden: ({document}) => Boolean(document?.pathOnly),
-      validation: (Rule) =>
-        Rule.custom((value, context) => {
-          if (context.document?.pathOnly) return true
-          return value ? true : 'Required'
-        }),
-    }),
-    defineField({
-      name: 'subheading',
-      title: 'Subheading',
-      type: 'string',
-      hidden: ({document}) => Boolean(document?.pathOnly),
-    }),
-    defineField({
       name: 'pageBuilder',
+      group: 'content',
       title: 'Page builder',
       type: 'array',
-      of: [{type: 'callToAction'}, {type: 'infoSection'}],
+      of: pageBuilderBlocks,
       hidden: ({document}) => Boolean(document?.pathOnly),
       options: {
         insertMenu: {
-          // Configure the "Add Item" menu to display a thumbnail preview of the content type. https://www.sanity.io/docs/studio/array-type#efb1fe03459d
+          filter: true,
+          // List is the default; the grid shows a preview image per block, read from
+          // studio/static/page-builder-thumbnails/<block name>.webp (716 x 369).
           views: [
+            {name: 'list'},
             {
               name: 'grid',
               previewImageUrl: (schemaTypeName) =>

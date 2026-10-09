@@ -15,6 +15,35 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: ../sanity.schema.json
+export type SanityImageAssetReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
+}
+
+export type CarouselImageImage = {
+  asset?: SanityImageAssetReference
+  media?: unknown // Unable to locate the referenced type "carouselImage.image.media" in schema
+  hotspot?: SanityImageHotspot
+  crop?: SanityImageCrop
+  alt?: string
+  _type: 'image'
+}
+
+export type SanityFileAssetReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'sanity.fileAsset'
+}
+
+export type DownloadFile = {
+  asset?: SanityFileAssetReference
+  media?: unknown // Unable to locate the referenced type "file.media" in schema
+  _type: 'file'
+}
+
 export type SocialLink = {
   _type: 'socialLink'
   platform: 'facebook' | 'instagram' | 'linkedin' | 'x' | 'youtube'
@@ -53,6 +82,52 @@ export type MenuGroup = {
   >
 }
 
+export type CtaContact = {
+  _type: 'ctaContact'
+  heading?: string
+  body?: string
+  button?: Button
+  desktopImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  mobileImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  disabled?: boolean
+}
+
+export type MissionStatement = {
+  _type: 'missionStatement'
+  eyebrow?: string
+  heading: string
+  links?: Array<{
+    label: string
+    link?: Link
+    _type: 'missionLink'
+    _key: string
+  }>
+  disabled?: boolean
+}
+
+export type AnchorLinks = {
+  _type: 'anchorLinks'
+  links?: Array<{
+    label: string
+    link?: Link
+    icon?: 'link' | 'download'
+    _type: 'anchorLink'
+    _key: string
+  }>
+}
+
 export type PageReference = {
   _ref: string
   _type: 'reference'
@@ -60,51 +135,187 @@ export type PageReference = {
   [internalGroqTypeReferenceTo]?: 'page'
 }
 
-export type PostReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'post'
-}
-
 export type Link = {
   _type: 'link'
-  linkType?: 'href' | 'page' | 'post'
+  linkType?: 'href' | 'page'
   href?: string
   page?: PageReference
-  post?: PostReference
   openInNewTab?: boolean
 }
 
-export type SanityImageAssetReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
+export type ContactForm = {
+  _type: 'contactForm'
+  heading?: string
+  disabled?: boolean
 }
 
-export type CallToAction = {
-  _type: 'callToAction'
+export type MapTeaser = {
+  _type: 'mapTeaser'
+  heading?: string
+  body?: string
+  disabled?: boolean
+}
+
+export type DownloadBlock = {
+  _type: 'downloadBlock'
+  downloads?: Array<{
+    label?: string
+    file: DownloadFile
+    _type: 'download'
+    _key: string
+  }>
+  disabled?: boolean
+}
+
+export type Timeline = {
+  _type: 'timeline'
+  entries?: Array<{
+    year: string
+    title: string
+    description?: string
+    _type: 'timelineEntry'
+    _key: string
+  }>
+  disabled?: boolean
+}
+
+export type ImageCarousel = {
+  _type: 'imageCarousel'
   eyebrow?: string
+  images?: Array<{
+    image: CarouselImageImage
+    caption?: string
+    _type: 'carouselImage'
+    _key: string
+  }>
+  disabled?: boolean
+}
+
+export type JumpNavContent = {
+  _type: 'jumpNavContent'
+  heading?: string
+  headingLevel?: 'h1' | 'h2'
+  content?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>
+          text?: string
+          _type: 'span'
+          _key: string
+        }>
+        style?: 'normal' | 'h3' | 'h4' | 'h5' | 'h6'
+        listItem?: 'bullet' | 'number'
+        markDefs?: Array<
+          {
+            _key: string
+          } & Link
+        >
+        level?: number
+        _type: 'block'
+        _key: string
+      }
+    | {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        _type: 'image'
+        _key: string
+      }
+  >
+  disabled?: boolean
+}
+
+export type BasicLeftRightText = {
+  _type: 'basicLeftRightText'
+  eyebrow?: string
+  heading?: string
+  headingLevel?: 'h1' | 'h2'
+  buttons?: Array<{
+    label: string
+    link?: Link
+    variant?: 'primary' | 'secondary' | 'ghost'
+    _type: 'blockButton'
+    _key: string
+  }>
+  rightContent?: BlockContent
+  disabled?: boolean
+}
+
+export type HeroTertiary = {
+  _type: 'heroTertiary'
+  eyebrow?: string
+  heading?: string
+  headingLevel?: 'h1' | 'h2'
+  body?: string
+  disabled?: boolean
+}
+
+export type HeroSecondary = {
+  _type: 'heroSecondary'
+  eyebrow?: string
+  body?: string
+  image: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  variant?: 'lowlands' | 'moody-moor' | 'light-brown'
+  disabled?: boolean
+}
+
+export type HeroImage = {
+  _type: 'heroImage'
+  eyebrow: string
   heading: string
-  body?: BlockContentTextOnly
-  button?: Button
+  image: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  disabled?: boolean
+}
+
+export type Hero = {
+  _type: 'hero'
+  eyebrow?: string
+  heading?: string
+  body?: string
   image?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  disabled?: boolean
+}
+
+export type HeroVideo = {
+  _type: 'heroVideo'
+  video: {
+    asset?: SanityFileAssetReference
+    media?: unknown
+    _type: 'file'
+  }
+  poster: {
     asset?: SanityImageAssetReference
     media?: unknown
     hotspot?: SanityImageHotspot
     crop?: SanityImageCrop
     _type: 'image'
   }
-  theme?: 'light' | 'dark'
-  contentAlignment?: 'textFirst' | 'imageFirst'
-}
-
-export type InfoSection = {
-  _type: 'infoSection'
-  heading?: string
-  subheading?: string
-  content?: BlockContent
+  alt: string
+  autoplay?: boolean
+  disabled?: boolean
 }
 
 export type BlockContentTextOnly = Array<{
@@ -134,13 +345,12 @@ export type BlockContent = Array<
         _type: 'span'
         _key: string
       }>
-      style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
+      style?: 'normal' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
       listItem?: 'bullet' | 'number'
       markDefs?: Array<{
-        linkType?: 'href' | 'page' | 'post'
+        linkType?: 'href' | 'page'
         href?: string
         page?: PageReference
-        post?: PostReference
         openInNewTab?: boolean
         _type: 'link'
         _key: string
@@ -154,9 +364,13 @@ export type BlockContent = Array<
       media?: unknown
       hotspot?: SanityImageHotspot
       crop?: SanityImageCrop
+      alt?: string
       _type: 'image'
       _key: string
     }
+  | ({
+      _key: string
+    } & AnchorLinks)
 >
 
 export type Button = {
@@ -261,71 +475,6 @@ export type SanityImageHotspot = {
   width: number
 }
 
-export type DepartmentReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'department'
-}
-
-export type StaffMember = {
-  _id: string
-  _type: 'staffMember'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  name: string
-  picture?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    _type: 'image'
-  }
-  jobTitle: string
-  department: DepartmentReference
-  displayOrder: number
-}
-
-export type Department = {
-  _id: string
-  _type: 'department'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  title: string
-  slug: Slug
-  displayOrder: number
-}
-
-export type Commissioner = {
-  _id: string
-  _type: 'commissioner'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  name: string
-  picture?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    _type: 'image'
-  }
-  role: string
-  termEndDate: string
-  displayOrder: number
-}
-
-export type SanityFileAssetReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'sanity.fileAsset'
-}
-
 export type ProjectSettings = {
   _id: string
   _type: 'projectSettings'
@@ -348,28 +497,6 @@ export type ProjectSettings = {
   }
   defaultCenter?: Geopoint
   defaultZoom?: number
-}
-
-export type StaffPage = {
-  _id: string
-  _type: 'staffPage'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  eyebrow: string
-  heading: string
-  intro?: string
-}
-
-export type CommissionersPage = {
-  _id: string
-  _type: 'commissionersPage'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  eyebrow: string
-  heading: string
-  intro?: string
 }
 
 export type MenuReference = {
@@ -425,6 +552,7 @@ export type Settings = {
   _updatedAt: string
   _rev: string
   title: string
+  landingPage?: PageReference
   description?: Array<{
     children?: Array<{
       marks?: Array<string>
@@ -435,10 +563,9 @@ export type Settings = {
     style?: 'normal'
     listItem?: never
     markDefs?: Array<{
-      linkType?: 'href' | 'page' | 'post'
+      linkType?: 'href' | 'page'
       href?: string
       page?: PageReference
-      post?: PostReference
       openInNewTab?: boolean
       _type: 'link'
       _key: string
@@ -465,66 +592,53 @@ export type Page = {
   _updatedAt: string
   _rev: string
   name: string
-  parent?: PageReference
   slug: Slug
+  parent?: PageReference
   pathOnly?: boolean
-  heading?: string
-  subheading?: string
   pageBuilder?: Array<
     | ({
         _key: string
-      } & CallToAction)
+      } & BasicLeftRightText)
     | ({
         _key: string
-      } & InfoSection)
+      } & ContactForm)
+    | ({
+        _key: string
+      } & CtaContact)
+    | ({
+        _key: string
+      } & DownloadBlock)
+    | ({
+        _key: string
+      } & Hero)
+    | ({
+        _key: string
+      } & HeroImage)
+    | ({
+        _key: string
+      } & HeroSecondary)
+    | ({
+        _key: string
+      } & HeroTertiary)
+    | ({
+        _key: string
+      } & HeroVideo)
+    | ({
+        _key: string
+      } & ImageCarousel)
+    | ({
+        _key: string
+      } & JumpNavContent)
+    | ({
+        _key: string
+      } & MapTeaser)
+    | ({
+        _key: string
+      } & MissionStatement)
+    | ({
+        _key: string
+      } & Timeline)
   >
-}
-
-export type PersonReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'person'
-}
-
-export type Post = {
-  _id: string
-  _type: 'post'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  title: string
-  slug: Slug
-  content?: BlockContent
-  excerpt?: string
-  coverImage?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    _type: 'image'
-  }
-  date?: string
-  author?: PersonReference
-}
-
-export type Person = {
-  _id: string
-  _type: 'person'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  firstName: string
-  lastName: string
-  picture: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    _type: 'image'
-  }
 }
 
 export type SanityAssistInstructionTask = {
@@ -764,17 +878,32 @@ export type SanityImageAsset = {
 }
 
 export type AllSanitySchemaTypes =
+  | SanityImageAssetReference
+  | CarouselImageImage
+  | SanityFileAssetReference
+  | DownloadFile
   | SocialLink
   | InfoLine
   | InfoColumn
   | MenuLink
   | MenuGroup
+  | CtaContact
+  | MissionStatement
+  | AnchorLinks
   | PageReference
-  | PostReference
   | Link
-  | SanityImageAssetReference
-  | CallToAction
-  | InfoSection
+  | ContactForm
+  | MapTeaser
+  | DownloadBlock
+  | Timeline
+  | ImageCarousel
+  | JumpNavContent
+  | BasicLeftRightText
+  | HeroTertiary
+  | HeroSecondary
+  | HeroImage
+  | Hero
+  | HeroVideo
   | BlockContentTextOnly
   | BlockContent
   | Button
@@ -787,22 +916,12 @@ export type AllSanitySchemaTypes =
   | Geopoint
   | SanityImageCrop
   | SanityImageHotspot
-  | DepartmentReference
-  | StaffMember
-  | Department
-  | Commissioner
-  | SanityFileAssetReference
   | ProjectSettings
-  | StaffPage
-  | CommissionersPage
   | MenuReference
   | Footer
   | Menu
   | Settings
   | Page
-  | PersonReference
-  | Post
-  | Person
   | SanityAssistInstructionTask
   | SanityAssistTaskStatus
   | SanityAssistSchemaTypeAnnotations

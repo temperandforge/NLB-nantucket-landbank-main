@@ -1,0 +1,194 @@
+{
+  "type-size": {
+    "display-lg": {
+      "$type": "number",
+      "$value": 120,
+      "$extensions": {
+        "com.figma.variableId": "VariableID:39:553",
+        "com.figma.hiddenFromPublishing": true,
+        "com.figma.scopes": [
+          "FONT_SIZE"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:49cdaa72729c9102ce8374daec370ae8e264cfb8/-1:-1",
+          "targetVariableName": "font/size/text-7xl",
+          "targetVariableSetId": "VariableCollectionId:1b5fc6c6bd33a7d7a1ac0056e6397c3f85ec4595/-1:-1",
+          "targetVariableSetName": "primitives"
+        }
+      }
+    },
+    "display-base": {
+      "$type": "number",
+      "$value": 100,
+      "$extensions": {
+        "com.figma.variableId": "VariableID:39:552",
+        "com.figma.hiddenFromPublishing": true,
+        "com.figma.scopes": [
+          "FONT_SIZE"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:bf15fc2bef4bee339601d15bfce8de5a4b965745/-1:-1",
+          "targetVariableName": "font/size/text-6xl",
+          "targetVariableSetId": "VariableCollectionId:1b5fc6c6bd33a7d7a1ac0056e6397c3f85ec4595/-1:-1",
+          "targetVariableSetName": "primitives"
+        }
+      }
+    },
+    "display-sm": {
+      "$type": "number",
+      "$value": 80,
+      "$extensions": {
+        "com.figma.variableId": "VariableID:39:549",
+        "com.figma.hiddenFromPublishing": true,
+        "com.figma.scopes": [
+          "FONT_SIZE"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:31fca9cd069a2ec3917c6f8343c4234157a2b1ad/-1:-1",
+          "targetVariableName": "font/size/text-5xl",
+          "targetVariableSetId": "VariableCollectionId:1b5fc6c6bd33a7d7a1ac0056e6397c3f85ec4595/-1:-1",
+          "targetVariableSetName": "primitives"
+        }
+      }
+    },
+    "headline-xl": {
+      "$type": "number",
+      "$value": 59,
+      "$extensions": {
+        "com.figma.variableId": "VariableID:39:547",
+        "com.figma.hiddenFromPublishing": true,
+        "com.figma.scopes": [
+          "FONT_SIZE"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:3275bd3e1bb2333836f2d3fcf9153e1aa82a9c5f/-1:-1",
+          "targetVariableName": "font/size/text-4xl",
+          "targetVariableSetId": "VariableCollectionId:1b5fc6c6bd33a7d7a1ac0056e6397c3f85ec4595/-1:-1",
+          "targetVariableSetName": "primitives"
+        }
+      }
+    },
+    "headline-lg": {
+      "$type": "number",
+      "$value": 44,
+      "$extensions": {
+        "com.figma.variableId": "VariableID:39:543",
+        "com.figma.hiddenFromPublishing": true,
+        "com.figma.scopes": [
+          "FONT_SIZE"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:f579ba17ecc87b8ac5b303f8a4dbe2a9f81ef930/-1:-1",
+          "targetVariableName": "font/size/text-3xl",
+          "targetVariableSetId": "VariableCollectionId:1b5fc6c6bd33a7d7a1ac0056e6397c3f85ec4595/-1:-1",
+          "targetVariableSetName": "primitives"
+        }
+      }
+    },
+    "headline-base": {
+      "$type": "number",
+      "$value": 32,
+      "$extensions": {
+        "com.figma.variableId": "VariableID:39:545",
+        "com.figma.hiddenFromPublishing": true,
+        "com.figma.scopes": [
+          "FONT_SIZE"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:819d399a3702f82367e766e7104fcdcddaa91c50/-1:-1",
+          "targetVariableName": "font/size/text-2xl",
+          "targetVariableSetId": "VariableCollectionId:1b5fc6c6bd33a7d7a1ac0056e6397c3f85ec4595/-1:-1",
+          "targetVariableSetName": "primitives"
+        }
+      }
+    },
+    "headline-sm": {
+      "$type": "number",
+      "$value": 24,
+      "$extensions": {
+        "com.figma.variableId": "VariableID:39:548",
+        "com.figma.hiddenFromPublishing": true,
+        "com.figma.scopes": [
+          "FONT_SIZE"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:01ac6f80d0663a997d5a735fcb04bacb9742b94a/-1:-1",
+          "targetVariableName": "font/size/text-xl",
+          "targetVariableSetId": "VariableCollectionId:1b5fc6c6bd33a7d7a1ac0056e6397c3f85ec4595/-1:-1",
+          "targetVariableSetName": "primitives"
+        }
+      }
+    },
+    "body-large": {
+      "$type": "number",
+      "$value": 20,
+      "$extensions": {
+        "com.figma.variableId": "VariableID:39:542",
+        "com.figma.hiddenFromPublishing": true,
+        "com.figma.scopes": [
+          "FONT_SIZE"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:f35d54fdef683eb646068470b52867404d1397a0/-1:-1",
+          "targetVariableName": "font/size/text-lg",
+          "targetVariableSetId": "VariableCollectionId:1b5fc6c6bd33a7d7a1ac0056e6397c3f85ec4595/-1:-1",
+          "targetVariableSetName": "primitives"
+        }
+      }
+    },
+    "body-base": {
+      "$type": "number",
+      "$value": 16,
+      "$extensions": {
+        "com.figma.variableId": "VariableID:39:546",
+        "com.figma.hiddenFromPublishing": true,
+        "com.figma.scopes": [
+          "FONT_SIZE"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:10279fd917896b67dde7af6410160f7dfb1e2494/-1:-1",
+          "targetVariableName": "font/size/text-base",
+          "targetVariableSetId": "VariableCollectionId:1b5fc6c6bd33a7d7a1ac0056e6397c3f85ec4595/-1:-1",
+          "targetVariableSetName": "primitives"
+        }
+      }
+    },
+    "body-small": {
+      "$type": "number",
+      "$value": 14,
+      "$extensions": {
+        "com.figma.variableId": "VariableID:39:544",
+        "com.figma.hiddenFromPublishing": true,
+        "com.figma.scopes": [
+          "FONT_SIZE"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:b8c2e44dc48b3294deabead61652b7374a4ee1e0/-1:-1",
+          "targetVariableName": "font/size/text-sm",
+          "targetVariableSetId": "VariableCollectionId:1b5fc6c6bd33a7d7a1ac0056e6397c3f85ec4595/-1:-1",
+          "targetVariableSetName": "primitives"
+        }
+      }
+    },
+    "body-xs": {
+      "$type": "number",
+      "$value": 10,
+      "$extensions": {
+        "com.figma.variableId": "VariableID:39:550",
+        "com.figma.hiddenFromPublishing": true,
+        "com.figma.scopes": [
+          "FONT_SIZE"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:b68c311980093b92020dc3a0e9aad29614c86c6c/-1:-1",
+          "targetVariableName": "font/size/text-xs",
+          "targetVariableSetId": "VariableCollectionId:1b5fc6c6bd33a7d7a1ac0056e6397c3f85ec4595/-1:-1",
+          "targetVariableSetName": "primitives"
+        }
+      }
+    }
+  },
+  "$extensions": {
+    "com.figma.modeName": "desktop"
+  }
+}

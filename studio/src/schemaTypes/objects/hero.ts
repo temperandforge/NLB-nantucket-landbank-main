@@ -1,0 +1,22 @@
+import {ImageIcon} from '@sanity/icons'
+import {defineField} from 'sanity'
+
+import {defineBlock, eyebrowField, imageWithAltField} from './blockFields'
+
+/** Centred hero: eyebrow, heading, intro and a wide image. */
+export const hero = defineBlock({
+  name: 'hero',
+  title: 'Hero',
+  type: 'object',
+  icon: ImageIcon,
+  fields: [
+    eyebrowField(),
+    defineField({name: 'heading', title: 'Heading', type: 'string'}),
+    defineField({name: 'body', title: 'Intro', type: 'text', rows: 3}),
+    imageWithAltField(),
+  ],
+  preview: {
+    select: {title: 'heading', media: 'image'},
+    prepare: ({title, media}) => ({title: title || 'Untitled', subtitle: 'Hero', media}),
+  },
+})

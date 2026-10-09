@@ -1,6 +1,6 @@
 import {Link} from '@/sanity.types'
 import {dataset, projectId, studioUrl} from '@/sanity/lib/api'
-import {createDataAttribute, CreateDataAttributeProps} from 'next-sanity'
+import {createDataAttribute, CreateDataAttributeProps, stegaClean} from 'next-sanity'
 import {createImageUrlBuilder, type SanityImageSource} from '@sanity/image-url'
 import {DereferencedLink} from '@/sanity/lib/types'
 
@@ -26,7 +26,17 @@ export function resolveOpenGraphImage(
   return {url, alt: (image as {alt?: string})?.alt || '', width, height}
 }
 
-// Depending on the type of link, we need to fetch the corresponding page, post, or URL.  Otherwise return null.
+// Depending on the type of link, we need to fetch the corresponding page or URL.  Otherwise return null.
+/**
+ * A tile or card links only to a real destination. `#` is the placeholder convention for a link
+ * whose path is not known yet (menus keep it), so a tile treats it, and an empty value, as no link
+ * rather than rendering an anchor that goes nowhere.
+ */
+export function realHref(href: string | null | undefined): string | null {
+  const value = href ? stegaClean(href).trim() : ''
+  return value && value !== '#' ? value : null
+}
+
 export function linkResolver(link: Link | DereferencedLink | undefined) {
   if (!link) return null
 
@@ -41,10 +51,6 @@ export function linkResolver(link: Link | DereferencedLink | undefined) {
     case 'page':
       if (link?.page && typeof link.page === 'string') {
         return `/${link.page}`
-      }
-    case 'post':
-      if (link?.post && typeof link.post === 'string') {
-        return `/posts/${link.post}`
       }
     default:
       return null

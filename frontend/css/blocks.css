@@ -1,0 +1,76 @@
+/**
+ * Page-builder block styles ported from the nlb-v2 WordPress theme (assets/src/main.css and each
+ * blocks/<name>/style.css). Tokens live in tokens.css; this file adds only what the blocks need
+ * and tokens.css does not have.
+ */
+
+@theme {
+  /* Section padding. The theme names these section-p-*; section-p-sm (64px) is in globals.css. */
+  --spacing-section-p-md: 96px;
+  --spacing-section-p-lg: 128px;
+  --spacing-section-p-xl: 160px;
+}
+
+/**
+ * Fluid horizontal section padding: 1.5rem at 375px, 2.5rem at 1440px (matches the 40px global
+ * margin exactly), extrapolated for the 1920px ceiling.
+ */
+:root {
+  --tf-x: clamp(1.5rem, 1.1479rem + 1.5023vw, 2.9507rem);
+}
+
+@utility tf-px {
+  padding-inline: var(--tf-x);
+}
+
+@utility tf-max-w {
+  @apply w-full max-w-[90rem] mx-auto;
+}
+
+/**
+ * Hero - Secondary. The panel colour and the line-art stroke are tuned per variant in the theme
+ * (cream stroke at ~70% on green, brown stroke at ~40% on brown), so the art is two SVGs.
+ * #5F8154 is the theme's own value for the Lowlands panel; the nearest token, lowlands-800, is
+ * #63795b.
+ */
+.hero-secondary__panel--lowlands {
+  background-color: #5f8154;
+}
+
+.hero-secondary__panel--moody-moor {
+  background-color: var(--color-moody-moor-500);
+}
+
+.hero-secondary__panel--light-brown {
+  background-color: var(--color-primary);
+}
+
+.hero-secondary__lines {
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.hero-secondary__lines--lowlands {
+  background-image: url('/images/blocks/hero-secondary-lines-lowlands.svg');
+  opacity: 0.6;
+}
+
+.hero-secondary__lines--moody-moor {
+  background-image: url('/images/blocks/hero-secondary-lines.svg');
+  opacity: 0.4;
+}
+
+.hero-secondary__lines--light-brown {
+  background-image: url('/images/blocks/decorative-line-hero.svg');
+  opacity: 0.6;
+}
+
+/* Image Carousel: scroll-snap is not expressible as utilities alone. */
+.image-carousel__track {
+  scroll-snap-type: x mandatory;
+}
+
+.image-carousel__slide {
+  scroll-snap-align: start;
+}

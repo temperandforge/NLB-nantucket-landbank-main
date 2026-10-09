@@ -24,6 +24,18 @@ export const settings = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'landingPage',
+      title: 'Landing page',
+      type: 'reference',
+      to: [{type: 'page'}],
+      description:
+        'The page shown at the site root (/). Until one is chosen, visitors are sent to the map. The page must be published.',
+      options: {
+        // A path-only page has no page of its own, so it cannot be a landing page.
+        filter: '!coalesce(pathOnly, false)',
+      },
+    }),
+    defineField({
       name: 'description',
       description: 'Used on the Homepage',
       title: 'Description',
@@ -53,7 +65,6 @@ export const settings = defineType({
                       list: [
                         {title: 'URL', value: 'href'},
                         {title: 'Page', value: 'page'},
-                        {title: 'Post', value: 'post'},
                       ],
                       layout: 'radio',
                     },
@@ -88,21 +99,6 @@ export const settings = defineType({
                       }),
                   }),
                   defineField({
-                    name: 'post',
-                    title: 'Post',
-                    type: 'reference',
-                    to: [{type: 'post'}],
-                    hidden: ({parent}) => parent?.linkType !== 'post',
-                    validation: (Rule) =>
-                      Rule.custom((value, context) => {
-                        const parent = context.parent as Link
-                        if (parent?.linkType === 'post' && !value) {
-                          return 'Post reference is required when Link Type is Post'
-                        }
-                        return true
-                      }),
-                  }),
-                  defineField({
                     name: 'openInNewTab',
                     title: 'Open in new tab',
                     type: 'boolean',
@@ -112,6 +108,26 @@ export const settings = defineType({
               },
             ],
           },
+        }),
+      ],
+    }),
+    defineField({
+      name: 'defaultPropertyImage',
+      title: 'Default property image',
+      type: 'image',
+      description: 'Shown on a property that has no image of its own.',
+      options: {hotspot: true},
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Alternative text',
+          type: 'string',
+          description: 'Important for accessibility and SEO.',
+          validation: (rule) =>
+            rule.custom((alt, context) => {
+              const image = context.document?.defaultPropertyImage as {asset?: {_ref?: string}} | undefined
+              return image?.asset?._ref && !alt ? 'Required' : true
+            }),
         }),
       ],
     }),

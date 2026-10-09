@@ -28,12 +28,12 @@ export default function NewsletterSignup({heading}: {heading: string}) {
           name="email"
           disabled
           placeholder="example@email.com"
-          className="h-[42px] min-w-0 flex-1 rounded-[4px] bg-warm-neutral-50 px-gap-sm py-[10px] font-secondary text-body-small text-brand-lowlands placeholder:text-brand-lowlands/70 disabled:cursor-not-allowed"
+          className="h-[42px] min-w-0 flex-1 rounded-[4px] bg-warm-neutral-50 px-gap-sm py-[10px] font-secondary text-body-small text-lowlands-500 placeholder:text-lowlands-500/70 disabled:cursor-not-allowed"
         />
         <button
           type="submit"
           disabled
-          className="flex size-[42px] shrink-0 items-center justify-center rounded-[4px] bg-brand-goldenrod text-brand-lowlands disabled:cursor-not-allowed"
+          className="flex size-[42px] shrink-0 items-center justify-center rounded-[4px] bg-goldenrod-500 text-lowlands-500 disabled:cursor-not-allowed"
         >
           <span className="sr-only">Subscribe</span>
           <ArrowForwardIcon className="size-[24px]" />

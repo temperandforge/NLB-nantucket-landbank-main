@@ -417,3 +417,6 @@ Recorded here, not built:
    `@import 'tailwindcss'` with `@theme` and no `@config` directive, so the file is not loaded. Its
    `green` / `yellow` scales are unrelated to the brand palette and are a trap for the next person.
 9. **Rest of the design system.** Only footer-consumed tokens are added here.
+10. **Redirects.** No mechanism exists for renamed or moved pages, the `/map` vs
+    `explore/interactive-map` overlap, or the landing page's own path. Tracked in
+    [#9](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/9).

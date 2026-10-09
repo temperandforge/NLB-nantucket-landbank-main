@@ -1,5 +1,6 @@
 import {defineArrayMember, defineType, defineField} from 'sanity'
 import type {Link} from '../../../sanity.types'
+import {altTextField} from './blockFields'
 
 /**
  * This is the schema definition for the rich text fields used for
@@ -20,6 +21,16 @@ export const blockContent = defineType({
   of: [
     defineArrayMember({
       type: 'block',
+      // No H1 or H2: a page's main heading belongs to the block's own heading field, and H3 is
+      // the top level of rich text.
+      styles: [
+        {title: 'Normal', value: 'normal'},
+        {title: 'Heading 3', value: 'h3'},
+        {title: 'Heading 4', value: 'h4'},
+        {title: 'Heading 5', value: 'h5'},
+        {title: 'Heading 6', value: 'h6'},
+        {title: 'Quote', value: 'blockquote'},
+      ],
       marks: {
         annotations: [
           {
@@ -36,7 +47,6 @@ export const blockContent = defineType({
                   list: [
                     {title: 'URL', value: 'href'},
                     {title: 'Page', value: 'page'},
-                    {title: 'Post', value: 'post'},
                   ],
                   layout: 'radio',
                 },
@@ -71,21 +81,6 @@ export const blockContent = defineType({
                   }),
               }),
               defineField({
-                name: 'post',
-                title: 'Post',
-                type: 'reference',
-                to: [{type: 'post'}],
-                hidden: ({parent}) => parent?.linkType !== 'post',
-                validation: (Rule) =>
-                  Rule.custom((value, context) => {
-                    const parent = context.parent as Link
-                    if (parent?.linkType === 'post' && !value) {
-                      return 'Post reference is required when Link Type is Post'
-                    }
-                    return true
-                  }),
-              }),
-              defineField({
                 name: 'openInNewTab',
                 title: 'Open in new tab',
                 type: 'boolean',
@@ -101,6 +96,8 @@ export const blockContent = defineType({
       options: {
         hotspot: true,
       },
+      fields: [altTextField()],
     }),
+    defineArrayMember({type: 'anchorLinks'}),
   ],
 })

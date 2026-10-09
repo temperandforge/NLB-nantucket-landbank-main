@@ -1,13 +1,15 @@
 import {
+  CalendarIcon,
   CaseIcon,
   CogIcon,
   DocumentsIcon,
+  DocumentTextIcon,
   DropIcon,
   EarthGlobeIcon,
   FolderIcon,
+  HelpCircleIcon,
   MenuIcon,
   PinIcon,
-  SquareIcon,
   TagIcon,
   UsersIcon,
 } from '@sanity/icons'
@@ -19,50 +21,39 @@ import pluralize from 'pluralize-esm'
  * listed in the studio or for adding additional in-studio previews or content to documents.
  * Learn more: https://www.sanity.io/docs/structure-builder-introduction
  *
- * Page Content is split into two kinds, matching how the Land Bank team actually works with
- * each:
- *  - Index pages: a fixed intro (eyebrow/heading/text) above a grid the client doesn't
- *    rearrange - Commissioners, Staff, and (later) News/Events/Projects/Properties.
- *  - Flexible pages: the page-builder 'page' type - the client freely composes and reorders
- *    sections, e.g. Home, About Us.
- * Site Settings sits outside both - it's global config with no page of its own, not a page.
+ * Pages are the page-builder 'page' type - the client freely composes and reorders sections,
+ * e.g. Home, About Us. Site Settings sits outside it - global config with no page of its own.
  *
  * Globals holds content that appears on every page rather than on a page of its own: the
  * Footer singleton and the reusable Menus it references. The header menu will join it here
  * without needing a schema change.
  */
 
-// Index pages - singletons, one fixed instance each, edited directly rather than picked
-// from a list. See commissionersPage.ts/staffPage.ts for the schema side of this pattern.
-const INDEX_PAGE_TYPES = [
-  {type: 'commissionersPage', documentId: 'commissionersPage', title: 'Commissioners Page', icon: UsersIcon},
-  {type: 'staffPage', documentId: 'staffPage', title: 'Staff Page', icon: CaseIcon},
-]
-
-// Repeatable collections shown grouped together, separate from the singletons above and the
-// freeform page-builder 'page' type below.
-const COLLECTION_TYPES = ['commissioner', 'staffMember', 'department', 'post']
-
 // Types removed from the automatic top-level list, either because they are handled
 // explicitly above/below or are internal to a plugin.
-// 'person' is the starter template's post-author type. It is hidden rather than deleted
-// because post.author and the frontend Avatar component still depend on it - see the PR
-// notes on whether News posts need bylines at all.
 const DISABLED_TYPES = [
-  ...INDEX_PAGE_TYPES.map((p) => p.type),
-  ...COLLECTION_TYPES,
   'settings',
+  'singleNewsPage',
   'page',
   'assist.instruction.context',
-  'person',
   // Handled explicitly under Globals below.
   'footer',
   'menu',
-  // Handled explicitly under Projects below.
-  'project',
+  // Handled explicitly under Properties below.
+  'property',
   'propertyType',
   'resource',
   'projectSettings',
+  // Handled explicitly below: news, events, people and FAQs.
+  'article',
+  'newsCategory',
+  'event',
+  'staffMember',
+  'commissioner',
+  'department',
+  'faq',
+  'faqCategory',
+  'job',
   // Internal to sanity-plugin-media. Tags are managed inside the Media tool, so listing them at
   // the root would just be a dead end for an editor.
   'media.tag',
@@ -72,62 +63,22 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
   S.list()
     .title('Website Content')
     .items([
-      // Page Content: everything that renders as a page on the site, split into Index
-      // (fixed shape, one per page) and Flexible (client-composed, many pages).
       S.listItem()
-        .title('Page Content')
+        .title('Pages')
         .icon(DocumentsIcon)
-        .child(
-          S.list()
-            .title('Page Content')
-            .items([
-              S.listItem()
-                .title('Index Pages')
-                .icon(SquareIcon)
-                .child(
-                  S.list()
-                    .title('Index Pages')
-                    .items(
-                      INDEX_PAGE_TYPES.map(({type, documentId, title, icon}) =>
-                        S.listItem()
-                          .title(title)
-                          .icon(icon)
-                          .child(S.document().schemaType(type).documentId(documentId)),
-                      ),
-                    ),
-                ),
-              S.listItem()
-                .title('Flexible Pages')
-                .icon(FolderIcon)
-                .child(S.documentTypeList('page').title(pluralize('Page'))),
-            ]),
-        ),
+        .child(S.documentTypeList('page').title('Pages')),
       S.divider(),
-      // Collections: repeatable content, grouped by subject rather than left alphabetical.
-      S.listItem()
-        .title('People')
-        .icon(UsersIcon)
-        .child(
-          S.list()
-            .title('People')
-            .items([
-              S.documentTypeListItem('commissioner').title('Commissioners'),
-              S.documentTypeListItem('staffMember').title('Staff'),
-              S.documentTypeListItem('department').title('Staff Departments'),
-            ]),
-        ),
-      S.documentTypeListItem('post').title('News'),
-      // Projects: the Land Bank's properties, their categorisation, and the settings that
-      // configure both the projects page and the interactive map. Grouped together because the
+      // Properties: the Land Bank's properties, their categorisation, and the settings that
+      // configure both the properties pages and the interactive map. Grouped together because the
       // taxonomies are meaningless outside this section.
       S.listItem()
-        .title('Projects')
+        .title('Properties')
         .icon(PinIcon)
         .child(
           S.list()
-            .title('Projects')
+            .title('Properties')
             .items([
-              S.documentTypeListItem('project').title('Projects').icon(PinIcon),
+              S.documentTypeListItem('property').title('Properties').icon(PinIcon),
               S.divider(),
               S.documentTypeListItem('propertyType').title('Property Types').icon(TagIcon),
               S.documentTypeListItem('resource').title('Resources').icon(DropIcon),
@@ -140,9 +91,48 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
                 ),
             ]),
         ),
+      S.listItem()
+        .title('News')
+        .icon(DocumentTextIcon)
+        .child(
+          S.list()
+            .title('News')
+            .items([
+              S.documentTypeListItem('article').title('Articles').icon(DocumentTextIcon),
+              S.divider(),
+              S.documentTypeListItem('newsCategory').title('News Categories').icon(TagIcon),
+            ]),
+        ),
+      S.documentTypeListItem('event').title('Events').icon(CalendarIcon),
+      S.listItem()
+        .title('People')
+        .icon(UsersIcon)
+        .child(
+          S.list()
+            .title('People')
+            .items([
+              S.documentTypeListItem('staffMember').title('Staff').icon(UsersIcon),
+              S.documentTypeListItem('commissioner').title('Commissioners').icon(UsersIcon),
+              S.divider(),
+              S.documentTypeListItem('department').title('Departments').icon(TagIcon),
+            ]),
+        ),
+      S.listItem()
+        .title('FAQs')
+        .icon(HelpCircleIcon)
+        .child(
+          S.list()
+            .title('FAQs')
+            .items([
+              S.documentTypeListItem('faq').title('FAQs').icon(HelpCircleIcon),
+              S.divider(),
+              S.documentTypeListItem('faqCategory').title('FAQ Categories').icon(TagIcon),
+            ]),
+        ),
+      S.documentTypeListItem('job').title('Jobs').icon(CaseIcon),
       S.divider(),
       // Globals: content rendered on every page rather than on a page of its own. Menus live
-      // here rather than under Page Content because they are navigation, not content.
+      // here rather than under Pages because they are navigation, not content.
       S.listItem()
         .title('Globals')
         .icon(EarthGlobeIcon)
@@ -158,10 +148,14 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
                 .title('Menus')
                 .icon(MenuIcon)
                 .child(S.documentTypeList('menu').title('Menus')),
+              // The content every news article page shares (wording and the "more news" section).
+              S.listItem()
+                .title('Single News Page')
+                .icon(DocumentTextIcon)
+                .child(S.document().schemaType('singleNewsPage').documentId('singleNewsPage')),
             ]),
         ),
-      // Site Settings: global config with no page/route of its own - deliberately outside
-      // Page Content, since it is neither an Index page nor a Flexible page.
+      // Site Settings: global config with no page/route of its own.
       S.listItem()
         .title('Site Settings')
         .child(S.document().schemaType('settings').documentId('siteSettings'))

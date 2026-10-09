@@ -33,23 +33,24 @@ Design docs live in [docs/superpowers/specs/](docs/superpowers/specs/).
 - **A taxonomy's slug is its stable key; its title is the label.** URL filters use the slug, so
   renaming a title is safe and changing a slug breaks shared links.
 
-## Projects and the map
+## Properties and the map
 
-- **`project` is a Land Bank property** — the things on the interactive map. It replaced the
-  hardcoded `frontend/app/map/properties.ts`.
-- **Boundary geometry is not stored per project.** One GeoJSON FeatureCollection on
-  `projectSettings.boundaryData` holds every boundary; a project stores `boundaryIds`, an array —
-  usually one id, but several when a property is split across multiple GIS parcels.
+- **`property` is a Land Bank property** — the things on the interactive map and the Properties
+  archive. It replaced the `project` type (migrated by `studio/scripts/migrateProjectsToProperties.ts`),
+  which replaced the hardcoded `frontend/app/map/properties.ts`. The page-builder blocks are still
+  named `projectGrid` and `projectPreview`; they read properties.
+- **Boundary geometry is not stored per property.** One GeoJSON FeatureCollection on
+  `projectSettings.boundaryData` holds every boundary; a property stores only `boundaryId`.
 - **Which feature property holds the identifier is configurable** (`boundaryIdProperty`). The file
   is the client's, so never hardcode a key like `MAP_ID`.
-- **Replacing the boundary file does not re-point any project.** Re-check assignments afterwards;
-  the picker flags any id in `boundaryIds` that is no longer in the file.
+- **Replacing the boundary file does not re-point any property.** Re-check assignments afterwards;
+  the `boundaryId` input flags a value that is no longer in the file.
 - **Nothing draws until Mapbox fires `load`.** That needs the style request to `api.mapbox.com` to
   succeed, so a dev server without `NEXT_PUBLIC_MAPBOX_TOKEN` shows an empty canvas with controls.
   An empty map is not evidence the data is wrong — verify map *data* separately from *rendering*.
-- **A project's marker and its boundary must share one feature id.** Hover linkage uses
-  `setFeatureState`; deriving the id from a separate index over only projects that have geometry
-  makes hovering highlight the wrong polygon as soon as one project has no boundary.
+- **A property's marker and its boundary must share one feature id.** Hover linkage uses
+  `setFeatureState`; deriving the id from a separate index over only properties that have geometry
+  makes hovering highlight the wrong polygon as soon as one property has no boundary.
 
 ## Page URLs
 
@@ -74,15 +75,16 @@ Design docs live in [docs/superpowers/specs/](docs/superpowers/specs/).
 ## Routing
 
 - **`app/[...slug]` is a catch-all** owning all page paths; `params.slug` is `string[]`. More
-  specific routes (`app/posts/[slug]`, `app/map`) still win, so adding a static route above it is
+  specific routes (`app/map`) still win, so adding a static route above it is
   safe.
 - **`link.href` and `socialLink.url` allow relative URLs.** Internal links are site-relative and
   `#` is the placeholder convention; the default `url` validation rejects both.
 - **Presentation needs both directions wired** — a `mainDocuments` route per depth (URL →
   document) and `defineLocations` per type (document → URL). Presentation picks a route by
   parameter count. Anchor each with `!defined(...)` at the top of the parent chain or a shallow
-  URL resolves to a deeper document, and keep page routes below more specific ones like
-  `/posts/:slug`. `defineLocations` `select` does dereference, so `parent->slug.current` works.
+  URL resolves to a deeper document, and keep page routes below any more specific static route. A `defineLocations` `select` is a
+  document-preview path, not GROQ: dereference with dots (`parent.slug.current`). `parent->slug.current`
+  returns undefined there, so a nested page previews at its leaf slug alone.
 
 ## Frontend and design
 
@@ -124,6 +126,15 @@ the result. Derive component prop types from the generated query result types (s
 
 Use `#` for a link whose real path isn't known yet, and create no page for it. Never invent a
 plausible external URL to fill a gap — say what's outstanding instead.
+
+## Deferred work
+
+**Every piece of deferred work gets a GitHub issue.** When you descope, stub, disable or leave
+something unfinished, open one with `gh issue create` before finishing, and link it from the spec's
+deferred section (and from a `TODO` in code, if one is needed). The issue states what is missing,
+why it was deferred, and enough context to act on without this conversation. Search existing issues
+first (`gh issue list --search`) so you don't file a duplicate. Mention the issue numbers in your
+summary to the user.
 
 ## Verification
 

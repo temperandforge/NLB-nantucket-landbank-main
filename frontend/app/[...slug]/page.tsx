@@ -1,11 +1,11 @@
 import type {Metadata} from 'next'
-import Head from 'next/head'
+import {draftMode} from 'next/headers'
 import {notFound} from 'next/navigation'
 
-import PageBuilderPage from '@/components/PageBuilder'
+import PageView from '@/components/PageView'
 import {sanityFetch} from '@/sanity/lib/live'
+import {currentHour} from '@/sanity/lib/dates'
 import {getPageQuery, pagesSlugs} from '@/sanity/lib/queries'
-import {GetPageQueryResult} from '@/sanity.types'
 
 /**
  * This is a catch-all segment rather than a single [slug] because a page URL spans as many
@@ -13,7 +13,7 @@ import {GetPageQueryResult} from '@/sanity.types'
  * marked pathOnly and have no page of their own - so there is no real route hierarchy to build.
  * One catch-all owns every page path.
  *
- * More specific routes still win over this one: /posts/x matches app/posts/[slug] and /map
+ * More specific routes still win over this one: /map
  * matches app/map, both of which Next.js checks before a catch-all.
  */
 
@@ -26,8 +26,16 @@ function toSegments(path: string): string[] {
  * The query narrows on the leaf slug and then matches the full assembled path, so both are
  * needed. An empty segment list cannot match a page and is treated as not found.
  */
-function toQueryParams(segments: string[]): {leaf: string; path: string} {
-  return {leaf: segments[segments.length - 1] ?? '', path: segments.join('/')}
+function toQueryParams(
+  segments: string[],
+  includeHidden = false,
+): {leaf: string; path: string; includeHidden: boolean; now: string} {
+  return {
+    leaf: segments[segments.length - 1] ?? '',
+    path: segments.join('/'),
+    includeHidden,
+    now: currentHour(),
+  }
 }
 
 /**
@@ -63,14 +71,21 @@ export async function generateMetadata(props: PageProps<'/[...slug]'>): Promise<
 
   return {
     title: page?.name,
-    description: page?.heading,
   } satisfies Metadata
 }
 
+/**
+ * Revalidate hourly: an event drops off the Events Preview once it ends, which is worked out when
+ * the page is fetched, so a static page would otherwise keep a past event until the next edit.
+ */
+export const revalidate = 3600
+
 export default async function Page(props: PageProps<'/[...slug]'>) {
   const {slug} = await props.params
+  // Hidden blocks are shown (with a badge) only while an editor is previewing in Presentation.
+  const {isEnabled: includeHidden} = await draftMode()
   const [{data: page}] = await Promise.all([
-    sanityFetch({query: getPageQuery, params: toQueryParams(slug)}),
+    sanityFetch({query: getPageQuery, params: toQueryParams(slug, includeHidden)}),
   ])
 
   // No page at this path - including a pathOnly grouping segment like /about-us, which the query
@@ -80,24 +95,5 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
     notFound()
   }
 
-  return (
-    <div className="my-12 lg:my-24">
-      <Head>
-        <title>{page.heading}</title>
-      </Head>
-      <div className="">
-        <div className="container">
-          <div className="pb-6 border-b border-gray-100">
-            <div className="max-w-3xl">
-              <h1 className="text-4xl text-gray-900 sm:text-5xl lg:text-7xl">{page.heading}</h1>
-              <p className="mt-4 text-base lg:text-lg leading-relaxed text-gray-600 uppercase font-light">
-                {page.subheading}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <PageBuilderPage page={page as GetPageQueryResult} />
-    </div>
-  )
+  return <PageView page={page} />
 }

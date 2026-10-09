@@ -1,21 +1,43 @@
-import {commissioner} from './documents/commissioner'
-import {department} from './documents/department'
 import {menu} from './documents/menu'
-import {person} from './documents/person'
 import {page} from './documents/page'
-import {post} from './documents/post'
-import {project} from './documents/project'
+import {property} from './documents/property'
+import {article} from './documents/article'
+import {commissioner} from './documents/commissioner'
+import {event} from './documents/event'
+import {faq} from './documents/faq'
+import {job} from './documents/job'
+import {staffMember} from './documents/staffMember'
+import {department, faqCategory, newsCategory} from './documents/taxonomies'
 import {propertyType} from './documents/propertyType'
 import {resource} from './documents/resource'
-import {staffMember} from './documents/staffMember'
-import {callToAction} from './objects/callToAction'
-import {infoSection} from './objects/infoSection'
+import {heroVideo} from './objects/heroVideo'
+import {hero} from './objects/hero'
+import {heroImage} from './objects/heroImage'
+import {heroSecondary} from './objects/heroSecondary'
+import {heroTertiary} from './objects/heroTertiary'
+import {basicLeftRightText} from './objects/basicLeftRightText'
+import {jumpNavContent} from './objects/jumpNavContent'
+import {downloadBlock} from './objects/downloadBlock'
+import {mapTeaser} from './objects/mapTeaser'
+import {contactForm} from './objects/contactForm'
+import {imageCarousel} from './objects/imageCarousel'
+import {timeline} from './objects/timeline'
 import {settings} from './singletons/settings'
 import {footer} from './singletons/footer'
-import {commissionersPage} from './singletons/commissionersPage'
 import {projectSettings} from './singletons/projectSettings'
-import {staffPage} from './singletons/staffPage'
+import {singleNewsPage} from './singletons/singleNewsPage'
 import {link} from './objects/link'
+import {anchorLinks} from './objects/anchorLinks'
+import {peopleGrid} from './objects/peopleGrid'
+import {projectGrid} from './objects/projectGrid'
+import {propertyArchive} from './objects/propertyArchive'
+import {projectPreview} from './objects/projectPreview'
+import {faqList} from './objects/faqList'
+import {jobListings} from './objects/jobListings'
+import {newsPreview} from './objects/newsPreview'
+import {eventsPreview} from './objects/eventsPreview'
+import {missionStatement} from './objects/missionStatement'
+import {ctaContact} from './objects/ctaContact'
 import {menuGroup} from './objects/menuGroup'
 import {menuLink} from './objects/menuLink'
 import {infoColumn} from './objects/infoColumn'
@@ -31,28 +53,53 @@ export const schemaTypes = [
   // Singletons
   settings,
   footer,
-  commissionersPage,
-  staffPage,
   projectSettings,
+  singleNewsPage,
   // Documents
   page,
-  post,
-  person,
-  commissioner,
-  staffMember,
-  department,
   menu,
-  project,
-  // Categorisation for projects - referenced, so the client can extend either without a deploy
+  property,
+  article,
+  event,
+  staffMember,
+  commissioner,
+  faq,
+  job,
+  // Categorisation for the above - referenced, so the client can extend them without a deploy
+  newsCategory,
+  department,
+  faqCategory,
+  // Categorisation for properties - referenced, so the client can extend either without a deploy
   propertyType,
   resource,
   // Objects
   button,
   blockContent,
   blockContentTextOnly,
-  infoSection,
-  callToAction,
+  heroVideo,
+  hero,
+  heroImage,
+  heroSecondary,
+  heroTertiary,
+  basicLeftRightText,
+  jumpNavContent,
+  imageCarousel,
+  timeline,
+  downloadBlock,
+  mapTeaser,
+  contactForm,
   link,
+  anchorLinks,
+  missionStatement,
+  newsPreview,
+  faqList,
+  jobListings,
+  peopleGrid,
+  projectGrid,
+  propertyArchive,
+  projectPreview,
+  eventsPreview,
+  ctaContact,
   // Menu building blocks - menuGroup nests menuLink, capped at two levels
   menuGroup,
   menuLink,

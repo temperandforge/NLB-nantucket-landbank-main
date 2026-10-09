@@ -46,7 +46,7 @@ not a demonstrated need. Raise the cap only when something actually requires it.
 
 **Status:** Implemented
 
-**Why:** URL / page reference / post reference and `openInNewTab` come for free, and link
+**Why:** URL / page reference and `openInNewTab` come for free, and link
 authoring stays identical everywhere in the Studio.
 
 **Implication:** Extending `link` extends every menu. Prefer changing `link` over adding a
@@ -285,8 +285,8 @@ through the same path, because the page query excludes it rather than the route 
 there is no real route hierarchy to build. One catch-all owns all page paths.
 
 **Implication:** `params.slug` is `string[]`; type it `PageProps<'/[...slug]'>` and join with
-`/` for the lookup. More specific routes still win — `/posts/x` matches `app/posts/[slug]` and
-`/map` matches `app/map` before the catch-all is considered. Adding a real static route above
+`/` for the lookup. More specific routes still win — `/map` matches
+`app/map` before the catch-all is considered. Adding a real static route above
 the catch-all is safe.
 
 ### 3.2 `link.href` allows relative URLs
@@ -316,12 +316,14 @@ Presentation selects a route by parameter count, so one route per depth covers e
 **Implication:** Each route is anchored with `!defined(...)` at the top of the parent chain, so
 a shallow URL cannot resolve to a deeper document — without it, `/conservation` would also match
 the page that lives at `/about-us/conservation`. Page routes must sit below more specific ones
-like `/posts/:slug`, which a two-segment page route would otherwise capture. A `pathOnly` page
+like a future `/news/:slug`, which a two-segment page route would otherwise capture. A `pathOnly` page
 reports no location rather than a broken link.
 
-`defineLocations` `select` **does** dereference (`parent->slug.current`), which is what makes
-assembling the URL there possible; `verifyPageRouting.ts` exercises that projection so a
-regression surfaces.
+`defineLocations` `select` dereferences through document-preview paths (`parent.slug.current`),
+which is what makes assembling the URL there possible. It is **not** GROQ: `parent->slug.current`
+returns undefined, so a nested page was previewed at its leaf slug alone (`/conservation`, a 404).
+`verifyPageRouting.ts` checks the GROQ equivalent of these fields; it cannot prove the preview store
+follows the reference, so confirm that in Presentation after changing the select.
 
 ---
 
@@ -488,7 +490,8 @@ fill a gap. Use `#` and list what is outstanding.
 Every spec in `docs/superpowers/specs/` ends with a deferred-work section.
 
 **Implication:** When you descope something, write it down there with enough context to act on
-later.
+later, and open a GitHub issue for it (see AGENTS.md "Deferred work") so it is tracked outside the
+spec.
 
 ### 6.3 Content-shape contracts get an executable check
 
@@ -520,6 +523,414 @@ should be read before the real run.
 
 ---
 
+## 7. Page-builder blocks
+
+Ported from the nlb-v2 WordPress theme. Design: [the blocks spec](superpowers/specs/2026-10-07-wp-blocks-migration-design.md).
+
+### 7.1 One object type and one component per block
+
+**Status:** Implemented
+
+Each block is a Sanity object type in `studio/src/schemaTypes/objects/`, listed in
+`page.pageBuilder`, rendered by `frontend/components/blocks/<Name>.tsx` and registered in
+`BlockRenderer`. Markup is ported 1:1 from the theme's `render.php`.
+
+**Why:** The page builder already worked this way for `heroVideo`, and Presentation's
+click-to-edit depends on the `data-sanity` wrapper `BlockRenderer` adds.
+
+**Implication:** Add a block by adding all three. Query branches for blocks with references, files
+or Portable Text go in `pageBuilderFields` in `queries.ts`.
+
+### 7.2 Required fields replace the theme's placeholder copy
+
+**Status:** Implemented
+
+`heroImage` requires eyebrow, heading and image, and `heroSecondary` requires its image. The theme
+fell back to "A short, punchy headline goes here." and to the page's featured image.
+
+**Why:** A Sanity page has no featured image, and placeholder copy that ships by accident reads as
+content. Hero-secondary's eyebrow still falls back to the page name.
+
+### 7.3 A jump nav is derived from the content, never authored
+
+**Status:** Implemented
+
+`jumpNavContent` builds its left-hand nav from the content's H2 headings. Ids come from
+`frontend/sanity/lib/jumpNav.ts` and are checked by `frontend/scripts/verifyJumpNav.mts`.
+
+**Why:** Editors maintain the content once, and the nav cannot drift from it.
+
+**Implication:** H1 is not offered inside the content, so H2 always means a nav section; H3 and below nest inside it. (Changed from H3 on 2026-10-07: the editor now offers H2.)
+
+### 7.4 GROQ fragments are constants, not functions
+
+**Status:** Implemented
+
+A function call inside a `defineQuery` template literal widens the query's type to `string`, and
+typegen's result map (keyed by the literal) no longer matches, so the result type collapses to `{}`.
+Shared fragments (`markDefsFields`, `linkFields`, `pageBuilderFields`) are plain constants.
+
+### 7.5 The theme's palette maps onto the Figma tokens
+
+**Status:** Implemented, two discrepancies to confirm with the designer
+
+The theme's `warm-neutral-*` and `brand-*` colours map to the nearest `dusty-heath`, `moody-moor`
+and `lowlands` tokens. The theme's `warm-neutral-800` (#4b4234) maps to `moody-moor-600`
+(#533b28), which is noticeably redder. The Lowlands hero panel keeps the theme's `#5F8154` rather
+than `lowlands-800` (#63795b).
+
+## 8. Absorbing nlb-design
+
+The standalone `nlb-design` project (a Next.js build of the Figma designs with hard-coded content)
+is absorbed as Sanity-driven blocks. Design: [the absorption spec](superpowers/specs/2026-10-07-absorb-nlb-design-design.md).
+Its docs now live in [design/](design/README.md).
+
+### 8.1 Where nlb-design and a theme-ported block overlap, nlb-design wins
+
+**Status:** Implemented (Phase A)
+
+Basic - Left Right Text, Hero - Tertiary (with an H2 option standing in for nlb-design's Section
+Intro), Hero - Image (nlb-design's Hero Quaternary) and Timeline (its History Slider) take
+nlb-design's design. Mission Statement and CTA Contact are new blocks.
+
+**Why:** nlb-design is the newer, Figma-faithful build; the theme port was a stopgap.
+
+**Implication:** Don't consult the WordPress theme for these blocks. Phase B (cards, news and
+events previews, FAQ, people and project grids, with their content types) is still to do.
+
+### 8.2 The headline system was replaced, not added to
+
+**Status:** Implemented
+
+`--text-display-*` and `--text-headline-*` in `tokens.css` are nlb-design's fluid clamps (plus
+`--text-headline-2xl`), and the `text-headline-*` utilities carry the serif heading style (-0.05em,
+1.1). `--tracking-wide` is 2px; tags and eyebrows use it. The slice 1 `text-h1`..`text-h6`
+utilities were removed and their users moved to `text-headline-*` by visual size.
+
+**Why:** Three parallel heading scales would have drifted. One scale, from Figma.
+
+**Implication:** The footer's `text-headline-base` now also gets the heading style. Its explicit
+`leading-[1.3]` still wins, but it gains -0.05em tracking: check it against the design
+([#14](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/14)).
+
+### 8.3 Differences kept on purpose
+
+**Status:** Implemented, to confirm with the designer ([#14](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/14))
+
+- Hover overlays: nlb-design uses translucent mixes, `tokens.css` has solid hexes. The UI CSS uses
+  its own `--ui-hover-darker` / `--ui-hover-lighter` and leaves `--color-hover-*` alone.
+- `tf-px` keeps this repo's clamp, not nlb-design's.
+- Basic - Left Right Text buttons are Primary, Secondary or Ghost (the design system's button
+  styles, Primary by default): the Figma links given did not specify one.
+- The light-brown Hero - Secondary uses nlb-design's `decorative-line-hero.svg`, the closest local
+  match to the Figma vector.
+
+### 8.4 Rich text offers H3-H6, and anchor links
+
+**Status:** Implemented
+
+`blockContent` no longer offers H1 or H2 (a page's main heading belongs to the block's heading
+field), and gains an **Anchor links** item: a stack of link rows, each a label, a link and an arrow
+or download icon, 16px apart.
+
+## 9. Phase B: content types and data-driven blocks
+
+Design: [the absorption spec](superpowers/specs/2026-10-07-absorb-nlb-design-design.md), Phase B.
+
+### 9.1 Content is documents, categories are referenced documents
+
+**Status:** Implemented
+
+`article`, `event`, `staffMember`, `commissioner` and `faq` are documents; `newsCategory`,
+`department` and `faqCategory` are the referenced taxonomies (slug is the key, title the label,
+`order` sets the display order). `nlb-design`'s `CardStaff` hard-coded three department labels;
+here the tag is the department document's title.
+
+**Why:** The client extends categories without a deploy; restating them in code would drift.
+
+**Implication:** A reference to an unpublished taxonomy dereferences to null, so every consumer
+filters nulls.
+
+### 9.2 "Upcoming" is computed, in New York time, and refreshes hourly
+
+**Status:** Implemented
+
+The events query keeps events whose end (or start, with no end) is not before `$now`, which the
+page passes as the start of the current hour (`currentHour()` in `frontend/sanity/lib/dates.ts`).
+All dates and times are shown in `America/New_York` (event datetimes are also entered in it:
+`displayTimeZone` on the Studio fields), checked by `frontend/scripts/verifyDates.mts` (also under
+another `TZ`). The landing page and the catch-all route set `revalidate = 3600`.
+
+**Why the parameter:** next-sanity caches its fetches with no expiry, and a route's `revalidate`
+does not override a fetch's own setting, so `now()` inside the query would be frozen at whatever
+Sanity answered first. Putting the hour in the params changes the cache key every hour, so the next
+hourly regeneration asks again. An ended event can therefore stay up to an hour late.
+
+**Implication:** Nothing about an event being upcoming is stored. Any other time-relative query
+needs the same treatment.
+
+### 9.3 Articles take an optional link until they have pages
+
+**Status:** Implemented
+
+`article.link` is the shared link object. A news tile is a link only when it resolves; otherwise it
+is a plain tile. Per-article pages, filters and pagination are slice 3
+([#11](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/11)).
+
+### 9.4 The FAQ accordion is a heading, a button and a sibling answer
+
+**Status:** Implemented
+
+`nlb-design` nested a paragraph inside a button, which is invalid HTML. Here the heading wraps a
+button (`aria-expanded`, `aria-controls`) and the answer is a sibling `div`, `hidden` when closed.
+Answers are rich text.
+
+### 9.5 `CardProject` renders the existing map projects
+
+**Status:** Implemented
+
+One "project" in this repo: the map property. Its tags are its property types and resources. The
+WordPress theme's separate work-"project" type is not carried over. `CardNews` is not ported (no
+consumer); see the spec.
+
+### 9.6 Assumptions to confirm with the designer
+
+**Status:** Implemented, to confirm ([#14](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/14))
+
+`nlb-design` has the cards but no archive pages, so the grid column counts (staff 4, commissioners
+3, projects 4), and the "No upcoming events right now."
+message are assumptions.
+
+## 10. News article pages and the map teaser
+
+Design: [the news article and map teaser spec](superpowers/specs/2026-10-07-news-article-and-map-teaser-design.md).
+
+### 10.1 Articles live at /news/<slug>, as a static route
+
+**Status:** Implemented
+
+`app/news/[slug]/page.tsx` renders an article (Figma: news_content_desktop). It is a static route,
+so it wins over the catch-all that owns CMS pages: a CMS page can sit at `/news` (the archive) but
+not beneath it. An unknown slug is a 404. Presentation resolves `/news/:slug` to the article, and
+the route is listed before the page routes because `/news/<slug>` also fits their two-segment
+pattern.
+
+**Implication:** Don't create CMS pages whose path begins `news/<something>`.
+
+### 10.2 A news tile goes to the article, unless it has its own link
+
+**Status:** Implemented
+
+`article.link` is now an optional override (an external story). A tile goes to it when it resolves
+(not empty, not `#`), otherwise to `/news/<slug>`. A call to action tile with no link stays a plain
+tile.
+
+### 10.3 The Share row: copy link, Facebook, LinkedIn
+
+**Status:** Implemented. Instagram is left out: it has no web share address.
+
+The buttons read the page address in the browser when clicked (`frontend/sanity/lib/share.ts`,
+checked by `frontend/scripts/verifyShare.mts`), so no site URL setting is needed and nothing is
+computed on the server. Copy-link success and failure are announced.
+
+### 10.4 "More news" has no call to action tile
+
+**Status:** Implemented, until the news archive exists
+([#11](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/11))
+
+The page shows up to three other articles, and the section is hidden when there are none.
+
+### 10.5 The Map Teaser is artwork, not a live map
+
+**Status:** Implemented, to compare with Figma ([#15](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/15))
+
+The block is the Figma Interactive Map Block: text on a brown panel, and a map illustration with a
+pin, a card for one featured `project`, and a button. Figma's absolute positions became
+percentages of the map panel's width at `md:` and up, and a stacked layout below: an assumption to
+check.
+
+## 11. The staff, commissioner and FAQ archives
+
+Design: [the archives spec](superpowers/specs/2026-10-07-staff-commissioner-faq-archives-design.md).
+
+### 11.1 An archive is an ordinary page built from blocks
+
+**Status:** Implemented
+
+Staff, Commissioners and FAQs are CMS pages (a header block plus the People Grid or FAQ List), seeded
+as drafts under About Us by `studio/scripts/seedArchivePages.ts`. Each one's address is its own slug
+and parent, so it can be changed per archive at any time in Studio. Links that point at a page by
+reference follow the move; old bookmarked addresses do not, which needs redirects
+([#9](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/9)). No Site Settings
+entry per archive: nothing in code needs to find an archive page.
+
+### 11.2 Department tabs come from the staff, and the choice lives in the address
+
+**Status:** Implemented
+
+The People Grid's tabs are derived from the staff on the block (`frontend/sanity/lib/archiveFilter.ts`,
+checked by `frontend/scripts/verifyStaffFilter.mts`): one per department with at least one member, in
+the department's `order`. The chosen department is `?department=<slug>`, read with `useSearchParams`
+and changed with the History API, so a filtered view can be shared without a server request. The
+server render is "All".
+
+The tab row is a shared `components/ui/FilterTabs` and the address handling a shared
+`useQueryFilter` hook, so any archive block can filter the same way. The Project Grid uses them with
+`?type=<slug>`, tabs from the property types on its projects (resources are amenities, not
+categories, and get no tab). The Project Grid's card follows the Figma projects archive (two
+columns, types as tags over the image, name below, no description), replacing the earlier assumed
+four-column card (9.6).
+
+### 11.3 The footer links are wired by a guarded script
+
+**Status:** Implemented, to run once the pages are published
+
+`studio/scripts/linkArchivePagesInMenus.ts` changes only the Footer Menu's About Us > Staff and FAQs
+links that are still `#`. It refuses to write if a page is unpublished or the menu has unpublished
+edits, and prints each change first.
+
+### 11.4 The Commissioners page uses the theme's layout
+
+**Status:** Implemented, to confirm ([#15](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/15))
+
+The Figma node the theme cites no longer exists and the Design System node was not readable, so the
+page is the Staff page's header and a three-column grid of the existing commissioner cards.
+
+## 12. The single news page and related news
+
+### 12.1 What every news article page shares lives in one settings document
+
+**Status:** Implemented
+
+`singleNewsPage` (Studio: Globals > Single News Page, fixed id) holds what all news article pages
+share, as opposed to one article's own content: the label above the title, the "Published:" and
+"Share" labels, and the "more news" section (the News Preview block's own fields, including its
+"Hide this block" setting). Other single templates (events, projects) get their own settings
+document when they have pages. Every field is optional: the article page falls back to the design's
+wording.
+
+### 12.2 "More news" ranks by shared categories and never includes the current article
+
+**Status:** Implemented
+
+`moreNewsQuery` excludes the article being read and orders by how many categories each other article
+shares with it, then newest first, so same-category articles come first and a thin category is
+topped up with the latest others. It ranks rather than filters, so the section is not left short.
+The count of shared categories is wrapped in `coalesce` because it is null for an article with no
+categories, and null does not compare with numbers (it let the date decide). The call to action has
+no destination until the news archive exists
+([#11](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/11)), so the settings
+default to no call to action.
+
+## 13. Job listings
+
+### 13.1 Jobs are documents; the block lists them all
+
+**Status:** Implemented, apply links outstanding ([#16](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/16))
+
+`job` documents (Studio: Jobs) hold the title, a `department` reference (the same options staff use,
+shown as the tag), description, location, employment type, apply link (the shared `link`) and
+`order`. The Job Listings block holds only an eyebrow and heading and shows every job, like the FAQ
+List; with no jobs it renders nothing. Location and employment type are free text, not taxonomies,
+until the client needs to filter by them. The description is clamped to two lines, as in the design.
+`studio/scripts/seedJobs.ts` seeds the three designed jobs and adds the block to Connect With Us as a
+draft. Their apply links are `#`.
+
+## 13. The WordPress people migration
+
+### 13.1 Staff and commissioners were migrated by a repeatable, read-only-source script
+
+**Status:** Implemented (run 2026-10-07; the people are drafts until published)
+
+`studio/scripts/wordpress/`: `extractPeople.sh` (read-only; snapshots the local WordPress site to a
+git-ignored `people.json`), `people.ts` (a pure transform, checked by `verifyPeopleTransform.mts`),
+`importWordpressPeople.ts` (drafts only, `--dry`, `--remove-samples`) and `verifyWordpressPeople.ts`
+(compares Sanity back to the source). Photos are uploaded from the uploads folder on disk. A person is
+matched on its name within its type and an existing document is never edited, so re-running is safe.
+Per the project rule there are no explicit ids; a report maps each WordPress id to its Sanity id.
+
+**Source quirks handled:** the department assignments are stored on the previous theme's `nlb_staff`
+posts, not on the current `staff` posts (the same people, joined by name); the taxonomy is called
+`department` in the database although the theme code says `staff_department`; titles carry HTML
+entities; commissioners' "Term Date" is free text such as "May 2027", so the schema's `termDate` is a
+string shown as entered. Two staff (Dean Belanger, Michael Hurff) have no photo in WordPress and none in
+Figma. One source value looks wrong and was migrated as is: the commissioner Neil Paterson has the title
+"Executive Director".
+
+**Implication:** the same pattern (extract, pure transform with a check, idempotent draft import,
+validation) fits the FAQs and news, which are still to import
+([#11](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/11)).
+
+## 14. The WordPress FAQ migration
+
+### 14.1 FAQs follow the people pattern, with the answers converted to Portable Text
+
+**Status:** Implemented (run 2026-10-07; the FAQs are drafts until published)
+
+`studio/scripts/wordpress/`: `extractFaqs.sh` (read-only; queries the tables directly so it does not
+depend on the theme registering `faq_category`), `faqs.ts` (pure transform, checked by
+`verifyFaqsTransform.mts`), `importWordpressFaqs.ts` (drafts only, `--dry`, `--remove-samples`) and
+`verifyWordpressFaqs.ts`. A category is matched on its slug, a FAQ on its question; an existing
+document is never edited. Each import writes its own `faqs-import-*.json` report, so it does not
+overwrite the people report.
+
+**Answers are converted, not stored as HTML.** The converter handles paragraphs, headings, block
+quotes, lists, bold, italic, links and line breaks. H1/H2 become H3 (the editor offers no higher);
+images, tables and embeds, and site-relative links (the editor's URL check rejects them), are
+dropped and reported. Keys derive from the WordPress id, so a re-run produces the same blocks.
+
+**Ordering.** Every `menu_order` on the site is 0, so a FAQ's order is its position by WordPress id
+within its category; categories follow the ACF `term_order` on the term (General FAQs, then Form
+Filing). A FAQ in several categories takes the earliest-ordered one.
+
+**Source quirks.** Only 1 of the 6 published FAQs has an answer in WordPress; the rest import with an
+empty answer, which Studio's required-field check flags until an editor writes one. The previous
+theme's `nlb_faq` posts are test content and are not migrated.
+
+**Samples.** `--remove-samples` deletes the sample FAQs and the `general` and `empty-category`
+categories from the Phase B seed before matching (one sample shares a question with a real FAQ).
+The `form-filing` category already exists and is reused as it stands.
+
+## 15. The property type and the Properties archive
+
+### 15.1 `property` replaced `project`, and the archive is a block
+
+**Status:** Implemented. The migration ran on 2026-10-07 (150 properties created, 2 with a draft; validation passed) and is safe to re-run (it skips every slug). The page seed ran on 2026-10-07: draft `explore/properties` exists, to be published by the user.
+
+**Note:** the dataset also holds an older draft `property` ("Surfside Beach", slug `a`, created 2026-07-21 under the previous content model). The migration did not create or touch it; delete it in Studio if it is not wanted.
+
+The client wants properties to be the map's document, so `property` replaced `project` (same
+fields; the Studio title is "Property"). `studio/scripts/migrateProjectsToProperties.ts` copies each
+project into a property **in the same publish state** (150 published, 2 with a draft when it was
+written), matched by slug, never editing an existing property, refusing to run if anything other
+than a project references a project, and leaving the `project` documents in place
+([#26](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/26) to delete them once
+the map is verified). `verifyPropertyMigration.ts` compares the two sets.
+
+The archive is a **Property Archive block** on an ordinary page (seeded as a draft
+`explore/properties` by `seedPropertiesPage.ts`), so its address is its slug and parent. It has two
+dropdown filters, Property Type and Resources, built from the types and resources the properties
+use; **any** checked option within a group matches and **every** group with a choice must hold. The
+choice is kept in the address as `?type=a,b&resource=c`. The filter functions live in
+`frontend/sanity/lib/archiveFilter.ts` with the other archive filters and are checked by
+`frontend/scripts/verifyPropertyFilter.mts`. A card with no image shows **Default property image**
+from Site Settings, or the staff cards' neutral box when that is unset.
+
+**Deploy order.** The map, the Project Grid, the Property Archive and the Studio's Properties list all
+read `property`, which is empty until the migration runs. Run `migrateProjectsToProperties.ts`, then
+`verifyPropertyMigration.ts`, **before** the frontend and Studio changes are deployed; otherwise the map
+shows no properties.
+
+**Open question.** The seeded top-level Projects page (a Project Grid with copy about conservation
+initiatives) now lists properties, so the same beaches and ponds appear under two pages. Whether to
+retire it, re-copy it or wait for a real "project" (initiative) type is the client's call.
+
+**Not done:** property detail pages ([#23](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/23)),
+renaming the Project blocks ([#24](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/24)),
+pagination or search ([#25](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/25)).
+Spec: [properties archive design](superpowers/specs/2026-10-07-properties-archive-design.md); plan:
+[properties archive plan](superpowers/plans/2026-10-07-properties-archive.md).
+
 ## Known outstanding items
 
 Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-design.md):
@@ -528,7 +939,7 @@ Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-desig
 - Newsletter submission has no provider, action, or validation.
 - Cookie Settings needs a consent manager; it is a JS trigger, not a URL.
 - `/map` and the seeded `explore/interactive-map` page overlap; one should redirect.
-- The Studio's Flexible Pages list is flat. It shows each page's resolved path in the subtitle,
+- The Studio's Pages list is flat. It shows each page's resolved path in the subtitle,
   but does not nest children under their parent, which gets harder to scan as pages are added.
 - Markers and boundaries render only once Mapbox fires `load`, which needs the style request to
   `api.mapbox.com` to succeed. If a dev server is started without `NEXT_PUBLIC_MAPBOX_TOKEN`
@@ -539,8 +950,18 @@ Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-desig
   at `studio/scripts/data/boundaries.geojson` and uses the project slug as each feature's `id`.
 - `project` has no page of its own and no body content. Explore → Properties is still `#`.
 - Renaming an ancestor's slug silently changes every descendant URL (2.3). There is no redirect
-  mechanism for the old paths.
+  mechanism for the old paths (tracked in [#9](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/9)).
 - Mobile footer breakpoints are assumptions awaiting designer confirmation.
 - `frontend/tailwind.config.ts` is vestigial under Tailwind v4 — `globals.css` uses
   `@import 'tailwindcss'` with `@theme` and no `@config`, so the file is never loaded. Its
   `green` / `yellow` scales are unrelated to the brand palette.
+
+## Content model reset (2026-10)
+
+- Removed the `post`, `person`, `commissioner`, `staffMember`, `department`, `commissionersPage` and
+  `staffPage` types, with the /posts route and its components. The Studio's "Page Content" folder is
+  now a flat "Pages" list.
+- `settings.landingPage` references the `page` shown at `/`; Presentation's `/` route resolves to it.
+  With none set, `/` redirects to `/map`.
+- `studio/scripts/cleanupRemovedTypes.ts` deleted every page and all orphaned documents, and turned
+  menu links to deleted pages into `#` placeholders. Re-run `seedFooterContent.ts` to recreate pages.
