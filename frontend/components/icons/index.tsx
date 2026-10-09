@@ -289,7 +289,7 @@ export function SearchIcon({className}: IconProps) {
  */
 export function CloseIcon({className}: IconProps) {
   return (
-    <svg viewBox="1385 12 10 10" fill="none" aria-hidden="true" focusable="false" className={className}>
+    <svg overflow="visible" viewBox="1385 12 10 10" fill="none" aria-hidden="true" focusable="false" className={className}>
       <path
         d="M1395 12L1385 22M1385 12L1395 22"
         stroke="currentColor"
