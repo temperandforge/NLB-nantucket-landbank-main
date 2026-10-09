@@ -227,7 +227,7 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
        * map entirely.
        */
       const features: GeoJSON.Feature[] = []
-      const featureIdToProject = new Map<number, Project>()
+      const featureIdToProject = new Map<number, Property>()
       // Every id in a project's own parcel group maps back to that same group array, so hovering
       // any one of a multi-parcel project's polygons highlights all of them together.
       const featureIdToGroupIds = new Map<number, number[]>()
