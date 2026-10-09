@@ -5,8 +5,6 @@ import {ArrowRightIcon} from '@/components/icons'
 import {groupMenuLinks} from '@/sanity/lib/menuGroups'
 import type {HeaderMenuChild} from '@/sanity/lib/types'
 
-import {resolveItemHref} from './resolveItemHref'
-
 /** Tracked uppercase label - Figma type style mono/tracked. */
 const LABEL_CLASS = 'font-mono-tracked text-[12px] uppercase tracking-[1.32px] leading-[1.6]'
 
@@ -31,18 +29,20 @@ export default function NavDropdown({
   id,
   labelledBy,
   items,
+  grouped,
   onNavigate,
 }: {
   id: string
   labelledBy: string
+  /** Resolvable links only (the owner filters), so `grouped` and this list agree. */
   items: HeaderMenuChild[]
+  /** Whether any link has a column heading; the owner computes it once for the <li> and the panel. */
+  grouped: boolean
   /** Called when a link inside the panel is activated, so the owner can close it. */
   onNavigate?: () => void
 }) {
-  const live = items.filter((item) => resolveItemHref(item.link))
-  if (live.length === 0) return null
-  const columns = groupMenuLinks(live)
-  const grouped = columns.some((column) => column.heading)
+  if (items.length === 0) return null
+  const columns = groupMenuLinks(items)
 
   return (
     <div
@@ -66,10 +66,10 @@ export default function NavDropdown({
                 <li key={item._key}>
                   <ResolvedLink
                     link={item.link}
-                    className="group inline-flex items-center gap-gap-sm border-b border-transparent font-secondary text-body-small hover:border-border-alt hover:text-secondary"
+                    className="group inline-flex items-center gap-gap-sm border-b border-transparent font-secondary text-body-small hover:border-border-alt"
                   >
                     {item.label}
-                    <ArrowRightIcon className="size-4" />
+                    <ArrowRightIcon className="size-4 group-hover:text-secondary" />
                   </ResolvedLink>
                 </li>
               ))}

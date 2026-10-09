@@ -31,6 +31,12 @@ export default function DesktopNav({menu}: {menu: HeaderMenuData}) {
 
   useEffect(() => {
     if (!openKey) return
+    // Below lg this bar is display:none; a dropdown left open would keep data-header-lock on a hidden element.
+    const desktop = window.matchMedia('(min-width: 64rem)')
+    const onChange = (event: MediaQueryListEvent) => {
+      if (!event.matches) setOpenKey(null)
+    }
+    desktop.addEventListener('change', onChange)
     const onPointerDown = (event: PointerEvent) => {
       if (!rootRef.current?.contains(event.target as Node)) setOpenKey(null)
     }
@@ -44,19 +50,34 @@ export default function DesktopNav({menu}: {menu: HeaderMenuData}) {
     return () => {
       document.removeEventListener('pointerdown', onPointerDown)
       document.removeEventListener('keydown', onKeyDown)
+      desktop.removeEventListener('change', onChange)
     }
   }, [openKey])
 
   return (
-    <div ref={rootRef} data-header-lock={openKey ? '' : undefined} className="flex items-center gap-gap-md max-lg:hidden">
-      <nav aria-label="Primary">
-        <ul className="flex items-center gap-gap-md">
-          {menu.items.map((item) => {
+    <div
+      ref={rootRef}
+      data-header-lock={openKey ? '' : undefined}
+      // Tabbing out of the bar closes the dropdown so it cannot cover the next focused element. A null
+      // relatedTarget (a click on non-focusable panel area, or the window losing focus) is ignored.
+      onBlur={(event) => {
+        if (event.relatedTarget && !rootRef.current?.contains(event.relatedTarget as Node)) setOpenKey(null)
+      }}
+      // Stretches to the full bar height so each <li> (and a flat panel's top-full) reaches the bar's bottom edge.
+      className="flex items-stretch gap-gap-md max-lg:hidden"
+    >
+      <nav aria-label="Primary" className="flex">
+        <ul className="flex items-stretch gap-gap-md">
+          {(menu.items ?? []).map((item) => {
+            if (!item) return null
             if (item._type === 'menuLink') {
               if (!resolveItemHref(item.link)) return null
               return (
-                <li key={item._key}>
-                  <ResolvedLink link={item.link} className="font-secondary text-body-small hover:underline">
+                <li key={item._key} className="flex items-center">
+                  <ResolvedLink
+                    link={item.link}
+                    className="font-secondary text-body-small whitespace-nowrap hover:underline"
+                  >
                     {item.label}
                   </ResolvedLink>
                 </li>
@@ -66,12 +87,14 @@ export default function DesktopNav({menu}: {menu: HeaderMenuData}) {
             const open = openKey === item._key
             const triggerId = `${baseId}-${item._key}-trigger`
             const panelId = `${baseId}-${item._key}-panel`
-            const hasLinks = item.children.some((child) => resolveItemHref(child.link))
-            if (!hasLinks) return null
-            const grouped = item.children.some((child) => child.group?.trim())
+            // children is typed non-null but the API does not enforce it: a freshly added submenu has none.
+            const live = (item.children ?? []).filter((child) => resolveItemHref(child.link))
+            if (live.length === 0) return null
+            // One value, from the resolvable links only, for both the <li> position and the panel layout.
+            const grouped = live.some((child) => child.group?.trim())
 
             return (
-              <li key={item._key} className={grouped ? 'static' : 'relative'}>
+              <li key={item._key} className={`flex items-center ${grouped ? 'static' : 'relative'}`}>
                 <button
                   id={triggerId}
                   type="button"
@@ -79,20 +102,28 @@ export default function DesktopNav({menu}: {menu: HeaderMenuData}) {
                   aria-expanded={open}
                   aria-controls={panelId}
                   onClick={() => setOpenKey(open ? null : item._key)}
-                  className={`inline-flex items-center gap-gap-mini font-secondary text-body-small ${
-                    open ? 'border-b border-border-dark text-on-background' : 'text-on-background-subtle'
+                  className={`inline-flex items-center gap-gap-mini border-b font-secondary text-body-small whitespace-nowrap ${
+                    open ? 'border-border-dark text-on-background' : 'border-transparent text-on-background-subtle'
                   }`}
                 >
                   {item.label}
                   {open ? <ChevronUpIcon className="size-4" /> : <ChevronDownIcon className="size-4" />}
                 </button>
-                {open && <NavDropdown onNavigate={() => setOpenKey(null)} id={panelId} labelledBy={triggerId} items={item.children} />}
+                {open && (
+                  <NavDropdown
+                    onNavigate={() => setOpenKey(null)}
+                    id={panelId}
+                    labelledBy={triggerId}
+                    items={live}
+                    grouped={grouped}
+                  />
+                )}
               </li>
             )
           })}
         </ul>
       </nav>
-      <NavSearch variant="desktop" />
+      <NavSearch variant="desktop" className="self-center" />
     </div>
   )
 }
