@@ -4,7 +4,8 @@ import {ArrowRightIcon, SearchIcon} from '@/components/icons'
  * Site search - UI only. Search itself (a results page and the "No search results" state) is
  * deferred, so every control is disabled and nothing submits. See the spec's deferred section.
  *
- * TODO: wire to site search once it exists - see the GitHub issue linked from
+ * TODO: wire to site search once it exists - see
+ * https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/29 and
  * docs/superpowers/specs/2026-10-07-site-navigation-design.md
  */
 

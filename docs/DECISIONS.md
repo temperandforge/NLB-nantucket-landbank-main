@@ -166,6 +166,21 @@ mode in the whole feature.
 is uploaded, when it cannot be read, or when no feature carries the configured property — never a
 blank control with no explanation.
 
+### 1.12 Dropdown column headings are a `group` string on `menuLink`, not a third menu level
+
+**Status:** Implemented
+
+The Figma About Us dropdown has Purpose / People / Other columns. They are an optional `group`
+string on `menuLink`; the two-level cap in 1.2 is unchanged.
+
+**Why:** The cap exists so invalid half-states can't be authored, and Sanity does not model
+recursive objects cleanly. A third level would break both.
+
+**Implication:** Headings are authored per link. Consecutive links with one heading form a column;
+interleaved headings (A, B, A) stay separate and render as three. The footer ignores `group`.
+Renaming a heading means editing each link under it. The grouping rule lives in
+`frontend/sanity/lib/menuGroups.ts` and is checked by `frontend/scripts/verifyMenuGroups.mts`.
+
 ---
 
 ## 2. Page hierarchy and URLs
@@ -411,6 +426,27 @@ The newsletter form has no action and no handler, and both controls are `disable
 not-yet-available.
 
 **Implication:** Record the missing work in the relevant spec's deferred section.
+
+### 4.9 The header and banner are Globals singletons, and the header hides on scroll down
+
+**Status:** Implemented
+
+`header` (`_id: 'header'`) holds the main menu reference; `siteBanner` (`_id: 'siteBanner'`) holds
+the announcement. Both are singletons under Globals. The header is rendered once from the root
+layout and is sticky. Banner dismissal is stored in `localStorage`, keyed by a hash of the message,
+so a changed message re-appears; storage access is guarded and the banner renders without it.
+
+**Why:** One header for the whole site belongs in the root layout. Hiding on scroll down returns
+space to the content; revealing on scroll up keeps navigation close.
+
+**Implication:**
+- The scroll rule lives in `frontend/components/header/headerScroll.ts` and is checked by
+  `frontend/scripts/verifyHeader.mts`. Change it there, not in the component.
+- `--header-height` is the single source for anything sized against the bar. The map uses it;
+  size new full-height regions from it rather than a literal.
+- The real content seed, `studio/scripts/seedHeaderContent.ts`, is idempotent and non-destructive
+  (it supports `--dry`).
+- Search is disabled; see [#29](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/29).
 
 ---
 
@@ -903,6 +939,8 @@ Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-desig
 - Renaming an ancestor's slug silently changes every descendant URL (2.3). There is no redirect
   mechanism for the old paths (tracked in [#9](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/9)).
 - Mobile footer breakpoints are assumptions awaiting designer confirmation.
+- Site search is not built: the header search field is disabled
+  ([#29](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/29)).
 - `frontend/tailwind.config.ts` is vestigial under Tailwind v4 — `globals.css` uses
   `@import 'tailwindcss'` with `@theme` and no `@config`, so the file is never loaded. Its
   `green` / `yellow` scales are unrelated to the brand palette.

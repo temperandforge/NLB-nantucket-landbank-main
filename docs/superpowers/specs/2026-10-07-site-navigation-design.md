@@ -251,9 +251,9 @@ The seed script is run with `--dry` first and its plan read before the real run.
 
 1. **Site search.** The search field is disabled. Missing: a results page, the GROQ search over
    pages, news, projects and other content, and the "No search results" state. Deferred because the
-   design covers only the field, not results, and the scope is a separate feature. The issue is
-   opened with the implementation and linked here; the `NavSearch` component carries a `TODO`
-   referencing it.
+   design covers only the field, not results, and the scope is a separate feature. Tracked in
+   [#29](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/29); the `NavSearch`
+   component carries a `TODO` referencing it.
 
 ## Notes
 
