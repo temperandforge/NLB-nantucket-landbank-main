@@ -58,7 +58,7 @@ export default function HeaderShell({children}: {children: React.ReactNode}) {
   return (
     <header
       ref={ref}
-      className={`sticky top-0 z-50 bg-background transition-transform duration-200 ease-out motion-reduce:transition-none ${
+      className={`sticky top-0 z-50 bg-background transition-transform duration-200 ease-out tf-px motion-reduce:transition-none ${
         hidden ? '-translate-y-full' : 'translate-y-0'
       }`}
     >

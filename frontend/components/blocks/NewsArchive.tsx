@@ -15,7 +15,7 @@ export default function NewsArchive({block}: BlockProps<'newsArchive'>) {
 
   return (
     <section className="bg-background py-s6">
-      <div className="flex w-full flex-col items-start gap-10 tf-max-w">
+      <div className="flex w-full flex-col items-start gap-10 _tf-max-w">
         {showTabs ? (
           // useSearchParams needs a Suspense boundary on a statically rendered page. The fallback
           // is the same tabs and list with "All" pressed, so the page does not shift when the
@@ -33,7 +33,9 @@ export default function NewsArchive({block}: BlockProps<'newsArchive'>) {
             <NewsFilter articles={articles} />
           </Suspense>
         ) : (
-          <NewsList articles={articles} />
+          <div className="tf-px">
+            <NewsList articles={articles} />
+          </div>
         )}
       </div>
     </section>

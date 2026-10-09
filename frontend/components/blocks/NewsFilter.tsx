@@ -13,9 +13,11 @@ export default function NewsFilter({articles}: {articles: NewsItem[]}) {
   const {active, choose} = useQueryFilter(NEWS_CATEGORY_PARAM, tabs)
 
   return (
-    <div className="flex w-full flex-col items-start gap-12 md:gap-16">
+    <div className="flex w-full flex-col items-start gap-12 _tf-max-w md:gap-16">
       <FilterTabs tabs={tabs} active={active} label={NEWS_FILTER_LABEL} onChoose={choose} />
-      <NewsList articles={filterByNewsCategory(articles, active)} />
+      <div className="tf-px mx-auto w-full">
+        <NewsList articles={filterByNewsCategory(articles, active)} />
+      </div>
     </div>
   )
 }

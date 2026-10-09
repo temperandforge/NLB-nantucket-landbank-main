@@ -11,7 +11,7 @@ export default function CardCommissioner({person}: {person: CommissionerItem}) {
           width={896}
           sizes="448px"
           fill
-          className="size-full object-cover"
+          className="absolute inset-0 size-full object-cover"
         />
       </div>
       <div className="flex w-full flex-col items-start break-words">

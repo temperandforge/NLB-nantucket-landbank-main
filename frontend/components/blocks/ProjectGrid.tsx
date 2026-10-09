@@ -15,7 +15,7 @@ export default function ProjectGrid({block}: BlockProps<'projectGrid'>) {
 
   return (
     <section className="bg-background py-s6">
-      <div className="flex w-full flex-col items-start gap-10 tf-max-w">
+      <div className="flex w-full flex-col items-start gap-10 _tf-max-w">
         {block.heading && <h2 className="w-full text-headline-xl text-on-background">{block.heading}</h2>}
         {showTabs ? (
           // useSearchParams needs a Suspense boundary on a statically rendered page. The fallback

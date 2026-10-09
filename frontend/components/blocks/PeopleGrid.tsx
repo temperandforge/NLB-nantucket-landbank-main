@@ -17,9 +17,9 @@ export default function PeopleGrid({block}: BlockProps<'peopleGrid'>) {
   const showTabs = Boolean(block.showFilters) && tabs.length > 0
 
   return (
-    <section className="bg-background tf-px py-s6">
-      <div className="flex w-full flex-col items-start gap-10 tf-max-w">
-        {block.heading && <h2 className="w-full text-headline-xl text-on-background">{block.heading}</h2>}
+    <section className="bg-background py-s6">
+      <div className="flex w-full flex-col items-start gap-10 _tf-max-w">
+        {block.heading && <h2 className="tf-px w-full text-headline-xl text-on-background">{block.heading}</h2>}
         {staff.length > 0 &&
           (showTabs ? (
             // useSearchParams needs a Suspense boundary on a statically rendered page. The fallback
@@ -29,17 +29,21 @@ export default function PeopleGrid({block}: BlockProps<'peopleGrid'>) {
               fallback={
                 <div className="flex w-full flex-col items-start gap-16">
                   <FilterTabs tabs={tabs} active={null} label={DEPARTMENT_FILTER_LABEL} />
-                  <StaffGrid people={staff} />
+                  <div className="tf-px">
+                    <StaffGrid people={staff} />
+                  </div>
                 </div>
               }
             >
               <StaffFilter people={staff} />
             </Suspense>
           ) : (
-            <StaffGrid people={staff} />
+            <div className="tf-px">
+              <StaffGrid people={staff} />
+            </div>
           ))}
         {commissioners.length > 0 && (
-          <ul className="grid w-full list-none grid-cols-1 gap-x-3 gap-y-16 p-0 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="tf-px grid tf-max-w w-full list-none grid-cols-1 gap-x-3 gap-y-16 p-0 sm:grid-cols-2 lg:grid-cols-3">
             {commissioners.map((person) => (
               <li key={person._id}>
                 <CardCommissioner person={person} />

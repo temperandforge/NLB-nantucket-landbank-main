@@ -7,7 +7,7 @@ export default function CardStaff({person}: {person: StaffItem}) {
   // A department that was unpublished dereferences to null.
   const department = person.department?.title
   return (
-    <div className="flex w-full max-w-[331px] flex-col items-start gap-3">
+    <div className="flex w-full _max-w-[331px] flex-col items-start gap-3">
       <div className="flex w-full flex-col items-start overflow-clip rounded">
         <div className="relative aspect-[304/380] w-full shrink-0 bg-on-background-tonal">
           <BlockImage
@@ -15,7 +15,7 @@ export default function CardStaff({person}: {person: StaffItem}) {
             width={662}
             sizes="331px"
             fill
-            className="size-full object-cover"
+            className="absolute inset-0 size-full object-cover"
           />
         </div>
         {department && <Tag label={department} size="lg" rounded={false} className="w-full" />}
