@@ -14,7 +14,7 @@ export default function JumpNavContent({block}: BlockProps<'jumpNavContent'>) {
   return (
     <section className="w-full">
       <div className="max-w-[1360px] mx-auto px-10 py-24 grid grid-cols-1 md:grid-cols-2 gap-24">
-        <div className="md:sticky md:top-10 self-start">
+        <div className="md:sticky md:top-[calc(var(--header-height)+2.5rem)] self-start">
           {block.heading && <Heading className="text-headline-2xl mb-8">{block.heading}</Heading>}
           {items.length > 0 && (
             <nav className="flex flex-col" aria-label={block.heading || 'Section navigation'}>

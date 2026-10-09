@@ -6,6 +6,11 @@
 @plugin "@tailwindcss/typography";
 
 @layer base {
+  /* Anchor jumps reveal the sticky header (HeaderShell), so keep targets clear of it. */
+  html {
+    scroll-padding-top: var(--header-height);
+  }
+
   h1,
   h2,
   h3,
