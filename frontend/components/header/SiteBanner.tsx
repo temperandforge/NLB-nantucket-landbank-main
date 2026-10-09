@@ -31,8 +31,9 @@ export default function SiteBanner({banner}: {banner: SiteBannerData}) {
   const text = <span className="font-secondary text-body-small">{message}</span>
 
   return (
-    // 34px high per Figma (59:20)
-    <div className="relative flex h-[34px] items-center justify-center bg-lowlands-500 px-gap-lg text-on-accent-secondary">
+    // 34px minimum per Figma (59:20); a longer message wraps and grows the bar. The side padding
+    // clears the close button, which is pinned to the right.
+    <div className="relative flex min-h-[34px] items-center justify-center bg-lowlands-500 px-14 py-1.5 text-on-accent-secondary">
       {banner.link ? (
         <ResolvedLink link={banner.link} className="underline-offset-4 hover:underline">
           {text}
@@ -47,7 +48,8 @@ export default function SiteBanner({banner}: {banner: SiteBannerData}) {
           writeDismissed(key)
           setDismissedNow(true)
         }}
-        className="absolute right-gap-md top-1/2 -translate-y-1/2"
+        // p-1 makes the hit area 28px (WCAG 2.5.8); right-5 keeps the 20px icon where it was.
+        className="absolute right-5 top-1/2 -translate-y-1/2 p-1"
       >
         <CloseIcon className="size-5" />
       </button>
