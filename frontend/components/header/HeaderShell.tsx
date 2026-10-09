@@ -27,7 +27,7 @@ export default function HeaderShell({children}: {children: React.ReactNode}) {
       setHidden(next.hidden)
     }
 
-    const locked = () => !!el.querySelector('[data-header-lock]') || el.contains(document.activeElement)
+    const locked = () => !!el.querySelector('[data-header-lock]') || !!el.querySelector(':focus-visible')
 
     const onScroll = () => {
       if (frame) return
@@ -37,14 +37,18 @@ export default function HeaderShell({children}: {children: React.ReactNode}) {
       })
     }
     const onReveal = () => apply({hidden: false, lastY: window.scrollY})
+    // Keyboard focus only: a mouse click leaves focus on the link but must not lock or reveal.
+    const onFocusIn = (event: FocusEvent) => {
+      if ((event.target as HTMLElement).matches(':focus-visible')) onReveal()
+    }
 
     window.addEventListener('scroll', onScroll, {passive: true})
     window.addEventListener('hashchange', onReveal)
-    el.addEventListener('focusin', onReveal)
+    el.addEventListener('focusin', onFocusIn)
     return () => {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('hashchange', onReveal)
-      el.removeEventListener('focusin', onReveal)
+      el.removeEventListener('focusin', onFocusIn)
       if (frame) cancelAnimationFrame(frame)
     }
   }, [])

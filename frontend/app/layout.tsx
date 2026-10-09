@@ -107,7 +107,7 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
         flush against one another, so each section owns its own spacing.
       */}
       <body className="flex flex-col min-h-screen">
-        <a href="#pageMain" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:bg-brand focus:text-white focus:px-4 focus:py-2">
+        <a href="#pageMain" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:bg-brand focus:text-white focus:px-4 focus:py-2">
           Skip to main content
         </a>
         {/* The <Toaster> component is responsible for rendering toast notifications used in /app/client-utils.ts and /app/components/DraftModeToast.tsx */}
