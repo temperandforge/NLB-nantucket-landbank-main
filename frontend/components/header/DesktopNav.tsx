@@ -20,20 +20,23 @@ export default function DesktopNav({menu}: {menu: HeaderMenuData}) {
   const baseId = useId()
   const rootRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
-  // The pathname the dropdown was opened on: once the route changes it no longer matches, so the
-  // dropdown reads as closed without a setState-in-effect.
-  const [opened, setOpened] = useState<{key: string; pathname: string} | null>(null)
-  const openKey = opened && opened.pathname === pathname ? opened.key : null
-  const setOpenKey = (key: string | null) => setOpened(key ? {key, pathname} : null)
+  const [openKey, setOpenKey] = useState<string | null>(null)
+  // Reset during render when the route changes (not an effect), so a navigation by any means
+  // closes the dropdown and a later return to the same path cannot reopen it.
+  const [prevPath, setPrevPath] = useState(pathname)
+  if (prevPath !== pathname) {
+    setPrevPath(pathname)
+    setOpenKey(null)
+  }
 
   useEffect(() => {
     if (!openKey) return
     const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpened(null)
+      if (!rootRef.current?.contains(event.target as Node)) setOpenKey(null)
     }
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return
-      setOpened(null)
+      setOpenKey(null)
       rootRef.current?.querySelector<HTMLButtonElement>(`[data-nav-trigger="${openKey}"]`)?.focus()
     }
     document.addEventListener('pointerdown', onPointerDown)

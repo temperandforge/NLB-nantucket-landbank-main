@@ -21,14 +21,19 @@ const LABEL_CLASS = 'font-mono-tracked text-[12px] uppercase tracking-[1.32px] l
 export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
   const panelId = useId()
   const pathname = usePathname()
-  // The pathname the panel was opened on: once the route changes it no longer matches, so the
-  // panel reads as closed (and the scroll lock releases) without a setState-in-effect.
-  const [openedOn, setOpenedOn] = useState<string | null>(null)
-  const open = openedOn === pathname
+  const [open, setOpen] = useState(false)
   const [drilledKey, setDrilledKey] = useState<string | null>(null)
+  // Reset during render when the route changes (React-sanctioned, not an effect), so a navigation
+  // by any means closes the panel and a later return to the same path cannot reopen it.
+  const [prevPath, setPrevPath] = useState(pathname)
+  if (prevPath !== pathname) {
+    setPrevPath(pathname)
+    setOpen(false)
+    setDrilledKey(null)
+  }
 
   const close = () => {
-    setOpenedOn(null)
+    setOpen(false)
     setDrilledKey(null)
   }
 
@@ -37,14 +42,19 @@ export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
     const previous = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-      setOpenedOn(null)
-      setDrilledKey(null)
+      if (event.key === 'Escape') close()
+    }
+    // Tailwind lg (64rem): the menu is hidden at and above it, so release the lock there.
+    const desktop = window.matchMedia('(min-width: 64rem)')
+    const onChange = (event: MediaQueryListEvent) => {
+      if (event.matches) close()
     }
     document.addEventListener('keydown', onKeyDown)
+    desktop.addEventListener('change', onChange)
     return () => {
       document.body.style.overflow = previous
       document.removeEventListener('keydown', onKeyDown)
+      desktop.removeEventListener('change', onChange)
     }
   }, [open])
 
@@ -61,7 +71,7 @@ export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
           if (open) close()
           else {
             setDrilledKey(null)
-            setOpenedOn(pathname)
+            setOpen(true)
           }
         }}
         className="flex size-10 items-center justify-center"
@@ -75,6 +85,7 @@ export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
           onClick={(event) => {
             if ((event.target as HTMLElement).closest('a')) close()
           }}
+          // Positioned against the header bar container (a `relative` ancestor); height uses --header-height.
           className="absolute inset-x-0 top-full z-40 flex h-[calc(100dvh-var(--header-height))] flex-col bg-background px-gap-md py-gap-md"
         >
           {drilled && drilled._type === 'menuGroup' ? (
