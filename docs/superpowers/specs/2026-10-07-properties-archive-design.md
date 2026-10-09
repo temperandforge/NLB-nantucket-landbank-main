@@ -108,11 +108,11 @@ none today), unchanged.
 
 ## Deferred
 
-Each gets a GitHub issue, linked here when opened:
-- Property detail pages (cards link only via the property's own link).
-- Renaming the Project Grid / Project Preview blocks.
-- Pagination or search on the archive.
-- Deleting the retired `project` documents (a user step after checking the map).
+Each has a GitHub issue:
+- Property detail pages ([#23](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/23)); cards link only via the property's own link.
+- Renaming the Project Grid / Project Preview blocks ([#24](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/24)).
+- Pagination or search on the archive ([#25](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/25)).
+- Deleting the retired `project` documents, a user step after checking the map ([#26](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/26)).
 
 ## Verification
 

@@ -42,8 +42,8 @@ const DISABLED_TYPES = [
   'header',
   'siteBanner',
   'menu',
-  // Handled explicitly under Projects below.
-  'project',
+  // Handled explicitly under Properties below.
+  'property',
   'propertyType',
   'resource',
   'projectSettings',
@@ -71,17 +71,17 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
         .icon(DocumentsIcon)
         .child(S.documentTypeList('page').title('Pages')),
       S.divider(),
-      // Projects: the Land Bank's properties, their categorisation, and the settings that
-      // configure both the projects page and the interactive map. Grouped together because the
+      // Properties: the Land Bank's properties, their categorisation, and the settings that
+      // configure both the properties pages and the interactive map. Grouped together because the
       // taxonomies are meaningless outside this section.
       S.listItem()
-        .title('Projects')
+        .title('Properties')
         .icon(PinIcon)
         .child(
           S.list()
-            .title('Projects')
+            .title('Properties')
             .items([
-              S.documentTypeListItem('project').title('Projects').icon(PinIcon),
+              S.documentTypeListItem('property').title('Properties').icon(PinIcon),
               S.divider(),
               S.documentTypeListItem('propertyType').title('Property Types').icon(TagIcon),
               S.documentTypeListItem('resource').title('Resources').icon(DropIcon),

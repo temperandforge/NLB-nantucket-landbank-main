@@ -123,7 +123,7 @@ since been deleted still renders as itself instead of blank.
 **Status:** Implemented
 
 The client maintains a single GeoJSON FeatureCollection covering every boundary, uploaded to
-`projectSettings.boundaryData`. Each project stores only `boundaryId`, naming one feature in it.
+`projectSettings.boundaryData`. Each project stores `boundaryIds`, naming every feature in it that belongs to that property — most projects have one, some (e.g. a preserve split across many GIS parcels) have several.
 
 **Why:** This is how the client works — one export from their GIS, not per-parcel geometry pasted
 into a CMS field. It also means re-exporting updates every boundary at once.
@@ -154,9 +154,11 @@ into `setHTML`, so all authored text is escaped first.
 
 **Status:** Implemented
 
-`boundaryId` uses a custom Studio input (`studio/src/components/BoundaryIdInput.tsx`) that loads the
-uploaded file, offers the identifiers it actually contains, and flags a stored value that is not
-among them.
+`boundaryIds` uses a custom Studio input (`studio/src/components/BoundaryIdsInput.tsx`, backed by
+the useBoundaryOptions hook) that loads the uploaded file, offers the identifiers it actually
+contains, and flags a stored value that is not among them. It is a multi-select — a project can be
+several parcels, and each is checked against the file independently so a stale one among several
+is visible on its own.
 
 **Why:** A mistyped identifier produces a property that silently never draws on the map, with
 nothing in the Studio to indicate why. Across hundreds of parcels that is the likeliest failure
@@ -802,11 +804,18 @@ entry per archive: nothing in code needs to find an archive page.
 
 **Status:** Implemented
 
-The People Grid's tabs are derived from the staff on the block (`frontend/sanity/lib/staffFilter.ts`,
+The People Grid's tabs are derived from the staff on the block (`frontend/sanity/lib/archiveFilter.ts`,
 checked by `frontend/scripts/verifyStaffFilter.mts`): one per department with at least one member, in
 the department's `order`. The chosen department is `?department=<slug>`, read with `useSearchParams`
 and changed with the History API, so a filtered view can be shared without a server request. The
 server render is "All".
+
+The tab row is a shared `components/ui/FilterTabs` and the address handling a shared
+`useQueryFilter` hook, so any archive block can filter the same way. The Project Grid uses them with
+`?type=<slug>`, tabs from the property types on its projects (resources are amenities, not
+categories, and get no tab). The Project Grid's card follows the Figma projects archive (two
+columns, types as tags over the image, name below, no description), replacing the earlier assumed
+four-column card (9.6).
 
 ### 11.3 The footer links are wired by a guarded script
 
@@ -917,6 +926,46 @@ theme's `nlb_faq` posts are test content and are not migrated.
 **Samples.** `--remove-samples` deletes the sample FAQs and the `general` and `empty-category`
 categories from the Phase B seed before matching (one sample shares a question with a real FAQ).
 The `form-filing` category already exists and is reused as it stands.
+
+## 15. The property type and the Properties archive
+
+### 15.1 `property` replaced `project`, and the archive is a block
+
+**Status:** Implemented. The migration ran on 2026-10-07 (150 properties created, 2 with a draft; validation passed) and is safe to re-run (it skips every slug). The page seed ran on 2026-10-07: draft `explore/properties` exists, to be published by the user.
+
+**Note:** the dataset also holds an older draft `property` ("Surfside Beach", slug `a`, created 2026-07-21 under the previous content model). The migration did not create or touch it; delete it in Studio if it is not wanted.
+
+The client wants properties to be the map's document, so `property` replaced `project` (same
+fields; the Studio title is "Property"). `studio/scripts/migrateProjectsToProperties.ts` copies each
+project into a property **in the same publish state** (150 published, 2 with a draft when it was
+written), matched by slug, never editing an existing property, refusing to run if anything other
+than a project references a project, and leaving the `project` documents in place
+([#26](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/26) to delete them once
+the map is verified). `verifyPropertyMigration.ts` compares the two sets.
+
+The archive is a **Property Archive block** on an ordinary page (seeded as a draft
+`explore/properties` by `seedPropertiesPage.ts`), so its address is its slug and parent. It has two
+dropdown filters, Property Type and Resources, built from the types and resources the properties
+use; **any** checked option within a group matches and **every** group with a choice must hold. The
+choice is kept in the address as `?type=a,b&resource=c`. The filter functions live in
+`frontend/sanity/lib/archiveFilter.ts` with the other archive filters and are checked by
+`frontend/scripts/verifyPropertyFilter.mts`. A card with no image shows **Default property image**
+from Site Settings, or the staff cards' neutral box when that is unset.
+
+**Deploy order.** The map, the Project Grid, the Property Archive and the Studio's Properties list all
+read `property`, which is empty until the migration runs. Run `migrateProjectsToProperties.ts`, then
+`verifyPropertyMigration.ts`, **before** the frontend and Studio changes are deployed; otherwise the map
+shows no properties.
+
+**Open question.** The seeded top-level Projects page (a Project Grid with copy about conservation
+initiatives) now lists properties, so the same beaches and ponds appear under two pages. Whether to
+retire it, re-copy it or wait for a real "project" (initiative) type is the client's call.
+
+**Not done:** property detail pages ([#23](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/23)),
+renaming the Project blocks ([#24](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/24)),
+pagination or search ([#25](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/25)).
+Spec: [properties archive design](superpowers/specs/2026-10-07-properties-archive-design.md); plan:
+[properties archive plan](superpowers/plans/2026-10-07-properties-archive.md).
 
 ## Known outstanding items
 

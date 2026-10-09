@@ -115,22 +115,23 @@ export const siteBannerQuery = defineQuery(`
 `)
 
 /**
- * Projects (the Land Bank properties shown on the interactive map).
+ * Properties (the Land Bank properties shown on the interactive map and the archive).
  *
  * Taxonomies are dereferenced to their slug and title: the slug is the stable key the map's URL
  * filters use, the title is what a visitor reads. A dereferenced entry is null when the referenced
  * document is unpublished, so consumers must filter those out.
  *
  * Boundary geometry is not here - it lives in the single GeoJSON file on Project Settings, and
- * boundaryId says which feature in it belongs to this project.
+ * boundaryId says which feature in it belongs to this property.
  */
-export const projectsQuery = defineQuery(`
-  *[_type == "project" && defined(slug.current)] | order(name asc) {
+export const propertiesQuery = defineQuery(`
+  *[_type == "property" && defined(slug.current)] | order(name asc) {
     _id,
     name,
     "slug": slug.current,
-    boundaryId,
+    boundaryIds,
     location,
+    disablePopup,
     description,
     link,
     "image": image{"url": asset->url, alt},
@@ -318,15 +319,26 @@ const pageBuilderFields = /* groq */ `
     },
     _type == "projectGrid" => {
       ...,
-      "projects": *[_type == "project" && defined(slug.current)] | order(name asc) {
+      "projects": *[_type == "property" && defined(slug.current)] | order(name asc) {
+        _id,
+        name,
+        image,
+        link,
+        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order}
+      }
+    },
+    _type == "propertyArchive" => {
+      ...,
+      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {
         _id,
         name,
         description,
-        image,
         link,
-        "propertyTypes": propertyTypes[]->{"slug": slug.current, title},
-        "resources": resources[]->{"slug": slug.current, title}
-      }
+        image,
+        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
+        "resources": resources[]->{"slug": slug.current, title, order}
+      },
+      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage
     },
     _type == "imageCarousel" => {
       ...,

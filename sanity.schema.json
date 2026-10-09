@@ -534,7 +534,7 @@
   },
   {
     "type": "type",
-    "name": "project.reference",
+    "name": "property.reference",
     "value": {
       "type": "object",
       "attributes": {
@@ -559,7 +559,7 @@
           "optional": true
         }
       },
-      "dereferencesTo": "project"
+      "dereferencesTo": "property"
     }
   },
   {
@@ -613,11 +613,34 @@
               },
               "rest": {
                 "type": "inline",
-                "name": "project.reference"
+                "name": "property.reference"
               }
             }
           },
           "optional": true
+        },
+        "disabled": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "propertyArchive",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "propertyArchive"
+          }
         },
         "disabled": {
           "type": "objectAttribute",
@@ -646,6 +669,13 @@
           "type": "objectAttribute",
           "value": {
             "type": "string"
+          },
+          "optional": true
+        },
+        "showFilters": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
           },
           "optional": true
         },
@@ -1159,7 +1189,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "inline",
-            "name": "project.reference"
+            "name": "property.reference"
           },
           "optional": true
         },
@@ -3942,7 +3972,7 @@
     }
   },
   {
-    "name": "project",
+    "name": "property",
     "type": "document",
     "attributes": {
       "_id": {
@@ -3955,7 +3985,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "string",
-          "value": "project"
+          "value": "property"
         }
       },
       "_createdAt": {
@@ -4103,10 +4133,13 @@
         },
         "optional": true
       },
-      "boundaryId": {
+      "boundaryIds": {
         "type": "objectAttribute",
         "value": {
-          "type": "string"
+          "type": "array",
+          "of": {
+            "type": "string"
+          }
         },
         "optional": true
       },
@@ -4115,6 +4148,13 @@
         "value": {
           "type": "inline",
           "name": "geopoint"
+        },
+        "optional": true
+      },
+      "disablePopup": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
         },
         "optional": true
       }
@@ -4920,6 +4960,60 @@
         },
         "optional": true
       },
+      "defaultPropertyImage": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "object",
+          "attributes": {
+            "asset": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "inline",
+                "name": "sanity.imageAsset.reference"
+              },
+              "optional": true
+            },
+            "media": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "unknown"
+              },
+              "optional": true
+            },
+            "hotspot": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "inline",
+                "name": "sanity.imageHotspot"
+              },
+              "optional": true
+            },
+            "crop": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "inline",
+                "name": "sanity.imageCrop"
+              },
+              "optional": true
+            },
+            "alt": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "string"
+              },
+              "optional": true
+            },
+            "_type": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "string",
+                "value": "image"
+              }
+            }
+          }
+        },
+        "optional": true
+      },
       "ogImage": {
         "type": "objectAttribute",
         "value": {
@@ -5353,6 +5447,21 @@
                 "rest": {
                   "type": "inline",
                   "name": "projectPreview"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "propertyArchive"
                 }
               },
               {

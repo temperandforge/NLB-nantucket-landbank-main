@@ -2,7 +2,7 @@ import {Suspense} from 'react'
 
 import PageHeader from '@/components/PageHeader'
 import {sanityFetch} from '@/sanity/lib/live'
-import {mapFiltersQuery, mapSettingsQuery, projectsQuery} from '@/sanity/lib/queries'
+import {mapFiltersQuery, mapSettingsQuery, propertiesQuery} from '@/sanity/lib/queries'
 
 import {MapExplorer} from './MapExplorer'
 
@@ -11,13 +11,13 @@ import {MapExplorer} from './MapExplorer'
  *
  * A server component that fetches the projects, the filter taxonomies and the map settings, then
  * hands them to the client component that owns filtering. The data used to be a hardcoded array in
- * ./properties.ts; it is now project / propertyType / resource documents in Sanity.
+ * ./properties.ts; it is now property / propertyType / resource documents in Sanity.
  *
  * The Suspense boundary is required because MapExplorer reads the filters from useSearchParams.
  */
 export default async function MapPage() {
   const [{data: projects}, {data: filters}, {data: settings}] = await Promise.all([
-    sanityFetch({query: projectsQuery}),
+    sanityFetch({query: propertiesQuery}),
     sanityFetch({query: mapFiltersQuery}),
     sanityFetch({query: mapSettingsQuery}),
   ])

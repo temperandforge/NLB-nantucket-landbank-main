@@ -19,6 +19,7 @@ import {faqList} from '../objects/faqList'
 import {jobListings} from '../objects/jobListings'
 import {peopleGrid} from '../objects/peopleGrid'
 import {projectGrid} from '../objects/projectGrid'
+import {propertyArchive} from '../objects/propertyArchive'
 import {projectPreview} from '../objects/projectPreview'
 import {newsPreview} from '../objects/newsPreview'
 import {timeline} from '../objects/timeline'
@@ -49,6 +50,7 @@ const pageBuilderBlocks = [
   peopleGrid,
   projectGrid,
   projectPreview,
+  propertyArchive,
   timeline,
 ]
   .sort((a, b) => (a.title ?? a.name).localeCompare(b.title ?? b.name))

@@ -112,11 +112,11 @@ export type EventsPreview = {
   disabled?: boolean
 }
 
-export type ProjectReference = {
+export type PropertyReference = {
   _ref: string
   _type: 'reference'
   _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'project'
+  [internalGroqTypeReferenceTo]?: 'property'
 }
 
 export type ProjectPreview = {
@@ -127,14 +127,20 @@ export type ProjectPreview = {
   projects?: Array<
     {
       _key: string
-    } & ProjectReference
+    } & PropertyReference
   >
+  disabled?: boolean
+}
+
+export type PropertyArchive = {
+  _type: 'propertyArchive'
   disabled?: boolean
 }
 
 export type ProjectGrid = {
   _type: 'projectGrid'
   heading?: string
+  showFilters?: boolean
   disabled?: boolean
 }
 
@@ -220,7 +226,7 @@ export type MapTeaser = {
   eyebrow?: string
   heading?: string
   body?: string
-  featuredProject?: ProjectReference
+  featuredProject?: PropertyReference
   button?: Button
   disabled?: boolean
 }
@@ -666,9 +672,9 @@ export type ResourceReference = {
   [internalGroqTypeReferenceTo]?: 'resource'
 }
 
-export type Project = {
+export type Property = {
   _id: string
-  _type: 'project'
+  _type: 'property'
   _createdAt: string
   _updatedAt: string
   _rev: string
@@ -694,8 +700,9 @@ export type Project = {
       _key: string
     } & ResourceReference
   >
-  boundaryId?: string
+  boundaryIds?: Array<string>
   location?: Geopoint
+  disablePopup?: boolean
 }
 
 export type Geopoint = {
@@ -836,6 +843,14 @@ export type Settings = {
     _type: 'block'
     _key: string
   }>
+  defaultPropertyImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
   ogImage?: {
     asset?: SanityImageAssetReference
     media?: unknown
@@ -918,6 +933,9 @@ export type Page = {
     | ({
         _key: string
       } & ProjectPreview)
+    | ({
+        _key: string
+      } & PropertyArchive)
     | ({
         _key: string
       } & Timeline)
@@ -1172,8 +1190,9 @@ export type AllSanitySchemaTypes =
   | MenuGroup
   | CtaContact
   | EventsPreview
-  | ProjectReference
+  | PropertyReference
   | ProjectPreview
+  | PropertyArchive
   | ProjectGrid
   | PeopleGrid
   | JobListings
@@ -1217,7 +1236,7 @@ export type AllSanitySchemaTypes =
   | Article
   | PropertyTypeReference
   | ResourceReference
-  | Project
+  | Property
   | Geopoint
   | SingleNewsPage
   | ProjectSettings

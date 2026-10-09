@@ -11,7 +11,7 @@ import {
   type FilterOption,
   type MapFilters,
   type MapSettings,
-  type Project,
+  type Property,
 } from './types'
 
 /**
@@ -25,7 +25,7 @@ import {
  */
 
 interface MapExplorerProps {
-  projects: Project[]
+  projects: Property[]
   filters: MapFilters
   settings: MapSettings | null
 }

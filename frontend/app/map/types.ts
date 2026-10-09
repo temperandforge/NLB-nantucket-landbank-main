@@ -1,18 +1,18 @@
 import type {
   MapFiltersQueryResult,
   MapSettingsQueryResult,
-  ProjectsQueryResult,
+  PropertiesQueryResult,
 } from '@/sanity.types'
 
 /**
  * Map types derived from the generated GROQ result types, so they cannot drift from the queries.
  *
  * This file used to hold hardcoded PropertyType / Resource unions, a Property interface and
- * parallel label maps. Those are now project / propertyType / resource documents in Sanity - a
+ * parallel label maps. Those are now property / propertyType / resource documents in Sanity - a
  * category can be added or renamed without a deploy, so the frontend must not restate the list.
  */
 
-export type Project = ProjectsQueryResult[number]
+export type Property = PropertiesQueryResult[number]
 export type MapFilters = MapFiltersQueryResult
 export type MapSettings = NonNullable<MapSettingsQueryResult>
 
@@ -33,6 +33,16 @@ export const DEFAULT_ZOOM = 11
 export const RESOURCE_SLUG = {
   parking: 'parking',
   handicapAccessible: 'handicap-accessible',
+} as const
+
+/**
+ * Property type slugs the map gives special treatment to.
+ *
+ * These are the slugs of `propertyType` documents. Named once here for the same reason as
+ * RESOURCE_SLUG above: a slug is a stable key, and code should never restate a taxonomy's values.
+ */
+export const PROPERTY_TYPE_SLUG = {
+  beach: 'beaches',
 } as const
 
 /**
