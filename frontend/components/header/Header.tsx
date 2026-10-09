@@ -21,9 +21,11 @@ const LOGO_HEIGHT = 50 // natural height
  * with the page; only the bar is sticky.
  */
 export default async function Header() {
+  // Each fetch is caught on its own so one failure cannot take down the other region or the layout.
+  // (Footer has the same exposure and is intentionally left as is.)
   const [{data: header}, {data: banner}] = await Promise.all([
-    sanityFetch({query: headerQuery}),
-    sanityFetch({query: siteBannerQuery}),
+    sanityFetch({query: headerQuery}).catch(() => ({data: null})),
+    sanityFetch({query: siteBannerQuery}).catch(() => ({data: null})),
   ])
   const menu = header?.mainMenu
 
@@ -31,7 +33,7 @@ export default async function Header() {
     <>
       {banner?.message && <SiteBanner banner={banner} />}
       <HeaderShell>
-        <div className="relative mx-auto flex h-(--header-height) max-w-site items-center justify-between px-gap-md">
+        <div data-header-bar className="relative mx-auto flex h-(--header-height) max-w-site items-center justify-between px-gap-md">
           <Link href="/" aria-label="Nantucket Land Bank - home">
             <Image src="/images/nlb-logo.svg" alt="" width={LOGO_WIDTH} height={LOGO_HEIGHT} priority />
           </Link>

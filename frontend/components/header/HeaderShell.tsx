@@ -13,7 +13,7 @@ import {nextHeaderScroll, type HeaderScrollState} from './headerScroll'
  * with requestAnimationFrame. The slide is removed under prefers-reduced-motion.
  */
 export default function HeaderShell({children}: {children: React.ReactNode}) {
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLElement>(null)
   const state = useRef<HeaderScrollState>({hidden: false, lastY: 0})
   const [hidden, setHidden] = useState(false)
 
@@ -21,6 +21,8 @@ export default function HeaderShell({children}: {children: React.ReactNode}) {
     const el = ref.current
     if (!el) return
     let frame = 0
+    // A reload can restore a mid-page scroll; start from it so the first upward scroll doesn't hide the bar.
+    state.current = {...state.current, lastY: window.scrollY}
 
     const apply = (next: HeaderScrollState) => {
       state.current = next
@@ -54,13 +56,13 @@ export default function HeaderShell({children}: {children: React.ReactNode}) {
   }, [])
 
   return (
-    <div
+    <header
       ref={ref}
       className={`sticky top-0 z-50 bg-background transition-transform duration-200 ease-out motion-reduce:transition-none ${
         hidden ? '-translate-y-full' : 'translate-y-0'
       }`}
     >
       {children}
-    </div>
+    </header>
   )
 }
