@@ -1,5 +1,6 @@
 'use client'
 
+import {usePathname} from 'next/navigation'
 import {useEffect, useId, useRef, useState} from 'react'
 
 import ResolvedLink from '@/components/ResolvedLink'
@@ -18,16 +19,21 @@ import {resolveItemHref} from './resolveItemHref'
 export default function DesktopNav({menu}: {menu: HeaderMenuData}) {
   const baseId = useId()
   const rootRef = useRef<HTMLDivElement>(null)
-  const [openKey, setOpenKey] = useState<string | null>(null)
+  const pathname = usePathname()
+  // The pathname the dropdown was opened on: once the route changes it no longer matches, so the
+  // dropdown reads as closed without a setState-in-effect.
+  const [opened, setOpened] = useState<{key: string; pathname: string} | null>(null)
+  const openKey = opened && opened.pathname === pathname ? opened.key : null
+  const setOpenKey = (key: string | null) => setOpened(key ? {key, pathname} : null)
 
   useEffect(() => {
     if (!openKey) return
     const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpenKey(null)
+      if (!rootRef.current?.contains(event.target as Node)) setOpened(null)
     }
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return
-      setOpenKey(null)
+      setOpened(null)
       rootRef.current?.querySelector<HTMLButtonElement>(`[data-nav-trigger="${openKey}"]`)?.focus()
     }
     document.addEventListener('pointerdown', onPointerDown)
@@ -77,7 +83,7 @@ export default function DesktopNav({menu}: {menu: HeaderMenuData}) {
                   {item.label}
                   {open ? <ChevronUpIcon className="size-4" /> : <ChevronDownIcon className="size-4" />}
                 </button>
-                {open && <NavDropdown id={panelId} labelledBy={triggerId} items={item.children} />}
+                {open && <NavDropdown onNavigate={() => setOpenKey(null)} id={panelId} labelledBy={triggerId} items={item.children} />}
               </li>
             )
           })}

@@ -31,10 +31,13 @@ export default function NavDropdown({
   id,
   labelledBy,
   items,
+  onNavigate,
 }: {
   id: string
   labelledBy: string
   items: HeaderMenuChild[]
+  /** Called when a link inside the panel is activated, so the owner can close it. */
+  onNavigate?: () => void
 }) {
   const live = items.filter((item) => resolveItemHref(item.link))
   if (live.length === 0) return null
@@ -47,6 +50,9 @@ export default function NavDropdown({
       role="region"
       aria-labelledby={labelledBy}
       onKeyDown={moveFocus}
+      onClick={(event) => {
+        if ((event.target as HTMLElement).closest('a')) onNavigate?.()
+      }}
       className={`absolute top-full z-40 bg-background px-gap-md py-gap-md shadow-layer ${
         grouped ? 'left-0 right-0' : 'left-0 min-w-56'
       }`}
