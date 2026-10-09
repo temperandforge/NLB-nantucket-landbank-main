@@ -176,7 +176,7 @@ async function main() {
     message: 'Welcome to the new website',
   })
   console.log('+ header and siteBanner singletons ensured (banner starts hidden)')
-  console.log('\nDone. Publish the Header Menu and Header in the Studio to make them live.')
+  console.log('\nDone. The Header Menu and Header are already published.')
 }
 
 main().catch((error) => {
