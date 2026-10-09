@@ -7,6 +7,7 @@
  * Imports the real helper, not a copy. Exits non-zero on the first failure.
  */
 import {groupMenuLinks} from '../sanity/lib/menuGroups.ts'
+import {resolveItemHref} from '../components/header/resolveItemHref.ts'
 
 let failed = false
 function check(condition: boolean, message: string) {
@@ -40,5 +41,16 @@ check(
   shape([l('A', 'Purpose'), l('B'), l('C', 'Purpose')]) === 'Purpose:A|-:B|Purpose:C',
   'an ungrouped link between two groups splits them',
 )
+
+check(resolveItemHref({_type: 'link', linkType: 'href', href: '#'}) === '#', 'a # placeholder resolves to #')
+check(
+  resolveItemHref({_type: 'link', linkType: 'page', page: 'about-us/history'}) === '/about-us/history',
+  'a page link resolves to its full path',
+)
+check(
+  resolveItemHref({_type: 'link', linkType: 'page', page: null}) === null,
+  'a link to an unpublished page resolves to null so the item is dropped',
+)
+check(resolveItemHref(undefined) === null, 'a missing link resolves to null')
 
 process.exit(failed ? 1 : 0)
