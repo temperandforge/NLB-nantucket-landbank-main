@@ -1,6 +1,5 @@
 import {Suspense} from 'react'
 
-// import Nav from '@/components/Nav'
 import PageHeader from '@/components/PageHeader'
 import {sanityFetch} from '@/sanity/lib/live'
 import {mapFiltersQuery, mapSettingsQuery, projectsQuery} from '@/sanity/lib/queries'
@@ -25,7 +24,6 @@ export default async function MapPage() {
 
   return (
     <>
-      {/* <Nav /> */}
       <PageHeader
         title={settings?.heading || 'Map with properties and boundary lines.'}
         copy={settings?.intro || ''}
