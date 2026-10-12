@@ -415,3 +415,12 @@ export function SquareIcon({className}: IconProps) {
     </svg>
   )
 }
+
+/** Tick, marking the chosen row of a single-choice list. 24 x 24, 2px stroke; drawn, not exported from Figma. */
+export function CheckIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}

@@ -58,7 +58,7 @@
     background-color: var(--color-background);
     border-color: var(--color-error);
   }
-  /* An unfilled select or multi-select reads as a placeholder. */
+  /* An unfilled select reads as a placeholder. */
   .form-control-empty {
     color: var(--color-on-input-placeholder);
   }
@@ -68,11 +68,6 @@
     min-height: 10.8125rem;
     padding: 0.75rem;
     resize: vertical;
-  }
-
-  .form-select {
-    appearance: none;
-    padding-right: 2.75rem;
   }
 
   /* Native date and time inputs keep their picker; the design's icon sits over it. */
@@ -136,6 +131,11 @@
     justify-content: space-between;
     gap: 0.5rem;
     min-height: 2.75rem;
+    /* The highlight reaches past the text by 0.75rem each side, and the negative margin keeps the
+       text where it was. */
+    margin-inline: -0.75rem;
+    padding-inline: 0.75rem;
+    border-radius: 4px;
     cursor: pointer;
     font-family: var(--font-sans);
     font-size: var(--text-body-base);

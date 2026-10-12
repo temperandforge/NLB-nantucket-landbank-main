@@ -116,7 +116,7 @@ const FORMS = [
           key: 'state-province',
           required: true,
           width: 'half',
-          placeholder: 'Select a state or province',
+          placeholder: 'Select one',
           options: REGIONS,
         }),
         field('text', 'City', {width: 'half'}),

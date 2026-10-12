@@ -118,7 +118,7 @@ Created only by the route handler. Read-only in Studio.
 Under `frontend/components/ui/form/`:
 
 - `Field` (label, helper, error wiring), `TextInput` (text, email, phone, number, date and time),
-  `Textarea`, `NativeSelect`, `MultiSelect`, `ChoiceGroup` (checkbox and radio groups).
+  `Textarea`, `ListSelect` (single and multiple choice), `ChoiceGroup` (checkbox and radio groups).
 - `FormRenderer` (client component): owns values and errors, evaluates `showIf`, validates, submits.
 - `FormEmbed`: server component that renders `FormRenderer` for a portable-text `formEmbed`.
   `ContactForm` and `FormEmbed` share `FormRenderer`.
@@ -240,5 +240,5 @@ and the discrepancy flagged.
 
 ## Notes
 
-- A native `<select>` limits styling of the open list; the spec accepts this for single selects and
-  uses the custom listbox only for multi-select.
+- A native `<select>` cannot style its open list. Single selects first used one, then moved to the
+  custom listbox with the multi-select, because the Figma draws every dropdown alike.

@@ -1231,8 +1231,10 @@ The browser and keyboard pass, and the live POST checks, were not run. To do:
 6. Keyboard-only pass at desktop and mobile widths:
    - Tab reaches every control in visual order, never the honeypot, and a focus indicator shows on
      every stop including radios and checkboxes; a radio group is one tab stop.
-   - Space and arrows operate checkboxes and radios; the native select opens with Alt+ArrowDown or
-     Space and chooses with arrows and Enter.
+   - Space and arrows operate checkboxes and radios.
+   - Single and multi-select share one custom listbox (`ListSelect`); a single select closes and
+     returns focus to the button on Enter, Space or a click, and a multi-select stays open. A
+     single select cannot be cleared once chosen.
    - Multi-select: Enter, Space and ArrowDown open it with focus in the list; Up/Down/Home/End move;
      typing a letter jumps; Space toggles; Tab closes it and moves on. Escape returns focus to the
      trigger with no validation flash.

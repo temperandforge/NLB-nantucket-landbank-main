@@ -49,7 +49,7 @@ const PLACEHOLDERS: Record<string, string> = {
 /** Text fields to turn into selects, by field name. */
 const SELECTS: Record<string, {options: string[]; placeholder: string}> = {
   country: {options: COUNTRIES, placeholder: 'Select a country'},
-  'state-province': {options: REGIONS, placeholder: 'Select a state or province'},
+  'state-province': {options: REGIONS, placeholder: 'Select one'},
 }
 
 type Doc = {

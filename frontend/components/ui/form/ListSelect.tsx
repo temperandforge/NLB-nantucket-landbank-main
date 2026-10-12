@@ -2,19 +2,21 @@
 
 import {useEffect, useId, useRef, useState, type KeyboardEvent} from 'react'
 
-import {ChevronDownIcon, SquareCheckIcon, SquareIcon} from '@/components/icons'
+import {CheckIcon, ChevronDownIcon, SquareCheckIcon, SquareIcon} from '@/components/icons'
 import {moveActive, typeaheadMatch} from '@/sanity/lib/listbox'
 
 import Field from './Field'
 import {describedBy, type ControlProps} from './types'
 
 /**
- * Several choices from a dropdown (Figma: Entertainment, Transportation, and the menu in Contact
- * Us). A button that opens a listbox. A native <select multiple> would render as an open box, not
- * the design, so this follows the ARIA listbox pattern instead; see the keyboard contract in the
- * plan. Closing on blur keeps Tab from leaving an open list behind.
+ * A dropdown, one choice (`select`) or several (`multiSelect`), with the design's styled list
+ * (Figma: Entertainment, Transportation, and the menu in Contact Us). A button that opens a
+ * listbox. A native <select> cannot style its open list and <select multiple> renders as an open
+ * box, so this follows the ARIA listbox pattern instead; see the keyboard contract in the plan.
+ * A single choice closes the list and returns focus to the button; several stay open. Closing on
+ * blur keeps Tab from leaving an open list behind.
  */
-export default function MultiSelect({field, id, value, error, onChange, onBlur}: ControlProps) {
+export default function ListSelect({field, id, value, error, onChange, onBlur}: ControlProps) {
   const listId = useId()
   const wrapper = useRef<HTMLDivElement>(null)
   const trigger = useRef<HTMLButtonElement>(null)
@@ -24,9 +26,11 @@ export default function MultiSelect({field, id, value, error, onChange, onBlur}:
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(-1)
 
+  const multi = field.fieldType === 'multiSelect'
   const options = field.options ?? []
-  const chosen = Array.isArray(value) ? value : []
-  const summary = chosen.length > 0 ? chosen.join(', ') : field.placeholder || 'Select all that apply'
+  const chosen = Array.isArray(value) ? value : typeof value === 'string' && value ? [value] : []
+  const summary =
+    chosen.length > 0 ? chosen.join(', ') : field.placeholder || (multi ? 'Select all that apply' : 'Select one')
   const optionId = (index: number) => `${listId}-${index}`
 
   // Focus moves into the list while it is open; the wrapper's blur check treats that as staying inside.
@@ -54,7 +58,12 @@ export default function MultiSelect({field, id, value, error, onChange, onBlur}:
     if (returnFocus) trigger.current?.focus()
   }
 
-  function toggle(option: string) {
+  function choose(option: string) {
+    if (!multi) {
+      onChange(option)
+      closeList(true)
+      return
+    }
     onChange(chosen.includes(option) ? chosen.filter((item) => item !== option) : [...chosen, option])
   }
 
@@ -72,7 +81,7 @@ export default function MultiSelect({field, id, value, error, onChange, onBlur}:
       setActive((current) => moveActive(current, options.length, key))
     } else if (key === ' ' || key === 'Enter') {
       event.preventDefault()
-      if (active >= 0 && active < options.length) toggle(options[active])
+      if (active >= 0 && active < options.length) choose(options[active])
     } else if (key === 'Escape') {
       event.preventDefault()
       closeList(true)
@@ -147,7 +156,7 @@ export default function MultiSelect({field, id, value, error, onChange, onBlur}:
             ref={list}
             id={listId}
             role="listbox"
-            aria-multiselectable="true"
+            aria-multiselectable={multi || undefined}
             aria-required={field.required || undefined}
             aria-invalid={error ? true : undefined}
             aria-labelledby={`${id}-label`}
@@ -169,12 +178,20 @@ export default function MultiSelect({field, id, value, error, onChange, onBlur}:
                   // mouseDown, not click: a click would blur the list first and close it.
                   onMouseDown={(event) => {
                     event.preventDefault()
-                    toggle(option)
+                    choose(option)
                   }}
                   className="form-option"
                 >
                   <span>{option}</span>
-                  {selected ? <SquareCheckIcon className="size-6" /> : <SquareIcon className="size-6" />}
+                  {multi ? (
+                    selected ? (
+                      <SquareCheckIcon className="size-6" />
+                    ) : (
+                      <SquareIcon className="size-6" />
+                    )
+                  ) : (
+                    selected && <CheckIcon className="size-6" />
+                  )}
                 </li>
               )
             })}

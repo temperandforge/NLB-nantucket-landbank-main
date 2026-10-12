@@ -14,8 +14,7 @@ import {
 import type {FormContent} from '@/sanity/lib/types'
 
 import ChoiceGroup from './ChoiceGroup'
-import MultiSelect from './MultiSelect'
-import NativeSelect from './NativeSelect'
+import ListSelect from './ListSelect'
 import Textarea from './Textarea'
 import TextInput from './TextInput'
 import Turnstile from './Turnstile'
@@ -36,9 +35,8 @@ function Control(props: ControlProps) {
     case 'textarea':
       return <Textarea {...props} />
     case 'select':
-      return <NativeSelect {...props} />
     case 'multiSelect':
-      return <MultiSelect {...props} />
+      return <ListSelect {...props} />
     case 'checkboxGroup':
     case 'radioGroup':
       return <ChoiceGroup {...props} />
