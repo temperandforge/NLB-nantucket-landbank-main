@@ -117,6 +117,9 @@ without a deploy.
   parameter. Real paths would be added as static routes if wanted ([#39](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/39)).
 - **Structured data (JSON-LD)** for the archive, as a `CollectionPage` of `DigitalDocument`s
   ([#41](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/41)).
+- **Year filter dropdown missing in some views**: not reproduced locally; suspected stega encoding of
+  the category's `filters` in Presentation, with an uncommitted `stegaClean` candidate fix
+  ([#42](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/42)).
 
 ## Verification
 

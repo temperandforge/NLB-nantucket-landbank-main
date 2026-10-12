@@ -1,3 +1,4 @@
+import {stegaClean} from 'next-sanity'
 import {Suspense} from 'react'
 
 import {recordView} from '@/sanity/lib/archiveFilter'
@@ -7,7 +8,13 @@ import RecordsList from './RecordsList'
 import {BlockProps} from './types'
 
 export default function RecordsArchive({block}: BlockProps<'recordsArchive'>) {
-  const categories = block.categories ?? []
+  // stegaClean: in Presentation, string values carry invisible characters, so a filter key like
+  // "year" would not match the registry and the category would show no filter dropdown.
+  const categories = (block.categories ?? []).map((category) => ({
+    ...category,
+    sortBy: stegaClean(category.sortBy),
+    filters: category.filters?.map((filter) => stegaClean(filter)),
+  }))
   const records = block.records ?? []
   // Nothing to show without a category: degrade, do not throw.
   if (categories.length === 0) return null
