@@ -1026,3 +1026,37 @@ Archive block (`newsArchive`), seeded by `studio/scripts/seedNewsPage.ts` (fills
 builder only). The block lists every article newest first, three across (one on mobile), with the
 shared `components/ui/FilterTabs` for categories and `?category=<slug>` through `useQueryFilter`,
 the same pattern as the Project Grid. Tabs come from the categories the articles actually have.
+
+## 19. Public records
+
+**Status:** Implemented. Not built, each with an issue: importing the real records
+([#35](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/35)), search and
+document-type filters ([#36](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/36)),
+manual ordering ([#37](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/37)),
+pagination ([#38](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/38)) and
+per-category URLs ([#39](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/39)).
+
+Design: [the public records spec](superpowers/specs/2026-10-12-public-records-design.md).
+
+### 19.1 One page, one block, categories as documents
+
+The Public Records page is an ordinary CMS page with a Records Archive block (`recordsArchive`); the
+five Figma templates are its tab states, not five pages and not a route. `record` is a document
+(title, date, file, category); `recordCategory` is a taxonomy, so the client adds a tab without a
+deploy. Tabs come from the categories themselves, so an empty category still has its tab. There is no
+"All" tab: the lists mix titled and dated rows under different sort rules, so a combined list has no
+sensible order.
+
+### 19.2 Per-category behaviour is data; filters are a registry
+
+A category sets `sortBy` (`dateDesc` or `titleAsc`) and `filters` (an array of keys, today `year`).
+All of it is applied by `recordView` in `frontend/sanity/lib/archiveFilter.ts`, checked by
+`frontend/scripts/verifyRecordsFilter.mts`. A filter is an entry in `RECORD_FILTERS` plus an allowed
+value on `recordCategory.filters` in the studio (one list in two packages, like the page depth in
+section 2); a new one needs no change to the block, the hook or the stored documents. A filter value
+a category does not offer, or a key the frontend does not know, is ignored.
+
+**Implication:** Changing a category's slug breaks shared `?category=` links; edit the title instead.
+A row is labelled by title, else date, else file name, so a record needs only one of them; Studio
+warns when a date-ordered or year-filtered category has an undated record. The seed's sort and filter
+settings per category are read from the Figma and need the client's confirmation.

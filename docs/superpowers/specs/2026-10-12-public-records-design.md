@@ -57,11 +57,12 @@ Adding a future filter dimension (for example a document type) means a new optio
 
 ## Frontend
 
-**Block.** `recordsArchive` has no fields of its own (like `newsArchive`); its GROQ projection
-returns every `record` that has a file and a published category, with the category's `slug`, `title`,
-`order`, `sortBy` and `filters`, as for the news block. All records are inlined in the page, as
-articles are; Annual Reports is the largest at about 40, which is fine. Unpublished categories
-dereference to null and their records drop out.
+**Block.** `recordsArchive` has no fields of its own (like `newsArchive`). Its GROQ projection
+returns two lists: every `recordCategory` with `slug`, `title`, `order`, `sortBy` and `filters` (so a
+category with no records still gets its tab), and every `record` that has a file and a published
+category, with its `categorySlug`. All records are inlined in the page, as articles are; Annual
+Reports is the largest at about 40, which is fine. A record whose category is unpublished or whose
+file is gone drops out.
 
 **Tabs.** Reuse `components/ui/FilterTabs`, `categoryTabs()` and the address-keyed state of
 `useQueryFilter`. **No "All" tab**: lists mix titled and dated rows under different sort rules, so a
@@ -108,14 +109,12 @@ without a deploy.
 
 ## Not in this slice
 
-- **Importing the real records from the current site.**
-- **Search and document-type filters**: designed for (see Frontend), not built.
-- **Manual ordering within a category**: only date-descending and alphabetical.
-- **Pagination**: every record is listed.
+- **Importing the real records from the current site** ([#35](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/35)).
+- **Search and document-type filters**: designed for (see Frontend), not built ([#36](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/36)).
+- **Manual ordering within a category**: only date-descending and alphabetical ([#37](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/37)).
+- **Pagination**: every record is listed ([#38](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/38)).
 - **Per-category indexable URLs** (`/public-records/meeting-minutes`): the category is a query
-  parameter. Real paths would be added as static routes if wanted.
-
-Each of these gets a GitHub issue before this work is finished.
+  parameter. Real paths would be added as static routes if wanted ([#39](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/39)).
 
 ## Verification
 
