@@ -427,6 +427,15 @@ const pageBuilderFields = /* groq */ `
         "slug": slug.current
       }
     },
+    _type == "growers" => {
+      ...,
+      growers[]{
+        _key,
+        name,
+        tag,
+        image
+      }
+    },
     _type == "mapPreview" => {
       ...,
       "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {

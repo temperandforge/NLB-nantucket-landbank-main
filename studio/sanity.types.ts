@@ -28,6 +28,22 @@ export type DownloadFile = {
   _type: 'file'
 }
 
+export type SanityImageAssetReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
+}
+
+export type GrowerImage = {
+  asset?: SanityImageAssetReference
+  media?: unknown // Unable to locate the referenced type "grower.image.media" in schema
+  hotspot?: SanityImageHotspot
+  crop?: SanityImageCrop
+  alt?: string
+  _type: 'image'
+}
+
 export type SocialLink = {
   _type: 'socialLink'
   platform: 'facebook' | 'instagram' | 'linkedin' | 'x' | 'youtube'
@@ -65,13 +81,6 @@ export type MenuGroup = {
       _key: string
     } & MenuLink
   >
-}
-
-export type SanityImageAssetReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
 }
 
 export type CtaContact = {
@@ -260,6 +269,20 @@ export type MapPreview = {
   _type: 'mapPreview'
   heading?: string
   body?: string
+  disabled?: boolean
+}
+
+export type Growers = {
+  _type: 'growers'
+  heading?: string
+  body?: string
+  growers?: Array<{
+    name: string
+    image: GrowerImage
+    tag?: string
+    _type: 'grower'
+    _key: string
+  }>
   disabled?: boolean
 }
 
@@ -1099,6 +1122,9 @@ export type Page = {
       } & FaqList)
     | ({
         _key: string
+      } & Growers)
+    | ({
+        _key: string
       } & Hero)
     | ({
         _key: string
@@ -1117,6 +1143,9 @@ export type Page = {
       } & ImageCarousel)
     | ({
         _key: string
+      } & MapTeaser)
+    | ({
+        _key: string
       } & JobListings)
     | ({
         _key: string
@@ -1124,9 +1153,6 @@ export type Page = {
     | ({
         _key: string
       } & MapPreview)
-    | ({
-        _key: string
-      } & MapTeaser)
     | ({
         _key: string
       } & MissionStatement)
@@ -1294,23 +1320,6 @@ export type SanityAssistSchemaTypeField = {
   >
 }
 
-export type MediaFolderReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'media.folder'
-}
-
-export type MediaFolder = {
-  _id: string
-  _type: 'media.folder'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  name?: string
-  parent?: MediaFolderReference
-}
-
 export type MediaTag = {
   _id: string
   _type: 'media.tag'
@@ -1413,12 +1422,13 @@ export type SanityImageAsset = {
 export type AllSanitySchemaTypes =
   | SanityFileAssetReference
   | DownloadFile
+  | SanityImageAssetReference
+  | GrowerImage
   | SocialLink
   | InfoLine
   | InfoColumn
   | MenuLink
   | MenuGroup
-  | SanityImageAssetReference
   | CtaContact
   | EventsGrid
   | EventsPreview
@@ -1441,6 +1451,7 @@ export type AllSanitySchemaTypes =
   | PropertyReference
   | MapTeaser
   | MapPreview
+  | Growers
   | DownloadBlock
   | Timeline
   | ProjectTypeReference
@@ -1504,8 +1515,6 @@ export type AllSanitySchemaTypes =
   | SanityAssistInstructionFieldRef
   | SanityAssistInstruction
   | SanityAssistSchemaTypeField
-  | MediaFolderReference
-  | MediaFolder
   | MediaTag
   | SanityImagePaletteSwatch
   | SanityImagePalette
