@@ -1,4 +1,4 @@
-import {CogIcon} from '@sanity/icons'
+import {CogIcon, HomeIcon} from '@sanity/icons'
 import type {StructureBuilder, StructureResolver} from 'sanity/structure'
 import pluralize from 'pluralize-esm'
 
@@ -8,12 +8,34 @@ import pluralize from 'pluralize-esm'
  * Learn more: https://www.sanity.io/docs/structure-builder-introduction
  */
 
-const DISABLED_TYPES = ['settings', 'assist.instruction.context']
+const DISABLED_TYPES = [
+  'settings',
+  'assist.instruction.context',
+  // Nested under the "Property" list item below instead of the flat list.
+  'property',
+  'propertyType',
+  'resource',
+]
 
 export const structure: StructureResolver = (S: StructureBuilder) =>
   S.list()
     .title('Website Content')
     .items([
+      // Property section: groups Properties with their Property Types and Resources taxonomies.
+      S.listItem()
+        .title('Property')
+        .icon(HomeIcon)
+        .child(
+          S.list()
+            .title('Property')
+            .items([
+              S.documentTypeListItem('property').title('Properties'),
+              S.divider(),
+              S.documentTypeListItem('propertyType').title('Property Types'),
+              S.documentTypeListItem('resource').title('Resources'),
+            ]),
+        ),
+      S.divider(),
       ...S.documentTypeListItems()
         // Remove the "assist.instruction.context" and "settings" content  from the list of content types
         .filter((listItem: any) => !DISABLED_TYPES.includes(listItem.getId()))
