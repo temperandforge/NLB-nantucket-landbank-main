@@ -21,6 +21,7 @@ import {heroTertiary} from './objects/heroTertiary'
 import {basicLeftRightText} from './objects/basicLeftRightText'
 import {jumpNavContent} from './objects/jumpNavContent'
 import {downloadBlock} from './objects/downloadBlock'
+import {mapPreview} from './objects/mapPreview'
 import {mapTeaser} from './objects/mapTeaser'
 import {contactForm} from './objects/contactForm'
 import {imageCarousel} from './objects/imageCarousel'
@@ -103,6 +104,7 @@ export const schemaTypes = [
   imageCarousel,
   timeline,
   downloadBlock,
+  mapPreview,
   mapTeaser,
   contactForm,
   link,

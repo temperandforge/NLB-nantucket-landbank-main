@@ -256,6 +256,13 @@ export type MapTeaser = {
   disabled?: boolean
 }
 
+export type MapPreview = {
+  _type: 'mapPreview'
+  heading?: string
+  body?: string
+  disabled?: boolean
+}
+
 export type DownloadBlock = {
   _type: 'downloadBlock'
   downloads?: Array<{
@@ -1116,6 +1123,9 @@ export type Page = {
       } & JumpNavContent)
     | ({
         _key: string
+      } & MapPreview)
+    | ({
+        _key: string
       } & MapTeaser)
     | ({
         _key: string
@@ -1430,6 +1440,7 @@ export type AllSanitySchemaTypes =
   | ContactForm
   | PropertyReference
   | MapTeaser
+  | MapPreview
   | DownloadBlock
   | Timeline
   | ProjectTypeReference

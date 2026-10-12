@@ -10,7 +10,7 @@ import {defineBlock} from './blockFields'
  */
 export const mapTeaser = defineBlock({
   name: 'mapTeaser',
-  title: 'Map Teaser',
+  title: 'Interactive Map',
   type: 'object',
   icon: PinIcon,
   fields: [
@@ -46,6 +46,6 @@ export const mapTeaser = defineBlock({
   ],
   preview: {
     select: {title: 'heading', eyebrow: 'eyebrow'},
-    prepare: ({title, eyebrow}) => ({title: title || eyebrow || 'No heading yet', subtitle: 'Map Teaser'}),
+    prepare: ({title, eyebrow}) => ({title: title || eyebrow || 'No heading yet', subtitle: 'Interactive Map'}),
   },
 })
