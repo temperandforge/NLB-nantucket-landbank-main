@@ -398,3 +398,26 @@
 .article-curve {
   background: url('/images/blocks/article-curve.svg') center / 100% 100% no-repeat;
 }
+
+/* ---- Mobile menu ------------------------------------------------------------------------------- */
+/* Drill-in / Back swap: the incoming view slides from the side it conceptually came from. */
+@keyframes mobile-menu-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--mobile-menu-slide-from, 1.5rem));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.mobile-menu-view {
+  animation: mobile-menu-slide-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu-view {
+    animation: none;
+  }
+}
