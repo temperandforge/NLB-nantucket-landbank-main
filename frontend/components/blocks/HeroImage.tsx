@@ -4,7 +4,9 @@ import BlockImage from './BlockImage'
 import Eyebrow from './Eyebrow'
 import {BlockProps} from './types'
 
-export default function HeroImage({block}: BlockProps<'heroImage'>) {
+export default function HeroImage({block, pageName}: BlockProps<'heroImage'>) {
+  const eyebrow = block.eyebrow || pageName
+
   return (
     <div className="relative flex w-full overflow-clip tf-px pt-s3 pb-s9">
       <BlockImage
@@ -23,8 +25,8 @@ export default function HeroImage({block}: BlockProps<'heroImage'>) {
             fill
             className="pointer-events-none absolute inset-y-[-30%] inset-x-[-60%] z-0 size-auto object-contain opacity-60"
           />
-          {block.eyebrow && (
-            <Eyebrow className="relative z-10 text-on-background">{block.eyebrow}</Eyebrow>
+          {eyebrow && (
+            <Eyebrow className="relative z-10 text-on-background">{eyebrow}</Eyebrow>
           )}
           {block.heading && (
             <h1 className="relative z-10 w-full text-headline-xl text-on-background [text-wrap:pretty]">
