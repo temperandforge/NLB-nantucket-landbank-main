@@ -26,10 +26,17 @@ export default function BasicLeftRightText({block}: BlockProps<'basicLeftRightTe
     <section className="relative w-full overflow-clip bg-background tf-px py-s6">
       <div className="basic-left-right__lines pointer-events-none absolute inset-0 z-0" aria-hidden="true" />
       <div className="relative z-10 flex w-full flex-col gap-20 tf-max-w md:flex-row md:items-start">
-        <div className="flex w-full flex-col items-start gap-10 md:flex-1">
-          {block.eyebrow && <Eyebrow className="text-on-background">{block.eyebrow}</Eyebrow>}
-          {block.heading && (
-            <Heading className="w-full text-headline-xl text-on-background text-balance">{block.heading}</Heading>
+        <div className="flex w-full flex-col items-start gap-8 md:max-w-[560px] md:flex-1">
+          {(block.eyebrow || block.heading || block.description) && (
+            <div className="flex w-full flex-col items-start gap-6 text-on-background">
+              {block.eyebrow && <Eyebrow className="text-on-background">{block.eyebrow}</Eyebrow>}
+              {block.heading && (
+                <Heading className="w-full text-headline-xl text-on-background text-balance">{block.heading}</Heading>
+              )}
+              {block.description && (
+                <p className="w-full whitespace-pre-line font-sans text-body-base leading-[1.6]">{block.description}</p>
+              )}
+            </div>
           )}
           {buttons.length > 0 && (
             <div className="flex flex-wrap gap-4">

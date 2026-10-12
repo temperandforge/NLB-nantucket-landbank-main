@@ -446,6 +446,7 @@ export type BasicLeftRightText = {
   eyebrow?: string
   heading?: string
   headingLevel?: 'h1' | 'h2'
+  description?: string
   buttons?: Array<{
     label: string
     link?: Link
@@ -1938,6 +1939,7 @@ export type GetPageQueryResult = {
         eyebrow?: string
         heading?: string
         headingLevel?: 'h1' | 'h2'
+        description?: string
         buttons: Array<{
           label: string
           link: {
@@ -3008,6 +3010,7 @@ export type LandingPageQueryResult = {
         eyebrow?: string
         heading?: string
         headingLevel?: 'h1' | 'h2'
+        description?: string
         buttons: Array<{
           label: string
           link: {
