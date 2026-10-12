@@ -95,5 +95,6 @@ server I start.
 - Active-section highlighting in the nav (Figma shows the first row highlighted): needs a
   scroll-position client component.
 - Hand-picked related projects, if the client wants control over the automatic ones.
-- Retiring or re-copying nothing: the Projects archive page is an ordinary CMS page; pointing
-  `archiveLink` at it is content work in Studio.
+
+Not deferred but not code: pointing `archiveLink` at the Projects archive page is content work in
+Studio (the seed leaves it empty, so the eyebrow is plain text until then).
