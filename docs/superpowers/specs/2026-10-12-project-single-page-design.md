@@ -93,8 +93,9 @@ server I start.
 ## Deferred (each gets a GitHub issue before I finish)
 
 - Active-section highlighting in the nav (Figma shows the first row highlighted): needs a
-  scroll-position client component.
-- Hand-picked related projects, if the client wants control over the automatic ones.
+  scroll-position client component ([#31](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/31)).
+- Hand-picked related projects, if the client wants control over the automatic ones
+  ([#32](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/32)).
 
 Not deferred but not code: pointing `archiveLink` at the Projects archive page is content work in
 Studio (the seed leaves it empty, so the eyebrow is plain text until then).

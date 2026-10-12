@@ -679,6 +679,13 @@ export type Article = {
   link?: Link
 }
 
+export type FaqReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'faq'
+}
+
 export type Project = {
   _id: string
   _type: 'project'
@@ -696,11 +703,47 @@ export type Project = {
     _type: 'image'
   }
   description?: string
-  link?: string
   projectTypes?: Array<
     {
       _key: string
     } & ProjectTypeReference
+  >
+  body?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>
+          text?: string
+          _type: 'span'
+          _key: string
+        }>
+        style?: 'normal' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+        listItem?: 'bullet' | 'number'
+        markDefs?: Array<
+          {
+            _key: string
+          } & Link
+        >
+        level?: number
+        _type: 'block'
+        _key: string
+      }
+    | {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        _type: 'image'
+        _key: string
+      }
+    | ({
+        _key: string
+      } & AnchorLinks)
+  >
+  faqs?: Array<
+    {
+      _key: string
+    } & FaqReference
   >
   property?: PropertyReference
 }
@@ -757,6 +800,24 @@ export type Geopoint = {
   lat?: number
   lng?: number
   alt?: number
+}
+
+export type SingleProjectPage = {
+  _id: string
+  _type: 'singleProjectPage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  eyebrow?: string
+  archiveLink?: Link
+  faqHeading?: string
+  moreProjects?: {
+    disabled?: boolean
+    eyebrow?: string
+    body?: string
+    button?: Button
+    count?: number
+  }
 }
 
 export type SingleNewsPage = {
@@ -1287,11 +1348,13 @@ export type AllSanitySchemaTypes =
   | Event
   | NewsCategoryReference
   | Article
+  | FaqReference
   | Project
   | PropertyTypeReference
   | ResourceReference
   | Property
   | Geopoint
+  | SingleProjectPage
   | SingleNewsPage
   | ProjectSettings
   | SiteBanner
