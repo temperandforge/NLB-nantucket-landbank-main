@@ -121,7 +121,9 @@ export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
             if ((event.target as HTMLElement).closest('a')) close()
           }}
           // Positioned against the header bar container (a `relative` ancestor); height uses --header-height.
-          className="absolute inset-x-0 top-full z-40 flex h-[calc(100dvh-var(--header-height))] flex-col bg-background px-gap-md py-gap-md"
+          // The container sits inside the header's page gutters, so break out to the viewport edges:
+          // centre on the container and take the full viewport width (body scroll is locked, so no scrollbar skews it).
+          className="absolute left-1/2 top-full z-40 flex h-[calc(100dvh-var(--header-height))] w-screen -translate-x-1/2 flex-col bg-background tf-px py-gap-md"
         >
           {drilled && drilled._type === 'menuGroup' ? (
             <nav aria-label="Primary" className="flex grow flex-col">
