@@ -186,6 +186,16 @@ export type MissionStatement = {
   disabled?: boolean
 }
 
+export type FaqAccordion = {
+  _type: 'faqAccordion'
+  items?: Array<{
+    question: string
+    answer: BlockContent
+    _type: 'faqAccordionItem'
+    _key: string
+  }>
+}
+
 export type AnchorLinks = {
   _type: 'anchorLinks'
   links?: Array<{
@@ -313,6 +323,9 @@ export type JumpNavContent = {
     | ({
         _key: string
       } & AnchorLinks)
+    | ({
+        _key: string
+      } & FaqAccordion)
   >
   disabled?: boolean
 }
@@ -679,13 +692,6 @@ export type Article = {
   link?: Link
 }
 
-export type FaqReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'faq'
-}
-
 export type Project = {
   _id: string
   _type: 'project'
@@ -739,11 +745,9 @@ export type Project = {
     | ({
         _key: string
       } & AnchorLinks)
-  >
-  faqs?: Array<
-    {
-      _key: string
-    } & FaqReference
+    | ({
+        _key: string
+      } & FaqAccordion)
   >
   property?: PropertyReference
 }
@@ -810,7 +814,6 @@ export type SingleProjectPage = {
   _rev: string
   eyebrow?: string
   archiveLink?: Link
-  faqHeading?: string
   moreProjects?: {
     disabled?: boolean
     eyebrow?: string
@@ -1310,6 +1313,7 @@ export type AllSanitySchemaTypes =
   | NewsArchive
   | NewsPreview
   | MissionStatement
+  | FaqAccordion
   | AnchorLinks
   | PageReference
   | Link
@@ -1348,7 +1352,6 @@ export type AllSanitySchemaTypes =
   | Event
   | NewsCategoryReference
   | Article
-  | FaqReference
   | Project
   | PropertyTypeReference
   | ResourceReference
