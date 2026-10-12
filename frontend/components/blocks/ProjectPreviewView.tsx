@@ -40,7 +40,10 @@ export default function ProjectPreviewView({
           stack in one column. */}
       <div className="flex w-full flex-col gap-6 tf-max-w xl:flex-row">
         {hasPanel && (
-          <div className="flex min-h-[28rem] flex-col items-start justify-between gap-10 bg-surface-dark p-6 text-on-surface-dark md:min-h-0 md:gap-16 xl:h-[644px] xl:w-[425px] xl:shrink-0 xl:gap-10">
+          // Figma's 644px is just what the row measures at 1440. The cards grow and shrink with the
+          // width, so the panel takes the row's height (a flex row stretches its children) and always
+          // matches them.
+          <div className="flex min-h-[28rem] flex-col items-start justify-between gap-10 bg-surface-dark p-6 text-on-surface-dark md:min-h-0 md:gap-16 xl:w-[425px] xl:shrink-0 xl:gap-10">
             {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
             {body && <p className="w-full font-sans text-body-base leading-[1.6]">{body}</p>}
             {button && <ButtonLink label={button.label} href={button.href} rightIcon />}
@@ -50,7 +53,7 @@ export default function ProjectPreviewView({
           // Three equal columns on one grid, so every card is the same width (and so the same image
           // size) and the two rows, header and image, line up across the cards however many lines a
           // name wraps to. The divider is drawn in the gap, not inside a column, for the same reason.
-          <ol className="m-0 grid min-w-0 flex-1 list-none grid-cols-1 gap-10 p-0 md:grid-cols-3 md:gap-x-6 md:gap-y-6 xl:content-center">
+          <ol className="m-0 grid min-w-0 flex-1 list-none grid-cols-1 gap-10 p-0 md:grid-cols-3 md:gap-x-6 md:gap-y-6">
             {shown.map((project, index) => {
               const href = project.slug ? projectHref(project.slug) : null
               const cardClass =
