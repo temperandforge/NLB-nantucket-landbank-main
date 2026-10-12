@@ -184,3 +184,149 @@ export function withSelection(search: string, selection: PropertySelection): str
   const query = parts.filter(Boolean).join('&')
   return query ? `?${query}` : ''
 }
+
+// --- Public records: tabs by category, each category sorting and filtering its own way -------
+
+export const RECORD_CATEGORY_PARAM = 'category'
+export const RECORD_FILTER_LABEL = 'Filter records by category'
+
+/**
+ * A record category with its presentation settings. `sortBy` and `filters` arrive as plain
+ * strings: the frontend ignores a value it does not know (a schema deployed before the frontend).
+ */
+export type RecordCategory = Category & {
+  sortBy?: string | null
+  filters?: ReadonlyArray<string | null> | null
+}
+
+export type RecordItem = {
+  _id: string
+  title?: string | null
+  /** YYYY-MM-DD */
+  date?: string | null
+  fileName?: string | null
+  fileUrl?: string | null
+  categorySlug?: string | null
+}
+
+type RecordFilterDefinition = {
+  /** The query-string parameter. */
+  param: string
+  label: string
+  /** The choices this filter offers for a category's records. */
+  options: (records: ReadonlyArray<RecordItem>) => FilterTab[]
+  matches: (record: RecordItem, value: string) => boolean
+}
+
+const dateParts = (date: string | null | undefined) => /^(\d{4})-(\d{2})-(\d{2})/.exec(date ?? '')
+
+const yearOf = (record: RecordItem) => dateParts(record.date)?.[1] ?? null
+
+/**
+ * Every record filter, by the key a category lists in its `filters`. Adding a filter is one entry
+ * here plus one allowed value on `recordCategory.filters` in the studio (the two lists cannot
+ * share code across packages). Nothing else, including the block and the hook, changes.
+ */
+export const RECORD_FILTERS = {
+  year: {
+    param: 'year',
+    label: 'Year',
+    options: (records) => {
+      const years = new Set<string>()
+      for (const record of records) {
+        const year = yearOf(record)
+        if (year) years.add(year)
+      }
+      return [...years].sort().reverse().map((year) => ({slug: year, title: year}))
+    },
+    matches: (record, value) => yearOf(record) === value,
+  },
+} satisfies Record<string, RecordFilterDefinition>
+
+export type RecordFilterKey = keyof typeof RECORD_FILTERS
+
+const isFilterKey = (key: string | null): key is RecordFilterKey =>
+  key !== null && Object.prototype.hasOwnProperty.call(RECORD_FILTERS, key)
+
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+]
+
+/** A row's text: its title, else its date written out, else its file name. */
+export function recordLabel(record: RecordItem): string {
+  const title = record.title?.trim()
+  if (title) return title
+  const date = dateParts(record.date)
+  if (date && Number(date[2]) >= 1 && Number(date[2]) <= 12) {
+    return `${MONTHS[Number(date[2]) - 1]} ${Number(date[3])}, ${date[1]}`
+  }
+  return record.fileName?.trim() || 'Untitled record'
+}
+
+const compareLabels = (a: RecordItem, b: RecordItem) =>
+  recordLabel(a).localeCompare(recordLabel(b), undefined, {sensitivity: 'base', numeric: true})
+
+/** `titleAsc` is A-Z; anything else, including a value this code does not know, is newest first. */
+function sortRecords(records: ReadonlyArray<RecordItem>, sortBy: string | null | undefined): RecordItem[] {
+  const list = [...records]
+  if (sortBy === 'titleAsc') return list.sort(compareLabels)
+  // An undated record compares as '' so it sorts last when newest-first.
+  return list.sort((a, b) => (b.date ?? '').localeCompare(a.date ?? '') || compareLabels(a, b))
+}
+
+export type RecordFilterView = {
+  key: RecordFilterKey
+  param: string
+  label: string
+  options: FilterTab[]
+  value: string | null
+}
+
+export type RecordView = {
+  tabs: FilterTab[]
+  category: RecordCategory | null
+  filters: RecordFilterView[]
+  records: RecordItem[]
+}
+
+/**
+ * Everything the Records block shows for an address: the tabs, the active category (the first one
+ * when the address names none, or an unknown one), the filters that category offers with their
+ * choices, and its records, narrowed by the chosen filters and sorted as the category says.
+ * A filter value the category does not offer is ignored.
+ */
+export function recordView(
+  search: string,
+  categories: ReadonlyArray<RecordCategory | null | undefined>,
+  records: ReadonlyArray<RecordItem>,
+): RecordView {
+  const tabs = categoryTabs(categories)
+  const slug = parseFilter(search, RECORD_CATEGORY_PARAM, tabs) ?? tabs[0]?.slug ?? null
+  const category = slug ? (categories.find((candidate) => candidate?.slug?.trim() === slug) ?? null) : null
+  if (!slug || !category) return {tabs, category: null, filters: [], records: []}
+
+  const inCategory = records.filter((record) => record.categorySlug === slug)
+  const keys = [...new Set(category.filters ?? [])].filter(isFilterKey)
+  const filters = keys.map((key): RecordFilterView => {
+    const definition = RECORD_FILTERS[key]
+    const options = definition.options(inCategory)
+    return {key, param: definition.param, label: definition.label, options, value: parseFilter(search, definition.param, options)}
+  })
+
+  let visible = inCategory
+  for (const filter of filters) {
+    const value = filter.value
+    if (value) visible = visible.filter((record) => RECORD_FILTERS[filter.key].matches(record, value))
+  }
+  return {tabs, category, filters, records: sortRecords(visible, category.sortBy)}
+}
+
+/**
+ * The query-string changes for choosing a category tab: set the category and clear every record
+ * filter, so a year chosen on one tab cannot leave the next one empty. Apply with `withFilter`.
+ */
+export function recordCategoryPatch(slug: string): Record<string, string | null> {
+  const cleared = Object.fromEntries(Object.values(RECORD_FILTERS).map((filter) => [filter.param, null]))
+  return {...cleared, [RECORD_CATEGORY_PARAM]: slug}
+}
