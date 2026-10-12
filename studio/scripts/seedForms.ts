@@ -22,7 +22,8 @@
  * OUTSTANDING / UNCONFIRMED client content:
  * - The Event type, Preferred location, Entertainment and Transportation options are
  *   "Option 1/2/3" samples.
- * - Country and State/Province are plain text fields because the Figma shows no option lists.
+ * - Country is a select of ISO 3166 countries (scripts/data/countries.ts); State/Province is a plain
+ *   text field because the Figma shows no option list.
  * - The Property Use Message `maxLength` of 1000 is not from the Figma.
  * - The "Caterer’s name" show-if on catering = Yes is inferred from the design, not shown in it.
  * - Contact topic is a native single select; the Figma draws a menu with check rows, and its
@@ -32,6 +33,8 @@
 import {randomUUID} from 'node:crypto'
 
 import {getCliClient} from 'sanity/cli'
+
+import {COUNTRIES} from './data/countries'
 
 const client = getCliClient({apiVersion: '2025-09-25'}).withConfig({
   perspective: 'raw',
@@ -101,7 +104,12 @@ const FORMS = [
       section('Mailing address', 2, [
         field('text', 'Address line 1', {required: true, placeholder: 'Address line 1'}),
         field('text', 'Address line 2', {helperText: 'Optional', placeholder: 'Address line 2 (optional)'}),
-        field('text', 'Country', {required: true, width: 'half'}),
+        field('select', 'Country', {
+          required: true,
+          width: 'half',
+          placeholder: 'Select a country',
+          options: COUNTRIES,
+        }),
         field('text', 'State/Province', {required: true, width: 'half'}),
         field('text', 'City', {width: 'half'}),
         field('text', 'Zip code', {width: 'half'}),
