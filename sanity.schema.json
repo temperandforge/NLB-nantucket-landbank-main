@@ -2234,7 +2234,7 @@
           "value": {
             "type": "string"
           },
-          "optional": false
+          "optional": true
         },
         "heading": {
           "type": "objectAttribute",
@@ -4638,11 +4638,10 @@
         },
         "optional": true
       },
-      "link": {
+      "externalUrl": {
         "type": "objectAttribute",
         "value": {
-          "type": "inline",
-          "name": "link"
+          "type": "string"
         },
         "optional": true
       }

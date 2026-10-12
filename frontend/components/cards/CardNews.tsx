@@ -1,8 +1,7 @@
 import BlockImage from '@/components/blocks/BlockImage'
 import Tag from '@/components/ui/Tag'
 import {formatDate} from '@/sanity/lib/dates'
-import {linkResolver, realHref} from '@/sanity/lib/utils'
-import type {DereferencedLink} from '@/sanity/lib/types'
+import {realHref} from '@/sanity/lib/utils'
 
 import Link from 'next/link'
 
@@ -40,9 +39,7 @@ export default function CardNews({article}: {article: NewsItem}) {
     </div>
   )
   // The article's own link wins (an external story); otherwise its page.
-  const href =
-    realHref(article.link ? linkResolver(article.link as DereferencedLink) : null) ??
-    (article.slug ? `/news/${article.slug}` : null)
+  const href = realHref(article.externalUrl) ?? (article.slug ? `/news/${article.slug}` : null)
   return href ? (
     <Link href={href} className="block w-full">
       {card}

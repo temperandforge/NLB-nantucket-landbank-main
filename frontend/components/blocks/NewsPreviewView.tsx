@@ -3,8 +3,7 @@ import {stegaClean} from 'next-sanity'
 import Link from 'next/link'
 
 import {ArrowDownRightIcon} from '@/components/icons'
-import {DereferencedLink} from '@/sanity/lib/types'
-import {linkResolver, realHref} from '@/sanity/lib/utils'
+import {realHref} from '@/sanity/lib/utils'
 import {formatDate} from '@/sanity/lib/dates'
 
 import BlockImage from './BlockImage'
@@ -54,9 +53,7 @@ export default function NewsPreviewView({
         <div className="grid w-full grid-cols-1 border-t border-l border-border-light md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => {
             // The article's own link wins (an external story); otherwise its page.
-            const href =
-              realHref(article.link ? linkResolver(article.link as DereferencedLink) : null) ??
-              (article.slug ? `/news/${article.slug}` : null)
+            const href = realHref(article.externalUrl) ?? (article.slug ? `/news/${article.slug}` : null)
             // A category whose document was unpublished dereferences to null.
             const category = (article.categories ?? []).find((c) => c?.title)?.title
             const date = formatDate(article.date)

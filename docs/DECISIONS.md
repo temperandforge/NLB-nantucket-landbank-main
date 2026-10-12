@@ -722,7 +722,7 @@ needs the same treatment.
 
 **Status:** Implemented
 
-`article.link` is the shared link object. A news tile is a link only when it resolves; otherwise it
+`article.link` was the shared link object (replaced by `externalUrl`, see 10.2). A news tile is a link only when it resolves; otherwise it
 is a plain tile. Per-article pages, filters and pagination are slice 3
 ([#11](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/11)).
 
@@ -770,8 +770,10 @@ pattern.
 
 **Status:** Implemented
 
-`article.link` is now an optional override (an external story). A tile goes to it when it resolves
-(not empty, not `#`), otherwise to `/news/<slug>`. A call to action tile with no link stays a plain
+`article.externalUrl` is an optional plain URL (http/https), for a story that lives on another site. It
+replaced the shared `link` object, whose page-reference and internal-path options had no use now that
+every article has its own page (`studio/scripts/migrateArticleLinks.ts`). A tile goes to it when it is
+set and not `#`, otherwise to `/news/<slug>`. A call to action tile with no link stays a plain
 tile.
 
 ### 10.3 The Share row: copy link, Facebook, LinkedIn

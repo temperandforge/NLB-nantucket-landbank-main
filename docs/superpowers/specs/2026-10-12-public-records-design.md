@@ -115,6 +115,8 @@ without a deploy.
 - **Pagination**: every record is listed ([#38](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/38)).
 - **Per-category indexable URLs** (`/public-records/meeting-minutes`): the category is a query
   parameter. Real paths would be added as static routes if wanted ([#39](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/39)).
+- **Structured data (JSON-LD)** for the archive, as a `CollectionPage` of `DigitalDocument`s
+  ([#41](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/41)).
 
 ## Verification
 

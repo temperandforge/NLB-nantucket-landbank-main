@@ -196,10 +196,7 @@ const articleCardFields = /* groq */ `
   "slug": slug.current,
   date,
   image,
-  link{
-    ...,
-    ${linkReference}
-  },
+  externalUrl,
   "categories": categories[]->{"slug": slug.current, title}
 `
 
