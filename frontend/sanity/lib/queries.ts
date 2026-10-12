@@ -254,6 +254,27 @@ const pageBuilderFields = /* groq */ `
         ${articleCardFields}
       }
     },
+    _type == "recordsArchive" => {
+      ...,
+      "categories": *[_type == "recordCategory" && defined(slug.current)] | order(order asc, title asc) {
+        _id,
+        title,
+        "slug": slug.current,
+        order,
+        sortBy,
+        filters
+      },
+      "records": *[
+        _type == "record" && defined(file.asset) && defined(category->slug.current)
+      ] {
+        _id,
+        title,
+        date,
+        "fileUrl": file.asset->url,
+        "fileName": file.asset->originalFilename,
+        "categorySlug": category->slug.current
+      }
+    },
     _type == "eventsPreview" => {
       ...,
       "events": *[
