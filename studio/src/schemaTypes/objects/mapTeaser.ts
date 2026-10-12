@@ -40,7 +40,7 @@ export const mapTeaser = defineBlock({
       type: 'button',
       initialValue: {
         buttonText: 'View the map',
-        link: {_type: 'link', linkType: 'href', href: '/map'},
+        link: {_type: 'link', linkType: 'href', href: '#'},
       },
     }),
   ],
