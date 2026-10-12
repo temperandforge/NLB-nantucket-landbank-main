@@ -5,7 +5,7 @@ Status: draft for review.
 ## Goal
 
 The filterable interactive map is a page-builder block an editor places on the map page entry
-(`explore/map` (the seeds said `interactive-map`; the dataset slug is `map`)), instead of a hardcoded `/map` route. The route is removed.
+(`explore/map`), instead of a hardcoded `/map` route. The route is removed.
 
 ## Decisions made
 
@@ -52,7 +52,7 @@ The filterable interactive map is a page-builder block an editor places on the m
 
 - Seeded links: `seedBlockGallery.ts` `/map` hrefs become `#`.
 - A small idempotent script, `studio/scripts/addMapExplorerToMapPage.ts` (`--dry` mode): finds the
-  page at `explore/interactive-map` and, if it has no `mapExplorer` block, appends one. It states in
+  page at `explore/map` (the seeds said `interactive-map`; the dataset slug is `map`) and, if it has no `mapExplorer` block, appends one. It states in
   its header that it only adds a block and never removes or reorders existing ones. If the page has
   no Hero Tertiary it reports that, but does not add one (the copy is the client's).
 - The map page's heading and intro are authored in the page's Hero Tertiary. Existing
