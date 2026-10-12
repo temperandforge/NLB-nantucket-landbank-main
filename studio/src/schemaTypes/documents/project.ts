@@ -1,10 +1,13 @@
 import {ProjectsIcon} from '@sanity/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
+import {jumpNavBodyMembers} from '../objects/jumpNavBody'
+
 /**
  * A Land Bank project - an initiative the Land Bank is carrying out, shown by the Project Grid,
  * Project Preview and Image Carousel blocks. Distinct from `property`, which is a parcel on the
- * interactive map; a project can point at the property it happens on.
+ * interactive map; a project can point at the property it happens on. Each project has a page of
+ * its own at /projects/<slug>; its address is derived from the slug, so it has no link field.
  */
 export const project = defineType({
   name: 'project',
@@ -46,20 +49,26 @@ export const project = defineType({
       rows: 3,
     }),
     defineField({
-      name: 'link',
-      title: 'Link',
-      type: 'url',
-      description:
-        'Optional. Where the project’s card links to. Accepts a path on this site, or # as a placeholder.',
-      // allowRelative because these are site-relative paths, and # is the placeholder convention.
-      validation: (Rule) => Rule.uri({allowRelative: true, scheme: ['http', 'https']}),
-    }),
-    defineField({
       name: 'projectTypes',
       title: 'Project types',
       type: 'array',
       of: [defineArrayMember({type: 'reference', to: [{type: 'projectType'}]})],
       description: 'What kind of project this is. Drives the Project Grid tabs and the Image Carousel category.',
+    }),
+    defineField({
+      name: 'body',
+      title: 'Page content',
+      type: 'array',
+      of: jumpNavBodyMembers,
+      description:
+        'The project page. Each “Section heading (H2)” becomes a link in the page’s left-hand nav. Leave empty for a page with just the title and image.',
+    }),
+    defineField({
+      name: 'faqs',
+      title: 'FAQs',
+      type: 'array',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'faq'}]})],
+      description: 'Shown under the page content as “Project FAQs”, in this order.',
     }),
     defineField({
       name: 'property',

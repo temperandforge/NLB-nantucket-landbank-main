@@ -30,6 +30,7 @@ import {header} from './singletons/header'
 import {siteBanner} from './singletons/siteBanner'
 import {projectSettings} from './singletons/projectSettings'
 import {singleNewsPage} from './singletons/singleNewsPage'
+import {singleProjectPage} from './singletons/singleProjectPage'
 import {link} from './objects/link'
 import {anchorLinks} from './objects/anchorLinks'
 import {peopleGrid} from './objects/peopleGrid'
@@ -62,6 +63,7 @@ export const schemaTypes = [
   siteBanner,
   projectSettings,
   singleNewsPage,
+  singleProjectPage,
   // Documents
   page,
   menu,
