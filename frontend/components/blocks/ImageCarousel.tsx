@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import {ArrowForwardIcon} from '@/components/icons'
-import {realHref} from '@/sanity/lib/utils'
+import {projectHref} from '@/sanity/lib/utils'
 
 import BlockImage from './BlockImage'
 import {BlockProps} from './types'
@@ -31,8 +31,8 @@ export default function ImageCarousel({block}: BlockProps<'imageCarousel'>) {
             tabIndex={0}
           >
             {projects.map((project) => {
-              // A link that does not resolve leaves a plain card, never a dead anchor.
-              const href = realHref(project.link)
+              // A project with no slug (unreachable through the query) is a plain card, never a dead anchor.
+              const href = project.slug ? projectHref(project.slug) : null
               const content = (
                 <>
                   <BlockImage

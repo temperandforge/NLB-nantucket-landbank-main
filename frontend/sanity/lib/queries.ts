@@ -329,7 +329,7 @@ const pageBuilderFields = /* groq */ `
         _id,
         name,
         image,
-        link,
+        "slug": slug.current,
         "projectTypes": projectTypes[]->{"slug": slug.current, title}
       }
     },
@@ -356,13 +356,13 @@ const pageBuilderFields = /* groq */ `
           _id,
           name,
           image,
-          link
+          "slug": slug.current
         },
         projects[]->{
           _id,
           name,
           image,
-          link
+          "slug": slug.current
         }
       ),
       "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage
@@ -377,7 +377,7 @@ const pageBuilderFields = /* groq */ `
         _id,
         name,
         image,
-        link
+        "slug": slug.current
       }
     },
     _type == "mapTeaser" => {
@@ -533,4 +533,75 @@ export const articleSlugs = defineQuery(`
 
 export const articleSitemapData = defineQuery(`
   *[_type == "article" && defined(slug.current)]{_updatedAt, "slug": slug.current}
+`)
+
+export const projectQuery = defineQuery(`
+  *[_type == "project" && slug.current == $slug][0]{
+    _id,
+    _type,
+    name,
+    "slug": slug.current,
+    description,
+    image,
+    // This project's own types, to find related projects.
+    "projectTypeIds": projectTypes[]._ref,
+    body[]{
+      ...,
+      _type == "anchorLinks" => {
+        links[]{
+          ...,
+          ${linkFields}
+        }
+      },
+      ${markDefsFields}
+    },
+    // An unpublished FAQ dereferences to null; the page filters those out.
+    "faqs": faqs[]->{
+      _id,
+      question,
+      answer[]{
+        ...,
+        ${markDefsFields}
+      }
+    }
+  }
+`)
+
+/** Every project but this one, to be ordered and trimmed by orderRelatedProjects(). */
+export const moreProjectsQuery = defineQuery(`
+  *[_type == "project" && defined(slug.current) && slug.current != $slug]{
+    _id,
+    _createdAt,
+    name,
+    image,
+    "slug": slug.current,
+    "projectTypeIds": projectTypes[]._ref
+  }
+`)
+
+/** Content shared by every project page (a singleton, so matched on its type and fixed id). */
+export const singleProjectPageQuery = defineQuery(`
+  *[_type == "singleProjectPage" && _id == "singleProjectPage"][0]{
+    eyebrow,
+    faqHeading,
+    archiveLink{
+      ...,
+      ${linkReference}
+    },
+    moreProjects{
+      ...,
+      button{
+        ...,
+        ${linkFields}
+      }
+    }
+  }
+`)
+
+export const projectSlugs = defineQuery(`
+  *[_type == "project" && defined(slug.current)]{"slug": slug.current}
+`)
+
+export const projectSitemapData = defineQuery(`
+  *[_type == "project" && defined(slug.current)]{_updatedAt, "slug": slug.current}
 `)
