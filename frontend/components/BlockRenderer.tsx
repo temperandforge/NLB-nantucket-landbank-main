@@ -3,6 +3,7 @@ import React from 'react'
 import BasicLeftRightText from '@/components/blocks/BasicLeftRightText'
 import Hero from '@/components/blocks/Hero'
 import CtaContact from '@/components/blocks/CtaContact'
+import EventsGrid from '@/components/blocks/EventsGrid'
 import EventsPreview from '@/components/blocks/EventsPreview'
 import NewsPreview from '@/components/blocks/NewsPreview'
 import NewsArchive from '@/components/blocks/NewsArchive'
@@ -56,6 +57,7 @@ const Blocks = {
   missionStatement: MissionStatement,
   newsPreview: NewsPreview,
   newsArchive: NewsArchive,
+  eventsGrid: EventsGrid,
   eventsPreview: EventsPreview,
   faqList: FaqList,
   jobListings: JobListings,

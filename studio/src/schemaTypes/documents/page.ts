@@ -22,6 +22,7 @@ import {projectGrid} from '../objects/projectGrid'
 import {propertyArchive} from '../objects/propertyArchive'
 import {projectPreview} from '../objects/projectPreview'
 import {newsPreview} from '../objects/newsPreview'
+import {eventsGrid} from '../objects/eventsGrid'
 import {newsArchive} from '../objects/newsArchive'
 import {recordsArchive} from '../objects/recordsArchive'
 import {timeline} from '../objects/timeline'
@@ -36,6 +37,7 @@ const pageBuilderBlocks = [
   contactForm,
   ctaContact,
   downloadBlock,
+  eventsGrid,
   eventsPreview,
   faqList,
   hero,

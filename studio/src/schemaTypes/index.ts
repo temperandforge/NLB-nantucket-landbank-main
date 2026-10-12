@@ -31,8 +31,10 @@ import {header} from './singletons/header'
 import {siteBanner} from './singletons/siteBanner'
 import {projectSettings} from './singletons/projectSettings'
 import {singleNewsPage} from './singletons/singleNewsPage'
+import {singleProjectPage} from './singletons/singleProjectPage'
 import {link} from './objects/link'
 import {anchorLinks} from './objects/anchorLinks'
+import {faqAccordion} from './objects/faqAccordion'
 import {peopleGrid} from './objects/peopleGrid'
 import {projectGrid} from './objects/projectGrid'
 import {propertyArchive} from './objects/propertyArchive'
@@ -41,6 +43,7 @@ import {projectPreview} from './objects/projectPreview'
 import {faqList} from './objects/faqList'
 import {jobListings} from './objects/jobListings'
 import {newsPreview} from './objects/newsPreview'
+import {eventsGrid} from './objects/eventsGrid'
 import {newsArchive} from './objects/newsArchive'
 import {eventsPreview} from './objects/eventsPreview'
 import {missionStatement} from './objects/missionStatement'
@@ -64,6 +67,7 @@ export const schemaTypes = [
   siteBanner,
   projectSettings,
   singleNewsPage,
+  singleProjectPage,
   // Documents
   page,
   menu,
@@ -103,6 +107,7 @@ export const schemaTypes = [
   contactForm,
   link,
   anchorLinks,
+  faqAccordion,
   missionStatement,
   newsPreview,
   newsArchive,
@@ -114,6 +119,7 @@ export const schemaTypes = [
   recordsArchive,
   projectPreview,
   eventsPreview,
+  eventsGrid,
   ctaContact,
   // Menu building blocks - menuGroup nests menuLink, capped at two levels
   menuGroup,

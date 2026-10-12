@@ -16,7 +16,7 @@ function FaqRows({faqs}: {faqs: Faq[]}) {
           {faq.answer && (
             <CustomPortableText
               variant="basic"
-              className="[--rich-text-color:var(--color-on-background)] [--rich-text-size:14px]"
+              className="[--rich-text-color:var(--color-on-surface-dark)]"
               value={faq.answer as PortableTextBlock[]}
             />
           )}

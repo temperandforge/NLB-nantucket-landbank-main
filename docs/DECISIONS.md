@@ -1027,6 +1027,53 @@ builder only). The block lists every article newest first, three across (one on 
 shared `components/ui/FilterTabs` for categories and `?category=<slug>` through `useQueryFilter`,
 the same pattern as the Project Grid. Tabs come from the categories the articles actually have.
 
+## 17. Project pages
+
+**Status:** Implemented (2026-10-12). Two manual steps remain: see **Not done**.
+
+A `project` (a Land Bank initiative, distinct from the map's `property`) has a page of its own at
+`/projects/<slug>`, a static route like `/news/<slug>`, built from the project's `body` (the same
+rich-text definition as Jump Nav Content, `jumpNavBodyMembers`), whose `faqAccordion` block holds the
+project's FAQs inline (question + answer items; `FaqItem`'s open state follows Figma 2103:36336). The page address is
+derived from the slug, so `project.link` was removed; FAQs have no heading field: the heading is a Section
+heading the editor writes above the accordion block; cards, the Image Carousel and Project Preview
+tiles all link to `/projects/<slug>` through `projectHref()`. What every project page shares lives on
+the `singleProjectPage` singleton: the eyebrow and where it links back (`archiveLink`) and the
+"more projects" section, whose projects are ordered by shared project type, then
+newest (`frontend/sanity/lib/relatedProjects.ts`, checked by `scripts/verifyRelatedProjects.mts`).
+`property`, the map and the Property Archive are unaffected. The jump-nav and project-preview markup
+were extracted (`JumpNavLayout`, `ProjectPreviewView`) so the blocks and the page share them.
+Spec: [project single page design](superpowers/specs/2026-10-12-project-single-page-design.md); plan:
+[project single page plan](superpowers/plans/2026-10-12-project-single-page.md).
+
+**Not done:** active-section highlighting in the nav ([#31](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/31)),
+hand-picked related projects ([#32](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/32)).
+Manual: run `studio/scripts/seedSingleProjectPage.ts` and `unsetProjectLinks.ts`, and fetch the two
+background curve SVGs (see the plan, Task 7). Issue [#23](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/23)
+(property detail pages) is superseded for projects.
+
+The jump-nav column is capped to the visible height with the nav scrolling inside it, and its offset
+follows the header's hide/show state (`--header-offset`, set by `HeaderShell`).
+
+## 18. Event pages and the Events Grid
+
+**Status:** Implemented (2026-10-12), not yet checked in a browser.
+
+An `event` has a page of its own at `/events/<slug>`, a static route like `/news/<slug>`. The page
+address is derived from the slug. `event` gained `slug`, `image` (the grid row's photo) and `body`
+(sections and images only: the `jumpNavBodyMembers` block and image members, with no jump nav and no
+FAQ accordion, so "Activities" and "Rain Date" are H2s in the body). The page closes with the existing
+events strip: `EventsPreview` was split into `EventsPreviewView` (shared with the page, which shows the
+next two *other* upcoming events) and the block. Tiles link to the event when it has a slug.
+
+The Events Grid block (`eventsGrid`) lists every upcoming event as a row: image with a date badge,
+title, time, place, summary and "View details". Upcoming is computed at render, as for the Events
+Preview (9.2). The page's heading is a separate Hero - Tertiary block, as on the News page.
+Seeds: `seedEvents.ts` (draft events, no images) and `seedEventsPage.ts` (fills the empty Events page).
+
+**Not done:** the calendar icon is drawn to match the clock and pin, not exported from Figma.
+Event images must be added in Studio.
+
 ## 19. Public records
 
 **Status:** Implemented. Not built, each with an issue: importing the real records

@@ -74,3 +74,14 @@ export function eventParts(start: string | null | undefined, end?: string | null
     time,
   }
 }
+
+/** "Wednesday July 22nd", in the site time zone. Empty when the start is missing or invalid. */
+export function eventDateLabel(start: string | null | undefined): string {
+  if (!start) return ''
+  const date = new Date(start)
+  if (Number.isNaN(date.getTime())) return ''
+  const day = Number(part(date, {day: 'numeric'}))
+  const suffix =
+    day % 100 >= 11 && day % 100 <= 13 ? 'th' : ({1: 'st', 2: 'nd', 3: 'rd'} as Record<number, string>)[day % 10] ?? 'th'
+  return `${part(date, {weekday: 'long'})} ${part(date, {month: 'long'})} ${day}${suffix}`
+}

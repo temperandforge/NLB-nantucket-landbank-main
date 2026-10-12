@@ -10,7 +10,8 @@ import {nextHeaderScroll, type HeaderScrollState} from './headerScroll'
  * "Locked" means a dropdown or the mobile panel is open (a descendant carries data-header-lock)
  * or keyboard focus is inside the header - in both cases the header must stay put. Anchor jumps
  * reveal it so focus is never left on a hidden element. One passive scroll listener, throttled
- * with requestAnimationFrame. The slide is removed under prefers-reduced-motion.
+ * with requestAnimationFrame. The slide is removed under prefers-reduced-motion. While hidden it sets
+ * --header-offset to 0 on <html>, so sticky content can move up into the freed space.
  */
 export default function HeaderShell({children}: {children: React.ReactNode}) {
   const ref = useRef<HTMLElement>(null)
@@ -27,6 +28,13 @@ export default function HeaderShell({children}: {children: React.ReactNode}) {
     const apply = (next: HeaderScrollState) => {
       state.current = next
       setHidden(next.hidden)
+      // Sticky content elsewhere on the page (the jump-nav column) sits below the header while it
+      // shows and moves up into its space once it hides: it reads --header-offset, falling back to
+      // --header-height before this runs.
+      document.documentElement.style.setProperty(
+        '--header-offset',
+        next.hidden ? '0px' : 'var(--header-height)',
+      )
     }
 
     const locked = () => !!el.querySelector('[data-header-lock]') || !!el.querySelector(':focus-visible')
@@ -52,6 +60,7 @@ export default function HeaderShell({children}: {children: React.ReactNode}) {
       window.removeEventListener('hashchange', onReveal)
       el.removeEventListener('focusin', onFocusIn)
       if (frame) cancelAnimationFrame(frame)
+      document.documentElement.style.removeProperty('--header-offset')
     }
   }, [])
 

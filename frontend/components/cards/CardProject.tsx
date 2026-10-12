@@ -1,6 +1,6 @@
 import BlockImage from '@/components/blocks/BlockImage'
 import Tag from '@/components/ui/Tag'
-import {realHref} from '@/sanity/lib/utils'
+import {projectHref} from '@/sanity/lib/utils'
 
 import type {ProjectItem} from './types'
 
@@ -31,8 +31,9 @@ export default function CardProject({project}: {project: ProjectItem}) {
       <p className="w-full break-words text-headline-sm leading-[1.2] tracking-normal text-on-background">{project.name}</p>
     </div>
   )
-  // The project's own link, when it has one; otherwise a plain card, never a dead anchor.
-  const href = realHref(project.link)
+  // Every project has a page of its own; a project with no slug (unreachable through the query,
+  // which requires one) would be a plain card, never a dead anchor.
+  const href = project.slug ? projectHref(project.slug) : null
   return href ? (
     <a href={href} className="block w-full">
       {card}

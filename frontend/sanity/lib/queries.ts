@@ -275,6 +275,22 @@ const pageBuilderFields = /* groq */ `
         "categorySlug": category->slug.current
       }
     },
+    _type == "eventsGrid" => {
+      ...,
+      "events": *[
+        _type == "event" && defined(start)
+        && dateTime(coalesce(end, start)) >= dateTime($now)
+      ] | order(start asc) {
+        _id,
+        title,
+        "slug": slug.current,
+        start,
+        end,
+        location,
+        description,
+        image
+      }
+    },
     _type == "eventsPreview" => {
       ...,
       "events": *[
@@ -283,6 +299,7 @@ const pageBuilderFields = /* groq */ `
       ] | order(start asc) [0...12] {
         _id,
         title,
+        "slug": slug.current,
         start,
         end,
         location,
@@ -350,7 +367,7 @@ const pageBuilderFields = /* groq */ `
         _id,
         name,
         image,
-        link,
+        "slug": slug.current,
         "projectTypes": projectTypes[]->{"slug": slug.current, title}
       }
     },
@@ -377,13 +394,13 @@ const pageBuilderFields = /* groq */ `
           _id,
           name,
           image,
-          link
+          "slug": slug.current
         },
         projects[]->{
           _id,
           name,
           image,
-          link
+          "slug": slug.current
         }
       ),
       "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage
@@ -398,7 +415,7 @@ const pageBuilderFields = /* groq */ `
         _id,
         name,
         image,
-        link
+        "slug": slug.current
       }
     },
     _type == "mapTeaser" => {
@@ -425,6 +442,15 @@ const pageBuilderFields = /* groq */ `
           links[]{
             ...,
             ${linkFields}
+          }
+        },
+        _type == "faqAccordion" => {
+          items[]{
+            ...,
+            answer[]{
+              ...,
+              ${markDefsFields}
+            }
           }
         },
         ${markDefsFields}
@@ -554,4 +580,115 @@ export const articleSlugs = defineQuery(`
 
 export const articleSitemapData = defineQuery(`
   *[_type == "article" && defined(slug.current)]{_updatedAt, "slug": slug.current}
+`)
+
+export const projectQuery = defineQuery(`
+  *[_type == "project" && slug.current == $slug][0]{
+    _id,
+    _type,
+    name,
+    "slug": slug.current,
+    description,
+    image,
+    // This project's own types, to find related projects.
+    "projectTypeIds": projectTypes[]._ref,
+    body[]{
+      ...,
+      _type == "anchorLinks" => {
+        links[]{
+          ...,
+          ${linkFields}
+        }
+      },
+      _type == "faqAccordion" => {
+        items[]{
+          ...,
+          answer[]{
+            ...,
+            ${markDefsFields}
+          }
+        }
+      },
+      ${markDefsFields}
+    }
+  }
+`)
+
+/** Every project but this one, to be ordered and trimmed by orderRelatedProjects(). */
+export const moreProjectsQuery = defineQuery(`
+  *[_type == "project" && defined(slug.current) && slug.current != $slug]{
+    _id,
+    _createdAt,
+    name,
+    image,
+    "slug": slug.current,
+    "projectTypeIds": projectTypes[]._ref
+  }
+`)
+
+/** Content shared by every project page (a singleton, so matched on its type and fixed id). */
+export const singleProjectPageQuery = defineQuery(`
+  *[_type == "singleProjectPage" && _id == "singleProjectPage"][0]{
+    eyebrow,
+    archiveLink{
+      ...,
+      ${linkReference}
+    },
+    moreProjects{
+      ...,
+      button{
+        ...,
+        ${linkFields}
+      }
+    }
+  }
+`)
+
+export const projectSlugs = defineQuery(`
+  *[_type == "project" && defined(slug.current)]{"slug": slug.current}
+`)
+
+export const projectSitemapData = defineQuery(`
+  *[_type == "project" && defined(slug.current)]{_updatedAt, "slug": slug.current}
+`)
+
+export const eventQuery = defineQuery(`
+  *[_type == "event" && slug.current == $slug][0]{
+    _id,
+    _type,
+    title,
+    "slug": slug.current,
+    start,
+    end,
+    location,
+    description,
+    body[]{
+      ...,
+      ${markDefsFields}
+    }
+  }
+`)
+
+/** Upcoming events other than this one, for the page's closing preview. */
+export const moreEventsQuery = defineQuery(`
+  *[
+    _type == "event" && defined(start) && slug.current != $slug
+    && dateTime(coalesce(end, start)) >= dateTime($now)
+  ] | order(start asc) [0...12] {
+    _id,
+    title,
+    "slug": slug.current,
+    start,
+    end,
+    location,
+    description
+  }
+`)
+
+export const eventSlugs = defineQuery(`
+  *[_type == "event" && defined(slug.current)]{"slug": slug.current}
+`)
+
+export const eventSitemapData = defineQuery(`
+  *[_type == "event" && defined(slug.current)]{_updatedAt, "slug": slug.current}
 `)
