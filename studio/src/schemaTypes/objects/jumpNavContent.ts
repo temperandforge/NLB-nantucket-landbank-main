@@ -1,7 +1,8 @@
 import {ThListIcon} from '@sanity/icons'
-import {defineArrayMember, defineField} from 'sanity'
+import {defineField} from 'sanity'
 
-import {altTextField, defineBlock, headingLevelField} from './blockFields'
+import {defineBlock, headingLevelField} from './blockFields'
+import {jumpNavBodyMembers} from './jumpNavBody'
 
 /**
  * A heading with a sticky section nav on the left and long-form content on the right. The nav is
@@ -22,26 +23,7 @@ export const jumpNavContent = defineBlock({
       title: 'Content',
       type: 'array',
       description: 'Each “Section heading (H2)” becomes a link in the left-hand nav.',
-      of: [
-        defineArrayMember({
-          type: 'block',
-          styles: [
-            {title: 'Normal', value: 'normal'},
-            {title: 'Section heading (H2)', value: 'h2'},
-            {title: 'H3', value: 'h3'},
-            {title: 'H4', value: 'h4'},
-            {title: 'H5', value: 'h5'},
-            {title: 'H6', value: 'h6'},
-          ],
-          lists: [
-            {title: 'Bullet', value: 'bullet'},
-            {title: 'Numbered', value: 'number'},
-          ],
-          marks: {annotations: [{type: 'link'}]},
-        }),
-        defineArrayMember({type: 'image', options: {hotspot: true}, fields: [altTextField()]}),
-        defineArrayMember({type: 'anchorLinks'}),
-      ],
+      of: jumpNavBodyMembers,
     }),
   ],
   preview: {

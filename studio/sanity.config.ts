@@ -69,6 +69,12 @@ export default defineConfig({
             route: '/news/:slug',
             filter: `_type == "article" && slug.current == $slug`,
           },
+          // A project page. Listed before the page routes for the same reason as /news/:slug:
+          // /projects/<slug> also fits their two-segment pattern.
+          {
+            route: '/projects/:slug',
+            filter: `_type == "project" && slug.current == $slug`,
+          },
           // One route per URL depth, defined in src/lib/pageHierarchy.ts so the same filters can
           // be exercised by scripts/verifyPageRouting.ts instead of being restated there.
           ...PAGE_PRESENTATION_ROUTES,
@@ -87,6 +93,15 @@ export default defineConfig({
                 ? [{title: doc.title || 'Untitled', href: `/news/${doc.slug}`}]
                 : [],
               message: doc?.slug ? undefined : 'Add a slug to preview this article.',
+            }),
+          }),
+          project: defineLocations({
+            select: {name: 'name', slug: 'slug.current'},
+            resolve: (doc) => ({
+              locations: doc?.slug
+                ? [{title: doc.name || 'Untitled', href: `/projects/${doc.slug}`}]
+                : [],
+              message: doc?.slug ? undefined : 'Add a slug to preview this project.',
             }),
           }),
           page: defineLocations({

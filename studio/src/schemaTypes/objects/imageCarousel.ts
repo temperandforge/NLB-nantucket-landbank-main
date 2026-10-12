@@ -6,9 +6,9 @@ import {defineBlock, eyebrowField} from './blockFields'
 /**
  * A horizontally scrolling row of hand-picked projects (Figma: Image Carousel). The eyebrow
  * shows as a tag above the row. Each project is a card with its image; on hover or focus it opens
- * into a green card showing the project name and an arrow, and links to the project's link.
- * Projects are either hand-picked or every project in a category. They are references, so name,
- * image and link are edited once, on the project.
+ * into a green card showing the project name and an arrow, and links to the project's page.
+ * Projects are either hand-picked or every project in a category. They are references, so name and
+ * image are edited once, on the project.
  */
 export const imageCarousel = defineBlock({
   name: 'imageCarousel',
@@ -35,7 +35,7 @@ export const imageCarousel = defineBlock({
       title: 'Projects',
       type: 'array',
       description:
-        'Shown in order. Each card uses the project’s image and name, and links to its "Find out more" link. Edit those on the project.',
+        'Shown in order. Each card uses the project’s image and name, and links to the project’s page. Edit those on the project.',
       of: [defineArrayMember({type: 'reference', to: [{type: 'project'}]})],
       hidden: ({parent}) => parent?.source === 'category',
     }),

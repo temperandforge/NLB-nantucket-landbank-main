@@ -186,6 +186,16 @@ export type MissionStatement = {
   disabled?: boolean
 }
 
+export type FaqAccordion = {
+  _type: 'faqAccordion'
+  items?: Array<{
+    question: string
+    answer: BlockContent
+    _type: 'faqAccordionItem'
+    _key: string
+  }>
+}
+
 export type AnchorLinks = {
   _type: 'anchorLinks'
   links?: Array<{
@@ -313,6 +323,9 @@ export type JumpNavContent = {
     | ({
         _key: string
       } & AnchorLinks)
+    | ({
+        _key: string
+      } & FaqAccordion)
   >
   disabled?: boolean
 }
@@ -696,11 +709,45 @@ export type Project = {
     _type: 'image'
   }
   description?: string
-  link?: string
   projectTypes?: Array<
     {
       _key: string
     } & ProjectTypeReference
+  >
+  body?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>
+          text?: string
+          _type: 'span'
+          _key: string
+        }>
+        style?: 'normal' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+        listItem?: 'bullet' | 'number'
+        markDefs?: Array<
+          {
+            _key: string
+          } & Link
+        >
+        level?: number
+        _type: 'block'
+        _key: string
+      }
+    | {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        _type: 'image'
+        _key: string
+      }
+    | ({
+        _key: string
+      } & AnchorLinks)
+    | ({
+        _key: string
+      } & FaqAccordion)
   >
   property?: PropertyReference
 }
@@ -757,6 +804,23 @@ export type Geopoint = {
   lat?: number
   lng?: number
   alt?: number
+}
+
+export type SingleProjectPage = {
+  _id: string
+  _type: 'singleProjectPage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  eyebrow?: string
+  archiveLink?: Link
+  moreProjects?: {
+    disabled?: boolean
+    eyebrow?: string
+    body?: string
+    button?: Button
+    count?: number
+  }
 }
 
 export type SingleNewsPage = {
@@ -1249,6 +1313,7 @@ export type AllSanitySchemaTypes =
   | NewsArchive
   | NewsPreview
   | MissionStatement
+  | FaqAccordion
   | AnchorLinks
   | PageReference
   | Link
@@ -1292,6 +1357,7 @@ export type AllSanitySchemaTypes =
   | ResourceReference
   | Property
   | Geopoint
+  | SingleProjectPage
   | SingleNewsPage
   | ProjectSettings
   | SiteBanner

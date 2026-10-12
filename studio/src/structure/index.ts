@@ -36,6 +36,7 @@ import pluralize from 'pluralize-esm'
 const DISABLED_TYPES = [
   'settings',
   'singleNewsPage',
+  'singleProjectPage',
   'page',
   'assist.instruction.context',
   // Handled explicitly under Globals below.
@@ -179,6 +180,13 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
                 .title('Single News Page')
                 .icon(DocumentTextIcon)
                 .child(S.document().schemaType('singleNewsPage').documentId('singleNewsPage')),
+              // The content every project page shares (wording, FAQ heading, "more projects").
+              S.listItem()
+                .title('Single Project Page')
+                .icon(ProjectsIcon)
+                .child(
+                  S.document().schemaType('singleProjectPage').documentId('singleProjectPage'),
+                ),
             ]),
         ),
       // Site Settings: global config with no page/route of its own.

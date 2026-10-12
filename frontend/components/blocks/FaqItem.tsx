@@ -14,7 +14,13 @@ export default function FaqItem({question, children}: {question: string; childre
   const answerId = useId()
 
   return (
-    <div className="flex w-full flex-col items-start gap-3 overflow-clip rounded bg-surface-dark p-6 text-left">
+    <div
+      className={`flex w-full flex-col items-start gap-8 overflow-clip rounded p-6 text-left ${
+        // Figma open state (2103:36336): the card takes the page background; a hairline keeps it
+        // visible on a page that is the same colour.
+        open ? 'bg-background ring-1 ring-inset ring-border-light' : 'bg-surface-dark'
+      }`}
+    >
       <h4 className="w-full">
         <button
           type="button"
@@ -31,11 +37,7 @@ export default function FaqItem({question, children}: {question: string; childre
           )}
         </button>
       </h4>
-      <div
-        id={answerId}
-        hidden={!open}
-        className="w-full rounded bg-warm-neutral-50 px-[31px] py-[26px]"
-      >
+      <div id={answerId} hidden={!open} className="w-full text-on-surface-dark">
         {children}
       </div>
     </div>

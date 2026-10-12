@@ -67,3 +67,12 @@ export function dataAttr(config: DataAttributeConfig) {
     baseUrl: studioUrl,
   }).combine(config)
 }
+
+/**
+ * The address of a project's page. Unlike a CMS page, whose URL comes from its parent chain, a
+ * project lives at a fixed route (app/projects/[slug]), so its address is derived from the slug
+ * alone. Keep in step with the `/projects/:slug` Presentation route in studio/sanity.config.ts.
+ */
+export function projectHref(slug: string): string {
+  return `/projects/${slug}`
+}

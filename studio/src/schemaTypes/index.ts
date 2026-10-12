@@ -30,8 +30,10 @@ import {header} from './singletons/header'
 import {siteBanner} from './singletons/siteBanner'
 import {projectSettings} from './singletons/projectSettings'
 import {singleNewsPage} from './singletons/singleNewsPage'
+import {singleProjectPage} from './singletons/singleProjectPage'
 import {link} from './objects/link'
 import {anchorLinks} from './objects/anchorLinks'
+import {faqAccordion} from './objects/faqAccordion'
 import {peopleGrid} from './objects/peopleGrid'
 import {projectGrid} from './objects/projectGrid'
 import {propertyArchive} from './objects/propertyArchive'
@@ -62,6 +64,7 @@ export const schemaTypes = [
   siteBanner,
   projectSettings,
   singleNewsPage,
+  singleProjectPage,
   // Documents
   page,
   menu,
@@ -99,6 +102,7 @@ export const schemaTypes = [
   contactForm,
   link,
   anchorLinks,
+  faqAccordion,
   missionStatement,
   newsPreview,
   newsArchive,

@@ -1026,3 +1026,31 @@ Archive block (`newsArchive`), seeded by `studio/scripts/seedNewsPage.ts` (fills
 builder only). The block lists every article newest first, three across (one on mobile), with the
 shared `components/ui/FilterTabs` for categories and `?category=<slug>` through `useQueryFilter`,
 the same pattern as the Project Grid. Tabs come from the categories the articles actually have.
+
+## 17. Project pages
+
+**Status:** Implemented (2026-10-12). Two manual steps remain: see **Not done**.
+
+A `project` (a Land Bank initiative, distinct from the map's `property`) has a page of its own at
+`/projects/<slug>`, a static route like `/news/<slug>`, built from the project's `body` (the same
+rich-text definition as Jump Nav Content, `jumpNavBodyMembers`), whose `faqAccordion` block holds the
+project's FAQs inline (question + answer items; `FaqItem`'s open state follows Figma 2103:36336). The page address is
+derived from the slug, so `project.link` was removed; FAQs have no heading field: the heading is a Section
+heading the editor writes above the accordion block; cards, the Image Carousel and Project Preview
+tiles all link to `/projects/<slug>` through `projectHref()`. What every project page shares lives on
+the `singleProjectPage` singleton: the eyebrow and where it links back (`archiveLink`) and the
+"more projects" section, whose projects are ordered by shared project type, then
+newest (`frontend/sanity/lib/relatedProjects.ts`, checked by `scripts/verifyRelatedProjects.mts`).
+`property`, the map and the Property Archive are unaffected. The jump-nav and project-preview markup
+were extracted (`JumpNavLayout`, `ProjectPreviewView`) so the blocks and the page share them.
+Spec: [project single page design](superpowers/specs/2026-10-12-project-single-page-design.md); plan:
+[project single page plan](superpowers/plans/2026-10-12-project-single-page.md).
+
+**Not done:** active-section highlighting in the nav ([#31](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/31)),
+hand-picked related projects ([#32](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/32)).
+Manual: run `studio/scripts/seedSingleProjectPage.ts` and `unsetProjectLinks.ts`, and fetch the two
+background curve SVGs (see the plan, Task 7). Issue [#23](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/23)
+(property detail pages) is superseded for projects.
+
+The jump-nav column is capped to the visible height with the nav scrolling inside it, and its offset
+follows the header's hide/show state (`--header-offset`, set by `HeaderShell`).
