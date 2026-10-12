@@ -12,6 +12,7 @@ import JobListings from '@/components/blocks/JobListings'
 import PeopleGrid from '@/components/blocks/PeopleGrid'
 import ProjectGrid from '@/components/blocks/ProjectGrid'
 import ProjectPreview from '@/components/blocks/ProjectPreview'
+import PropertiesPreview from '@/components/blocks/PropertiesPreview'
 import PropertyArchive from '@/components/blocks/PropertyArchive'
 import RecordsArchive from '@/components/blocks/RecordsArchive'
 import MissionStatement from '@/components/blocks/MissionStatement'
@@ -66,6 +67,7 @@ const Blocks = {
   peopleGrid: PeopleGrid,
   projectGrid: ProjectGrid,
   projectPreview: ProjectPreview,
+  propertiesPreview: PropertiesPreview,
   propertyArchive: PropertyArchive,
   recordsArchive: RecordsArchive,
 } as BlocksType

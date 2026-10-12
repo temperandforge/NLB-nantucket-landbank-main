@@ -427,6 +427,23 @@ const pageBuilderFields = /* groq */ `
         "slug": slug.current
       }
     },
+    _type == "propertiesPreview" => {
+      ...,
+      button{
+        ...,
+        ${linkFields}
+      },
+      "properties": properties[]->{
+        _id,
+        name,
+        description,
+        link,
+        image,
+        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
+        "resources": resources[]->{"slug": slug.current, title, order}
+      },
+      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage
+    },
     _type == "mapPreview" => {
       ...,
       "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {
