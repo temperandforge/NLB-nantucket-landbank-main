@@ -117,6 +117,7 @@ export type FormField = {
   label: string
   name: Slug
   helperText?: string
+  prompt?: string
   placeholder?: string
   options?: Array<string>
   maxLength?: number

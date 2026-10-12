@@ -1206,7 +1206,12 @@ browser.
 - **No native `maxLength`.** Validation and the counter report overflow instead of silently
   truncating typed text.
 - **Icons.** Time fields use the Figma clock-2 icon (`Clock2Icon`). The design system has no radio
-  icons, so radios use circle icons drawn to match the square ones.
+  icons and the Figma draws the Yes/No pair as squares, so radio groups use the same square icons
+  as checkboxes and keep radio behaviour (one answer, arrow keys, one tab stop).
+- **A field's `prompt`** is the small text above the control when the section heading already asks
+  the question (Figma: the mono heading plus "Select one"). The `label` stays the question: it is
+  in the accessible name (as visually hidden text before the prompt), in validation messages and in
+  stored answers. The asterisk moves to the section heading.
 
 ### 21.5 Verification still to do by a person
 

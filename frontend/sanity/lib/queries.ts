@@ -204,6 +204,7 @@ const formProjection = /* groq */ `{
       _key,
       "name": name.current,
       label,
+      prompt,
       helperText,
       placeholder,
       fieldType,

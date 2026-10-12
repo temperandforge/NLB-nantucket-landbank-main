@@ -9,6 +9,7 @@ export default function Field({
   id,
   name,
   label,
+  prompt,
   required,
   helperText,
   error,
@@ -18,6 +19,8 @@ export default function Field({
   id: string
   name: string
   label: string
+  /** Visible text in place of the label; the label stays in the accessible name. */
+  prompt?: string | null
   required: boolean
   helperText?: string | null
   error: string | null
@@ -31,8 +34,17 @@ export default function Field({
         htmlFor={id}
         className={`form-label ${error ? 'form-label-error' : ''}`}
       >
-        {label}
-        {required && <span aria-hidden="true">*</span>}
+        {prompt ? (
+          <>
+            <span className="sr-only">{label}: </span>
+            {prompt}
+          </>
+        ) : (
+          <>
+            {label}
+            {required && <span aria-hidden="true">*</span>}
+          </>
+        )}
       </label>
       {children}
       {(error || helperText) && (

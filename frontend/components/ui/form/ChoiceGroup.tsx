@@ -1,4 +1,4 @@
-import {CircleDotIcon, CircleIcon, SquareCheckIcon, SquareIcon} from '@/components/icons'
+import {SquareCheckIcon, SquareIcon} from '@/components/icons'
 
 import {describedBy, type ControlProps} from './types'
 
@@ -11,8 +11,10 @@ import {describedBy, type ControlProps} from './types'
 export default function ChoiceGroup({field, id, value, error, onChange, onBlur}: ControlProps) {
   const multi = field.fieldType === 'checkboxGroup'
   const chosen = multi ? (Array.isArray(value) ? value : []) : typeof value === 'string' ? value : ''
-  const Off = multi ? SquareIcon : CircleIcon
-  const On = multi ? SquareCheckIcon : CircleDotIcon
+  // The design system draws one square pair for both, so a radio group looks like checkboxes but
+  // keeps radio behaviour (one answer, arrow keys, one tab stop).
+  const Off = SquareIcon
+  const On = SquareCheckIcon
 
   function toggle(option: string, checked: boolean) {
     if (!multi) return onChange(option)

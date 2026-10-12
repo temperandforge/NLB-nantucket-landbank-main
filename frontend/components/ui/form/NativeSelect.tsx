@@ -14,6 +14,7 @@ export default function NativeSelect({field, id, value, error, onChange, onBlur}
       id={id}
       name={field.name as string}
       label={field.label as string}
+      prompt={field.prompt}
       required={Boolean(field.required)}
       helperText={field.helperText}
       error={error}

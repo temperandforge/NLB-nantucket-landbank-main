@@ -69,6 +69,14 @@ export const formField = defineType({
     }),
     defineField({name: 'helperText', title: 'Helper text', type: 'string'}),
     defineField({
+      name: 'prompt',
+      title: 'Prompt',
+      type: 'string',
+      description:
+        'Optional. Small text shown above the control in place of the label, for when the section heading already asks the question (for example "Select one"). The label is still read out and stored.',
+      hidden: ({parent}) => ['radioGroup', 'checkboxGroup'].includes((parent as Parent)?.fieldType ?? ''),
+    }),
+    defineField({
       name: 'placeholder',
       title: 'Placeholder',
       type: 'string',

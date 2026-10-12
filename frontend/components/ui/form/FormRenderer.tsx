@@ -206,7 +206,11 @@ export default function FormRenderer({form}: {form: FormContent}) {
         )
         return section.heading ? (
           <fieldset key={section._key} className="m-0 flex min-w-0 flex-col gap-5 border-0 p-0">
-            <legend className="form-section-heading mb-5">{section.heading}</legend>
+            <legend className="form-section-heading mb-5">
+              {section.heading}
+              {/* A prompted field's label has no asterisk, so the heading carries it. */}
+              {fields.some((field) => field.prompt && field.required) && <span aria-hidden="true">*</span>}
+            </legend>
             {grid}
           </fieldset>
         ) : (
