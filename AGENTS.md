@@ -77,7 +77,7 @@ Design docs live in [docs/superpowers/specs/](docs/superpowers/specs/).
 ## Routing
 
 - **`app/[...slug]` is a catch-all** owning all page paths; `params.slug` is `string[]`. More
-  specific routes (`app/map`) still win, so adding a static route above it is
+  specific routes (`/news/<slug>` → `app/news/[slug]`) still win, so adding a static route above it is
   safe.
 - **`link.href` and `socialLink.url` allow relative URLs.** Internal links are site-relative and
   `#` is the placeholder convention; the default `url` validation rejects both.

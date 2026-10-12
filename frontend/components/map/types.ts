@@ -1,20 +1,21 @@
-import type {
-  MapFiltersQueryResult,
-  MapSettingsQueryResult,
-  PropertiesQueryResult,
-} from '@/sanity.types'
+import type {ExtractPageBuilderType} from '@/sanity/lib/types'
+
+type MapPreviewBlock = ExtractPageBuilderType<'mapPreview'>
+type MapExplorerBlock = ExtractPageBuilderType<'mapExplorer'>
 
 /**
- * Map types derived from the generated GROQ result types, so they cannot drift from the queries.
+ * Map types derived from the generated page-builder block types, so they cannot drift from the
+ * GROQ projections. Map Preview and Map Explorer share the property and settings projections; the
+ * filters exist only on Map Explorer.
  *
  * This file used to hold hardcoded PropertyType / Resource unions, a Property interface and
  * parallel label maps. Those are now property / propertyType / resource documents in Sanity - a
  * category can be added or renamed without a deploy, so the frontend must not restate the list.
  */
 
-export type Property = PropertiesQueryResult[number]
-export type MapFilters = MapFiltersQueryResult
-export type MapSettings = NonNullable<MapSettingsQueryResult>
+export type Property = NonNullable<MapPreviewBlock['properties']>[number]
+export type MapFilters = NonNullable<MapExplorerBlock['filters']>
+export type MapSettings = NonNullable<MapPreviewBlock['settings']>
 
 /** A filter option as the dropdowns consume it. */
 export type FilterOption = {value: string; label: string}
