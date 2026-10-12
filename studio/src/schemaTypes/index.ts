@@ -24,6 +24,7 @@ import {basicLeftRightText} from './objects/basicLeftRightText'
 import {jumpNavContent} from './objects/jumpNavContent'
 import {downloadBlock} from './objects/downloadBlock'
 import {growers} from './objects/growers'
+import {mapExplorer} from './objects/mapExplorer'
 import {mapPreview} from './objects/mapPreview'
 import {mapTeaser} from './objects/mapTeaser'
 import {contactForm} from './objects/contactForm'
@@ -115,6 +116,7 @@ export const schemaTypes = [
   timeline,
   downloadBlock,
   growers,
+  mapExplorer,
   mapPreview,
   mapTeaser,
   contactForm,

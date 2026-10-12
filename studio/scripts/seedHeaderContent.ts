@@ -48,7 +48,7 @@ const MENU: Top[] = [
   {
     label: 'Explore',
     children: [
-      {label: 'Map', path: 'explore/interactive-map'},
+      {label: 'Map', path: 'explore/map'},
       {label: 'Properties'},
       {label: 'Plan Your Visit', path: 'explore/plan-your-visit'},
       {label: 'Property Use Request', path: 'explore/request-for-property-use'},

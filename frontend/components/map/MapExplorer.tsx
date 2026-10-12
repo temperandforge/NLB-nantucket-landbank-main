@@ -1,7 +1,7 @@
 'use client'
 
 import {useMemo} from 'react'
-import {useRouter, useSearchParams} from 'next/navigation'
+import {usePathname, useRouter, useSearchParams} from 'next/navigation'
 
 import {MapboxMap} from './MapboxMap'
 import {MultiSelectDropdown} from './MultiSelectDropdown'
@@ -18,7 +18,8 @@ import {
  * The interactive map's filtering UI.
  *
  * Client-side because the selected filters live in the URL and update without a navigation. The
- * data itself is fetched on the server and passed in - see page.tsx.
+ * data itself is fetched on the server in the block's GROQ projection and passed in - see
+ * components/blocks/MapExplorer.tsx.
  *
  * Filter options come from the propertyType and resource documents rather than a hardcoded list,
  * so a category the client adds in the Studio appears here without a deploy.
@@ -36,6 +37,7 @@ function parseParam(value: string | null): string[] {
 
 export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
   const router = useRouter()
+  const pathname = usePathname()
   const searchParams = useSearchParams()
 
   const propertyTypeOptions = useMemo(() => toFilterOptions(filters.propertyTypes), [filters])
@@ -65,7 +67,7 @@ export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
     }
 
     const query = params.toString()
-    router.replace(query ? `/map?${query}` : '/map', {scroll: false})
+    router.replace(query ? `${pathname}?${query}` : pathname, {scroll: false})
   }
 
   const filteredProjects = useMemo(() => {

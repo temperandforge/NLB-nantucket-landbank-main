@@ -184,7 +184,7 @@ and the discrepancy flagged.
 - Use native elements wherever they exist: `<input>`, `<textarea>`, `<select>`, checkbox, radio and
   `<fieldset>`/`<legend>` for groups. Tab order is DOM order.
 - **Multi-select (custom listbox)**: the trigger is a `role="combobox"` button that opens a
-  listbox (see DECISIONS 20.4), with `aria-haspopup="listbox"` and `aria-expanded`.
+  listbox (see DECISIONS 21.4), with `aria-haspopup="listbox"` and `aria-expanded`.
   - Enter, Space or ArrowDown opens it; focus moves into the list.
   - Up/Down move between options, Home/End jump to the first and last, and typing a character jumps
     to a match.

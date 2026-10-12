@@ -337,6 +337,11 @@ export type MapPreview = {
   disabled?: boolean
 }
 
+export type MapExplorer = {
+  _type: 'mapExplorer'
+  disabled?: boolean
+}
+
 export type Growers = {
   _type: 'growers'
   heading?: string
@@ -1290,6 +1295,9 @@ export type Page = {
       } & JumpNavContent)
     | ({
         _key: string
+      } & MapExplorer)
+    | ({
+        _key: string
       } & MapPreview)
     | ({
         _key: string
@@ -1598,6 +1606,7 @@ export type AllSanitySchemaTypes =
   | ContactForm
   | MapTeaser
   | MapPreview
+  | MapExplorer
   | Growers
   | DownloadBlock
   | Timeline

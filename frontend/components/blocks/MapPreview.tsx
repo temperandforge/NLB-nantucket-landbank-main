@@ -1,4 +1,4 @@
-import {MapboxMap} from '@/app/map/MapboxMap'
+import {MapboxMap} from '@/components/map/MapboxMap'
 
 import {BlockProps} from './types'
 

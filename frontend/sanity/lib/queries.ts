@@ -124,7 +124,7 @@ export const siteBannerQuery = defineQuery(`
  * Boundary geometry is not here - it lives in the single GeoJSON file on Project Settings, and
  * boundaryId says which feature in it belongs to this property.
  */
-/** What the map needs from a property. Shared by the map page and the Map Preview block. */
+/** What the map needs from a property. Shared by the Map Preview and Map Explorer blocks. */
 const mapPropertyFields = /* groq */ `
   _id,
   name,
@@ -139,17 +139,11 @@ const mapPropertyFields = /* groq */ `
   "resources": resources[]->{"slug": slug.current, title}
 `
 
-export const propertiesQuery = defineQuery(`
-  *[_type == "property" && defined(slug.current)] | order(name asc) {
-    ${mapPropertyFields}
-  }
-`)
-
 /**
- * Every available filter option, not just the ones currently in use - a category the client has
- * created but not yet assigned should still appear in the dropdown.
+ * Every available filter option, not just the ones in use: a category the client has created but
+ * not yet assigned should still appear in the dropdown.
  */
-export const mapFiltersQuery = defineQuery(`{
+const mapFiltersFields = /* groq */ `
   "propertyTypes": *[_type == "propertyType" && defined(slug.current)] | order(title asc){
     "slug": slug.current,
     title
@@ -158,13 +152,10 @@ export const mapFiltersQuery = defineQuery(`{
     "slug": slug.current,
     title
   }
-}`)
+`
 
-/** The map's settings. Shared by the map page and the Map Preview block. */
+/** The map's settings. Shared by the Map Preview and Map Explorer blocks. */
 const mapSettingsFields = /* groq */ `
-  eyebrow,
-  heading,
-  intro,
   "boundaryDataUrl": boundaryData.asset->url,
   "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),
   "trailsDataUrl": trailsData.asset->url,
@@ -172,11 +163,6 @@ const mapSettingsFields = /* groq */ `
   defaultZoom
 `
 
-export const mapSettingsQuery = defineQuery(`
-  *[_type == "projectSettings" && _id == "projectSettings"][0]{
-    ${mapSettingsFields}
-  }
-`)
 /**
  * Resolves page references inside a Portable Text field's link annotations. A constant, not a
  * function of the field name: a function call inside a template literal widens the query's type
@@ -505,6 +491,18 @@ const pageBuilderFields = /* groq */ `
       ...,
       "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {
         ${mapPropertyFields}
+      },
+      "settings": *[_type == "projectSettings" && _id == "projectSettings"][0]{
+        ${mapSettingsFields}
+      }
+    },
+    _type == "mapExplorer" => {
+      ...,
+      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {
+        ${mapPropertyFields}
+      },
+      "filters": {
+        ${mapFiltersFields}
       },
       "settings": *[_type == "projectSettings" && _id == "projectSettings"][0]{
         ${mapSettingsFields}
