@@ -30,32 +30,37 @@ export default function RecordsList({
         showAll={false}
         onChoose={onChooseCategory ? (slug) => slug && onChooseCategory(slug) : undefined}
       />
-      <div className="tf-px mx-auto flex w-full flex-col items-start gap-12 tf-max-w">
-        {filters.map((filter) => (
-          <RecordFilterMenu
-            key={filter.key}
-            label={filter.label}
-            options={filter.options}
-            value={filter.value}
-            onChange={onChooseFilter ? (value) => onChooseFilter(filter.param, value) : undefined}
-          />
-        ))}
-        <div className="flex w-full flex-col">
-          <div className="flex w-full items-start justify-between py-6 font-mono text-body-small uppercase leading-[1.6] tracking-wide text-on-background">
-            <span>File Name</span>
-            <span>Download</span>
+      {/* The same nesting as FilterTabs and the heroes: the page padding outside, the max width
+          inside. Both on one element would pad the content inside the max-width box and push it
+          in from the tabs on wide screens. */}
+      <div className="tf-px w-full">
+        <div className="tf-max-w flex flex-col items-start gap-12">
+          {filters.map((filter) => (
+            <RecordFilterMenu
+              key={filter.key}
+              label={filter.label}
+              options={filter.options}
+              value={filter.value}
+              onChange={onChooseFilter ? (value) => onChooseFilter(filter.param, value) : undefined}
+            />
+          ))}
+          <div className="flex w-full flex-col">
+            <div className="flex w-full items-start justify-between py-6 font-mono text-body-small uppercase leading-[1.6] tracking-wide text-on-background">
+              <span>File Name</span>
+              <span>Download</span>
+            </div>
+            {records.length > 0 ? (
+              <ul className="m-0 w-full list-none p-0">
+                {records.map((record) => (
+                  <RecordRow key={record._id} record={record} />
+                ))}
+              </ul>
+            ) : (
+              <p className="border-t border-border-light py-6 font-mono text-body-base text-on-background-subtle">
+                No records in this category yet.
+              </p>
+            )}
           </div>
-          {records.length > 0 ? (
-            <ul className="m-0 w-full list-none p-0">
-              {records.map((record) => (
-                <RecordRow key={record._id} record={record} />
-              ))}
-            </ul>
-          ) : (
-            <p className="border-t border-border-light py-6 font-mono text-body-base text-on-background-subtle">
-              No records in this category yet.
-            </p>
-          )}
         </div>
       </div>
     </div>
