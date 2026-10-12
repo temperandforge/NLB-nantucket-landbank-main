@@ -250,7 +250,11 @@ const pageBuilderFields = /* groq */ `
         ...,
         ${linkReference}
       },
-      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) [0...12] {
+      // A chosen category narrows the list; none means the latest of all news.
+      "articles": *[
+        _type == "article" && defined(slug.current)
+        && (!defined(^.category) || ^.category._ref in categories[]._ref)
+      ] | order(date desc) [0...12] {
         ${articleCardFields}
       }
     },
