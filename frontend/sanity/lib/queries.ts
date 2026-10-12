@@ -583,7 +583,6 @@ export const moreProjectsQuery = defineQuery(`
 export const singleProjectPageQuery = defineQuery(`
   *[_type == "singleProjectPage" && _id == "singleProjectPage"][0]{
     eyebrow,
-    faqHeading,
     archiveLink{
       ...,
       ${linkReference}

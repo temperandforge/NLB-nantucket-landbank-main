@@ -68,7 +68,8 @@ export const project = defineType({
       title: 'FAQs',
       type: 'array',
       of: [defineArrayMember({type: 'reference', to: [{type: 'faq'}]})],
-      description: 'Shown under the page content as “Project FAQs”, in this order.',
+      description:
+        'Shown under the page content, in this order. Add your own heading (for example “Project FAQs” as a Section heading) at the end of the page content to introduce them and to get a link in the nav.',
     }),
     defineField({
       name: 'property',

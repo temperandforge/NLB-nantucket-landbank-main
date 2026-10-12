@@ -30,25 +30,28 @@ export default function JumpNavLayout({
     <div
       className={
         project
-          ? 'relative z-10 mx-auto flex w-full max-w-[90rem] flex-col gap-12 tf-px py-12 md:flex-row md:justify-between md:gap-24 md:py-24'
+          ? 'relative z-10 mx-auto flex w-full max-w-[90rem] flex-col gap-12 tf-px py-12 lg:flex-row lg:justify-between lg:gap-24 lg:py-24'
           : 'max-w-[1360px] mx-auto px-10 py-24 grid grid-cols-1 md:grid-cols-2 gap-24'
       }
     >
       <div
-        className={`md:sticky md:top-[calc(var(--header-height)+2.5rem)] self-start ${
-          project ? 'flex w-full flex-col gap-12 md:max-w-[553px] md:flex-1' : ''
-        }`}
+        className={
+          project
+            ? 'flex w-full flex-col gap-12 self-start lg:sticky lg:top-[calc(var(--header-height)+2.5rem)] lg:max-w-[553px] lg:flex-1'
+            : 'md:sticky md:top-[calc(var(--header-height)+2.5rem)] self-start'
+        }
       >
-        <div className={project ? 'flex w-full max-w-[560px] flex-col gap-6' : ''}>
-          {eyebrow}
-          {heading && (
-            <Heading
-              className={project ? 'w-full text-headline-xl text-on-background' : 'text-headline-2xl mb-8'}
-            >
-              {heading}
-            </Heading>
-          )}
-        </div>
+        {project ? (
+          <div className="flex w-full max-w-[560px] flex-col gap-6">
+            {eyebrow}
+            {heading && <Heading className="w-full text-headline-xl text-on-background">{heading}</Heading>}
+          </div>
+        ) : (
+          <>
+            {eyebrow}
+            {heading && <Heading className="text-headline-2xl mb-8">{heading}</Heading>}
+          </>
+        )}
         {items.length > 0 && (
           <nav className="flex flex-col" aria-label={navLabel}>
             {items.map((item) => (
@@ -68,7 +71,7 @@ export default function JumpNavLayout({
           </nav>
         )}
       </div>
-      <div className={project ? 'flex w-full flex-col md:w-[640px] md:shrink-0' : 'flex flex-col gap-10'}>
+      <div className={project ? 'flex w-full flex-col lg:w-[640px] lg:shrink-0' : 'flex flex-col gap-10'}>
         {children}
       </div>
     </div>

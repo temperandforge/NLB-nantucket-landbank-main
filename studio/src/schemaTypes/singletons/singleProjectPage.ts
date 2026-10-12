@@ -3,8 +3,8 @@ import {defineField, defineType} from 'sanity'
 
 /**
  * Single Project Page (singleton, fixed id `singleProjectPage`): what every project page shares,
- * as opposed to one project's own content: the eyebrow and where it links, the FAQ heading, and
- * the "more projects" section under the page. Mirrors Single News Page.
+ * as opposed to one project's own content: the eyebrow and where it links, and the "more
+ * projects" section under the page. Mirrors Single News Page.
  *
  * Every field is optional: the page falls back to the wording in the design.
  */
@@ -26,12 +26,6 @@ export const singleProjectPage = defineType({
       type: 'link',
       description:
         'The Projects page the label links back to. With no link (or one that does not resolve) the label is plain text.',
-    }),
-    defineField({
-      name: 'faqHeading',
-      title: 'FAQ heading',
-      type: 'string',
-      description: 'Heading above a project’s FAQs. Default: "Project FAQs".',
     }),
     defineField({
       name: 'moreProjects',

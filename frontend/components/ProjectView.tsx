@@ -5,7 +5,7 @@ import BlockImage from '@/components/blocks/BlockImage'
 import FaqItem from '@/components/blocks/FaqItem'
 import JumpNavLayout from '@/components/JumpNavLayout'
 import CustomPortableText from '@/components/PortableText'
-import {buildJumpNav, slugify} from '@/sanity/lib/jumpNav'
+import {buildJumpNav} from '@/sanity/lib/jumpNav'
 import type {ProjectQueryResult, SingleProjectPageQueryResult} from '@/sanity.types'
 
 /**
@@ -24,17 +24,9 @@ export default function ProjectView({
   archiveHref: string | null
 }) {
   const body = project.body ?? []
-  const {items: bodyItems, idByKey} = buildJumpNav(body)
+  const {items, idByKey} = buildJumpNav(body)
   // An unpublished FAQ dereferences to null.
   const faqs = (project.faqs ?? []).flatMap((faq) => (faq?.question ? [faq] : []))
-  const faqHeading = settings?.faqHeading || 'Project FAQs'
-
-  // The FAQ section's anchor must not collide with a body H2 that slugifies the same.
-  const taken = new Set(bodyItems.map((item) => item.id))
-  const base = slugify(faqHeading) || 'faqs'
-  let faqId = base
-  for (let n = 2; taken.has(faqId); n++) faqId = `${base}-${n}`
-  const items = faqs.length > 0 ? [...bodyItems, {id: faqId, text: 'FAQs'}] : bodyItems
 
   const eyebrowText = settings?.eyebrow || 'Projects'
   const eyebrow = (
@@ -75,31 +67,34 @@ export default function ProjectView({
               />
             </div>
           )}
-          {body.length > 0 && (
-            <CustomPortableText
-              variant="project"
-              className="w-full"
-              value={body as PortableTextBlock[]}
-              sectionIds={idByKey}
-            />
-          )}
-          {faqs.length > 0 && (
-            <section id={faqId} className="scroll-mt-10 flex w-full flex-col gap-8">
-              <h2 className="w-full text-headline-lg text-on-background">{faqHeading}</h2>
-              <div className="flex w-full flex-col gap-5">
-                {faqs.map((faq) => (
-                  <FaqItem key={faq._id} question={faq.question ?? ''}>
-                    {faq.answer && (
-                      <CustomPortableText
-                        variant="basic"
-                        className="[--rich-text-color:var(--color-on-background)] [--rich-text-size:14px]"
-                        value={faq.answer as PortableTextBlock[]}
-                      />
-                    )}
-                  </FaqItem>
-                ))}
-              </div>
-            </section>
+          {(body.length > 0 || faqs.length > 0) && (
+            <div className="flex w-full flex-col gap-8">
+              {body.length > 0 && (
+                <CustomPortableText
+                  variant="project"
+                  className="w-full"
+                  value={body as PortableTextBlock[]}
+                  sectionIds={idByKey}
+                />
+              )}
+              {/* The heading above the FAQs is a Section heading the editor writes at the end of
+                  the page content, so it comes with its own nav link. */}
+              {faqs.length > 0 && (
+                <div className="flex w-full flex-col gap-5">
+                  {faqs.map((faq) => (
+                    <FaqItem key={faq._id} question={faq.question ?? ''}>
+                      {faq.answer && (
+                        <CustomPortableText
+                          variant="basic"
+                          className="[--rich-text-color:var(--color-on-background)] [--rich-text-size:14px]"
+                          value={faq.answer as PortableTextBlock[]}
+                        />
+                      )}
+                    </FaqItem>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
         </div>
       </JumpNavLayout>

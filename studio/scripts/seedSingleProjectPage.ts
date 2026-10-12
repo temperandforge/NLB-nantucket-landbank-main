@@ -24,7 +24,6 @@ const doc = {
   _id: 'singleProjectPage',
   _type: 'singleProjectPage',
   eyebrow: 'Projects',
-  faqHeading: 'Project FAQs',
   moreProjects: {
     disabled: false,
     eyebrow: 'projects',

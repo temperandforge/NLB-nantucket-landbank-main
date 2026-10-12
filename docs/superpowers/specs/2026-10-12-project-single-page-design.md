@@ -22,7 +22,8 @@ Project Preview stacks.
 
 The nav in Figma is placeholder text ("Project Goals" and "Environmental Impact Report" match no
 heading). The nav is built from the body's H2s, exactly as Jump Nav Content builds it. The FAQ
-section adds a "FAQs" nav row when the project has FAQs. The header is not rendered (the layout has
+accordion has no heading of its own: the editor writes one (e.g. "Project FAQs") as the last
+Section heading in the project's page content, which gives the FAQs their nav row too. The header is not rendered (the layout has
 it off, as on the news page).
 
 ## Approach
@@ -39,8 +40,7 @@ compose blocks.
 - The body's `of` array is currently inline in `jumpNavContent`. It moves to one shared constant
   (`studio/src/schemaTypes/objects/jumpNavBody.ts`) used by both, so the two cannot drift.
 - New singleton `singleProjectPage`, mirroring `singleNewsPage`: `eyebrow` (default "Projects"),
-  `archiveLink` (the shared `link` object, to the Projects archive page), `faqHeading` (default
-  "Project FAQs"), and `moreProjects` {`disabled`, `eyebrow`, `body`, `button`, `count`}. The preview
+  `archiveLink` (the shared `link` object, to the Projects archive page), and `moreProjects` {`disabled`, `eyebrow`, `body`, `button`, `count`}. The preview
   panel's text and button are lorem in Figma, so they are authored here once for every project.
 - `property` is not touched. `project.property` stays as it is and is not displayed.
 
