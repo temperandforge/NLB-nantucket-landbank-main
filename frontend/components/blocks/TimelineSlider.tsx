@@ -63,30 +63,42 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
       return;
     }
 
-    // Defined once and reused both as Splide's own `breakpoints` option and by
-    // our own matchMedia-based watcher below — Splide's internal breakpoint
-    // listener does not reliably re-fire on every resize (e.g. programmatic
-    // viewport changes), which left perPage/getEnd() silently stuck at
-    // whatever breakpoint was active on mount, breaking the dot's math after
-    // a resize crossed a breakpoint. We watch matchMedia ourselves and
-    // re-apply the right options directly rather than trusting that listener.
-    const BASE_SPLIDE_OPTIONS = { perPage: 4, padding: "6%" };
-    const SPLIDE_BREAKPOINTS: Record<number, { perPage: number; padding: string }> = {
-      1280: { perPage: 3, padding: "8%" },
-      1024: { perPage: 2, padding: "10%" },
-      640: { perPage: 1, padding: "14%" },
+    // The left padding mirrors `tf-px` + `tf-max-w` (see css/blocks.css) so the first card
+    // lines up with the rest of the page content on load; the previous cards still show in
+    // that padding as the slider moves. The right side uses the same inset so the last card ends flush with the content.
+    // Splide parses padding itself and can't resolve calc()/var(), so it's measured to px here
+    // (a CSS-string value left getEnd() at 0 and froze the dot).
+    const gutterProbe = document.createElement("div");
+    gutterProbe.style.cssText = "position:absolute;visibility:hidden;padding-left:var(--tf-x)";
+    rootRef.current!.appendChild(gutterProbe);
+    // Distance from each viewport edge to the page content (the same on both sides).
+    function getContentInset() {
+      const gutter = parseFloat(getComputedStyle(gutterProbe).paddingLeft) || 0;
+      const maxWidth = 90 * (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
+      return Math.max(gutter, (splideRoot!.clientWidth - maxWidth) / 2);
+    }
+
+    const SPLIDE_BREAKPOINTS: Record<number, { perPage: number }> = {
+      1280: { perPage: 3 },
+      1024: { perPage: 2 },
+      640: { perPage: 1 },
     };
+    const BASE_SPLIDE_OPTIONS = { perPage: 4 };
     const breakpointThresholds = Object.keys(SPLIDE_BREAKPOINTS)
       .map(Number)
       .sort((a, b) => a - b);
 
+    // Not using Splide's own `breakpoints` option: its listener does not reliably re-fire
+    // on every resize (e.g. programmatic viewport changes), which left perPage/getEnd()
+    // stuck at whatever breakpoint was active on mount. We watch matchMedia ourselves.
     function getActiveSplideOptions() {
-      for (const threshold of breakpointThresholds) {
-        if (window.matchMedia(`(max-width: ${threshold}px)`).matches) {
-          return SPLIDE_BREAKPOINTS[threshold];
-        }
-      }
-      return BASE_SPLIDE_OPTIONS;
+      const active =
+        breakpointThresholds
+          .filter((threshold) => window.matchMedia(`(max-width: ${threshold}px)`).matches)
+          .map((threshold) => SPLIDE_BREAKPOINTS[threshold])[0] ?? BASE_SPLIDE_OPTIONS;
+      const inset = getContentInset();
+      // Same inset both sides, so the last card ends flush with the page content.
+      return { perPage: active.perPage, padding: { left: inset, right: inset } };
     }
 
     const splide = new Splide(splideRoot, {
@@ -94,15 +106,15 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
       gap: "32px",
       arrows: false,
       pagination: false,
-      breakpoints: SPLIDE_BREAKPOINTS,
-      ...BASE_SPLIDE_OPTIONS,
+      ...getActiveSplideOptions(),
     });
 
     function getEndIndex() {
       return splide.Components.Controller.getEnd();
     }
 
-    const isMobileLayout = window.matchMedia("(max-width: 640px)");
+    // Matches the 2-card breakpoint: the stretched curve gets too squished below the large breakpoint.
+    const isMobileLayout = window.matchMedia("(max-width: 1024px)");
 
     // Desktop/tablet: the line is stretched to fill the container width
     // (non-uniform x/y scale — an intentional "squish" of the same curve).
@@ -197,7 +209,8 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
 
     function indexToProgress(index: number) {
       const end = getEndIndex();
-      return end > 0 ? index / end : 0;
+      // Clamp: after a resize to a larger perPage, splide.index can briefly exceed the new end.
+      return end > 0 ? Math.min(1, Math.max(0, index / end)) : 0;
     }
 
     let currentProgress = 0;
@@ -280,13 +293,10 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
     // Belt-and-suspenders resync: re-apply the options for whatever breakpoint
     // is actually active right now, independent of Splide's own (unreliable)
     // breakpoint listener, then bring our own dot/bounds state back in sync.
-    let lastAppliedOptions: { perPage: number; padding: string } | null = null;
     function resyncToViewport() {
-      const active = getActiveSplideOptions();
-      if (active !== lastAppliedOptions) {
-        lastAppliedOptions = active;
-        splide.options = active;
-      }
+      splide.options = getActiveSplideOptions();
+      // Fewer slides fit-to-end at a larger perPage, so the old index may now be past the end.
+      if (splide.index > getEndIndex()) splide.go(getEndIndex());
       updateBounds();
       setDotToIndexInstant(splide.index);
       updateArrows();
@@ -297,7 +307,6 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
     window.addEventListener("resize", resyncToViewport);
 
     splide.mount();
-    lastAppliedOptions = getActiveSplideOptions();
 
     return () => {
       if (dotAnimationFrame !== null) cancelAnimationFrame(dotAnimationFrame);
@@ -305,6 +314,7 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
       window.removeEventListener("resize", resyncToViewport);
       prevButton.removeEventListener("click", handlePrevClick);
       nextButton.removeEventListener("click", handleNextClick);
+      gutterProbe.remove();
       splide.destroy();
     };
   }, [events]);
