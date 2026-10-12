@@ -96,6 +96,12 @@ export type CtaContact = {
   disabled?: boolean
 }
 
+export type EventsGrid = {
+  _type: 'eventsGrid'
+  emptyText?: string
+  disabled?: boolean
+}
+
 export type EventsPreview = {
   _type: 'eventsPreview'
   eyebrow?: string
@@ -120,6 +126,11 @@ export type ProjectPreview = {
       _key: string
     } & ProjectReference
   >
+  disabled?: boolean
+}
+
+export type RecordsArchive = {
+  _type: 'recordsArchive'
   disabled?: boolean
 }
 
@@ -529,6 +540,42 @@ export type NewsCategory = {
   order?: number
 }
 
+export type RecordCategoryReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'recordCategory'
+}
+
+export type Record = {
+  _id: string
+  _type: 'record'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title?: string
+  date?: string
+  file: {
+    asset?: SanityFileAssetReference
+    media?: unknown
+    _type: 'file'
+  }
+  category: RecordCategoryReference
+}
+
+export type RecordCategory = {
+  _id: string
+  _type: 'recordCategory'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  order?: number
+  sortBy: 'dateDesc' | 'titleAsc'
+  filters?: Array<string>
+}
+
 export type DepartmentReference = {
   _ref: string
   _type: 'reference'
@@ -653,10 +700,48 @@ export type Event = {
   _updatedAt: string
   _rev: string
   title: string
+  slug: Slug
   start: string
   end?: string
+  image?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
   location?: string
   description?: string
+  body?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>
+          text?: string
+          _type: 'span'
+          _key: string
+        }>
+        style?: 'normal' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+        listItem?: 'bullet' | 'number'
+        markDefs?: Array<
+          {
+            _key: string
+          } & Link
+        >
+        level?: number
+        _type: 'block'
+        _key: string
+      }
+    | {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        _type: 'image'
+        _key: string
+      }
+  >
 }
 
 export type NewsCategoryReference = {
@@ -998,6 +1083,9 @@ export type Page = {
       } & DownloadBlock)
     | ({
         _key: string
+      } & EventsGrid)
+    | ({
+        _key: string
       } & EventsPreview)
     | ({
         _key: string
@@ -1050,6 +1138,9 @@ export type Page = {
     | ({
         _key: string
       } & PropertyArchive)
+    | ({
+        _key: string
+      } & RecordsArchive)
     | ({
         _key: string
       } & Timeline)
@@ -1193,6 +1284,23 @@ export type SanityAssistSchemaTypeField = {
   >
 }
 
+export type MediaFolderReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'media.folder'
+}
+
+export type MediaFolder = {
+  _id: string
+  _type: 'media.folder'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name?: string
+  parent?: MediaFolderReference
+}
+
 export type MediaTag = {
   _id: string
   _type: 'media.tag'
@@ -1302,9 +1410,11 @@ export type AllSanitySchemaTypes =
   | MenuGroup
   | SanityImageAssetReference
   | CtaContact
+  | EventsGrid
   | EventsPreview
   | ProjectReference
   | ProjectPreview
+  | RecordsArchive
   | PropertyArchive
   | ProjectGrid
   | PeopleGrid
@@ -1339,6 +1449,9 @@ export type AllSanitySchemaTypes =
   | ProjectType
   | PropertyType
   | NewsCategory
+  | RecordCategoryReference
+  | Record
+  | RecordCategory
   | DepartmentReference
   | Job
   | FaqCategoryReference
@@ -1380,6 +1493,8 @@ export type AllSanitySchemaTypes =
   | SanityAssistInstructionFieldRef
   | SanityAssistInstruction
   | SanityAssistSchemaTypeField
+  | MediaFolderReference
+  | MediaFolder
   | MediaTag
   | SanityImagePaletteSwatch
   | SanityImagePalette
