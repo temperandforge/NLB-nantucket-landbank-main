@@ -1,5 +1,5 @@
 /**
- * Adds a Map Explorer block to the end of the Interactive Map page (explore/interactive-map).
+ * Adds a Map Explorer block to the end of the Map page (explore/map; the seeds call it interactive-map, but the dataset slug is "map").
  *
  * Run from the studio directory:
  *   npx sanity exec scripts/addMapExplorerToMapPage.ts --with-user-token -- --dry
@@ -27,18 +27,18 @@ type PageRow = {_id: string; types: string[] | null}
 
 async function main() {
   const rows = await client.fetch<PageRow[]>(
-    `*[_type == "page" && slug.current == "interactive-map" && parent->slug.current == "explore"]{
+    `*[_type == "page" && slug.current == "map" && parent->slug.current == "explore"]{
        _id,
        "types": pageBuilder[]._type
      }`,
   )
   if (rows.length === 0) {
-    console.error('There is no explore/interactive-map page. Nothing was written.')
+    console.error('There is no explore/map page. Nothing was written.')
     process.exit(1)
   }
 
   if (rows.some((row) => row.types?.includes('mapExplorer'))) {
-    console.log('  = explore/interactive-map already has a Map Explorer block')
+    console.log('  = explore/map already has a Map Explorer block')
     return
   }
 
