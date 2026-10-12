@@ -1,6 +1,6 @@
 import type {Metadata} from 'next'
 import {draftMode} from 'next/headers'
-import {redirect} from 'next/navigation'
+import {notFound} from 'next/navigation'
 
 import PageView from '@/components/PageView'
 import {sanityFetch} from '@/sanity/lib/live'
@@ -30,6 +30,6 @@ export default async function Page() {
   // Hidden blocks are shown (with a badge) only while an editor is previewing in Presentation.
   const {isEnabled: includeHidden} = await draftMode()
   const {data: page} = await sanityFetch({query: landingPageQuery, params: {includeHidden, now: currentHour()}})
-  if (!page?._id) redirect('/map')
+  if (!page?._id) notFound()
   return <PageView page={page} />
 }

@@ -55,7 +55,7 @@ const FOOTER_MENU: GroupSpec[] = [
   {
     label: 'Explore',
     children: [
-      {label: 'Interactive Map', link: page('explore/interactive-map')},
+      {label: 'Interactive Map', link: page('explore/map')},
       {label: 'Properties', link: placeholder},
       {label: 'Plan Your Visit', link: page('explore/plan-your-visit')},
       {label: 'Request for Property Use', link: page('explore/request-for-property-use')},

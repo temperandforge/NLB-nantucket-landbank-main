@@ -153,21 +153,21 @@ async function main() {
           _key: key(),
           label: 'Primary button',
           variant: 'primary',
-          link: {_type: 'link', linkType: 'href', href: '/map'},
+          link: {_type: 'link', linkType: 'href', href: '#'},
         },
         {
           _type: 'blockButton',
           _key: key(),
           label: 'Secondary button',
           variant: 'secondary',
-          link: {_type: 'link', linkType: 'href', href: '/map'},
+          link: {_type: 'link', linkType: 'href', href: '#'},
         },
         {
           _type: 'blockButton',
           _key: key(),
           label: 'Ghost button',
           variant: 'ghost',
-          link: {_type: 'link', linkType: 'href', href: '/map'},
+          link: {_type: 'link', linkType: 'href', href: '#'},
         },
       ],
       rightContent: [
@@ -186,14 +186,14 @@ async function main() {
               _key: key(),
               label: 'A link row with the arrow icon',
               icon: 'link',
-              link: {_type: 'link', linkType: 'href', href: '/map'},
+              link: {_type: 'link', linkType: 'href', href: '#'},
             },
             {
               _type: 'anchorLink',
               _key: key(),
               label: 'A download row with the download icon',
               icon: 'download',
-              link: {_type: 'link', linkType: 'href', href: '/map'},
+              link: {_type: 'link', linkType: 'href', href: '#'},
             },
             {
               // A page link with no page chosen: must not render a row.
@@ -230,14 +230,14 @@ async function main() {
               _key: key(),
               label: 'A link row inside a jump nav section',
               icon: 'link',
-              link: {_type: 'link', linkType: 'href', href: '/map'},
+              link: {_type: 'link', linkType: 'href', href: '#'},
             },
             {
               _type: 'anchorLink',
               _key: key(),
               label: 'A download row inside a jump nav section',
               icon: 'download',
-              link: {_type: 'link', linkType: 'href', href: '/map'},
+              link: {_type: 'link', linkType: 'href', href: '#'},
             },
           ],
         },
@@ -248,7 +248,7 @@ async function main() {
       _key: key(),
       eyebrow: 'Image carousel',
       images: [
-        {_key: key(), _type: 'carouselImage', image: imageValue(beach, 'Dionis Beach'), caption: 'Dionis Beach', link: {_type: 'link', linkType: 'href', href: '/map'}},
+        {_key: key(), _type: 'carouselImage', image: imageValue(beach, 'Dionis Beach'), caption: 'Dionis Beach', link: {_type: 'link', linkType: 'href', href: '#'}},
         {_key: key(), _type: 'carouselImage', image: imageValue(jetties, 'Jetties Beach'), caption: 'Jetties Beach'},
         {_key: key(), _type: 'carouselImage', image: imageValue(pond, 'Long Pond'), caption: 'Long Pond'},
         {_key: key(), _type: 'carouselImage', image: imageValue(beach, 'Dionis Beach'), caption: 'Dionis Beach again'},
@@ -284,7 +284,7 @@ async function main() {
       button: {
         _type: 'button',
         buttonText: 'View the map',
-        link: {_type: 'link', linkType: 'href', href: '/map'},
+        link: {_type: 'link', linkType: 'href', href: '#'},
       },
     },
     {
@@ -319,8 +319,8 @@ async function main() {
       eyebrow: 'Our mission',
       heading: 'Preserving Nantucket’s open spaces for the public while adapting to the island’s needs with balance, simplicity, and care.',
       links: [
-        {_type: 'missionLink', _key: key(), label: 'Agriculture', link: {_type: 'link', linkType: 'href', href: '/map'}},
-        {_type: 'missionLink', _key: key(), label: 'Conservation', link: {_type: 'link', linkType: 'href', href: '/map'}},
+        {_type: 'missionLink', _key: key(), label: 'Agriculture', link: {_type: 'link', linkType: 'href', href: '#'}},
+        {_type: 'missionLink', _key: key(), label: 'Conservation', link: {_type: 'link', linkType: 'href', href: '#'}},
         {_type: 'missionLink', _key: key(), label: 'Should not appear', link: {_type: 'link', linkType: 'page'}},
       ],
     },
@@ -329,7 +329,7 @@ async function main() {
       _key: key(),
       heading: 'Contact Us',
       body: 'Have a question, need more information, or not sure where to start? Reach out.',
-      button: {_type: 'button', buttonText: 'Reach out', link: {_type: 'link', linkType: 'href', href: '/map'}},
+      button: {_type: 'button', buttonText: 'Reach out', link: {_type: 'link', linkType: 'href', href: '#'}},
       desktopImage: {_type: 'image', asset: ref(beach)},
       mobileImage: {_type: 'image', asset: ref(beach)},
     },
@@ -346,7 +346,7 @@ async function main() {
       count: 2,
       ctaHeading: 'Check out what is happening with the latest NLB news.',
       ctaLabel: 'View all news',
-      ctaLink: {_type: 'link', linkType: 'href', href: '/map'},
+      ctaLink: {_type: 'link', linkType: 'href', href: '#'},
     },
     {
       // The call to action link points at no page: the tile must be plain, not a dead link.
@@ -369,7 +369,7 @@ async function main() {
       _key: key(),
       eyebrow: 'Projects - Conservation',
       body: 'Our conservation work does not stop at the property line. We partner with scientists, agencies and local organizations to monitor wildlife, restore habitat and track how the island is changing.',
-      button: {_type: 'button', buttonText: 'View all projects', link: {_type: 'link', linkType: 'href', href: '/map'}},
+      button: {_type: 'button', buttonText: 'View all projects', link: {_type: 'link', linkType: 'href', href: '#'}},
       projects: projectRefs.slice(0, 3).map((id) => ({...ref(id), _key: key()})),
     },
 

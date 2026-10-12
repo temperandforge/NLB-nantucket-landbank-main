@@ -13,6 +13,8 @@ export const mapPreview = defineBlock({
   title: 'Map Preview',
   type: 'object',
   icon: PinIcon,
+  description:
+    'A short embed of the map with a heading and no filters. Use Map Explorer for the full filterable map.',
   fields: [
     defineField({
       name: 'heading',
