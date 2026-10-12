@@ -232,6 +232,11 @@ and the discrepancy flagged.
   client or to Studio. Whether Sanity can issue a create-only, `formSubmission`-only token on this
   plan, or whether the writes should move behind a Sanity Function, is investigated separately.
   Issue: #22.
+- **Go-live hardening and review follow-ups.** Before the forms go live: timeouts on the
+  Turnstile and Sanity calls in the submit route, a byte-accurate streaming body-size cap, the
+  three env vars in `frontend/.env.example`, and settling `X-Forwarded-For` trust with the hosting
+  target (with #21). The issue also lists the smaller accessibility, Studio and script-check
+  follow-ups from the branch review. Issue: #27.
 
 ## Notes
 
