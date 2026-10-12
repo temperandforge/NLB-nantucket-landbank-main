@@ -13,15 +13,25 @@ export default function JumpNavContent({block}: BlockProps<'jumpNavContent'>) {
   const {items, idByKey} = buildJumpNav(content)
 
   return (
-    <section className="w-full">
+    <section className="relative w-full overflow-clip bg-background">
+      <div
+        className="project-curve pointer-events-none absolute left-1/2 top-[40%] h-[1089px] w-[1684px] max-w-none -translate-x-1/2 -translate-y-1/2"
+        aria-hidden="true"
+      />
       <JumpNavLayout
+        variant="project"
         heading={block.heading}
         headingLevel={headingLevel}
         navLabel={block.heading || 'Section navigation'}
         items={items}
       >
         {content.length > 0 && (
-          <CustomPortableText value={content as PortableTextBlock[]} sectionIds={idByKey} />
+          <CustomPortableText
+            variant="project"
+            className="w-full"
+            value={content as PortableTextBlock[]}
+            sectionIds={idByKey}
+          />
         )}
       </JumpNavLayout>
     </section>
