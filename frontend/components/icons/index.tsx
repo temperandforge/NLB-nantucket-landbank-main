@@ -320,17 +320,21 @@ export function CloseIcon({className}: IconProps) {
   )
 }
 
-/** Hamburger. Figma: nav menu glyph (mobile-glyph-1). 18 x 14, 2px stroke. */
-export function MenuIcon({className}: IconProps) {
+/**
+ * Hamburger that morphs into a close x as `open` flips. 18 x 14, 2px strokes: the outer bars
+ * travel 6px to the middle and rotate to form the x while the middle bar collapses. Motion is
+ * dropped under prefers-reduced-motion (the state still changes).
+ */
+export function MenuToggleIcon({className, open}: IconProps & {open: boolean}) {
+  const bar =
+    'origin-center [transform-box:fill-box] transition-[translate,rotate,scale,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none'
   return (
     <svg viewBox="0 0 18 14" fill="none" aria-hidden="true" focusable="false" className={className}>
-      <path
-        d="M1 7H17M1 1H17M1 13H17"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M1 1H17" className={`${bar} ${open ? 'translate-y-[6px] rotate-45' : ''}`} />
+        <path d="M1 7H17" className={`${bar} ${open ? 'scale-x-0 opacity-0' : ''}`} />
+        <path d="M1 13H17" className={`${bar} ${open ? '-translate-y-[6px] -rotate-45' : ''}`} />
+      </g>
     </svg>
   )
 }
