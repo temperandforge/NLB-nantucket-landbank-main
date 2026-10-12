@@ -69,7 +69,7 @@ and the map section mentions `frontend/app/map/properties.ts` history only, so i
 
 ## Out of scope
 
-- Removing `projectSettings.heading` / `intro` / `eyebrow` (issue).
+- Removing `projectSettings.heading` / `intro` / `eyebrow` ([#44](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/44)).
 - Adding a Hero Tertiary to the live page's content (client copy).
 
 ## Verification

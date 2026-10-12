@@ -101,7 +101,7 @@ to `propertyType` and `resource` documents.
 meant a code change and a deploy. As documents, the client owns them.
 
 **Implication:** The frontend must not restate the category list. Filter options come from the
-documents, and `frontend/app/map/types.ts` derives its types from the generated query results.
+documents, and `frontend/components/map/types.ts` derives its types from the generated page-builder block types.
 A dereferenced taxonomy entry is null when its document is unpublished, so consumers filter those
 out rather than rendering a blank option.
 
@@ -122,7 +122,7 @@ Property Archive read properties. Properties and projects have separate type tax
 **Status:** Implemented
 
 Both `propertyType` and `resource` carry a slug and a title. The map's URL filters use the slug
-(`/map?propertyType=beach`).
+(`?propertyType=beach`, on the page that carries the Map Explorer block).
 
 **Why:** Filter state is shareable and bookmarkable. Keying off the title would break every shared
 link the moment someone fixed a typo.
@@ -313,8 +313,8 @@ through the same path, because the page query excludes it rather than the route 
 there is no real route hierarchy to build. One catch-all owns all page paths.
 
 **Implication:** `params.slug` is `string[]`; type it `PageProps<'/[...slug]'>` and join with
-`/` for the lookup. More specific routes still win — `/map` matches
-`app/map` before the catch-all is considered. Adding a real static route above
+`/` for the lookup. More specific routes still win — `/news` matches
+`app/news` before the catch-all is considered. Adding a real static route above
 the catch-all is safe.
 
 ### 3.2 `link.href` allows relative URLs
@@ -989,7 +989,6 @@ Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-desig
 - Nine menu links and three social URLs are `#` placeholders awaiting real values.
 - Newsletter submission has no provider, action, or validation.
 - Cookie Settings needs a consent manager; it is a JS trigger, not a URL.
-- `/map` and the seeded `explore/interactive-map` page overlap; one should redirect.
 - The Studio's Pages list is flat. It shows each page's resolved path in the subtitle,
   but does not nest children under their parent, which gets harder to scan as pages are added.
 - Markers and boundaries render only once Mapbox fires `load`, which needs the style request to
@@ -1015,7 +1014,7 @@ Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-desig
   `staffPage` types, with the /posts route and its components. The Studio's "Page Content" folder is
   now a flat "Pages" list.
 - `settings.landingPage` references the `page` shown at `/`; Presentation's `/` route resolves to it.
-  With none set, `/` redirects to `/map`.
+  With none set, `/` returns 404.
 - `studio/scripts/cleanupRemovedTypes.ts` deleted every page and all orphaned documents, and turned
   menu links to deleted pages into `#` placeholders. Re-run `seedFooterContent.ts` to recreate pages.
 
@@ -1109,3 +1108,20 @@ a category does not offer, or a key the frontend does not know, is ignored.
 A row is labelled by title, else date, else file name, so a record needs only one of them; Studio
 warns when a date-ordered or year-filtered category has an undated record. The seed's sort and filter
 settings per category are read from the Figma and need the client's confirmation.
+
+## 20. The interactive map is a page-builder block, not a route
+
+**Status:** Implemented
+
+`/map` is removed. The filterable map is the `mapExplorer` block, placed on a normal page
+(`explore/interactive-map`); the page's heading comes from a Hero Tertiary, so the block has no text
+fields. Map Preview stays the lightweight embed (heading, body, no filters). The map code lives in
+`frontend/components/map/`, and the block carries its data in its GROQ projection, so there are no
+standalone map queries. Filters write to the current pathname.
+
+**Why:** `/map` and the CMS page overlapped, and a route cannot be moved, reworded or given a hero
+in Studio. A block can.
+
+**Implication:** There is no redirect: old `/map` links 404. `/` with no landing page also 404s.
+`projectSettings.heading`, `intro` and `eyebrow` no longer feed the map and can be removed
+(tracked in [#44](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/44)). Two Map Explorers on one page share their URL filters.
