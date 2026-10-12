@@ -16,6 +16,7 @@ import {
 } from 'next-sanity'
 import ResolvedLink from '@/components/ResolvedLink'
 import Image from '@/components/SanityImage'
+import FaqItem from '@/components/blocks/FaqItem'
 import LinkRow from '@/components/ui/LinkRow'
 import {ExtractPageBuilderType} from '@/sanity/lib/types'
 import {linkResolver} from '@/sanity/lib/utils'
@@ -26,6 +27,14 @@ type AnchorLinkRow = NonNullable<
     NonNullable<ExtractPageBuilderType<'basicLeftRightText'>['rightContent']>[number],
     {_type: 'anchorLinks'}
   >['links']
+>[number]
+
+/** One item of an FAQ accordion, derived from the generated query result so it cannot drift. */
+type FaqAccordionItem = NonNullable<
+  Extract<
+    NonNullable<ExtractPageBuilderType<'jumpNavContent'>['content']>[number],
+    {_type: 'faqAccordion'}
+  >['items']
 >[number]
 
 export default function CustomPortableText({
@@ -69,6 +78,26 @@ export default function CustomPortableText({
                 icon={row.icon}
                 newTab={row.newTab}
               />
+            ))}
+          </div>
+        )
+      },
+      faqAccordion: ({value}) => {
+        // An item needs a question; an item with no answer still opens to nothing, so it is dropped.
+        const items = ((value?.items ?? []) as FaqAccordionItem[]).filter(
+          (item) => item?.question && item.answer && item.answer.length > 0,
+        )
+        if (items.length === 0) return null
+        return (
+          <div className="flex w-full flex-col gap-5">
+            {items.map((item) => (
+              <FaqItem key={item._key} question={item.question ?? ''}>
+                <CustomPortableText
+                  variant="basic"
+                  className="[--rich-text-color:var(--color-on-surface-dark)]"
+                  value={item.answer as PortableTextBlock[]}
+                />
+              </FaqItem>
             ))}
           </div>
         )

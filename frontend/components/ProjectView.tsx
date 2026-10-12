@@ -2,7 +2,6 @@ import Link from 'next/link'
 import type {PortableTextBlock} from 'next-sanity'
 
 import BlockImage from '@/components/blocks/BlockImage'
-import FaqItem from '@/components/blocks/FaqItem'
 import JumpNavLayout from '@/components/JumpNavLayout'
 import CustomPortableText from '@/components/PortableText'
 import {buildJumpNav} from '@/sanity/lib/jumpNav'
@@ -25,8 +24,6 @@ export default function ProjectView({
 }) {
   const body = project.body ?? []
   const {items, idByKey} = buildJumpNav(body)
-  // An unpublished FAQ dereferences to null.
-  const faqs = (project.faqs ?? []).flatMap((faq) => (faq?.question ? [faq] : []))
 
   const eyebrowText = settings?.eyebrow || 'Projects'
   const eyebrow = (
@@ -67,34 +64,13 @@ export default function ProjectView({
               />
             </div>
           )}
-          {(body.length > 0 || faqs.length > 0) && (
-            <div className="flex w-full flex-col gap-8">
-              {body.length > 0 && (
-                <CustomPortableText
-                  variant="project"
-                  className="w-full"
-                  value={body as PortableTextBlock[]}
-                  sectionIds={idByKey}
-                />
-              )}
-              {/* The heading above the FAQs is a Section heading the editor writes at the end of
-                  the page content, so it comes with its own nav link. */}
-              {faqs.length > 0 && (
-                <div className="flex w-full flex-col gap-5">
-                  {faqs.map((faq) => (
-                    <FaqItem key={faq._id} question={faq.question ?? ''}>
-                      {faq.answer && (
-                        <CustomPortableText
-                          variant="basic"
-                          className="[--rich-text-color:var(--color-on-background)] [--rich-text-size:14px]"
-                          value={faq.answer as PortableTextBlock[]}
-                        />
-                      )}
-                    </FaqItem>
-                  ))}
-                </div>
-              )}
-            </div>
+          {body.length > 0 && (
+            <CustomPortableText
+              variant="project"
+              className="w-full"
+              value={body as PortableTextBlock[]}
+              sectionIds={idByKey}
+            />
           )}
         </div>
       </JumpNavLayout>

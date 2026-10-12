@@ -406,6 +406,15 @@ const pageBuilderFields = /* groq */ `
             ${linkFields}
           }
         },
+        _type == "faqAccordion" => {
+          items[]{
+            ...,
+            answer[]{
+              ...,
+              ${markDefsFields}
+            }
+          }
+        },
         ${markDefsFields}
       }
     },
@@ -553,16 +562,16 @@ export const projectQuery = defineQuery(`
           ${linkFields}
         }
       },
+      _type == "faqAccordion" => {
+        items[]{
+          ...,
+          answer[]{
+            ...,
+            ${markDefsFields}
+          }
+        }
+      },
       ${markDefsFields}
-    },
-    // An unpublished FAQ dereferences to null; the page filters those out.
-    "faqs": faqs[]->{
-      _id,
-      question,
-      answer[]{
-        ...,
-        ${markDefsFields}
-      }
     }
   }
 `)

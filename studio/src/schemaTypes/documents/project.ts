@@ -61,15 +61,7 @@ export const project = defineType({
       type: 'array',
       of: jumpNavBodyMembers,
       description:
-        'The project page. Each “Section heading (H2)” becomes a link in the page’s left-hand nav. Leave empty for a page with just the title and image.',
-    }),
-    defineField({
-      name: 'faqs',
-      title: 'FAQs',
-      type: 'array',
-      of: [defineArrayMember({type: 'reference', to: [{type: 'faq'}]})],
-      description:
-        'Shown under the page content, in this order. Add your own heading (for example “Project FAQs” as a Section heading) at the end of the page content to introduce them and to get a link in the nav.',
+        'The project page. Each “Section heading (H2)” becomes a link in the page’s left-hand nav. Add an FAQ accordion block for questions and answers; put a Section heading above it to introduce it. Leave empty for a page with just the title and image.',
     }),
     defineField({
       name: 'property',

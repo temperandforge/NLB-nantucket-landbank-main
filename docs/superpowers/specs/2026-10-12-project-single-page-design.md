@@ -36,7 +36,8 @@ compose blocks.
 
 - `project` loses `link`. The page address is `/projects/` + slug, derived, never stored.
 - `project` gains `body` (rich text: normal, H2 as "Section heading", H3-H6, bullet/number lists,
-  link annotations, images, `anchorLinks`) and `faqs` (references to existing `faq` documents).
+  link annotations, images, `anchorLinks`, `faqAccordion`). FAQs are written in the body as an FAQ
+  accordion block (a list of question/answer items), not picked from FAQ documents.
 - The body's `of` array is currently inline in `jumpNavContent`. It moves to one shared constant
   (`studio/src/schemaTypes/objects/jumpNavBody.ts`) used by both, so the two cannot drift.
 - New singleton `singleProjectPage`, mirroring `singleNewsPage`: `eyebrow` (default "Projects"),
@@ -51,7 +52,7 @@ compose blocks.
   (published), `generateMetadata` (title, description from the body, Open Graph from the image),
   sitemap entries.
 - `ProjectView` (new): composes the shared jump-nav layout, the image, `CustomPortableText` with
-  `sectionIds`, the FAQ accordion (`FaqItem`, answers rendered with `CustomPortableText`) and the
+  `sectionIds`, the FAQ accordion block (`FaqItem`, answers rendered with `CustomPortableText`) and the
   eyebrow link. Eyebrow renders as plain text when `archiveLink` is unset or unresolved, never
   throws.
 - `JumpNavLayout` (extracted from `JumpNavContent.tsx`): heading, nav, content slot, sticky nav on
