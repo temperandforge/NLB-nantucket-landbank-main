@@ -12,6 +12,7 @@ import {heroTertiary} from '../objects/heroTertiary'
 import {heroVideo} from '../objects/heroVideo'
 import {imageCarousel} from '../objects/imageCarousel'
 import {jumpNavContent} from '../objects/jumpNavContent'
+import {growers} from '../objects/growers'
 import {mapPreview} from '../objects/mapPreview'
 import {mapTeaser} from '../objects/mapTeaser'
 import {missionStatement} from '../objects/missionStatement'
@@ -49,6 +50,7 @@ const pageBuilderBlocks = [
   imageCarousel,
   jobListings,
   jumpNavContent,
+  growers,
   mapPreview,
   mapTeaser,
   missionStatement,
