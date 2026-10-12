@@ -13,8 +13,8 @@ import {getPageQuery, pagesSlugs} from '@/sanity/lib/queries'
  * marked pathOnly and have no page of their own - so there is no real route hierarchy to build.
  * One catch-all owns every page path.
  *
- * More specific routes still win over this one: /news matches app/news, which Next.js checks
- * before a catch-all.
+ * More specific routes still win over this one: /news/<slug> matches app/news/[slug], which Next.js
+ * checks before a catch-all.
  */
 
 /** Split a derived path ("about-us/conservation") into catch-all segments. */

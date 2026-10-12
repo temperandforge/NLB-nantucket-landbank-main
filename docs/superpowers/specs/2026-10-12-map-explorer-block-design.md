@@ -5,7 +5,7 @@ Status: draft for review.
 ## Goal
 
 The filterable interactive map is a page-builder block an editor places on the map page entry
-(`explore/interactive-map`), instead of a hardcoded `/map` route. The route is removed.
+(`explore/map` (the seeds said `interactive-map`; the dataset slug is `map`)), instead of a hardcoded `/map` route. The route is removed.
 
 ## Decisions made
 

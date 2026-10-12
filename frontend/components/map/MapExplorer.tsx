@@ -18,7 +18,8 @@ import {
  * The interactive map's filtering UI.
  *
  * Client-side because the selected filters live in the URL and update without a navigation. The
- * data itself is fetched on the server and passed in - see page.tsx.
+ * data itself is fetched on the server in the block's GROQ projection and passed in - see
+ * components/blocks/MapExplorer.tsx.
  *
  * Filter options come from the propertyType and resource documents rather than a hardcoded list,
  * so a category the client adds in the Studio appears here without a deploy.

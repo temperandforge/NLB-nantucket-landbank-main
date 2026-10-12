@@ -153,7 +153,7 @@ since choosing arbitrarily would make the map depend on file ordering.
 
 `project` carries `image`, `description` and `link` for the map popup. The popup's "Handicap
 Accessible" and "Parking" badges are driven by resource **slugs**, named once in `RESOURCE_SLUG`
-in `frontend/app/map/types.ts`.
+in `frontend/components/map/types.ts`.
 
 **Why:** The popup design predates the move to Sanity and used a hardcoded `Property` type whose
 resource values were underscored (`handicap_accessible`). The `resource` documents use hyphens
@@ -313,8 +313,8 @@ through the same path, because the page query excludes it rather than the route 
 there is no real route hierarchy to build. One catch-all owns all page paths.
 
 **Implication:** `params.slug` is `string[]`; type it `PageProps<'/[...slug]'>` and join with
-`/` for the lookup. More specific routes still win — `/news` matches
-`app/news` before the catch-all is considered. Adding a real static route above
+`/` for the lookup. More specific routes still win — `/news/<slug>` matches
+`app/news/[slug]` before the catch-all is considered. Adding a real static route above
 the catch-all is safe.
 
 ### 3.2 `link.href` allows relative URLs
@@ -1114,7 +1114,7 @@ settings per category are read from the Figma and need the client's confirmation
 **Status:** Implemented
 
 `/map` is removed. The filterable map is the `mapExplorer` block, placed on a normal page
-(`explore/interactive-map`); the page's heading comes from a Hero Tertiary, so the block has no text
+(`explore/map`); the page's heading comes from a Hero Tertiary, so the block has no text
 fields. Map Preview stays the lightweight embed (heading, body, no filters). The map code lives in
 `frontend/components/map/`, and the block carries its data in its GROQ projection, so there are no
 standalone map queries. Filters write to the current pathname.
