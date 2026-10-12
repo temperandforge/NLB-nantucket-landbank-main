@@ -2,7 +2,7 @@
  * Brings forms seeded by an earlier seedForms.ts in line with the Figma: gives the five
  * single-field sections their mono question heading and the field its small "Select one" /
  * "Select all that apply" prompt, and fills the example placeholders on the email, phone and address
- * fields, and turns the Country text field into a select of countries.
+ * fields, and turns the Country and State/Province text fields into selects.
  *
  * Run from the studio directory:
  *   npx sanity exec scripts/updateFormHeadings.ts --with-user-token -- --dry
@@ -17,6 +17,7 @@
 import {getCliClient} from 'sanity/cli'
 
 import {COUNTRIES} from './data/countries'
+import {REGIONS} from './data/regions'
 
 const client = getCliClient({apiVersion: '2025-09-25'}).withConfig({
   perspective: 'raw',
@@ -45,6 +46,12 @@ const PLACEHOLDERS: Record<string, string> = {
   'address-line-2': 'Address line 2 (optional)',
 }
 
+/** Text fields to turn into selects, by field name. */
+const SELECTS: Record<string, {options: string[]; placeholder: string}> = {
+  country: {options: COUNTRIES, placeholder: 'Select a country'},
+  'state-province': {options: REGIONS, placeholder: 'Select a state or province'},
+}
+
 type Doc = {
   _id: string
   title: string
@@ -66,11 +73,12 @@ async function main() {
     let count = 0
     for (const section of doc.sections ?? []) {
       for (const f of section.fields ?? []) {
-        if (f.name?.current === 'country' && f.fieldType === 'text') {
+        const list = f.name?.current ? SELECTS[f.name.current] : undefined
+        if (list && f.fieldType === 'text') {
           const at = `sections[_key=="${section._key}"].fields[_key=="${f._key}"]`
           set[`${at}.fieldType`] = 'select'
-          set[`${at}.options`] = COUNTRIES
-          set[`${at}.placeholder`] = 'Select a country'
+          set[`${at}.options`] = list.options
+          set[`${at}.placeholder`] = list.placeholder
           count += 1
           continue
         }
