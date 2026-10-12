@@ -19,6 +19,7 @@ import MissionStatement from '@/components/blocks/MissionStatement'
 import ContactForm from '@/components/blocks/ContactForm'
 import DownloadBlock from '@/components/blocks/DownloadBlock'
 import Growers from '@/components/blocks/Growers'
+import MapExplorerBlock from '@/components/blocks/MapExplorer'
 import MapPreview from '@/components/blocks/MapPreview'
 import MapTeaser from '@/components/blocks/MapTeaser'
 import JumpNavContent from '@/components/blocks/JumpNavContent'
@@ -55,6 +56,7 @@ const Blocks = {
   timeline: Timeline,
   downloadBlock: DownloadBlock,
   growers: Growers,
+  mapExplorer: MapExplorerBlock,
   mapPreview: MapPreview,
   mapTeaser: MapTeaser,
   contactForm: ContactForm,

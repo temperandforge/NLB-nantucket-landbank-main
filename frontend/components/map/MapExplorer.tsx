@@ -1,7 +1,7 @@
 'use client'
 
 import {useMemo} from 'react'
-import {useRouter, useSearchParams} from 'next/navigation'
+import {usePathname, useRouter, useSearchParams} from 'next/navigation'
 
 import {MapboxMap} from './MapboxMap'
 import {MultiSelectDropdown} from './MultiSelectDropdown'
@@ -36,6 +36,7 @@ function parseParam(value: string | null): string[] {
 
 export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
   const router = useRouter()
+  const pathname = usePathname()
   const searchParams = useSearchParams()
 
   const propertyTypeOptions = useMemo(() => toFilterOptions(filters.propertyTypes), [filters])
@@ -65,7 +66,7 @@ export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
     }
 
     const query = params.toString()
-    router.replace(query ? `/map?${query}` : '/map', {scroll: false})
+    router.replace(query ? `${pathname}?${query}` : pathname, {scroll: false})
   }
 
   const filteredProjects = useMemo(() => {

@@ -1483,6 +1483,29 @@
     }
   },
   {
+    "name": "mapExplorer",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "mapExplorer"
+          }
+        },
+        "disabled": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
     "name": "growers",
     "type": "type",
     "value": {
@@ -6834,6 +6857,21 @@
                 "rest": {
                   "type": "inline",
                   "name": "jumpNavContent"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "mapExplorer"
                 }
               },
               {
