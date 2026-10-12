@@ -22,12 +22,15 @@ export default function FilterTabs({
   active,
   label,
   onChoose,
+  showAll = true,
 }: {
   tabs: FilterTab[]
   active: string | null
   /** Accessible name of the group, e.g. "Filter staff by department". */
   label: string
   onChoose?: (slug: string | null) => void
+  /** The leading "All" tab. Off for a list where a combined view has no sensible order. Default true. */
+  showAll?: boolean
 }) {
   const groupRef = useRef<HTMLDivElement>(null)
   const mounted = useRef(false)
@@ -55,14 +58,16 @@ export default function FilterTabs({
           aria-label={label}
           className="-mx-(--tf-x) flex items-center gap-10 overflow-x-auto px-(--tf-x) py-2 scroll-pl-(--tf-x) [mask-image:linear-gradient(to_right,transparent,black_var(--tf-x),black_calc(100%-var(--tf-x)),transparent)]"
         >
-          <button
-            type="button"
-            aria-pressed={active === null}
-            onClick={onChoose ? () => onChoose(null) : undefined}
-            className={cls(active === null)}
-          >
-            All
-          </button>
+          {showAll && (
+            <button
+              type="button"
+              aria-pressed={active === null}
+              onClick={onChoose ? () => onChoose(null) : undefined}
+              className={cls(active === null)}
+            >
+              All
+            </button>
+          )}
           {tabs.map((tab) => (
             <button
               key={tab.slug}
