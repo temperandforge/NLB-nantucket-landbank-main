@@ -23,6 +23,7 @@ import {peopleGrid} from '../objects/peopleGrid'
 import {projectGrid} from '../objects/projectGrid'
 import {propertyArchive} from '../objects/propertyArchive'
 import {projectPreview} from '../objects/projectPreview'
+import {propertiesPreview} from '../objects/propertiesPreview'
 import {newsPreview} from '../objects/newsPreview'
 import {eventsGrid} from '../objects/eventsGrid'
 import {newsArchive} from '../objects/newsArchive'
@@ -59,6 +60,7 @@ const pageBuilderBlocks = [
   peopleGrid,
   projectGrid,
   projectPreview,
+  propertiesPreview,
   propertyArchive,
   recordsArchive,
   timeline,

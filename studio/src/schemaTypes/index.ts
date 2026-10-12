@@ -42,6 +42,7 @@ import {projectGrid} from './objects/projectGrid'
 import {propertyArchive} from './objects/propertyArchive'
 import {recordsArchive} from './objects/recordsArchive'
 import {projectPreview} from './objects/projectPreview'
+import {propertiesPreview} from './objects/propertiesPreview'
 import {faqList} from './objects/faqList'
 import {jobListings} from './objects/jobListings'
 import {newsPreview} from './objects/newsPreview'
@@ -122,6 +123,7 @@ export const schemaTypes = [
   propertyArchive,
   recordsArchive,
   projectPreview,
+  propertiesPreview,
   eventsPreview,
   eventsGrid,
   ctaContact,
