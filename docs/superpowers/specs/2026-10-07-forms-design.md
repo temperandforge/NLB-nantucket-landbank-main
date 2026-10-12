@@ -237,6 +237,11 @@ and the discrepancy flagged.
   three env vars in `frontend/.env.example`, and settling `X-Forwarded-For` trust with the hosting
   target (with #21). The issue also lists the smaller accessibility, Studio and script-check
   follow-ups from the branch review. Issue: #27.
+- **Hover state has no border in the Figma**, so a hovered field disappears into the page
+  background. Needs a design decision. Issue: #46.
+- **A single select cannot be cleared once chosen** in the styled listbox. Issue: #47.
+- **Seeded labels, placeholders and options** that differ from the Figma or are stand-in client
+  content. Issue: #48.
 
 ## Notes
 
