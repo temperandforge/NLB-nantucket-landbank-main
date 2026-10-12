@@ -35,14 +35,17 @@ export default function JumpNavLayout({
       }
     >
       <div
+        // The column is capped to the visible height (viewport minus the sticky offset, top and
+        // bottom breathing room) and the nav scrolls inside it, so every link stays reachable on a
+        // short screen or with a long list. Title stays pinned; only the nav rows scroll.
         className={
           project
-            ? 'flex w-full flex-col gap-12 self-start lg:sticky lg:top-[calc(var(--header-offset,var(--header-height))+2.5rem)] lg:max-w-[553px] lg:flex-1 lg:transition-[top] lg:duration-200 lg:ease-out motion-reduce:transition-none'
-            : 'md:sticky md:top-[calc(var(--header-offset,var(--header-height))+2.5rem)] md:transition-[top] md:duration-200 md:ease-out motion-reduce:transition-none self-start'
+            ? 'flex w-full flex-col gap-12 self-start lg:sticky lg:top-[calc(var(--header-offset,var(--header-height))+2.5rem)] lg:max-h-[calc(100dvh-var(--header-offset,var(--header-height))-5rem)] lg:max-w-[553px] lg:flex-1 lg:transition-[top] lg:duration-200 lg:ease-out motion-reduce:transition-none'
+            : 'md:sticky md:top-[calc(var(--header-offset,var(--header-height))+2.5rem)] md:flex md:max-h-[calc(100dvh-var(--header-offset,var(--header-height))-5rem)] md:flex-col md:transition-[top] md:duration-200 md:ease-out motion-reduce:transition-none self-start'
         }
       >
         {project ? (
-          <div className="flex w-full max-w-[560px] flex-col gap-6">
+          <div className="flex w-full max-w-[560px] shrink-0 flex-col gap-6">
             {eyebrow}
             {heading && <Heading className="w-full text-headline-xl text-on-background">{heading}</Heading>}
           </div>
@@ -53,7 +56,14 @@ export default function JumpNavLayout({
           </>
         )}
         {items.length > 0 && (
-          <nav className="flex flex-col" aria-label={navLabel}>
+          <nav
+            className={`flex flex-col [scrollbar-color:var(--color-border-light)_transparent] [scrollbar-width:thin] ${
+              project
+                ? 'lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain'
+                : 'md:min-h-0 md:overflow-y-auto md:overscroll-contain'
+            }`}
+            aria-label={navLabel}
+          >
             {items.map((item) => (
               <a
                 key={item.id}
