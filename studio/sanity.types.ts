@@ -96,6 +96,12 @@ export type CtaContact = {
   disabled?: boolean
 }
 
+export type EventsGrid = {
+  _type: 'eventsGrid'
+  emptyText?: string
+  disabled?: boolean
+}
+
 export type EventsPreview = {
   _type: 'eventsPreview'
   eyebrow?: string
@@ -653,10 +659,48 @@ export type Event = {
   _updatedAt: string
   _rev: string
   title: string
+  slug: Slug
   start: string
   end?: string
+  image?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
   location?: string
   description?: string
+  body?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>
+          text?: string
+          _type: 'span'
+          _key: string
+        }>
+        style?: 'normal' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+        listItem?: 'bullet' | 'number'
+        markDefs?: Array<
+          {
+            _key: string
+          } & Link
+        >
+        level?: number
+        _type: 'block'
+        _key: string
+      }
+    | {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        _type: 'image'
+        _key: string
+      }
+  >
 }
 
 export type NewsCategoryReference = {
@@ -998,6 +1042,9 @@ export type Page = {
       } & DownloadBlock)
     | ({
         _key: string
+      } & EventsGrid)
+    | ({
+        _key: string
       } & EventsPreview)
     | ({
         _key: string
@@ -1302,6 +1349,7 @@ export type AllSanitySchemaTypes =
   | MenuGroup
   | SanityImageAssetReference
   | CtaContact
+  | EventsGrid
   | EventsPreview
   | ProjectReference
   | ProjectPreview
