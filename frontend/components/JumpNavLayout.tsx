@@ -37,8 +37,8 @@ export default function JumpNavLayout({
       <div
         className={
           project
-            ? 'flex w-full flex-col gap-12 self-start lg:sticky lg:top-[calc(var(--header-height)+2.5rem)] lg:max-w-[553px] lg:flex-1'
-            : 'md:sticky md:top-[calc(var(--header-height)+2.5rem)] self-start'
+            ? 'flex w-full flex-col gap-12 self-start lg:sticky lg:top-[calc(var(--header-offset,var(--header-height))+2.5rem)] lg:max-w-[553px] lg:flex-1 lg:transition-[top] lg:duration-200 lg:ease-out motion-reduce:transition-none'
+            : 'md:sticky md:top-[calc(var(--header-offset,var(--header-height))+2.5rem)] md:transition-[top] md:duration-200 md:ease-out motion-reduce:transition-none self-start'
         }
       >
         {project ? (
