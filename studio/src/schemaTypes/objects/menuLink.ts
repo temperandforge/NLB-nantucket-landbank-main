@@ -1,6 +1,8 @@
 import {defineField, defineType} from 'sanity'
 import {LinkIcon} from '@sanity/icons'
 
+import {buildPagePath} from '../../lib/pageHierarchy'
+
 /**
  * A single clickable menu entry - a label plus the shared 'link' object, so menus get
  * URL / page reference support and 'open in new tab' for free, and link
@@ -43,9 +45,11 @@ export const menuLink = defineType({
       label: 'label',
       linkType: 'link.linkType',
       href: 'link.href',
-      pageSlug: 'link.page->slug.current',
+      pageSlug: 'link.page.slug.current',
+      parentSlug: 'link.page.parent.slug.current',
+      grandparentSlug: 'link.page.parent.parent.slug.current',
     },
-    prepare({label, linkType, href, pageSlug}) {
+    prepare({label, linkType, href, pageSlug, parentSlug, grandparentSlug}) {
       // Show where the link actually points, so a menu of a dozen items is scannable
       // without opening each one.
       let subtitle: string | undefined
@@ -54,7 +58,11 @@ export const menuLink = defineType({
           subtitle = href
           break
         case 'page':
-          subtitle = pageSlug ? `/${pageSlug}` : 'No page selected'
+          // Dot paths, not `->`: the preview store follows references itself. Ancestors come
+          // first, as in the page's own preview.
+          subtitle = pageSlug
+            ? `/${buildPagePath([grandparentSlug, parentSlug, pageSlug])}`
+            : 'No page selected'
           break
         default:
           subtitle = undefined
