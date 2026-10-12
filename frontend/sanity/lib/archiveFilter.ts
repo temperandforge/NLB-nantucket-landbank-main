@@ -69,20 +69,20 @@ export const parseDepartment = (search: string, tabs: ReadonlyArray<FilterTab>) 
 export const withDepartment = (search: string, slug: string | null) =>
   withFilter(search, DEPARTMENT_PARAM, slug)
 
-// Projects, by property type.
+// Projects, by project type.
 
 export const PROJECT_TYPE_PARAM = 'type'
 export const PROJECT_FILTER_LABEL = 'Filter projects by type'
 
-type WithPropertyTypes = {propertyTypes?: ReadonlyArray<Category | null> | null}
+type WithProjectTypes = {projectTypes?: ReadonlyArray<Category | null> | null}
 
-/** One tab per property type that at least one project has. Resources (amenities) get none. */
-export function projectTabs(projects: ReadonlyArray<WithPropertyTypes>): FilterTab[] {
-  return categoryTabs(projects.flatMap((project) => project.propertyTypes ?? []))
+/** One tab per project type that at least one project has. */
+export function projectTabs(projects: ReadonlyArray<WithProjectTypes>): FilterTab[] {
+  return categoryTabs(projects.flatMap((project) => project.projectTypes ?? []))
 }
 
-export function filterByPropertyType<T extends WithPropertyTypes>(projects: T[], slug: string | null): T[] {
-  return slug ? projects.filter((p) => p.propertyTypes?.some((type) => type?.slug === slug)) : projects
+export function filterByProjectType<T extends WithProjectTypes>(projects: T[], slug: string | null): T[] {
+  return slug ? projects.filter((p) => p.projectTypes?.some((type) => type?.slug === slug)) : projects
 }
 
 export const parseProjectType = (search: string, tabs: ReadonlyArray<FilterTab>) =>

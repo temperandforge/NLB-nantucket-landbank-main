@@ -325,12 +325,12 @@ const pageBuilderFields = /* groq */ `
     },
     _type == "projectGrid" => {
       ...,
-      "projects": *[_type == "property" && defined(slug.current)] | order(name asc) {
+      "projects": *[_type == "project" && defined(slug.current)] | order(name asc) {
         _id,
         name,
         image,
         link,
-        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order}
+        "projectTypes": projectTypes[]->{"slug": slug.current, title}
       }
     },
     _type == "propertyArchive" => {
@@ -348,10 +348,24 @@ const pageBuilderFields = /* groq */ `
     },
     _type == "imageCarousel" => {
       ...,
-      images[]{
-        ...,
-        ${linkFields}
-      }
+      "projects": select(
+        source == "category" => *[
+          _type == "project" && defined(slug.current)
+          && ^.category._ref in projectTypes[]._ref
+        ] | order(name asc) {
+          _id,
+          name,
+          image,
+          link
+        },
+        projects[]->{
+          _id,
+          name,
+          image,
+          link
+        }
+      ),
+      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage
     },
     _type == "projectPreview" => {
       ...,

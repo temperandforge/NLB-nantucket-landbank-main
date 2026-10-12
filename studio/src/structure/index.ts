@@ -11,6 +11,7 @@ import {
   HelpCircleIcon,
   MenuIcon,
   PinIcon,
+  ProjectsIcon,
   TagIcon,
   UsersIcon,
 } from '@sanity/icons'
@@ -92,6 +93,20 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
                 .child(
                   S.document().schemaType('projectSettings').documentId('projectSettings'),
                 ),
+            ]),
+        ),
+      // Projects: initiatives the Land Bank runs, with their own categories. Separate from
+      // properties (the map's parcels).
+      S.listItem()
+        .title('Projects')
+        .icon(ProjectsIcon)
+        .child(
+          S.list()
+            .title('Projects')
+            .items([
+              S.documentTypeListItem('project').title('Projects').icon(ProjectsIcon),
+              S.divider(),
+              S.documentTypeListItem('projectType').title('Project Types').icon(TagIcon),
             ]),
         ),
       S.listItem()

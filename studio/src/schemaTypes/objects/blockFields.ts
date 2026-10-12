@@ -64,14 +64,9 @@ export const headingLevelField = (initial: 'h1' | 'h2') =>
     description: 'Use H1 only once per page.',
   })
 
-const settingsFieldset = {
-  name: 'settings',
-  title: 'Settings',
-  options: {collapsible: true, collapsed: true},
-}
-
 /**
- * Defines a page-builder block. Adds the "Hide this block" setting and marks hidden blocks in the
+ * Defines a page-builder block. Content fields go on a Content tab and the settings on a Settings
+ * tab. Adds the "Hide this block" setting and marks hidden blocks in the
  * Studio list, so every block gets them the same way. A hidden block stays in the page with its
  * content but is not shown on the live site (see the pageBuilder projection in queries.ts); in
  * Presentation it is shown with a "Hidden" badge so editors can still see and select it.
@@ -80,14 +75,17 @@ export function defineBlock(config: ObjectDefinition) {
   const preview = config.preview
   return defineType({
     ...config,
-    fieldsets: [...(config.fieldsets ?? []), settingsFieldset],
+    groups: [
+      {name: 'content', title: 'Content', default: true},
+      {name: 'settings', title: 'Settings'},
+    ],
     fields: [
-      ...config.fields,
+      ...config.fields.map((field) => ({...field, group: field.group ?? 'content'})),
       defineField({
         name: 'disabled',
         title: 'Hide this block',
         type: 'boolean',
-        fieldset: 'settings',
+        group: 'settings',
         initialValue: false,
         description:
           'Keeps the block in the page but does not show it on the site. Use it to take a block out without deleting it.',

@@ -4,10 +4,10 @@ import {realHref} from '@/sanity/lib/utils'
 
 import type {ProjectItem} from './types'
 
-/** A project (Figma: image with its property types as tags over the bottom-left, name below). */
+/** A project (Figma: image with its project types as tags over the bottom-left, name below). */
 export default function CardProject({project}: {project: ProjectItem}) {
   // Taxonomies that were unpublished dereference to null.
-  const tags = (project.propertyTypes ?? []).flatMap((tag) =>
+  const tags = (project.projectTypes ?? []).flatMap((tag) =>
     tag?.title ? [{key: tag.slug ?? tag.title, label: tag.title}] : [],
   )
   const card = (

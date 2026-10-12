@@ -39,6 +39,7 @@ next-env.d.ts
 **/*.local.*
 **/.worktrees
 .agents
+.playwright-mcp
 .claude/skills
 skills.json
 # Raw WordPress extraction and import reports (names and local photo paths)

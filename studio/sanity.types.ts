@@ -15,22 +15,6 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: ../sanity.schema.json
-export type SanityImageAssetReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
-}
-
-export type CarouselImageImage = {
-  asset?: SanityImageAssetReference
-  media?: unknown // Unable to locate the referenced type "carouselImage.image.media" in schema
-  hotspot?: SanityImageHotspot
-  crop?: SanityImageCrop
-  alt?: string
-  _type: 'image'
-}
-
 export type SanityFileAssetReference = {
   _ref: string
   _type: 'reference'
@@ -83,6 +67,13 @@ export type MenuGroup = {
   >
 }
 
+export type SanityImageAssetReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
+}
+
 export type CtaContact = {
   _type: 'ctaContact'
   heading?: string
@@ -112,11 +103,11 @@ export type EventsPreview = {
   disabled?: boolean
 }
 
-export type PropertyReference = {
+export type ProjectReference = {
   _ref: string
   _type: 'reference'
   _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'property'
+  [internalGroqTypeReferenceTo]?: 'project'
 }
 
 export type ProjectPreview = {
@@ -127,7 +118,7 @@ export type ProjectPreview = {
   projects?: Array<
     {
       _key: string
-    } & PropertyReference
+    } & ProjectReference
   >
   disabled?: boolean
 }
@@ -163,6 +154,12 @@ export type FaqList = {
   _type: 'faqList'
   heading?: string
   description?: string
+  disabled?: boolean
+}
+
+export type NewsArchive = {
+  _type: 'newsArchive'
+  showFilters?: boolean
   disabled?: boolean
 }
 
@@ -221,6 +218,13 @@ export type ContactForm = {
   disabled?: boolean
 }
 
+export type PropertyReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'property'
+}
+
 export type MapTeaser = {
   _type: 'mapTeaser'
   eyebrow?: string
@@ -254,16 +258,23 @@ export type Timeline = {
   disabled?: boolean
 }
 
+export type ProjectTypeReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'projectType'
+}
+
 export type ImageCarousel = {
   _type: 'imageCarousel'
   eyebrow?: string
-  images?: Array<{
-    image: CarouselImageImage
-    caption?: string
-    link?: Link
-    _type: 'carouselImage'
-    _key: string
-  }>
+  source?: 'manual' | 'category'
+  projects?: Array<
+    {
+      _key: string
+    } & ProjectReference
+  >
+  category?: ProjectTypeReference
   disabled?: boolean
 }
 
@@ -474,6 +485,16 @@ export type Slug = {
   source?: string
 }
 
+export type ProjectType = {
+  _id: string
+  _type: 'projectType'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+}
+
 export type PropertyType = {
   _id: string
   _type: 'propertyType'
@@ -656,6 +677,32 @@ export type Article = {
     } & NewsCategoryReference
   >
   link?: Link
+}
+
+export type Project = {
+  _id: string
+  _type: 'project'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  slug: Slug
+  image?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  description?: string
+  link?: string
+  projectTypes?: Array<
+    {
+      _key: string
+    } & ProjectTypeReference
+  >
+  property?: PropertyReference
 }
 
 export type PropertyTypeReference = {
@@ -923,6 +970,9 @@ export type Page = {
       } & MissionStatement)
     | ({
         _key: string
+      } & NewsArchive)
+    | ({
+        _key: string
       } & NewsPreview)
     | ({
         _key: string
@@ -1179,8 +1229,6 @@ export type SanityImageAsset = {
 }
 
 export type AllSanitySchemaTypes =
-  | SanityImageAssetReference
-  | CarouselImageImage
   | SanityFileAssetReference
   | DownloadFile
   | SocialLink
@@ -1188,24 +1236,28 @@ export type AllSanitySchemaTypes =
   | InfoColumn
   | MenuLink
   | MenuGroup
+  | SanityImageAssetReference
   | CtaContact
   | EventsPreview
-  | PropertyReference
+  | ProjectReference
   | ProjectPreview
   | PropertyArchive
   | ProjectGrid
   | PeopleGrid
   | JobListings
   | FaqList
+  | NewsArchive
   | NewsPreview
   | MissionStatement
   | AnchorLinks
   | PageReference
   | Link
   | ContactForm
+  | PropertyReference
   | MapTeaser
   | DownloadBlock
   | Timeline
+  | ProjectTypeReference
   | ImageCarousel
   | JumpNavContent
   | BasicLeftRightText
@@ -1219,6 +1271,7 @@ export type AllSanitySchemaTypes =
   | Button
   | Resource
   | Slug
+  | ProjectType
   | PropertyType
   | NewsCategory
   | DepartmentReference
@@ -1234,6 +1287,7 @@ export type AllSanitySchemaTypes =
   | Event
   | NewsCategoryReference
   | Article
+  | Project
   | PropertyTypeReference
   | ResourceReference
   | Property

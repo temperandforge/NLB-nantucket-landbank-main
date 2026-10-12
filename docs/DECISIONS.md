@@ -88,12 +88,13 @@ field.
 are selectable but render nothing until an icon is exported from Figma into
 `frontend/components/icons`. A platform with no icon is skipped, not rendered as an empty box.
 
-### 1.7 Projects are the map's properties, and their categorisation is referenced
+### 1.7 Properties are the map's parcels, and their categorisation is referenced
 
 **Status:** Implemented
 
-`project` is a Land Bank property — the parcels, beaches, trails and ponds on the interactive map.
-It replaced the hardcoded array in `frontend/app/map/properties.ts`. Categorisation is by reference
+`property` is a Land Bank property — the parcels, beaches, trails and ponds on the interactive map.
+It replaced the hardcoded array in `frontend/app/map/properties.ts`. (The old `project` type was
+migrated into it; a new, unrelated `project` type was introduced later — see 1.7a.) Categorisation is by reference
 to `propertyType` and `resource` documents.
 
 **Why:** The taxonomies were TypeScript union types plus parallel label maps, so adding a category
@@ -103,6 +104,18 @@ meant a code change and a deploy. As documents, the client owns them.
 documents, and `frontend/app/map/types.ts` derives its types from the generated query results.
 A dereferenced taxonomy entry is null when its document is unpublished, so consumers filter those
 out rather than rendering a blank option.
+
+### 1.7a Projects are separate from properties
+
+**Status:** Implemented
+
+`project` is an initiative the Land Bank carries out (image, description, link), categorised by
+referenced `projectType` documents and optionally pointing at the `property` it happens on. It is
+not on the map. Project Grid, Project Preview and Image Carousel read projects; the map and the
+Property Archive read properties. Properties and projects have separate type taxonomies.
+
+**Why:** A parcel and an initiative are different things with different editors' needs; reusing
+`property` for both forced projects to carry map data and parcel categories.
 
 ### 1.8 A taxonomy's slug is the stable key, its title is the label
 

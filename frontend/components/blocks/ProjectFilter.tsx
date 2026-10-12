@@ -5,14 +5,14 @@ import FilterTabs from '@/components/ui/FilterTabs'
 import {
   PROJECT_FILTER_LABEL,
   PROJECT_TYPE_PARAM,
-  filterByPropertyType,
+  filterByProjectType,
   projectTabs,
 } from '@/sanity/lib/archiveFilter'
 
 import ProjectList from './ProjectList'
 import {useQueryFilter} from './useQueryFilter'
 
-/** The projects with property-type tabs. Only used when there are tabs to show (ProjectGrid renders a plain list otherwise). */
+/** The projects with project-type tabs. Only used when there are tabs to show (ProjectGrid renders a plain list otherwise). */
 export default function ProjectFilter({projects}: {projects: ProjectItem[]}) {
   const tabs = projectTabs(projects)
   const {active, choose} = useQueryFilter(PROJECT_TYPE_PARAM, tabs)
@@ -21,7 +21,7 @@ export default function ProjectFilter({projects}: {projects: ProjectItem[]}) {
     <div className="flex w-full flex-col items-start gap-16">
       <FilterTabs tabs={tabs} active={active} label={PROJECT_FILTER_LABEL} onChoose={choose} />
       <div className="tf-px mx-auto w-full">
-        <ProjectList projects={filterByPropertyType(projects, active)} />
+        <ProjectList projects={filterByProjectType(projects, active)} />
       </div>
     </div>
   )

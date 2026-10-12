@@ -36,9 +36,11 @@ Design docs live in [docs/superpowers/specs/](docs/superpowers/specs/).
 ## Properties and the map
 
 - **`property` is a Land Bank property** — the things on the interactive map and the Properties
-  archive. It replaced the `project` type (migrated by `studio/scripts/migrateProjectsToProperties.ts`),
-  which replaced the hardcoded `frontend/app/map/properties.ts`. The page-builder blocks are still
-  named `projectGrid` and `projectPreview`; they read properties.
+  archive. It replaced the old `project` type (migrated by `studio/scripts/migrateProjectsToProperties.ts`),
+  which replaced the hardcoded `frontend/app/map/properties.ts`.
+- **`project` is a separate, newer type** — a Land Bank initiative, categorised by `projectType`,
+  optionally referencing a `property`. `projectGrid`, `projectPreview` and `imageCarousel` read
+  projects; the map and `propertyArchive` read properties. See DECISIONS 1.7a.
 - **Boundary geometry is not stored per property.** One GeoJSON FeatureCollection on
   `projectSettings.boundaryData` holds every boundary; a property stores only `boundaryId`.
 - **Which feature property holds the identifier is configurable** (`boundaryIdProperty`). The file
