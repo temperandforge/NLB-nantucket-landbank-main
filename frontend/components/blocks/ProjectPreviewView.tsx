@@ -36,21 +36,28 @@ export default function ProjectPreviewView({
 
   return (
     <section className="w-full bg-background tf-px py-s5">
-      <div className="flex w-full flex-col gap-6 tf-max-w lg:flex-row">
+      {/* Below 1280px the numbered cards drop to their own row under the panel; below 768px they
+          stack in one column. */}
+      <div className="flex w-full flex-col gap-6 tf-max-w xl:flex-row">
         {hasPanel && (
-          <div className="flex min-h-[28rem] flex-col items-start justify-between gap-10 bg-surface-dark p-6 text-on-surface-dark lg:h-[644px] lg:min-h-0 lg:w-[425px] lg:shrink-0">
+          <div className="flex min-h-[28rem] flex-col items-start justify-between gap-10 bg-surface-dark p-6 text-on-surface-dark md:min-h-0 md:gap-16 xl:h-[644px] xl:w-[425px] xl:shrink-0 xl:gap-10">
             {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
             {body && <p className="w-full font-sans text-body-base leading-[1.6]">{body}</p>}
             {button && <ButtonLink label={button.label} href={button.href} rightIcon />}
           </div>
         )}
         {shown.length > 0 && (
-          <ol className="m-0 grid min-w-0 flex-1 list-none grid-cols-1 gap-6 p-0 sm:grid-cols-2 lg:flex lg:items-center">
+          // Three equal columns on one grid, so every card is the same width (and so the same image
+          // size) and the two rows, header and image, line up across the cards however many lines a
+          // name wraps to. The divider is drawn in the gap, not inside a column, for the same reason.
+          <ol className="m-0 grid min-w-0 flex-1 list-none grid-cols-1 gap-10 p-0 md:grid-cols-3 md:gap-x-6 md:gap-y-6 xl:content-center">
             {shown.map((project, index) => {
               const href = project.slug ? projectHref(project.slug) : null
+              const cardClass =
+                'flex min-w-0 flex-col items-start gap-6 md:row-span-2 md:grid md:grid-rows-subgrid md:gap-y-6'
               const card = (
                 <>
-                  <div className="flex w-full flex-col items-start gap-8 text-on-background lg:gap-32">
+                  <div className="flex w-full flex-col items-start gap-8 text-on-background md:gap-16 xl:gap-32">
                     <span className="text-headline-xl whitespace-nowrap">
                       {String(index + 1).padStart(2, '0')}
                     </span>
@@ -60,7 +67,7 @@ export default function ProjectPreviewView({
                     <BlockImage
                       image={project.image}
                       width={692}
-                      sizes="(min-width: 1024px) 20vw, 50vw"
+                      sizes="(min-width: 1280px) 20vw, (min-width: 768px) 30vw, 100vw"
                       fill
                       className="size-full object-cover"
                     />
@@ -68,16 +75,20 @@ export default function ProjectPreviewView({
                 </>
               )
               return (
-                <li key={project._id} className="flex min-w-0 flex-1 items-stretch gap-6 self-stretch">
-                  {index > 0 && (
-                    <span className="hidden w-px shrink-0 self-stretch bg-border-light lg:block" aria-hidden="true" />
-                  )}
+                <li
+                  key={project._id}
+                  className={`relative min-w-0 md:row-span-2 md:grid md:grid-rows-subgrid ${
+                    index > 0
+                      ? 'md:before:absolute md:before:inset-y-0 md:before:-left-3 md:before:w-px md:before:bg-border-light'
+                      : ''
+                  }`}
+                >
                   {href ? (
-                    <a href={href} className="flex min-w-0 flex-1 flex-col items-start gap-6">
+                    <a href={href} className={cardClass}>
                       {card}
                     </a>
                   ) : (
-                    <div className="flex min-w-0 flex-1 flex-col items-start gap-6">{card}</div>
+                    <div className={cardClass}>{card}</div>
                   )}
                 </li>
               )
