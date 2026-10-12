@@ -39,7 +39,7 @@ export default function CustomPortableText({
   /** Block _key -> id for H2 section headings, so a jump nav can link to them. */
   sectionIds?: Record<string, string>
   /** `prose` uses Tailwind Typography; `basic` uses the nlb-design rich-text styles. */
-  variant?: 'prose' | 'basic' | 'article'
+  variant?: 'prose' | 'basic' | 'article' | 'project'
 }) {
   const components: PortableTextComponents = {
     types: {
@@ -169,7 +169,9 @@ export default function CustomPortableText({
       className={
         variant === 'basic'
           ? `rich-text-basic ${className ?? ''}`
-          : variant === 'article'
+          : variant === 'project'
+            ? `rich-text-project ${className ?? ''}`
+            : variant === 'article'
             ? `rich-text-article ${className ?? ''}`
             : `prose-a:text-brand prose dark:prose-invert ${className}`
       }

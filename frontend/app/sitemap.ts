@@ -1,6 +1,6 @@
 import {MetadataRoute} from 'next'
 import {sanityFetch} from '@/sanity/lib/live'
-import {articleSitemapData, sitemapData} from '@/sanity/lib/queries'
+import {articleSitemapData, projectSitemapData, sitemapData} from '@/sanity/lib/queries'
 import {headers} from 'next/headers'
 
 /**
@@ -41,6 +41,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
       changeFrequency: 'monthly',
       url: `${domain}/news/${article.slug}`,
+    })
+  }
+
+  const projects = await sanityFetch({query: projectSitemapData})
+  for (const project of projects.data) {
+    if (!project.slug) continue
+    sitemap.push({
+      lastModified: project._updatedAt || new Date(),
+      priority: 0.6,
+      changeFrequency: 'monthly',
+      url: `${domain}/projects/${project.slug}`,
     })
   }
 
