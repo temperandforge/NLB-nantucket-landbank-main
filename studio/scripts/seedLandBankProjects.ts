@@ -10,8 +10,7 @@
  * the id). Idempotent: a project is matched on its slug among published documents and drafts and
  * skipped if it exists, so it never edits an existing project. It writes no images, no project
  * types and no property references - the source page has none to copy - so add those in Studio.
- * Every link is the `#` placeholder: the old site's pages are not this site's, so the real
- * paths are not known yet.
+ * Projects have a page of their own (/projects/<slug>), so they carry no link field.
  *
  * Descriptions are the page's own teaser text, copied as written.
  */
@@ -112,7 +111,6 @@ async function main() {
         name,
         slug: {_type: 'slug', current: slug},
         description,
-        link: '#',
       })
       console.log(`  + ${slug} (${doc._id})`)
     }
