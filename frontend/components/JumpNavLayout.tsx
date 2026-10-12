@@ -45,10 +45,13 @@ export default function JumpNavLayout({
         }
       >
         {project ? (
-          <div className="flex w-full max-w-[560px] shrink-0 flex-col gap-6">
-            {eyebrow}
-            {heading && <Heading className="w-full text-headline-xl text-on-background">{heading}</Heading>}
-          </div>
+          // Skipped when empty: a childless box would still add the column's gap above the nav.
+          (eyebrow || heading) && (
+            <div className="flex w-full max-w-[560px] shrink-0 flex-col gap-6">
+              {eyebrow}
+              {heading && <Heading className="w-full text-headline-xl text-on-background">{heading}</Heading>}
+            </div>
+          )
         ) : (
           <>
             {eyebrow}

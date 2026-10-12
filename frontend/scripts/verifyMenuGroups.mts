@@ -6,6 +6,7 @@
  *
  * Imports the real helper, not a copy. Exits non-zero on the first failure.
  */
+import {vercelStegaCombine} from '@vercel/stega'
 import {groupMenuLinks} from '../sanity/lib/menuGroups.ts'
 import {resolveItemHref} from '../components/header/resolveItemHref.ts'
 
@@ -40,6 +41,11 @@ check(shape([l('A', ' Purpose '), l('B', 'Purpose')]) === 'Purpose:A+B', 'headin
 check(
   shape([l('A', 'Purpose'), l('B'), l('C', 'Purpose')]) === 'Purpose:A|-:B|Purpose:C',
   'an ungrouped link between two groups splits them',
+)
+
+check(
+  shape([l('A', vercelStegaCombine('Purpose', {origin: 'sanity.io', href: '/a'})), l('B', vercelStegaCombine('Purpose', {origin: 'sanity.io', href: '/b'}))]) === 'Purpose:A+B',
+  'headings are stega-cleaned, so per-field invisible suffixes do not split a group',
 )
 
 check(resolveItemHref({_type: 'link', linkType: 'href', href: '#'}) === '#', 'a # placeholder resolves to #')
