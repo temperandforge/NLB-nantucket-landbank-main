@@ -12,7 +12,7 @@ import {Toaster} from 'sonner'
 
 import DraftModeToast from '@/components/DraftModeToast'
 import Footer from '@/components/Footer'
-// import Header from '@/components/Header'
+import Header from '@/components/header/Header'
 import * as demo from '@/sanity/lib/demo'
 import {sanityFetch, SanityLive} from '@/sanity/lib/live'
 import {settingsQuery} from '@/sanity/lib/queries'
@@ -107,7 +107,7 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
         flush against one another, so each section owns its own spacing.
       */}
       <body className="flex flex-col min-h-screen">
-        <a href="#pageMain" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:bg-brand focus:text-white focus:px-4 focus:py-2">
+        <a href="#pageMain" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:bg-brand focus:text-white focus:px-4 focus:py-2">
           Skip to main content
         </a>
         {/* The <Toaster> component is responsible for rendering toast notifications used in /app/client-utils.ts and /app/components/DraftModeToast.tsx */}
@@ -121,16 +121,16 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
         )}
         {/* The <SanityLive> component is responsible for making all sanityFetch calls in your application live, so should always be rendered. */}
         <SanityLive onError={handleError} />
-        {/* <Header /> - pages render their own <Nav /> for now */}
+        <Header />
         <main className="pageMain grow" id="pageMain">
           {children}
         </main>
         <Footer />
         <SpeedInsights />
-        <Script
+        {/* <Script
           src="https://www.bugherd.com/sidebarv2.js?apikey=vuefxgttt1s6fiowcnigea"
           strategy="lazyOnload"
-        />
+        /> */}
       </body>
     </html>
   )

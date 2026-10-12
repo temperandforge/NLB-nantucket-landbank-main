@@ -20,7 +20,7 @@ export default function HeroSecondary({block, pageName}: BlockProps<'heroSeconda
   const variant = chosen === 'moody-moor' || chosen === 'light-brown' ? chosen : 'lowlands'
   const eyebrow = block.eyebrow || pageName
   return (
-    <section className="w-full">
+    <section className="bg-background w-full">
       <div className="tf-px py-section-p-sm overflow-hidden">
         <div className="tf-max-w">
           <div className="grid grid-cols-1 md:grid-cols-2">

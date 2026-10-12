@@ -178,12 +178,17 @@
   color: var(--color-on-primary);
   cursor: pointer;
 
-  &:hover {
-    gap: calc(var(--spacing) * 4);
-  }
-
+  /* The arrow nudges with a transform so hover never changes the layout box and shifts siblings. */
   &:hover .link-button-icon {
     color: var(--color-secondary);
+  }
+
+  &:hover .link-button-icon:last-child {
+    transform: translateX(calc(var(--spacing) * 2));
+  }
+
+  &:hover .link-button-icon:first-child {
+    transform: translateX(calc(var(--spacing) * -2));
   }
 }
 
@@ -192,7 +197,13 @@
   width: 1.5rem;
   height: 1.5rem;
   color: var(--color-on-primary);
-  transition: color 150ms ease;
+  transition:
+    color 200ms ease,
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: color 200ms ease;
+  }
 }
 
 /* ---- Link item / link row (Figma Design System 114-258, 673-1914) ------------------------------ */
@@ -327,6 +338,66 @@
   list-style: decimal;
 }
 
+/* Project page body (Figma 1910:14941): H2 = a section (headline-lg), H3+ = subsections, 24px between
+   paragraphs, 64px between sections. */
+.rich-text-project {
+  color: var(--color-on-background);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-base);
+  line-height: 1.6;
+}
+
+.rich-text-project > * + * {
+  margin-top: 1.5rem;
+}
+
+.rich-text-project > h2,
+.rich-text-project > h3,
+.rich-text-project > h4,
+.rich-text-project > h5,
+.rich-text-project > h6 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+}
+
+.rich-text-project > h2 {
+  margin-top: 4rem;
+  font-size: var(--text-headline-lg);
+}
+
+.rich-text-project > h3 {
+  font-size: var(--text-headline-base);
+}
+
+.rich-text-project > h4,
+.rich-text-project > h5,
+.rich-text-project > h6 {
+  font-size: var(--text-headline-sm);
+}
+
+.rich-text-project > :first-child {
+  margin-top: 0;
+}
+
+.rich-text-project a:not(.link-item--inactive) {
+  text-decoration: underline;
+}
+
+.rich-text-project ul,
+.rich-text-project ol {
+  padding-left: 1.5rem;
+}
+
+.rich-text-project ul {
+  list-style: disc;
+}
+
+.rich-text-project ol {
+  list-style: decimal;
+}
+
 /* Map Teaser (Figma 1910:9569). The brown panel's line art is a very wide drawing, positioned as
    in the design: 10381 x 1369, offset -541px from the top. */
 .map-teaser__lines {
@@ -397,4 +468,39 @@
 
 .article-curve {
   background: url('/images/blocks/article-curve.svg') center / 100% 100% no-repeat;
+}
+
+/* Project page (Figma 1910:14941 desktop, 1910:15044 mobile): the line art behind the content. The
+   two frames use different drawings, so the mobile one is swapped in below the md breakpoint. */
+.project-curve {
+  background: url('/images/blocks/project-curve-mobile.svg') center / 100% 100% no-repeat;
+}
+
+@media (min-width: 48rem) {
+  .project-curve {
+    background-image: url('/images/blocks/project-curve-desktop.svg');
+  }
+}
+
+/* ---- Mobile menu ------------------------------------------------------------------------------- */
+/* Drill-in / Back swap: the incoming view slides from the side it conceptually came from. */
+@keyframes mobile-menu-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--mobile-menu-slide-from, 1.5rem));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.mobile-menu-view {
+  animation: mobile-menu-slide-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu-view {
+    animation: none;
+  }
 }

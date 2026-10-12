@@ -7,6 +7,11 @@
 @plugin "@tailwindcss/typography";
 
 @layer base {
+  /* Anchor jumps reveal the sticky header (HeaderShell), so keep targets clear of it. */
+  html {
+    scroll-padding-top: var(--header-height);
+  }
+
   h1,
   h2,
   h3,
@@ -68,8 +73,15 @@
   --spacing-global-margin: 40px;
 
   --container-site: 1440px;
+
+  /* Figma Navigation bar (61:100 desktop, 293:325 mobile): 80px at both breakpoints. */
+  --header-height: 5rem;
 }
 
 #mapWrap {
-  height: calc(100dvh - 6rem - 2.5rem);
+  height: calc(100dvh - var(--header-height) - 2.5rem);
+}
+
+body {
+  @apply bg-background;
 }

@@ -12,6 +12,8 @@ import {heroTertiary} from '../objects/heroTertiary'
 import {heroVideo} from '../objects/heroVideo'
 import {imageCarousel} from '../objects/imageCarousel'
 import {jumpNavContent} from '../objects/jumpNavContent'
+import {growers} from '../objects/growers'
+import {mapPreview} from '../objects/mapPreview'
 import {mapTeaser} from '../objects/mapTeaser'
 import {missionStatement} from '../objects/missionStatement'
 import {eventsPreview} from '../objects/eventsPreview'
@@ -19,8 +21,13 @@ import {faqList} from '../objects/faqList'
 import {jobListings} from '../objects/jobListings'
 import {peopleGrid} from '../objects/peopleGrid'
 import {projectGrid} from '../objects/projectGrid'
+import {propertyArchive} from '../objects/propertyArchive'
 import {projectPreview} from '../objects/projectPreview'
+import {propertiesPreview} from '../objects/propertiesPreview'
 import {newsPreview} from '../objects/newsPreview'
+import {eventsGrid} from '../objects/eventsGrid'
+import {newsArchive} from '../objects/newsArchive'
+import {recordsArchive} from '../objects/recordsArchive'
 import {timeline} from '../objects/timeline'
 import {buildPagePath, MAX_PAGE_DEPTH, slugifySegment} from '../../lib/pageHierarchy'
 
@@ -33,6 +40,7 @@ const pageBuilderBlocks = [
   contactForm,
   ctaContact,
   downloadBlock,
+  eventsGrid,
   eventsPreview,
   faqList,
   hero,
@@ -43,12 +51,18 @@ const pageBuilderBlocks = [
   imageCarousel,
   jobListings,
   jumpNavContent,
+  growers,
+  mapPreview,
   mapTeaser,
   missionStatement,
+  newsArchive,
   newsPreview,
   peopleGrid,
   projectGrid,
   projectPreview,
+  propertiesPreview,
+  propertyArchive,
+  recordsArchive,
   timeline,
 ]
   .sort((a, b) => (a.title ?? a.name).localeCompare(b.title ?? b.name))

@@ -3,16 +3,23 @@ import React from 'react'
 import BasicLeftRightText from '@/components/blocks/BasicLeftRightText'
 import Hero from '@/components/blocks/Hero'
 import CtaContact from '@/components/blocks/CtaContact'
+import EventsGrid from '@/components/blocks/EventsGrid'
 import EventsPreview from '@/components/blocks/EventsPreview'
 import NewsPreview from '@/components/blocks/NewsPreview'
+import NewsArchive from '@/components/blocks/NewsArchive'
 import FaqList from '@/components/blocks/FaqList'
 import JobListings from '@/components/blocks/JobListings'
 import PeopleGrid from '@/components/blocks/PeopleGrid'
 import ProjectGrid from '@/components/blocks/ProjectGrid'
 import ProjectPreview from '@/components/blocks/ProjectPreview'
+import PropertiesPreview from '@/components/blocks/PropertiesPreview'
+import PropertyArchive from '@/components/blocks/PropertyArchive'
+import RecordsArchive from '@/components/blocks/RecordsArchive'
 import MissionStatement from '@/components/blocks/MissionStatement'
 import ContactForm from '@/components/blocks/ContactForm'
 import DownloadBlock from '@/components/blocks/DownloadBlock'
+import Growers from '@/components/blocks/Growers'
+import MapPreview from '@/components/blocks/MapPreview'
 import MapTeaser from '@/components/blocks/MapTeaser'
 import JumpNavContent from '@/components/blocks/JumpNavContent'
 import ImageCarousel from '@/components/blocks/ImageCarousel'
@@ -47,17 +54,24 @@ const Blocks = {
   imageCarousel: ImageCarousel,
   timeline: Timeline,
   downloadBlock: DownloadBlock,
+  growers: Growers,
+  mapPreview: MapPreview,
   mapTeaser: MapTeaser,
   contactForm: ContactForm,
   ctaContact: CtaContact,
   missionStatement: MissionStatement,
   newsPreview: NewsPreview,
+  newsArchive: NewsArchive,
+  eventsGrid: EventsGrid,
   eventsPreview: EventsPreview,
   faqList: FaqList,
   jobListings: JobListings,
   peopleGrid: PeopleGrid,
   projectGrid: ProjectGrid,
   projectPreview: ProjectPreview,
+  propertiesPreview: PropertiesPreview,
+  propertyArchive: PropertyArchive,
+  recordsArchive: RecordsArchive,
 } as BlocksType
 
 /**

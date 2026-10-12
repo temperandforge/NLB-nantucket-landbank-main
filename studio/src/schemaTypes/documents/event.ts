@@ -1,8 +1,12 @@
 import {CalendarIcon} from '@sanity/icons'
 import {defineField, defineType} from 'sanity'
 
+import {imageWithAltField} from '../objects/blockFields'
+import {jumpNavBodyMembers} from '../objects/jumpNavBody'
+
 /**
- * An event. Whether it is "upcoming" is worked out from its dates when the page is built or
+ * An event, with a page of its own at /events/<slug> (its address is derived from the slug).
+ * Whether it is "upcoming" is worked out from its dates when the page is built or
  * revalidated, never stored. Times are entered and shown in the site time zone, America/New_York.
  */
 export const event = defineType({
@@ -15,6 +19,13 @@ export const event = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'slug',
+      title: 'Slug',
+      type: 'slug',
+      options: {source: 'title', maxLength: 96},
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -36,12 +47,28 @@ export const event = defineType({
           return end && start && end <= start ? 'The end must be after the start' : true
         }),
     }),
+    imageWithAltField({title: 'Image'}),
     defineField({name: 'location', title: 'Location', type: 'string'}),
-    defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
+    defineField({
+      name: 'description',
+      title: 'Description',
+      type: 'text',
+      rows: 4,
+      description: 'The short text shown on event tiles.',
+    }),
+    defineField({
+      name: 'body',
+      title: 'Page content',
+      type: 'array',
+      // Sections and images only: the event page has no jump nav and no FAQ accordion.
+      of: jumpNavBodyMembers.filter((member) => member.type === 'block' || member.type === 'image'),
+      description:
+        'The event page. Use Section heading (H2) for sections such as “Activities” or “Rain Date”, and add images between them.',
+    }),
   ],
   orderings: [{title: 'Start, soonest first', name: 'startAsc', by: [{field: 'start', direction: 'asc'}]}],
   preview: {
-    select: {title: 'title', subtitle: 'start'},
-    prepare: ({title, subtitle}) => ({title: title || 'Untitled', subtitle}),
+    select: {title: 'title', subtitle: 'start', media: 'image'},
+    prepare: ({title, subtitle, media}) => ({title: title || 'Untitled', subtitle, media}),
   },
 })

@@ -88,12 +88,13 @@ field.
 are selectable but render nothing until an icon is exported from Figma into
 `frontend/components/icons`. A platform with no icon is skipped, not rendered as an empty box.
 
-### 1.7 Projects are the map's properties, and their categorisation is referenced
+### 1.7 Properties are the map's parcels, and their categorisation is referenced
 
 **Status:** Implemented
 
-`project` is a Land Bank property — the parcels, beaches, trails and ponds on the interactive map.
-It replaced the hardcoded array in `frontend/app/map/properties.ts`. Categorisation is by reference
+`property` is a Land Bank property — the parcels, beaches, trails and ponds on the interactive map.
+It replaced the hardcoded array in `frontend/app/map/properties.ts`. (The old `project` type was
+migrated into it; a new, unrelated `project` type was introduced later — see 1.7a.) Categorisation is by reference
 to `propertyType` and `resource` documents.
 
 **Why:** The taxonomies were TypeScript union types plus parallel label maps, so adding a category
@@ -103,6 +104,18 @@ meant a code change and a deploy. As documents, the client owns them.
 documents, and `frontend/app/map/types.ts` derives its types from the generated query results.
 A dereferenced taxonomy entry is null when its document is unpublished, so consumers filter those
 out rather than rendering a blank option.
+
+### 1.7a Projects are separate from properties
+
+**Status:** Implemented
+
+`project` is an initiative the Land Bank carries out (image, description, link), categorised by
+referenced `projectType` documents and optionally pointing at the `property` it happens on. It is
+not on the map. Project Grid, Project Preview and Image Carousel read projects; the map and the
+Property Archive read properties. Properties and projects have separate type taxonomies.
+
+**Why:** A parcel and an initiative are different things with different editors' needs; reusing
+`property` for both forced projects to carry map data and parcel categories.
 
 ### 1.8 A taxonomy's slug is the stable key, its title is the label
 
@@ -123,7 +136,7 @@ since been deleted still renders as itself instead of blank.
 **Status:** Implemented
 
 The client maintains a single GeoJSON FeatureCollection covering every boundary, uploaded to
-`projectSettings.boundaryData`. Each project stores only `boundaryId`, naming one feature in it.
+`projectSettings.boundaryData`. Each project stores `boundaryIds`, naming every feature in it that belongs to that property — most projects have one, some (e.g. a preserve split across many GIS parcels) have several.
 
 **Why:** This is how the client works — one export from their GIS, not per-parcel geometry pasted
 into a CMS field. It also means re-exporting updates every boundary at once.
@@ -154,9 +167,11 @@ into `setHTML`, so all authored text is escaped first.
 
 **Status:** Implemented
 
-`boundaryId` uses a custom Studio input (`studio/src/components/BoundaryIdInput.tsx`) that loads the
-uploaded file, offers the identifiers it actually contains, and flags a stored value that is not
-among them.
+`boundaryIds` uses a custom Studio input (`studio/src/components/BoundaryIdsInput.tsx`, backed by
+the useBoundaryOptions hook) that loads the uploaded file, offers the identifiers it actually
+contains, and flags a stored value that is not among them. It is a multi-select — a project can be
+several parcels, and each is checked against the file independently so a stale one among several
+is visible on its own.
 
 **Why:** A mistyped identifier produces a property that silently never draws on the map, with
 nothing in the Studio to indicate why. Across hundreds of parcels that is the likeliest failure
@@ -165,6 +180,21 @@ mode in the whole feature.
 **Implication:** The input degrades to an explanatory message and the raw stored value when no file
 is uploaded, when it cannot be read, or when no feature carries the configured property — never a
 blank control with no explanation.
+
+### 1.12 Dropdown column headings are a `group` string on `menuLink`, not a third menu level
+
+**Status:** Implemented
+
+The Figma About Us dropdown has Purpose / People / Other columns. They are an optional `group`
+string on `menuLink`; the two-level cap in 1.2 is unchanged.
+
+**Why:** The cap exists so invalid half-states can't be authored, and Sanity does not model
+recursive objects cleanly. A third level would break both.
+
+**Implication:** Headings are authored per link. Consecutive links with one heading form a column;
+interleaved headings (A, B, A) stay separate and render as three. The footer ignores `group`.
+Renaming a heading means editing each link under it. The grouping rule lives in
+`frontend/sanity/lib/menuGroups.ts` and is checked by `frontend/scripts/verifyMenuGroups.mts`.
 
 ---
 
@@ -411,6 +441,27 @@ The newsletter form has no action and no handler, and both controls are `disable
 not-yet-available.
 
 **Implication:** Record the missing work in the relevant spec's deferred section.
+
+### 4.9 The header and banner are Globals singletons, and the header hides on scroll down
+
+**Status:** Implemented
+
+`header` (`_id: 'header'`) holds the main menu reference; `siteBanner` (`_id: 'siteBanner'`) holds
+the announcement. Both are singletons under Globals. The header is rendered once from the root
+layout and is sticky. Banner dismissal is stored in `localStorage`, keyed by a hash of the message,
+so a changed message re-appears; storage access is guarded and the banner renders without it.
+
+**Why:** One header for the whole site belongs in the root layout. Hiding on scroll down returns
+space to the content; revealing on scroll up keeps navigation close.
+
+**Implication:**
+- The scroll rule lives in `frontend/components/header/headerScroll.ts` and is checked by
+  `frontend/scripts/verifyHeader.mts`. Change it there, not in the component.
+- `--header-height` is the single source for anything sized against the bar. The map uses it;
+  size new full-height regions from it rather than a literal.
+- The real content seed, `studio/scripts/seedHeaderContent.ts`, is idempotent and non-destructive
+  (it supports `--dry`).
+- Search is disabled; see [#29](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/29).
 
 ---
 
@@ -671,7 +722,7 @@ needs the same treatment.
 
 **Status:** Implemented
 
-`article.link` is the shared link object. A news tile is a link only when it resolves; otherwise it
+`article.link` was the shared link object (replaced by `externalUrl`, see 10.2). A news tile is a link only when it resolves; otherwise it
 is a plain tile. Per-article pages, filters and pagination are slice 3
 ([#11](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/11)).
 
@@ -719,8 +770,10 @@ pattern.
 
 **Status:** Implemented
 
-`article.link` is now an optional override (an external story). A tile goes to it when it resolves
-(not empty, not `#`), otherwise to `/news/<slug>`. A call to action tile with no link stays a plain
+`article.externalUrl` is an optional plain URL (http/https), for a story that lives on another site. It
+replaced the shared `link` object, whose page-reference and internal-path options had no use now that
+every article has its own page (`studio/scripts/migrateArticleLinks.ts`). A tile goes to it when it is
+set and not `#`, otherwise to `/news/<slug>`. A call to action tile with no link stays a plain
 tile.
 
 ### 10.3 The Share row: copy link, Facebook, LinkedIn
@@ -766,11 +819,18 @@ entry per archive: nothing in code needs to find an archive page.
 
 **Status:** Implemented
 
-The People Grid's tabs are derived from the staff on the block (`frontend/sanity/lib/staffFilter.ts`,
+The People Grid's tabs are derived from the staff on the block (`frontend/sanity/lib/archiveFilter.ts`,
 checked by `frontend/scripts/verifyStaffFilter.mts`): one per department with at least one member, in
 the department's `order`. The chosen department is `?department=<slug>`, read with `useSearchParams`
 and changed with the History API, so a filtered view can be shared without a server request. The
 server render is "All".
+
+The tab row is a shared `components/ui/FilterTabs` and the address handling a shared
+`useQueryFilter` hook, so any archive block can filter the same way. The Project Grid uses them with
+`?type=<slug>`, tabs from the property types on its projects (resources are amenities, not
+categories, and get no tab). The Project Grid's card follows the Figma projects archive (two
+columns, types as tags over the image, name below, no description), replacing the earlier assumed
+four-column card (9.6).
 
 ### 11.3 The footer links are wired by a guarded script
 
@@ -882,11 +942,179 @@ theme's `nlb_faq` posts are test content and are not migrated.
 categories from the Phase B seed before matching (one sample shares a question with a real FAQ).
 The `form-filing` category already exists and is reused as it stands.
 
-## 15. Forms
+## 15. The property type and the Properties archive
 
-### 15.1 A form is a document of sections of typed fields
+### 15.1 `property` replaced `project`, and the archive is a block
 
-**Status:** Implemented; type-checked and linted but not yet verified in a browser (see 15.5)
+**Status:** Implemented. The migration ran on 2026-10-07 (150 properties created, 2 with a draft; validation passed) and is safe to re-run (it skips every slug). The page seed ran on 2026-10-07: draft `explore/properties` exists, to be published by the user.
+
+**Note:** the dataset also holds an older draft `property` ("Surfside Beach", slug `a`, created 2026-07-21 under the previous content model). The migration did not create or touch it; delete it in Studio if it is not wanted.
+
+The client wants properties to be the map's document, so `property` replaced `project` (same
+fields; the Studio title is "Property"). `studio/scripts/migrateProjectsToProperties.ts` copies each
+project into a property **in the same publish state** (150 published, 2 with a draft when it was
+written), matched by slug, never editing an existing property, refusing to run if anything other
+than a project references a project, and leaving the `project` documents in place
+([#26](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/26) to delete them once
+the map is verified). `verifyPropertyMigration.ts` compares the two sets.
+
+The archive is a **Property Archive block** on an ordinary page (seeded as a draft
+`explore/properties` by `seedPropertiesPage.ts`), so its address is its slug and parent. It has two
+dropdown filters, Property Type and Resources, built from the types and resources the properties
+use; **any** checked option within a group matches and **every** group with a choice must hold. The
+choice is kept in the address as `?type=a,b&resource=c`. The filter functions live in
+`frontend/sanity/lib/archiveFilter.ts` with the other archive filters and are checked by
+`frontend/scripts/verifyPropertyFilter.mts`. A card with no image shows **Default property image**
+from Site Settings, or the staff cards' neutral box when that is unset.
+
+**Deploy order.** The map, the Project Grid, the Property Archive and the Studio's Properties list all
+read `property`, which is empty until the migration runs. Run `migrateProjectsToProperties.ts`, then
+`verifyPropertyMigration.ts`, **before** the frontend and Studio changes are deployed; otherwise the map
+shows no properties.
+
+**Open question.** The seeded top-level Projects page (a Project Grid with copy about conservation
+initiatives) now lists properties, so the same beaches and ponds appear under two pages. Whether to
+retire it, re-copy it or wait for a real "project" (initiative) type is the client's call.
+
+**Not done:** property detail pages ([#23](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/23)),
+renaming the Project blocks ([#24](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/24)),
+pagination or search ([#25](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/25)).
+Spec: [properties archive design](superpowers/specs/2026-10-07-properties-archive-design.md); plan:
+[properties archive plan](superpowers/plans/2026-10-07-properties-archive.md).
+
+## Known outstanding items
+
+Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-design.md):
+
+- Nine menu links and three social URLs are `#` placeholders awaiting real values.
+- Newsletter submission has no provider, action, or validation.
+- Cookie Settings needs a consent manager; it is a JS trigger, not a URL.
+- `/map` and the seeded `explore/interactive-map` page overlap; one should redirect.
+- The Studio's Pages list is flat. It shows each page's resolved path in the subtitle,
+  but does not nest children under their parent, which gets harder to scan as pages are added.
+- Markers and boundaries render only once Mapbox fires `load`, which needs the style request to
+  `api.mapbox.com` to succeed. If a dev server is started without `NEXT_PUBLIC_MAPBOX_TOKEN`
+  available, the canvas and controls still appear but nothing is drawn on them — an empty map is
+  not evidence that the data is wrong. Verify map *data* separately from map *rendering*.
+- The boundary file currently in Sanity was generated from the geometry that used to be inline in
+  `properties.ts`, purely so the map keeps working until the client's real export arrives. It lives
+  at `studio/scripts/data/boundaries.geojson` and uses the project slug as each feature's `id`.
+- `project` has no page of its own and no body content. Explore → Properties is still `#`.
+- Renaming an ancestor's slug silently changes every descendant URL (2.3). There is no redirect
+  mechanism for the old paths (tracked in [#9](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/9)).
+- Mobile footer breakpoints are assumptions awaiting designer confirmation.
+- Site search is not built: the header search field is disabled
+  ([#29](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/29)).
+- `frontend/tailwind.config.ts` is vestigial under Tailwind v4 — `globals.css` uses
+  `@import 'tailwindcss'` with `@theme` and no `@config`, so the file is never loaded. Its
+  `green` / `yellow` scales are unrelated to the brand palette.
+
+## Content model reset (2026-10)
+
+- Removed the `post`, `person`, `commissioner`, `staffMember`, `department`, `commissionersPage` and
+  `staffPage` types, with the /posts route and its components. The Studio's "Page Content" folder is
+  now a flat "Pages" list.
+- `settings.landingPage` references the `page` shown at `/`; Presentation's `/` route resolves to it.
+  With none set, `/` redirects to `/map`.
+- `studio/scripts/cleanupRemovedTypes.ts` deleted every page and all orphaned documents, and turned
+  menu links to deleted pages into `#` placeholders. Re-run `seedFooterContent.ts` to recreate pages.
+
+## 16. The news archive is a page-builder block
+
+**Status:** Implemented. Pagination is not in the Figma design, so every article is listed.
+
+The News page (`our-work/news`) is an ordinary CMS page: a Hero - Tertiary header and the News
+Archive block (`newsArchive`), seeded by `studio/scripts/seedNewsPage.ts` (fills an empty page
+builder only). The block lists every article newest first, three across (one on mobile), with the
+shared `components/ui/FilterTabs` for categories and `?category=<slug>` through `useQueryFilter`,
+the same pattern as the Project Grid. Tabs come from the categories the articles actually have.
+
+## 17. Project pages
+
+**Status:** Implemented (2026-10-12). Two manual steps remain: see **Not done**.
+
+A `project` (a Land Bank initiative, distinct from the map's `property`) has a page of its own at
+`/projects/<slug>`, a static route like `/news/<slug>`, built from the project's `body` (the same
+rich-text definition as Jump Nav Content, `jumpNavBodyMembers`), whose `faqAccordion` block holds the
+project's FAQs inline (question + answer items; `FaqItem`'s open state follows Figma 2103:36336). The page address is
+derived from the slug, so `project.link` was removed; FAQs have no heading field: the heading is a Section
+heading the editor writes above the accordion block; cards, the Image Carousel and Project Preview
+tiles all link to `/projects/<slug>` through `projectHref()`. What every project page shares lives on
+the `singleProjectPage` singleton: the eyebrow and where it links back (`archiveLink`) and the
+"more projects" section, whose projects are ordered by shared project type, then
+newest (`frontend/sanity/lib/relatedProjects.ts`, checked by `scripts/verifyRelatedProjects.mts`).
+`property`, the map and the Property Archive are unaffected. The jump-nav and project-preview markup
+were extracted (`JumpNavLayout`, `ProjectPreviewView`) so the blocks and the page share them.
+Spec: [project single page design](superpowers/specs/2026-10-12-project-single-page-design.md); plan:
+[project single page plan](superpowers/plans/2026-10-12-project-single-page.md).
+
+**Not done:** active-section highlighting in the nav ([#31](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/31)),
+hand-picked related projects ([#32](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/32)).
+Manual: run `studio/scripts/seedSingleProjectPage.ts` and `unsetProjectLinks.ts`, and fetch the two
+background curve SVGs (see the plan, Task 7). Issue [#23](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/23)
+(property detail pages) is superseded for projects.
+
+The jump-nav column is capped to the visible height with the nav scrolling inside it, and its offset
+follows the header's hide/show state (`--header-offset`, set by `HeaderShell`).
+
+## 18. Event pages and the Events Grid
+
+**Status:** Implemented (2026-10-12), not yet checked in a browser.
+
+An `event` has a page of its own at `/events/<slug>`, a static route like `/news/<slug>`. The page
+address is derived from the slug. `event` gained `slug`, `image` (the grid row's photo) and `body`
+(sections and images only: the `jumpNavBodyMembers` block and image members, with no jump nav and no
+FAQ accordion, so "Activities" and "Rain Date" are H2s in the body). The page closes with the existing
+events strip: `EventsPreview` was split into `EventsPreviewView` (shared with the page, which shows the
+next two *other* upcoming events) and the block. Tiles link to the event when it has a slug.
+
+The Events Grid block (`eventsGrid`) lists every upcoming event as a row: image with a date badge,
+title, time, place, summary and "View details". Upcoming is computed at render, as for the Events
+Preview (9.2). The page's heading is a separate Hero - Tertiary block, as on the News page.
+Seeds: `seedEvents.ts` (draft events, no images) and `seedEventsPage.ts` (fills the empty Events page).
+
+**Not done:** the calendar icon is drawn to match the clock and pin, not exported from Figma.
+Event images must be added in Studio.
+
+## 19. Public records
+
+**Status:** Implemented. Not built, each with an issue: importing the real records
+([#35](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/35)), search and
+document-type filters ([#36](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/36)),
+manual ordering ([#37](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/37)),
+pagination ([#38](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/38)) and
+per-category URLs ([#39](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/39)).
+
+Design: [the public records spec](superpowers/specs/2026-10-12-public-records-design.md).
+
+### 19.1 One page, one block, categories as documents
+
+The Public Records page is an ordinary CMS page with a Records Archive block (`recordsArchive`); the
+five Figma templates are its tab states, not five pages and not a route. `record` is a document
+(title, date, file, category); `recordCategory` is a taxonomy, so the client adds a tab without a
+deploy. Tabs come from the categories themselves, so an empty category still has its tab. There is no
+"All" tab: the lists mix titled and dated rows under different sort rules, so a combined list has no
+sensible order.
+
+### 19.2 Per-category behaviour is data; filters are a registry
+
+A category sets `sortBy` (`dateDesc` or `titleAsc`) and `filters` (an array of keys, today `year`).
+All of it is applied by `recordView` in `frontend/sanity/lib/archiveFilter.ts`, checked by
+`frontend/scripts/verifyRecordsFilter.mts`. A filter is an entry in `RECORD_FILTERS` plus an allowed
+value on `recordCategory.filters` in the studio (one list in two packages, like the page depth in
+section 2); a new one needs no change to the block, the hook or the stored documents. A filter value
+a category does not offer, or a key the frontend does not know, is ignored.
+
+**Implication:** Changing a category's slug breaks shared `?category=` links; edit the title instead.
+A row is labelled by title, else date, else file name, so a record needs only one of them; Studio
+warns when a date-ordered or year-filtered category has an undated record. The seed's sort and filter
+settings per category are read from the Figma and need the client's confirmation.
+
+## 20. Forms
+
+### 20.1 A form is a document of sections of typed fields
+
+**Status:** Implemented; type-checked and linted but not yet verified in a browser (see 20.5)
 
 **Verified:** schema and generated types (`tsc`, typegen), lint, and `verifyForms.ts` (run with zero
 forms present, so vacuous). Not verified: rendering of either placement.
@@ -903,9 +1131,9 @@ without a deploy.
 **Implication:** Choice answers are stored as the option text, so renaming an option detaches
 earlier answers and any show-if that names it (Studio flags the show-if).
 
-### 15.2 Validation is shared and always repeated on the server
+### 20.2 Validation is shared and always repeated on the server
 
-**Status:** Implemented; logic checked, route not exercised against a live dataset (see 15.5)
+**Status:** Implemented; logic checked, route not exercised against a live dataset (see 20.5)
 
 **Verified:** type-check, lint, the node check script `verifyFormLogic.mts` for the pure logic
 (validation, visibility, listbox keys, rate limit), and code review of the route. Not verified: a
@@ -919,9 +1147,9 @@ rate-limits per IP, drops honeypot hits silently with a 200, verifies Turnstile 
 
 **Why:** A visitor's JSON is untrusted. One implementation means the two cannot disagree.
 
-### 15.3 Submissions are stored, not emailed (yet)
+### 20.3 Submissions are stored, not emailed (yet)
 
-**Status:** Implemented; email deferred; not yet exercised against a live dataset (see 15.5)
+**Status:** Implemented; email deferred; not yet exercised against a live dataset (see 20.5)
 
 **Verified:** schema type-check and code review. Not verified: a stored submission, or the weak
 reference, against a real dataset with the write token.
@@ -944,9 +1172,9 @@ can read submissions.
 Turnstile: set both `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`, or neither. With
 only the secret set, every submission fails the captcha check.
 
-### 15.4 Accessibility choices that differ from the obvious
+### 20.4 Accessibility choices that differ from the obvious
 
-**Status:** Implemented; type-checked and linted but not yet verified in a browser (see 15.5)
+**Status:** Implemented; type-checked and linted but not yet verified in a browser (see 20.5)
 
 **Verified:** type-check, lint, `verifyFormLogic.mts` (listbox key handling) and code review. Not
 verified: keyboard, focus and screen-reader behaviour, focus-ring contrast, or the ARIA wiring in a
@@ -964,13 +1192,13 @@ browser.
 - **Icons.** Time fields use the Figma clock-2 icon (`Clock2Icon`). The design system has no radio
   icons, so radios use circle icons drawn to match the square ones.
 
-### 15.5 Verification still to do by a person
+### 20.5 Verification still to do by a person
 
 **Status:** Not yet run (needs seeded, published forms, a dev server and the write token)
 
 The browser and keyboard pass, and the live POST checks, were not run. To do:
 
-1. **Decide dataset visibility (OPEN, project owner).** See the requirement under 15.3: submissions
+1. **Decide dataset visibility (OPEN, project owner).** See the requirement under 20.3: submissions
    must not go live while the dataset is public.
 2. Seed the forms: `cd studio && npx sanity exec scripts/seedForms.ts --with-user-token -- --dry`,
    read the plan, then run it again without `--dry`.
@@ -1001,38 +1229,3 @@ The browser and keyboard pass, and the live POST checks, were not run. To do:
 
 A form that exists only as a draft resolves in Presentation but cannot be submitted there: the route
 reads published forms only and answers 404.
-
-## Known outstanding items
-
-Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-design.md):
-
-- Nine menu links and three social URLs are `#` placeholders awaiting real values.
-- Newsletter submission has no provider, action, or validation.
-- Cookie Settings needs a consent manager; it is a JS trigger, not a URL.
-- `/map` and the seeded `explore/interactive-map` page overlap; one should redirect.
-- The Studio's Pages list is flat. It shows each page's resolved path in the subtitle,
-  but does not nest children under their parent, which gets harder to scan as pages are added.
-- Markers and boundaries render only once Mapbox fires `load`, which needs the style request to
-  `api.mapbox.com` to succeed. If a dev server is started without `NEXT_PUBLIC_MAPBOX_TOKEN`
-  available, the canvas and controls still appear but nothing is drawn on them — an empty map is
-  not evidence that the data is wrong. Verify map *data* separately from map *rendering*.
-- The boundary file currently in Sanity was generated from the geometry that used to be inline in
-  `properties.ts`, purely so the map keeps working until the client's real export arrives. It lives
-  at `studio/scripts/data/boundaries.geojson` and uses the project slug as each feature's `id`.
-- `project` has no page of its own and no body content. Explore → Properties is still `#`.
-- Renaming an ancestor's slug silently changes every descendant URL (2.3). There is no redirect
-  mechanism for the old paths (tracked in [#9](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/9)).
-- Mobile footer breakpoints are assumptions awaiting designer confirmation.
-- `frontend/tailwind.config.ts` is vestigial under Tailwind v4 — `globals.css` uses
-  `@import 'tailwindcss'` with `@theme` and no `@config`, so the file is never loaded. Its
-  `green` / `yellow` scales are unrelated to the brand palette.
-
-## Content model reset (2026-10)
-
-- Removed the `post`, `person`, `commissioner`, `staffMember`, `department`, `commissionersPage` and
-  `staffPage` types, with the /posts route and its components. The Studio's "Page Content" folder is
-  now a flat "Pages" list.
-- `settings.landingPage` references the `page` shown at `/`; Presentation's `/` route resolves to it.
-  With none set, `/` redirects to `/map`.
-- `studio/scripts/cleanupRemovedTypes.ts` deleted every page and all orphaned documents, and turned
-  menu links to deleted pages into `#` placeholders. Re-run `seedFooterContent.ts` to recreate pages.

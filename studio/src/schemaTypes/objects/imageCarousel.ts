@@ -1,13 +1,14 @@
 import {ImagesIcon} from '@sanity/icons'
 import {defineArrayMember, defineField} from 'sanity'
 
-import {defineBlock, eyebrowField, imageWithAltField} from './blockFields'
+import {defineBlock, eyebrowField} from './blockFields'
 
 /**
- * A horizontally scrolling row of images (Figma: Image Carousel). The eyebrow shows as a tag
- * above the row. An image with a label opens into a green card showing the label and an arrow on
- * hover or focus; with a link it is clickable. The field is still named `caption`, so existing
- * content keeps its text.
+ * A horizontally scrolling row of hand-picked projects (Figma: Image Carousel). The eyebrow
+ * shows as a tag above the row. Each project is a card with its image; on hover or focus it opens
+ * into a green card showing the project name and an arrow, and links to the project's page.
+ * Projects are either hand-picked or every project in a category. They are references, so name and
+ * image are edited once, on the project.
  */
 export const imageCarousel = defineBlock({
   name: 'imageCarousel',
@@ -17,41 +18,51 @@ export const imageCarousel = defineBlock({
   fields: [
     eyebrowField(),
     defineField({
-      name: 'images',
-      title: 'Images',
+      name: 'source',
+      title: 'Projects shown',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Hand-picked projects', value: 'manual'},
+          {title: 'All projects in a category', value: 'category'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'manual',
+    }),
+    defineField({
+      name: 'projects',
+      title: 'Projects',
       type: 'array',
-      of: [
-        defineArrayMember({
-          type: 'object',
-          name: 'carouselImage',
-          fields: [
-            imageWithAltField({required: true}),
-            defineField({
-              name: 'caption',
-              title: 'Label',
-              type: 'string',
-              description: 'Shown on the card when the image is hovered or focused.',
-            }),
-            defineField({
-              name: 'link',
-              title: 'Link',
-              type: 'link',
-              description: 'Optional. Leave empty for an image that is not a link.',
-            }),
-          ],
-          preview: {
-            select: {title: 'caption', media: 'image'},
-            prepare: ({title, media}) => ({title: title || 'Image', media}),
-          },
-        }),
-      ],
+      description:
+        'Shown in order. Each card uses the project’s image and name, and links to the project’s page. Edit those on the project.',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'project'}]})],
+      hidden: ({parent}) => parent?.source === 'category',
+    }),
+    defineField({
+      name: 'category',
+      title: 'Category',
+      type: 'reference',
+      to: [{type: 'projectType'}],
+      description:
+        'Every project in this category is shown, A to Z. New projects added to it appear automatically.',
+      hidden: ({parent}) => parent?.source !== 'category',
+      validation: (rule) =>
+        rule.custom((value, context) =>
+          (context.parent as {source?: string} | undefined)?.source === 'category' && !value
+            ? 'Choose a category'
+            : true,
+        ),
     }),
   ],
   preview: {
-    select: {title: 'eyebrow', images: 'images'},
-    prepare: ({title, images}) => ({
+    select: {title: 'eyebrow', source: 'source', projects: 'projects', category: 'category.title'},
+    prepare: ({title, source, projects, category}) => ({
       title: title || 'Untitled',
-      subtitle: `Image Carousel · ${images?.length ?? 0} images`,
+      subtitle:
+        source === 'category'
+          ? `Image Carousel · ${category ?? 'no category'}`
+          : `Image Carousel · ${projects?.length ?? 0} projects`,
     }),
   },
 })

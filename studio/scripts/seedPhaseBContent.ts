@@ -137,8 +137,6 @@ async function main() {
     image: image(pond, 'A moorland pond'),
     categories: [{...weakRef(conservation, 'newsCategory'), _key: key()}],
     body: body(pond, 'A moorland pond'),
-    // An override: this tile goes to /map, though the article's own page is still reachable.
-    link: {_type: 'link', linkType: 'href', href: '/map'},
   })
   await ensure('article', 'slug.current', 'polpis-road-farm', {
     title: 'Polpis Road Farm Acquisition Preserves Working Agricultural Land',
@@ -147,7 +145,7 @@ async function main() {
     image: image(beach, 'A sandy path through moorland'),
     categories: [{...weakRef(conservation, 'newsCategory'), _key: key()}],
     body: body(beach, 'A sandy path through moorland'),
-    // No link: this tile goes to the article's own page.
+    // No external URL: this tile goes to the article's own page.
   })
   await ensure('article', 'slug.current', 'no-category-article', {
     title: 'An article with no category and no link',

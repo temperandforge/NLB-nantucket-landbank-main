@@ -48,6 +48,7 @@ const menuItemFields = /* groq */ `
     children[]{
       _key,
       label,
+      group,
       ${linkFields}
     }
   }
@@ -91,27 +92,56 @@ export const footerQuery = defineQuery(`
 `)
 
 /**
- * Projects (the Land Bank properties shown on the interactive map).
+ * The site header. Matched on _type and the fixed singleton id, like footerQuery. The main menu
+ * is null when the reference is unset or points at an unpublished menu - the header degrades.
+ */
+export const headerQuery = defineQuery(`
+  *[_type == "header" && _id == "header"][0]{
+    "mainMenu": mainMenu->{
+      ${menuFields}
+    }
+  }
+`)
+
+/**
+ * The site banner. Returns nothing unless it is switched on, so a disabled banner costs the
+ * frontend no branch.
+ */
+export const siteBannerQuery = defineQuery(`
+  *[_type == "siteBanner" && _id == "siteBanner" && enabled == true][0]{
+    message,
+    ${linkFields}
+  }
+`)
+
+/**
+ * Properties (the Land Bank properties shown on the interactive map and the archive).
  *
  * Taxonomies are dereferenced to their slug and title: the slug is the stable key the map's URL
  * filters use, the title is what a visitor reads. A dereferenced entry is null when the referenced
  * document is unpublished, so consumers must filter those out.
  *
  * Boundary geometry is not here - it lives in the single GeoJSON file on Project Settings, and
- * boundaryId says which feature in it belongs to this project.
+ * boundaryId says which feature in it belongs to this property.
  */
-export const projectsQuery = defineQuery(`
-  *[_type == "project" && defined(slug.current)] | order(name asc) {
-    _id,
-    name,
-    "slug": slug.current,
-    boundaryId,
-    location,
-    description,
-    link,
-    "image": image{"url": asset->url, alt},
-    "propertyTypes": propertyTypes[]->{"slug": slug.current, title},
-    "resources": resources[]->{"slug": slug.current, title}
+/** What the map needs from a property. Shared by the map page and the Map Preview block. */
+const mapPropertyFields = /* groq */ `
+  _id,
+  name,
+  "slug": slug.current,
+  boundaryIds,
+  location,
+  disablePopup,
+  description,
+  link,
+  "image": image{"url": asset->url, alt},
+  "propertyTypes": propertyTypes[]->{"slug": slug.current, title},
+  "resources": resources[]->{"slug": slug.current, title}
+`
+
+export const propertiesQuery = defineQuery(`
+  *[_type == "property" && defined(slug.current)] | order(name asc) {
+    ${mapPropertyFields}
   }
 `)
 
@@ -130,19 +160,23 @@ export const mapFiltersQuery = defineQuery(`{
   }
 }`)
 
+/** The map's settings. Shared by the map page and the Map Preview block. */
+const mapSettingsFields = /* groq */ `
+  eyebrow,
+  heading,
+  intro,
+  "boundaryDataUrl": boundaryData.asset->url,
+  "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),
+  "trailsDataUrl": trailsData.asset->url,
+  defaultCenter,
+  defaultZoom
+`
+
 export const mapSettingsQuery = defineQuery(`
   *[_type == "projectSettings" && _id == "projectSettings"][0]{
-    eyebrow,
-    heading,
-    intro,
-    "boundaryDataUrl": boundaryData.asset->url,
-    "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),
-    "trailsDataUrl": trailsData.asset->url,
-    defaultCenter,
-    defaultZoom
+    ${mapSettingsFields}
   }
 `)
-
 /**
  * Resolves page references inside a Portable Text field's link annotations. A constant, not a
  * function of the field name: a function call inside a template literal widens the query's type
@@ -162,10 +196,7 @@ const articleCardFields = /* groq */ `
   "slug": slug.current,
   date,
   image,
-  link{
-    ...,
-    ${linkReference}
-  },
+  externalUrl,
   "categories": categories[]->{"slug": slug.current, title}
 `
 
@@ -266,8 +297,55 @@ const pageBuilderFields = /* groq */ `
         ...,
         ${linkReference}
       },
-      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) [0...12] {
+      // A chosen category narrows the list; none means the latest of all news.
+      "articles": *[
+        _type == "article" && defined(slug.current)
+        && (!defined(^.category) || ^.category._ref in categories[]._ref)
+      ] | order(date desc) [0...12] {
         ${articleCardFields}
+      }
+    },
+    _type == "newsArchive" => {
+      ...,
+      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) {
+        ${articleCardFields}
+      }
+    },
+    _type == "recordsArchive" => {
+      ...,
+      "categories": *[_type == "recordCategory" && defined(slug.current)] | order(order asc, title asc) {
+        _id,
+        title,
+        "slug": slug.current,
+        order,
+        sortBy,
+        filters
+      },
+      "records": *[
+        _type == "record" && defined(file.asset) && defined(category->slug.current)
+      ] {
+        _id,
+        title,
+        date,
+        "fileUrl": file.asset->url,
+        "fileName": file.asset->originalFilename,
+        "categorySlug": category->slug.current
+      }
+    },
+    _type == "eventsGrid" => {
+      ...,
+      "events": *[
+        _type == "event" && defined(start)
+        && dateTime(coalesce(end, start)) >= dateTime($now)
+      ] | order(start asc) {
+        _id,
+        title,
+        "slug": slug.current,
+        start,
+        end,
+        location,
+        description,
+        image
       }
     },
     _type == "eventsPreview" => {
@@ -278,6 +356,7 @@ const pageBuilderFields = /* groq */ `
       ] | order(start asc) [0...12] {
         _id,
         title,
+        "slug": slug.current,
         start,
         end,
         location,
@@ -344,19 +423,44 @@ const pageBuilderFields = /* groq */ `
       "projects": *[_type == "project" && defined(slug.current)] | order(name asc) {
         _id,
         name,
-        description,
         image,
-        link,
-        "propertyTypes": propertyTypes[]->{"slug": slug.current, title},
-        "resources": resources[]->{"slug": slug.current, title}
+        "slug": slug.current,
+        "projectTypes": projectTypes[]->{"slug": slug.current, title}
       }
+    },
+    _type == "propertyArchive" => {
+      ...,
+      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {
+        _id,
+        name,
+        description,
+        link,
+        image,
+        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
+        "resources": resources[]->{"slug": slug.current, title, order}
+      },
+      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage
     },
     _type == "imageCarousel" => {
       ...,
-      images[]{
-        ...,
-        ${linkFields}
-      }
+      "projects": select(
+        source == "category" => *[
+          _type == "project" && defined(slug.current)
+          && ^.category._ref in projectTypes[]._ref
+        ] | order(name asc) {
+          _id,
+          name,
+          image,
+          "slug": slug.current
+        },
+        projects[]->{
+          _id,
+          name,
+          image,
+          "slug": slug.current
+        }
+      ),
+      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage
     },
     _type == "projectPreview" => {
       ...,
@@ -368,7 +472,42 @@ const pageBuilderFields = /* groq */ `
         _id,
         name,
         image,
-        link
+        "slug": slug.current
+      }
+    },
+    _type == "growers" => {
+      ...,
+      growers[]{
+        _key,
+        name,
+        tag,
+        image
+      }
+    },
+    _type == "propertiesPreview" => {
+      ...,
+      button{
+        ...,
+        ${linkFields}
+      },
+      "properties": properties[]->{
+        _id,
+        name,
+        description,
+        link,
+        image,
+        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
+        "resources": resources[]->{"slug": slug.current, title, order}
+      },
+      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage
+    },
+    _type == "mapPreview" => {
+      ...,
+      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {
+        ${mapPropertyFields}
+      },
+      "settings": *[_type == "projectSettings" && _id == "projectSettings"][0]{
+        ${mapSettingsFields}
       }
     },
     _type == "mapTeaser" => {
@@ -395,6 +534,15 @@ const pageBuilderFields = /* groq */ `
           links[]{
             ...,
             ${linkFields}
+          }
+        },
+        _type == "faqAccordion" => {
+          items[]{
+            ...,
+            answer[]{
+              ...,
+              ${markDefsFields}
+            }
           }
         },
         ${markDefsFields}
@@ -524,4 +672,115 @@ export const articleSlugs = defineQuery(`
 
 export const articleSitemapData = defineQuery(`
   *[_type == "article" && defined(slug.current)]{_updatedAt, "slug": slug.current}
+`)
+
+export const projectQuery = defineQuery(`
+  *[_type == "project" && slug.current == $slug][0]{
+    _id,
+    _type,
+    name,
+    "slug": slug.current,
+    description,
+    image,
+    // This project's own types, to find related projects.
+    "projectTypeIds": projectTypes[]._ref,
+    body[]{
+      ...,
+      _type == "anchorLinks" => {
+        links[]{
+          ...,
+          ${linkFields}
+        }
+      },
+      _type == "faqAccordion" => {
+        items[]{
+          ...,
+          answer[]{
+            ...,
+            ${markDefsFields}
+          }
+        }
+      },
+      ${markDefsFields}
+    }
+  }
+`)
+
+/** Every project but this one, to be ordered and trimmed by orderRelatedProjects(). */
+export const moreProjectsQuery = defineQuery(`
+  *[_type == "project" && defined(slug.current) && slug.current != $slug]{
+    _id,
+    _createdAt,
+    name,
+    image,
+    "slug": slug.current,
+    "projectTypeIds": projectTypes[]._ref
+  }
+`)
+
+/** Content shared by every project page (a singleton, so matched on its type and fixed id). */
+export const singleProjectPageQuery = defineQuery(`
+  *[_type == "singleProjectPage" && _id == "singleProjectPage"][0]{
+    eyebrow,
+    archiveLink{
+      ...,
+      ${linkReference}
+    },
+    moreProjects{
+      ...,
+      button{
+        ...,
+        ${linkFields}
+      }
+    }
+  }
+`)
+
+export const projectSlugs = defineQuery(`
+  *[_type == "project" && defined(slug.current)]{"slug": slug.current}
+`)
+
+export const projectSitemapData = defineQuery(`
+  *[_type == "project" && defined(slug.current)]{_updatedAt, "slug": slug.current}
+`)
+
+export const eventQuery = defineQuery(`
+  *[_type == "event" && slug.current == $slug][0]{
+    _id,
+    _type,
+    title,
+    "slug": slug.current,
+    start,
+    end,
+    location,
+    description,
+    body[]{
+      ...,
+      ${markDefsFields}
+    }
+  }
+`)
+
+/** Upcoming events other than this one, for the page's closing preview. */
+export const moreEventsQuery = defineQuery(`
+  *[
+    _type == "event" && defined(start) && slug.current != $slug
+    && dateTime(coalesce(end, start)) >= dateTime($now)
+  ] | order(start asc) [0...12] {
+    _id,
+    title,
+    "slug": slug.current,
+    start,
+    end,
+    location,
+    description
+  }
+`)
+
+export const eventSlugs = defineQuery(`
+  *[_type == "event" && defined(slug.current)]{"slug": slug.current}
+`)
+
+export const eventSitemapData = defineQuery(`
+  *[_type == "event" && defined(slug.current)]{_updatedAt, "slug": slug.current}
 `)

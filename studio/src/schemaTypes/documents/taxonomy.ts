@@ -1,4 +1,4 @@
-import {defineField, defineType, type DocumentDefinition} from 'sanity'
+import {defineField, defineType, type DocumentDefinition, type FieldDefinition} from 'sanity'
 
 /**
  * A referenced category, so the client can add one without a deploy. The slug is the stable key
@@ -9,11 +9,14 @@ export function defineTaxonomy({
   title,
   icon,
   description,
+  fields = [],
 }: {
   name: string
   title: string
   icon: DocumentDefinition['icon']
   description: string
+  /** Settings specific to this taxonomy, after the shared title, slug and order. */
+  fields?: FieldDefinition[]
 }) {
   return defineType({
     name,
@@ -43,6 +46,7 @@ export function defineTaxonomy({
         type: 'number',
         description: 'Lower numbers come first. Ties fall back to the title.',
       }),
+      ...fields,
     ],
     orderings: [
       {

@@ -1,0 +1,142 @@
+import {defineArrayMember, defineField, defineType} from 'sanity'
+import {PinIcon} from '@sanity/icons'
+
+import {BoundaryIdsInput} from '../../components/BoundaryIdsInput'
+
+/**
+ * A Land Bank property - the parcels, beaches, trails and ponds shown on the interactive map.
+ *
+ * Listed on the Properties archive too. It replaced the `project` type (migrated by
+ * scripts/migrateProjectsToProperties.ts), which itself replaced the hardcoded list that used to
+ * live in frontend/app/map/properties.ts. Categorisation
+ * is by reference to propertyType and resource documents so the client can extend either without
+ * a deploy.
+ *
+ * Boundary geometry is NOT stored here. The client maintains one GeoJSON file covering every
+ * boundary (uploaded on Project Settings) and each property points into it by identifier - see
+ * boundaryId below.
+ */
+
+export const property = defineType({
+  name: 'property',
+  title: 'Property',
+  type: 'document',
+  icon: PinIcon,
+  groups: [
+    {name: 'details', title: 'Details', default: true},
+    {name: 'map', title: 'Map'},
+  ],
+  fields: [
+    defineField({
+      name: 'name',
+      title: 'Name',
+      type: 'string',
+      group: 'details',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'slug',
+      title: 'Slug',
+      type: 'slug',
+      group: 'details',
+      description: 'Used if this property gets a page of its own later.',
+      options: {source: 'name', maxLength: 96},
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'image',
+      title: 'Image',
+      type: 'image',
+      group: 'details',
+      description:
+        'Shown in the map popup and on the Properties archive. A property without one shows the default property image from Site Settings.',
+      options: {hotspot: true},
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Alternative text',
+          type: 'string',
+          description: 'Important for accessibility and SEO.',
+        }),
+      ],
+    }),
+    defineField({
+      name: 'description',
+      title: 'Description',
+      type: 'text',
+      rows: 3,
+      group: 'details',
+      description: 'Short summary shown in the map popup.',
+    }),
+    defineField({
+      name: 'link',
+      title: 'Find out more link',
+      type: 'url',
+      group: 'details',
+      description:
+        'Optional. Where the popup’s "Find out more" link points. Accepts a path on this site, or # as a placeholder.',
+      // allowRelative because these are site-relative paths, and # is the placeholder convention.
+      validation: (Rule) => Rule.uri({allowRelative: true, scheme: ['http', 'https']}),
+    }),
+    defineField({
+      name: 'propertyTypes',
+      title: 'Property types',
+      type: 'array',
+      group: 'details',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'propertyType'}]})],
+      description: 'What kind of property this is. Drives the Property Type filter on the map.',
+    }),
+    defineField({
+      name: 'resources',
+      title: 'Resources',
+      type: 'array',
+      group: 'details',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'resource'}]})],
+      description: 'Amenities available here. Drives the Resources filter on the map.',
+    }),
+    defineField({
+      name: 'boundaryIds',
+      title: 'Property map IDs',
+      type: 'array',
+      of: [defineArrayMember({type: 'string'})],
+      group: 'map',
+      description:
+        'Which boundaries in the uploaded map data file belong to this property — usually one, sometimes several separate parcels. Pick from the list rather than typing; an identifier that is not in the file draws nothing on the map.',
+      components: {
+        input: BoundaryIdsInput,
+      },
+    }),
+    defineField({
+      name: 'location',
+      title: 'Map marker',
+      type: 'geopoint',
+      group: 'map',
+      description:
+        'Optional. Where the marker sits. Leave empty to place it at the centre of the assigned boundary.',
+    }),
+    defineField({
+      name: 'disablePopup',
+      title: 'Disable map popup',
+      type: 'boolean',
+      group: 'map',
+      initialValue: false,
+      description:
+        'Turn on to stop this property from opening a popup on the map — its marker or boundary still shows and (for a boundary) still highlights on hover, it just does not respond to a click.',
+    }),
+  ],
+  preview: {
+    select: {
+      name: 'name',
+      boundaryIds: 'boundaryIds',
+    },
+    prepare({name, boundaryIds}) {
+      const count = Array.isArray(boundaryIds) ? boundaryIds.length : 0
+      return {
+        title: name || 'Untitled',
+        subtitle: count
+          ? `${count} boundar${count === 1 ? 'y' : 'ies'} assigned`
+          : 'No boundary assigned',
+      }
+    },
+  },
+})

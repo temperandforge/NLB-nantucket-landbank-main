@@ -3,7 +3,10 @@ import {defineField} from 'sanity'
 
 import {defineBlock} from './blockFields'
 
-/** The latest news, with a call-to-action tile. The articles come from the News Articles list. */
+/**
+ * The latest news, with a call-to-action tile. The articles come from the News Articles list,
+ * optionally narrowed to one category (e.g. Agriculture news on the Agriculture page).
+ */
 export const newsPreview = defineBlock({
   name: 'newsPreview',
   title: 'News Preview',
@@ -11,6 +14,13 @@ export const newsPreview = defineBlock({
   icon: DocumentTextIcon,
   fields: [
     defineField({name: 'heading', title: 'Heading', type: 'string', initialValue: 'Nantucket News'}),
+    defineField({
+      name: 'category',
+      title: 'Category',
+      type: 'reference',
+      to: [{type: 'newsCategory'}],
+      description: 'Optional. Show only articles in this category. Leave empty for the latest of all news.',
+    }),
     defineField({
       name: 'count',
       title: 'Articles shown',
@@ -33,7 +43,10 @@ export const newsPreview = defineBlock({
     }),
   ],
   preview: {
-    select: {title: 'heading'},
-    prepare: ({title}) => ({title: title || 'Untitled', subtitle: 'News Preview'}),
+    select: {title: 'heading', category: 'category.title'},
+    prepare: ({title, category}) => ({
+      title: title || 'Untitled',
+      subtitle: category ? `News Preview · ${category}` : 'News Preview',
+    }),
   },
 })

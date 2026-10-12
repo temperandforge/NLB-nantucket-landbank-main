@@ -268,6 +268,58 @@ export function BriefcaseBusinessIcon({className}: IconProps) {
   )
 }
 
+/** Magnifier. Figma: nav search glyph (mobile-glyph-2). 20 x 20, 2px stroke. */
+export function SearchIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <path
+        d="M19 19L14.7 14.7M17 9C17 13.4183 13.4183 17 9 17C4.58172 17 1 13.4183 1 9C1 4.58172 4.58172 1 9 1C13.4183 1 17 4.58172 17 9Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+/**
+ * Close x. Figma: banner dismiss glyph (x). 10 x 10, 2px stroke. The viewBox keeps the
+ * export's own page offset (1385, 12) so the path data is exactly as exported.
+ */
+export function CloseIcon({className}: IconProps) {
+  return (
+    <svg overflow="visible" viewBox="1385 12 10 10" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <path
+        d="M1395 12L1385 22M1385 12L1395 22"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+/**
+ * Hamburger that morphs into a close x as `open` flips. 18 x 14, 2px strokes: the outer bars
+ * travel 6px to the middle and rotate to form the x while the middle bar collapses. Motion is
+ * dropped under prefers-reduced-motion (the state still changes).
+ */
+export function MenuToggleIcon({className, open}: IconProps & {open: boolean}) {
+  const bar =
+    'origin-center [transform-box:fill-box] transition-[translate,rotate,scale,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none'
+  return (
+    <svg viewBox="0 0 18 14" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M1 1H17" className={`${bar} ${open ? 'translate-y-[6px] rotate-45' : ''}`} />
+        <path d="M1 7H17" className={`${bar} ${open ? 'scale-x-0 opacity-0' : ''}`} />
+        <path d="M1 13H17" className={`${bar} ${open ? '-translate-y-[6px] -rotate-45' : ''}`} />
+      </g>
+    </svg>
+  )
+}
+
 /** Figma: calendar (I2406:29002;627:617), the icon in the Date field. 24 x 24, 2px stroke. */
 export function CalendarIcon({className}: IconProps) {
   return (

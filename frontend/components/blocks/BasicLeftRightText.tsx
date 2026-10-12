@@ -40,6 +40,7 @@ export default function BasicLeftRightText({block}: BlockProps<'basicLeftRightTe
                   href={button.href}
                   variant={button.variant}
                   newTab={button.newTab}
+                  rightIcon
                 />
               ))}
             </div>

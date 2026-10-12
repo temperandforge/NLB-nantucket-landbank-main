@@ -100,8 +100,8 @@ async function main() {
   })
 
   // A project for the Map Teaser's detail card, if the dataset has one.
-  const featuredProject = await client.fetch<string | null>(`*[_type == "project"][0]._id`)
-  const projectRefs = await client.fetch<string[]>(`*[_type == "project" && !(_id in path("drafts.**"))][0...3]._id`)
+  const featuredProject = await client.fetch<string | null>(`*[_type == "property"][0]._id`)
+  const projectRefs = await client.fetch<string[]>(`*[_type == "property" && !(_id in path("drafts.**"))][0...3]._id`)
 
   const pageBuilder = [
     {

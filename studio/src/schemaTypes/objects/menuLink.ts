@@ -1,13 +1,16 @@
 import {defineField, defineType} from 'sanity'
 import {LinkIcon} from '@sanity/icons'
 
+import {buildPagePath} from '../../lib/pageHierarchy'
+
 /**
  * A single clickable menu entry - a label plus the shared 'link' object, so menus get
  * URL / page reference support and 'open in new tab' for free, and link
  * authoring stays consistent with the rest of the Studio.
  *
  * Used as a leaf both at the top level of a menu and inside a menuGroup's submenu. Menu
- * nesting is deliberately capped at two levels (menuGroup -> menuLink); see menuGroup.ts.
+ * nesting is deliberately capped at two levels (menuGroup -> menuLink); see menuGroup.ts. The
+ * header's dropdown column headings are the optional `group` string below, not a third level.
  */
 
 export const menuLink = defineType({
@@ -29,15 +32,24 @@ export const menuLink = defineType({
       type: 'link',
       validation: (Rule) => Rule.required(),
     }),
+    defineField({
+      name: 'group',
+      title: 'Column heading',
+      type: 'string',
+      description:
+        'Optional. In a dropdown, consecutive links with the same heading appear together under it (e.g. "Purpose"). Leave empty for a plain list. Ignored in the footer.',
+    }),
   ],
   preview: {
     select: {
       label: 'label',
       linkType: 'link.linkType',
       href: 'link.href',
-      pageSlug: 'link.page->slug.current',
+      pageSlug: 'link.page.slug.current',
+      parentSlug: 'link.page.parent.slug.current',
+      grandparentSlug: 'link.page.parent.parent.slug.current',
     },
-    prepare({label, linkType, href, pageSlug}) {
+    prepare({label, linkType, href, pageSlug, parentSlug, grandparentSlug}) {
       // Show where the link actually points, so a menu of a dozen items is scannable
       // without opening each one.
       let subtitle: string | undefined
@@ -46,7 +58,11 @@ export const menuLink = defineType({
           subtitle = href
           break
         case 'page':
-          subtitle = pageSlug ? `/${pageSlug}` : 'No page selected'
+          // Dot paths, not `->`: the preview store follows references itself. Ancestors come
+          // first, as in the page's own preview.
+          subtitle = pageSlug
+            ? `/${buildPagePath([grandparentSlug, parentSlug, pageSlug])}`
+            : 'No page selected'
           break
         default:
           subtitle = undefined

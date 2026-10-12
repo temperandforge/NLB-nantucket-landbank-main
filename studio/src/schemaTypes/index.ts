@@ -1,6 +1,8 @@
 import {menu} from './documents/menu'
 import {page} from './documents/page'
 import {project} from './documents/project'
+import {projectType} from './documents/projectType'
+import {property} from './documents/property'
 import {article} from './documents/article'
 import {commissioner} from './documents/commissioner'
 import {event} from './documents/event'
@@ -9,7 +11,8 @@ import {job} from './documents/job'
 import {form} from './documents/form'
 import {formSubmission} from './documents/formSubmission'
 import {staffMember} from './documents/staffMember'
-import {department, faqCategory, newsCategory} from './documents/taxonomies'
+import {record} from './documents/record'
+import {department, faqCategory, newsCategory, recordCategory} from './documents/taxonomies'
 import {propertyType} from './documents/propertyType'
 import {resource} from './documents/resource'
 import {heroVideo} from './objects/heroVideo'
@@ -20,24 +23,35 @@ import {heroTertiary} from './objects/heroTertiary'
 import {basicLeftRightText} from './objects/basicLeftRightText'
 import {jumpNavContent} from './objects/jumpNavContent'
 import {downloadBlock} from './objects/downloadBlock'
+import {growers} from './objects/growers'
+import {mapPreview} from './objects/mapPreview'
 import {mapTeaser} from './objects/mapTeaser'
 import {contactForm} from './objects/contactForm'
 import {imageCarousel} from './objects/imageCarousel'
 import {timeline} from './objects/timeline'
 import {settings} from './singletons/settings'
 import {footer} from './singletons/footer'
+import {header} from './singletons/header'
+import {siteBanner} from './singletons/siteBanner'
 import {projectSettings} from './singletons/projectSettings'
 import {singleNewsPage} from './singletons/singleNewsPage'
+import {singleProjectPage} from './singletons/singleProjectPage'
 import {link} from './objects/link'
 import {anchorLinks} from './objects/anchorLinks'
+import {faqAccordion} from './objects/faqAccordion'
 import {peopleGrid} from './objects/peopleGrid'
 import {projectGrid} from './objects/projectGrid'
+import {propertyArchive} from './objects/propertyArchive'
+import {recordsArchive} from './objects/recordsArchive'
 import {projectPreview} from './objects/projectPreview'
+import {propertiesPreview} from './objects/propertiesPreview'
 import {faqList} from './objects/faqList'
 import {jobListings} from './objects/jobListings'
 import {formField} from './objects/formField'
 import {formEmbed} from './objects/formEmbed'
 import {newsPreview} from './objects/newsPreview'
+import {eventsGrid} from './objects/eventsGrid'
+import {newsArchive} from './objects/newsArchive'
 import {eventsPreview} from './objects/eventsPreview'
 import {missionStatement} from './objects/missionStatement'
 import {ctaContact} from './objects/ctaContact'
@@ -57,11 +71,15 @@ export const schemaTypes = [
   // Singletons
   settings,
   footer,
+  header,
+  siteBanner,
   projectSettings,
   singleNewsPage,
+  singleProjectPage,
   // Documents
   page,
   menu,
+  property,
   project,
   article,
   event,
@@ -71,12 +89,15 @@ export const schemaTypes = [
   job,
   form,
   formSubmission,
+  record,
   // Categorisation for the above - referenced, so the client can extend them without a deploy
   newsCategory,
   department,
   faqCategory,
-  // Categorisation for projects - referenced, so the client can extend either without a deploy
+  recordCategory,
+  // Categorisation for properties - referenced, so the client can extend either without a deploy
   propertyType,
+  projectType,
   resource,
   // Objects
   button,
@@ -93,18 +114,26 @@ export const schemaTypes = [
   imageCarousel,
   timeline,
   downloadBlock,
+  growers,
+  mapPreview,
   mapTeaser,
   contactForm,
   link,
   anchorLinks,
+  faqAccordion,
   missionStatement,
   newsPreview,
+  newsArchive,
   faqList,
   jobListings,
   peopleGrid,
   projectGrid,
+  propertyArchive,
+  recordsArchive,
   projectPreview,
+  propertiesPreview,
   eventsPreview,
+  eventsGrid,
   ctaContact,
   formField,
   formEmbed,

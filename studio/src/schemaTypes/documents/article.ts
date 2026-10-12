@@ -4,8 +4,8 @@ import {defineArrayMember, defineField, defineType} from 'sanity'
 import {imageWithAltField} from '../objects/blockFields'
 
 /**
- * A news item, with a page of its own at /news/<slug>. `link` is an optional override for where
- * its news tile goes (an external story); with no link the tile goes to the article's page.
+ * A news item, with a page of its own at /news/<slug>. `externalUrl` is an optional override for
+ * where its news tile goes (a story on another site); without it the tile goes to the article's page.
  */
 export const article = defineType({
   name: 'article',
@@ -47,10 +47,12 @@ export const article = defineType({
       of: [defineArrayMember({type: 'reference', to: [{type: 'newsCategory'}]})],
     }),
     defineField({
-      name: 'link',
-      title: 'Link',
-      type: 'link',
-      description: 'Where the news tile goes. Leave empty for a tile that is not a link.',
+      name: 'externalUrl',
+      title: 'External URL',
+      type: 'url',
+      validation: (rule) => rule.uri({scheme: ['http', 'https']}),
+      description:
+        'Optional. Only for an article that lives on another site: the news tile goes to this address instead of the article page. Leave empty to use the article page.',
     }),
   ],
   orderings: [{title: 'Date, newest first', name: 'dateDesc', by: [{field: 'date', direction: 'desc'}]}],

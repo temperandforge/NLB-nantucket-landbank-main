@@ -1,4 +1,5 @@
 import {
+  BellIcon,
   CalendarIcon,
   CaseIcon,
   ClipboardIcon,
@@ -12,6 +13,7 @@ import {
   InboxIcon,
   MenuIcon,
   PinIcon,
+  ProjectsIcon,
   TagIcon,
   UsersIcon,
 } from '@sanity/icons'
@@ -27,8 +29,8 @@ import pluralize from 'pluralize-esm'
  * e.g. Home, About Us. Site Settings sits outside it - global config with no page of its own.
  *
  * Globals holds content that appears on every page rather than on a page of its own: the
- * Footer singleton and the reusable Menus it references. The header menu will join it here
- * without needing a schema change.
+ * Footer singleton and the reusable Menus it references. The Header and Site Banner singletons
+ * sit beside it.
  */
 
 // Types removed from the automatic top-level list, either because they are handled
@@ -36,13 +38,16 @@ import pluralize from 'pluralize-esm'
 const DISABLED_TYPES = [
   'settings',
   'singleNewsPage',
+  'singleProjectPage',
   'page',
   'assist.instruction.context',
   // Handled explicitly under Globals below.
   'footer',
+  'header',
+  'siteBanner',
   'menu',
-  // Handled explicitly under Projects below.
-  'project',
+  // Handled explicitly under Properties below.
+  'property',
   'propertyType',
   'resource',
   'projectSettings',
@@ -55,6 +60,8 @@ const DISABLED_TYPES = [
   'department',
   'faq',
   'faqCategory',
+  'record',
+  'recordCategory',
   'job',
   'form',
   'formSubmission',
@@ -72,17 +79,17 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
         .icon(DocumentsIcon)
         .child(S.documentTypeList('page').title('Pages')),
       S.divider(),
-      // Projects: the Land Bank's properties, their categorisation, and the settings that
-      // configure both the projects page and the interactive map. Grouped together because the
+      // Properties: the Land Bank's properties, their categorisation, and the settings that
+      // configure both the properties pages and the interactive map. Grouped together because the
       // taxonomies are meaningless outside this section.
       S.listItem()
-        .title('Projects')
+        .title('Properties')
         .icon(PinIcon)
         .child(
           S.list()
-            .title('Projects')
+            .title('Properties')
             .items([
-              S.documentTypeListItem('project').title('Projects').icon(PinIcon),
+              S.documentTypeListItem('property').title('Properties').icon(PinIcon),
               S.divider(),
               S.documentTypeListItem('propertyType').title('Property Types').icon(TagIcon),
               S.documentTypeListItem('resource').title('Resources').icon(DropIcon),
@@ -93,6 +100,20 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
                 .child(
                   S.document().schemaType('projectSettings').documentId('projectSettings'),
                 ),
+            ]),
+        ),
+      // Projects: initiatives the Land Bank runs, with their own categories. Separate from
+      // properties (the map's parcels).
+      S.listItem()
+        .title('Projects')
+        .icon(ProjectsIcon)
+        .child(
+          S.list()
+            .title('Projects')
+            .items([
+              S.documentTypeListItem('project').title('Projects').icon(ProjectsIcon),
+              S.divider(),
+              S.documentTypeListItem('projectType').title('Project Types').icon(TagIcon),
             ]),
         ),
       S.listItem()
@@ -133,6 +154,18 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
               S.documentTypeListItem('faqCategory').title('FAQ Categories').icon(TagIcon),
             ]),
         ),
+      S.listItem()
+        .title('Records')
+        .icon(DocumentsIcon)
+        .child(
+          S.list()
+            .title('Records')
+            .items([
+              S.documentTypeListItem('record').title('Records').icon(DocumentsIcon),
+              S.divider(),
+              S.documentTypeListItem('recordCategory').title('Record Categories').icon(TagIcon),
+            ]),
+        ),
       S.documentTypeListItem('job').title('Jobs').icon(CaseIcon),
       // Forms: the forms editors build, and what visitors sent. Submissions hold personal data, so
       // they sit in their own clearly named list rather than among content.
@@ -161,6 +194,14 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
             .title('Globals')
             .items([
               S.listItem()
+                .title('Header')
+                .icon(FolderIcon)
+                .child(S.document().schemaType('header').documentId('header')),
+              S.listItem()
+                .title('Site Banner')
+                .icon(BellIcon)
+                .child(S.document().schemaType('siteBanner').documentId('siteBanner')),
+              S.listItem()
                 .title('Footer')
                 .icon(FolderIcon)
                 .child(S.document().schemaType('footer').documentId('footer')),
@@ -173,6 +214,13 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
                 .title('Single News Page')
                 .icon(DocumentTextIcon)
                 .child(S.document().schemaType('singleNewsPage').documentId('singleNewsPage')),
+              // The content every project page shares (wording, FAQ heading, "more projects").
+              S.listItem()
+                .title('Single Project Page')
+                .icon(ProjectsIcon)
+                .child(
+                  S.document().schemaType('singleProjectPage').documentId('singleProjectPage'),
+                ),
             ]),
         ),
       // Site Settings: global config with no page/route of its own.

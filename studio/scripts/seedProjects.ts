@@ -174,7 +174,7 @@ async function main() {
   console.log('\nProjects:')
   for (const spec of PROJECTS) {
     const existing = await client.fetch<string | null>(
-      `*[_type == "project" && slug.current == $slug][0]._id`,
+      `*[_type == "property" && slug.current == $slug][0]._id`,
       {slug: spec.slug},
     )
     if (existing) {
@@ -186,14 +186,14 @@ async function main() {
       continue
     }
     const created = await client.create({
-      _type: 'project',
+      _type: 'property',
       name: spec.name,
       slug: {_type: 'slug', current: spec.slug},
       propertyTypes: spec.propertyTypes.map((s) => reference(propertyTypeIds.get(s)!, `pt-${s}`)),
       resources: spec.resources.map((s) => reference(resourceIds.get(s)!, `r-${s}`)),
       // The generated boundary file uses the project slug as each feature's id, so the two line
       // up without a mapping table. The client's real file will use its own identifiers.
-      boundaryId: spec.slug,
+      boundaryIds: [spec.slug],
       location: {_type: 'geopoint', lng: spec.coordinates[0], lat: spec.coordinates[1]},
     })
     console.log(`  + project created: ${spec.slug} (${created._id})`)

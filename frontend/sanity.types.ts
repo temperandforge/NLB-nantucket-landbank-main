@@ -20,22 +20,6 @@ export type ShowIf = {
   equals?: string
 }
 
-export type SanityImageAssetReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
-}
-
-export type CarouselImageImage = {
-  asset?: SanityImageAssetReference
-  media?: unknown // Unable to locate the referenced type "carouselImage.image.media" in schema
-  hotspot?: SanityImageHotspot
-  crop?: SanityImageCrop
-  alt?: string
-  _type: 'image'
-}
-
 export type SanityFileAssetReference = {
   _ref: string
   _type: 'reference'
@@ -47,6 +31,22 @@ export type DownloadFile = {
   asset?: SanityFileAssetReference
   media?: unknown // Unable to locate the referenced type "file.media" in schema
   _type: 'file'
+}
+
+export type SanityImageAssetReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
+}
+
+export type GrowerImage = {
+  asset?: SanityImageAssetReference
+  media?: unknown // Unable to locate the referenced type "grower.image.media" in schema
+  hotspot?: SanityImageHotspot
+  crop?: SanityImageCrop
+  alt?: string
+  _type: 'image'
 }
 
 export type SocialLink = {
@@ -75,6 +75,7 @@ export type MenuLink = {
   _type: 'menuLink'
   label: string
   link: Link
+  group?: string
 }
 
 export type MenuGroup = {
@@ -146,10 +147,35 @@ export type CtaContact = {
   disabled?: boolean
 }
 
+export type EventsGrid = {
+  _type: 'eventsGrid'
+  emptyText?: string
+  disabled?: boolean
+}
+
 export type EventsPreview = {
   _type: 'eventsPreview'
   eyebrow?: string
   count: number
+  disabled?: boolean
+}
+
+export type PropertyReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'property'
+}
+
+export type PropertiesPreview = {
+  _type: 'propertiesPreview'
+  heading?: string
+  button?: Button
+  properties?: Array<
+    {
+      _key: string
+    } & PropertyReference
+  >
   disabled?: boolean
 }
 
@@ -173,9 +199,20 @@ export type ProjectPreview = {
   disabled?: boolean
 }
 
+export type RecordsArchive = {
+  _type: 'recordsArchive'
+  disabled?: boolean
+}
+
+export type PropertyArchive = {
+  _type: 'propertyArchive'
+  disabled?: boolean
+}
+
 export type ProjectGrid = {
   _type: 'projectGrid'
   heading?: string
+  showFilters?: boolean
   disabled?: boolean
 }
 
@@ -201,9 +238,23 @@ export type FaqList = {
   disabled?: boolean
 }
 
+export type NewsArchive = {
+  _type: 'newsArchive'
+  showFilters?: boolean
+  disabled?: boolean
+}
+
+export type NewsCategoryReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'newsCategory'
+}
+
 export type NewsPreview = {
   _type: 'newsPreview'
   heading?: string
+  category?: NewsCategoryReference
   count: number
   ctaHeading?: string
   ctaLabel?: string
@@ -222,6 +273,16 @@ export type MissionStatement = {
     _key: string
   }>
   disabled?: boolean
+}
+
+export type FaqAccordion = {
+  _type: 'faqAccordion'
+  items?: Array<{
+    question: string
+    answer: BlockContent
+    _type: 'faqAccordionItem'
+    _key: string
+  }>
 }
 
 export type AnchorLinks = {
@@ -264,8 +325,29 @@ export type MapTeaser = {
   eyebrow?: string
   heading?: string
   body?: string
-  featuredProject?: ProjectReference
+  featuredProject?: PropertyReference
   button?: Button
+  disabled?: boolean
+}
+
+export type MapPreview = {
+  _type: 'mapPreview'
+  heading?: string
+  body?: string
+  disabled?: boolean
+}
+
+export type Growers = {
+  _type: 'growers'
+  heading?: string
+  body?: string
+  growers?: Array<{
+    name: string
+    image: GrowerImage
+    tag?: string
+    _type: 'grower'
+    _key: string
+  }>
   disabled?: boolean
 }
 
@@ -292,16 +374,23 @@ export type Timeline = {
   disabled?: boolean
 }
 
+export type ProjectTypeReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'projectType'
+}
+
 export type ImageCarousel = {
   _type: 'imageCarousel'
   eyebrow?: string
-  images?: Array<{
-    image: CarouselImageImage
-    caption?: string
-    link?: Link
-    _type: 'carouselImage'
-    _key: string
-  }>
+  source?: 'manual' | 'category'
+  projects?: Array<
+    {
+      _key: string
+    } & ProjectReference
+  >
+  category?: ProjectTypeReference
   disabled?: boolean
 }
 
@@ -340,6 +429,9 @@ export type JumpNavContent = {
     | ({
         _key: string
       } & AnchorLinks)
+    | ({
+        _key: string
+      } & FaqAccordion)
   >
   disabled?: boolean
 }
@@ -387,7 +479,7 @@ export type HeroSecondary = {
 
 export type HeroImage = {
   _type: 'heroImage'
-  eyebrow: string
+  eyebrow?: string
   heading: string
   image: {
     asset?: SanityImageAssetReference
@@ -551,6 +643,16 @@ export type Slug = {
   source?: string
 }
 
+export type ProjectType = {
+  _id: string
+  _type: 'projectType'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+}
+
 export type PropertyType = {
   _id: string
   _type: 'propertyType'
@@ -570,6 +672,42 @@ export type NewsCategory = {
   title: string
   slug: Slug
   order?: number
+}
+
+export type RecordCategoryReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'recordCategory'
+}
+
+export type Record = {
+  _id: string
+  _type: 'record'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title?: string
+  date?: string
+  file: {
+    asset?: SanityFileAssetReference
+    media?: unknown
+    _type: 'file'
+  }
+  category: RecordCategoryReference
+}
+
+export type RecordCategory = {
+  _id: string
+  _type: 'recordCategory'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  order?: number
+  sortBy: 'dateDesc' | 'titleAsc'
+  filters?: Array<string>
 }
 
 export type FormSubmission = {
@@ -737,17 +875,48 @@ export type Event = {
   _updatedAt: string
   _rev: string
   title: string
+  slug: Slug
   start: string
   end?: string
+  image?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
   location?: string
   description?: string
-}
-
-export type NewsCategoryReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'newsCategory'
+  body?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>
+          text?: string
+          _type: 'span'
+          _key: string
+        }>
+        style?: 'normal' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+        listItem?: 'bullet' | 'number'
+        markDefs?: Array<
+          {
+            _key: string
+          } & Link
+        >
+        level?: number
+        _type: 'block'
+        _key: string
+      }
+    | {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        _type: 'image'
+        _key: string
+      }
+  >
 }
 
 export type Article = {
@@ -773,7 +942,67 @@ export type Article = {
       _key: string
     } & NewsCategoryReference
   >
-  link?: Link
+  externalUrl?: string
+}
+
+export type Project = {
+  _id: string
+  _type: 'project'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  slug: Slug
+  image?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  description?: string
+  projectTypes?: Array<
+    {
+      _key: string
+    } & ProjectTypeReference
+  >
+  body?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>
+          text?: string
+          _type: 'span'
+          _key: string
+        }>
+        style?: 'normal' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+        listItem?: 'bullet' | 'number'
+        markDefs?: Array<
+          {
+            _key: string
+          } & Link
+        >
+        level?: number
+        _type: 'block'
+        _key: string
+      }
+    | {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        _type: 'image'
+        _key: string
+      }
+    | ({
+        _key: string
+      } & AnchorLinks)
+    | ({
+        _key: string
+      } & FaqAccordion)
+  >
+  property?: PropertyReference
 }
 
 export type PropertyTypeReference = {
@@ -790,9 +1019,9 @@ export type ResourceReference = {
   [internalGroqTypeReferenceTo]?: 'resource'
 }
 
-export type Project = {
+export type Property = {
   _id: string
-  _type: 'project'
+  _type: 'property'
   _createdAt: string
   _updatedAt: string
   _rev: string
@@ -818,8 +1047,9 @@ export type Project = {
       _key: string
     } & ResourceReference
   >
-  boundaryId?: string
+  boundaryIds?: Array<string>
   location?: Geopoint
+  disablePopup?: boolean
 }
 
 export type Geopoint = {
@@ -827,6 +1057,23 @@ export type Geopoint = {
   lat?: number
   lng?: number
   alt?: number
+}
+
+export type SingleProjectPage = {
+  _id: string
+  _type: 'singleProjectPage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  eyebrow?: string
+  archiveLink?: Link
+  moreProjects?: {
+    disabled?: boolean
+    eyebrow?: string
+    body?: string
+    button?: Button
+    count?: number
+  }
 }
 
 export type SingleNewsPage = {
@@ -865,11 +1112,31 @@ export type ProjectSettings = {
   defaultZoom?: number
 }
 
+export type SiteBanner = {
+  _id: string
+  _type: 'siteBanner'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  enabled?: boolean
+  message?: string
+  link?: Link
+}
+
 export type MenuReference = {
   _ref: string
   _type: 'reference'
   _weak?: boolean
   [internalGroqTypeReferenceTo]?: 'menu'
+}
+
+export type Header = {
+  _id: string
+  _type: 'header'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  mainMenu: MenuReference
 }
 
 export type Footer = {
@@ -940,6 +1207,14 @@ export type Settings = {
     _type: 'block'
     _key: string
   }>
+  defaultPropertyImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
   ogImage?: {
     asset?: SanityImageAssetReference
     media?: unknown
@@ -976,10 +1251,16 @@ export type Page = {
       } & DownloadBlock)
     | ({
         _key: string
+      } & EventsGrid)
+    | ({
+        _key: string
       } & EventsPreview)
     | ({
         _key: string
       } & FaqList)
+    | ({
+        _key: string
+      } & Growers)
     | ({
         _key: string
       } & Hero)
@@ -1000,16 +1281,22 @@ export type Page = {
       } & ImageCarousel)
     | ({
         _key: string
+      } & MapTeaser)
+    | ({
+        _key: string
       } & JobListings)
     | ({
         _key: string
       } & JumpNavContent)
     | ({
         _key: string
-      } & MapTeaser)
+      } & MapPreview)
     | ({
         _key: string
       } & MissionStatement)
+    | ({
+        _key: string
+      } & NewsArchive)
     | ({
         _key: string
       } & NewsPreview)
@@ -1022,6 +1309,15 @@ export type Page = {
     | ({
         _key: string
       } & ProjectPreview)
+    | ({
+        _key: string
+      } & PropertiesPreview)
+    | ({
+        _key: string
+      } & PropertyArchive)
+    | ({
+        _key: string
+      } & RecordsArchive)
     | ({
         _key: string
       } & Timeline)
@@ -1266,10 +1562,10 @@ export type SanityImageAsset = {
 
 export type AllSanitySchemaTypes =
   | ShowIf
-  | SanityImageAssetReference
-  | CarouselImageImage
   | SanityFileAssetReference
   | DownloadFile
+  | SanityImageAssetReference
+  | GrowerImage
   | SocialLink
   | InfoLine
   | InfoColumn
@@ -1279,22 +1575,33 @@ export type AllSanitySchemaTypes =
   | FormEmbed
   | FormField
   | CtaContact
+  | EventsGrid
   | EventsPreview
+  | PropertyReference
+  | PropertiesPreview
   | ProjectReference
   | ProjectPreview
+  | RecordsArchive
+  | PropertyArchive
   | ProjectGrid
   | PeopleGrid
   | JobListings
   | FaqList
+  | NewsArchive
+  | NewsCategoryReference
   | NewsPreview
   | MissionStatement
+  | FaqAccordion
   | AnchorLinks
   | PageReference
   | Link
   | ContactForm
   | MapTeaser
+  | MapPreview
+  | Growers
   | DownloadBlock
   | Timeline
+  | ProjectTypeReference
   | ImageCarousel
   | JumpNavContent
   | BasicLeftRightText
@@ -1309,8 +1616,12 @@ export type AllSanitySchemaTypes =
   | Button
   | Resource
   | Slug
+  | ProjectType
   | PropertyType
   | NewsCategory
+  | RecordCategoryReference
+  | Record
+  | RecordCategory
   | FormSubmission
   | Form
   | DepartmentReference
@@ -1324,15 +1635,18 @@ export type AllSanitySchemaTypes =
   | StaffMember
   | Department
   | Event
-  | NewsCategoryReference
   | Article
+  | Project
   | PropertyTypeReference
   | ResourceReference
-  | Project
+  | Property
   | Geopoint
+  | SingleProjectPage
   | SingleNewsPage
   | ProjectSettings
+  | SiteBanner
   | MenuReference
+  | Header
   | Footer
   | Menu
   | Settings
@@ -1391,6 +1705,14 @@ export type SettingsQueryResult = {
     _type: 'block'
     _key: string
   }>
+  defaultPropertyImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
   ogImage?: {
     asset?: SanityImageAssetReference
     media?: unknown
@@ -1404,7 +1726,7 @@ export type SettingsQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: footerQuery
-// Query: *[_type == "footer" && _id == "footer"][0]{    newsletterHeading,    organizationName,    infoColumns[]{      _key,      heading,      lines[]{        _key,        text,        href      }    },    socialLinks[]{      _key,      platform,      url    },    "footerMenu": footerMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,        link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }    }  }  }    },    "legalMenu": legalMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,        link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }    }  }  }    },  }
+// Query: *[_type == "footer" && _id == "footer"][0]{    newsletterHeading,    organizationName,    infoColumns[]{      _key,      heading,      lines[]{        _key,        text,        href      }    },    socialLinks[]{      _key,      platform,      url    },    "footerMenu": footerMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,      group,        link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }    }  }  }    },    "legalMenu": legalMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,      group,        link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }    }  }  }    },  }
 export type FooterQueryResult = {
   newsletterHeading: string
   organizationName: string
@@ -1433,6 +1755,7 @@ export type FooterQueryResult = {
           children: Array<{
             _key: string
             label: string
+            group: string | null
             link: {
               _type: 'link'
               linkType?: 'href' | 'page'
@@ -1467,6 +1790,7 @@ export type FooterQueryResult = {
           children: Array<{
             _key: string
             label: string
+            group: string | null
             link: {
               _type: 'link'
               linkType?: 'href' | 'page'
@@ -1493,14 +1817,70 @@ export type FooterQueryResult = {
 } | null
 
 // Source: sanity/lib/queries.ts
-// Variable: projectsQuery
-// Query: *[_type == "project" && defined(slug.current)] | order(name asc) {    _id,    name,    "slug": slug.current,    boundaryId,    location,    description,    link,    "image": image{"url": asset->url, alt},    "propertyTypes": propertyTypes[]->{"slug": slug.current, title},    "resources": resources[]->{"slug": slug.current, title}  }
-export type ProjectsQueryResult = Array<{
+// Variable: headerQuery
+// Query: *[_type == "header" && _id == "header"][0]{    "mainMenu": mainMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,      group,        link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }    }  }  }    }  }
+export type HeaderQueryResult = {
+  mainMenu: {
+    _id: string
+    title: string
+    items: Array<
+      | {
+          _key: string
+          _type: 'menuGroup'
+          label: string
+          children: Array<{
+            _key: string
+            label: string
+            group: string | null
+            link: {
+              _type: 'link'
+              linkType?: 'href' | 'page'
+              href?: string
+              page: string | null
+              openInNewTab?: boolean
+            }
+          }>
+        }
+      | {
+          _key: string
+          _type: 'menuLink'
+          label: string
+          link: {
+            _type: 'link'
+            linkType?: 'href' | 'page'
+            href?: string
+            page: string | null
+            openInNewTab?: boolean
+          }
+        }
+    >
+  }
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: siteBannerQuery
+// Query: *[_type == "siteBanner" && _id == "siteBanner" && enabled == true][0]{    message,      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }  }
+export type SiteBannerQueryResult = {
+  message: string | null
+  link: {
+    _type: 'link'
+    linkType?: 'href' | 'page'
+    href?: string
+    page: string | null
+    openInNewTab?: boolean
+  } | null
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: propertiesQuery
+// Query: *[_type == "property" && defined(slug.current)] | order(name asc) {      _id,  name,  "slug": slug.current,  boundaryIds,  location,  disablePopup,  description,  link,  "image": image{"url": asset->url, alt},  "propertyTypes": propertyTypes[]->{"slug": slug.current, title},  "resources": resources[]->{"slug": slug.current, title}  }
+export type PropertiesQueryResult = Array<{
   _id: string
   name: string
   slug: string
-  boundaryId: string | null
+  boundaryIds: Array<string> | null
   location: Geopoint | null
+  disablePopup: boolean | null
   description: string | null
   link: string | null
   image: {
@@ -1533,7 +1913,7 @@ export type MapFiltersQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: mapSettingsQuery
-// Query: *[_type == "projectSettings" && _id == "projectSettings"][0]{    eyebrow,    heading,    intro,    "boundaryDataUrl": boundaryData.asset->url,    "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),    "trailsDataUrl": trailsData.asset->url,    defaultCenter,    defaultZoom  }
+// Query: *[_type == "projectSettings" && _id == "projectSettings"][0]{      eyebrow,  heading,  intro,  "boundaryDataUrl": boundaryData.asset->url,  "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),  "trailsDataUrl": trailsData.asset->url,  defaultCenter,  defaultZoom  }
 export type MapSettingsQueryResult = {
   eyebrow: string | null
   heading: string | null
@@ -1589,7 +1969,7 @@ export type FORM_FOR_SUBMIT_QUERY_RESULT = {
 
 // Source: sanity/lib/queries.ts
 // Variable: getPageQuery
-// Query: *[_type == 'page' && slug.current == $leaf && !coalesce(pathOnly, false)]{      _id,  _type,  name,  slug,  "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),    pageBuilder[$includeHidden || !coalesce(disabled, false)]{    ...,    _type == "heroVideo" => {      ...,      "videoUrl": video.asset->url    },    _type == "basicLeftRightText" => {      ...,      buttons[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      rightContent[]{        ...,        _type == "anchorLinks" => {          links[]{            ...,              link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }          }        },        _type == "formEmbed" => {          ...,          form->{  _id,  title,  submitLabel,  successMessage,  sections[]{    _key,    heading,    columns,    fields[]{      _key,      "name": name.current,      label,      helperText,      placeholder,      fieldType,      required,      width,      maxLength,      options,      showIf{field, equals}    }  }}        },          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },    _type == "contactForm" => {      ...,      details[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      },      form->{  _id,  title,  submitLabel,  successMessage,  sections[]{    _key,    heading,    columns,    fields[]{      _key,      "name": name.current,      label,      helperText,      placeholder,      fieldType,      required,      width,      maxLength,      options,      showIf{field, equals}    }  }}    },    _type == "missionStatement" => {      ...,      links[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "ctaContact" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "newsPreview" => {      ...,      ctaLink{        ...,          _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      },      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) [0...12] {          _id,  title,  "slug": slug.current,  date,  image,  link{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  },  "categories": categories[]->{"slug": slug.current, title}      }    },    _type == "eventsPreview" => {      ...,      "events": *[        _type == "event" && defined(start)        && dateTime(coalesce(end, start)) >= dateTime($now)      ] | order(start asc) [0...12] {        _id,        title,        start,        end,        location,        description      }    },    _type == "faqList" => {      ...,      "ungrouped": *[_type == "faq" && !defined(category->_id)] | order(order asc, question asc) {        _id,        question,        answer[]{          ...,            markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }        }      },      "groups": *[_type == "faqCategory"] | order(order asc, title asc) {        _id,        title,        "faqs": *[_type == "faq" && category._ref == ^._id] | order(order asc, question asc) {          _id,          question,          answer[]{            ...,              markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }          }        }      }[count(faqs) > 0]    },    _type == "jobListings" => {      ...,      "jobs": *[_type == "job"] | order(order asc, title asc) {        _id,        title,        description,        location,        employmentType,        "department": department->{"slug": slug.current, title},        applyLink{          ...,            _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }        }      }    },    _type == "peopleGrid" => {      ...,      "staff": *[_type == "staffMember" && ^.source == "staff"] | order(order asc, name asc) {        _id,        name,        title,        headshot,        "department": department->{"slug": slug.current, title, order}      },      "commissioners": *[_type == "commissioner" && ^.source == "commissioners"] | order(order asc, name asc) {        _id,        name,        title,        termDate,        headshot      }    },    _type == "projectGrid" => {      ...,      "projects": *[_type == "project" && defined(slug.current)] | order(name asc) {        _id,        name,        description,        image,        link,        "propertyTypes": propertyTypes[]->{"slug": slug.current, title},        "resources": resources[]->{"slug": slug.current, title}      }    },    _type == "imageCarousel" => {      ...,      images[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "projectPreview" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      "projects": projects[]->{        _id,        name,        image,        link      }    },    _type == "mapTeaser" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      "featuredProject": featuredProject->{name, description, image}    },    _type == "downloadBlock" => {      ...,      downloads[]{        ...,        "fileUrl": file.asset->url,        "fileName": file.asset->originalFilename      }    },    _type == "jumpNavContent" => {      ...,      content[]{        ...,        _type == "anchorLinks" => {          links[]{            ...,              link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }          }        },          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },  }  }[path == $path][0]
+// Query: *[_type == 'page' && slug.current == $leaf && !coalesce(pathOnly, false)]{      _id,  _type,  name,  slug,  "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),    pageBuilder[$includeHidden || !coalesce(disabled, false)]{    ...,    _type == "heroVideo" => {      ...,      "videoUrl": video.asset->url    },    _type == "basicLeftRightText" => {      ...,      buttons[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      rightContent[]{        ...,        _type == "anchorLinks" => {          links[]{            ...,              link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }          }        },        _type == "formEmbed" => {          ...,          form->{  _id,  title,  submitLabel,  successMessage,  sections[]{    _key,    heading,    columns,    fields[]{      _key,      "name": name.current,      label,      helperText,      placeholder,      fieldType,      required,      width,      maxLength,      options,      showIf{field, equals}    }  }}        },          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },    _type == "contactForm" => {      ...,      details[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      },      form->{  _id,  title,  submitLabel,  successMessage,  sections[]{    _key,    heading,    columns,    fields[]{      _key,      "name": name.current,      label,      helperText,      placeholder,      fieldType,      required,      width,      maxLength,      options,      showIf{field, equals}    }  }}    },    _type == "missionStatement" => {      ...,      links[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "ctaContact" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "newsPreview" => {      ...,      ctaLink{        ...,          _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      },      // A chosen category narrows the list; none means the latest of all news.      "articles": *[        _type == "article" && defined(slug.current)        && (!defined(^.category) || ^.category._ref in categories[]._ref)      ] | order(date desc) [0...12] {          _id,  title,  "slug": slug.current,  date,  image,  externalUrl,  "categories": categories[]->{"slug": slug.current, title}      }    },    _type == "newsArchive" => {      ...,      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) {          _id,  title,  "slug": slug.current,  date,  image,  externalUrl,  "categories": categories[]->{"slug": slug.current, title}      }    },    _type == "recordsArchive" => {      ...,      "categories": *[_type == "recordCategory" && defined(slug.current)] | order(order asc, title asc) {        _id,        title,        "slug": slug.current,        order,        sortBy,        filters      },      "records": *[        _type == "record" && defined(file.asset) && defined(category->slug.current)      ] {        _id,        title,        date,        "fileUrl": file.asset->url,        "fileName": file.asset->originalFilename,        "categorySlug": category->slug.current      }    },    _type == "eventsGrid" => {      ...,      "events": *[        _type == "event" && defined(start)        && dateTime(coalesce(end, start)) >= dateTime($now)      ] | order(start asc) {        _id,        title,        "slug": slug.current,        start,        end,        location,        description,        image      }    },    _type == "eventsPreview" => {      ...,      "events": *[        _type == "event" && defined(start)        && dateTime(coalesce(end, start)) >= dateTime($now)      ] | order(start asc) [0...12] {        _id,        title,        "slug": slug.current,        start,        end,        location,        description      }    },    _type == "faqList" => {      ...,      "ungrouped": *[_type == "faq" && !defined(category->_id)] | order(order asc, question asc) {        _id,        question,        answer[]{          ...,            markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }        }      },      "groups": *[_type == "faqCategory"] | order(order asc, title asc) {        _id,        title,        "faqs": *[_type == "faq" && category._ref == ^._id] | order(order asc, question asc) {          _id,          question,          answer[]{            ...,              markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }          }        }      }[count(faqs) > 0]    },    _type == "jobListings" => {      ...,      "jobs": *[_type == "job"] | order(order asc, title asc) {        _id,        title,        description,        location,        employmentType,        "department": department->{"slug": slug.current, title},        applyLink{          ...,            _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }        }      }    },    _type == "peopleGrid" => {      ...,      "staff": *[_type == "staffMember" && ^.source == "staff"] | order(order asc, name asc) {        _id,        name,        title,        headshot,        "department": department->{"slug": slug.current, title, order}      },      "commissioners": *[_type == "commissioner" && ^.source == "commissioners"] | order(order asc, name asc) {        _id,        name,        title,        termDate,        headshot      }    },    _type == "projectGrid" => {      ...,      "projects": *[_type == "project" && defined(slug.current)] | order(name asc) {        _id,        name,        image,        "slug": slug.current,        "projectTypes": projectTypes[]->{"slug": slug.current, title}      }    },    _type == "propertyArchive" => {      ...,      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {        _id,        name,        description,        link,        image,        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},        "resources": resources[]->{"slug": slug.current, title, order}      },      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage    },    _type == "imageCarousel" => {      ...,      "projects": select(        source == "category" => *[          _type == "project" && defined(slug.current)          && ^.category._ref in projectTypes[]._ref        ] | order(name asc) {          _id,          name,          image,          "slug": slug.current        },        projects[]->{          _id,          name,          image,          "slug": slug.current        }      ),      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage    },    _type == "projectPreview" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      "projects": projects[]->{        _id,        name,        image,        "slug": slug.current      }    },    _type == "growers" => {      ...,      growers[]{        _key,        name,        tag,        image      }    },    _type == "propertiesPreview" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      "properties": properties[]->{        _id,        name,        description,        link,        image,        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},        "resources": resources[]->{"slug": slug.current, title, order}      },      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage    },    _type == "mapPreview" => {      ...,      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {          _id,  name,  "slug": slug.current,  boundaryIds,  location,  disablePopup,  description,  link,  "image": image{"url": asset->url, alt},  "propertyTypes": propertyTypes[]->{"slug": slug.current, title},  "resources": resources[]->{"slug": slug.current, title}      },      "settings": *[_type == "projectSettings" && _id == "projectSettings"][0]{          eyebrow,  heading,  intro,  "boundaryDataUrl": boundaryData.asset->url,  "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),  "trailsDataUrl": trailsData.asset->url,  defaultCenter,  defaultZoom      }    },    _type == "mapTeaser" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      "featuredProject": featuredProject->{name, description, image}    },    _type == "downloadBlock" => {      ...,      downloads[]{        ...,        "fileUrl": file.asset->url,        "fileName": file.asset->originalFilename      }    },    _type == "jumpNavContent" => {      ...,      content[]{        ...,        _type == "anchorLinks" => {          links[]{            ...,              link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }          }        },        _type == "faqAccordion" => {          items[]{            ...,            answer[]{              ...,                markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }            }          }        },          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },  }  }[path == $path][0]
 export type GetPageQueryResult = {
   _id: string
   _type: 'page'
@@ -1849,6 +2229,29 @@ export type GetPageQueryResult = {
       }
     | {
         _key: string
+        _type: 'eventsGrid'
+        emptyText?: string
+        disabled?: boolean
+        events: Array<{
+          _id: string
+          title: string
+          slug: string
+          start: string
+          end: string | null
+          location: string | null
+          description: string | null
+          image: {
+            asset?: SanityImageAssetReference
+            media?: unknown
+            hotspot?: SanityImageHotspot
+            crop?: SanityImageCrop
+            alt?: string
+            _type: 'image'
+          } | null
+        }>
+      }
+    | {
+        _key: string
         _type: 'eventsPreview'
         eyebrow?: string
         count: number
@@ -1856,6 +2259,7 @@ export type GetPageQueryResult = {
         events: Array<{
           _id: string
           title: string
+          slug: string
           start: string
           end: string | null
           location: string | null
@@ -1973,6 +2377,19 @@ export type GetPageQueryResult = {
       }
     | {
         _key: string
+        _type: 'growers'
+        heading?: string
+        body?: string
+        growers: Array<{
+          _key: string
+          name: string
+          tag: string | null
+          image: GrowerImage
+        }> | null
+        disabled?: boolean
+      }
+    | {
+        _key: string
         _type: 'hero'
         eyebrow?: string
         heading?: string
@@ -1990,7 +2407,7 @@ export type GetPageQueryResult = {
     | {
         _key: string
         _type: 'heroImage'
-        eyebrow: string
+        eyebrow?: string
         heading: string
         image: {
           asset?: SanityImageAssetReference
@@ -2051,20 +2468,30 @@ export type GetPageQueryResult = {
         _key: string
         _type: 'imageCarousel'
         eyebrow?: string
-        images: Array<{
-          image: CarouselImageImage
-          caption?: string
-          link: {
-            _type: 'link'
-            linkType?: 'href' | 'page'
-            href?: string
-            page: string | null
-            openInNewTab?: boolean
+        source?: 'category' | 'manual'
+        projects: Array<{
+          _id: string
+          name: string
+          image: {
+            asset?: SanityImageAssetReference
+            media?: unknown
+            hotspot?: SanityImageHotspot
+            crop?: SanityImageCrop
+            alt?: string
+            _type: 'image'
           } | null
-          _type: 'carouselImage'
-          _key: string
+          slug: string
         }> | null
+        category?: ProjectTypeReference
         disabled?: boolean
+        defaultImage: {
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          alt?: string
+          _type: 'image'
+        } | null
       }
     | {
         _key: string
@@ -2137,6 +2564,61 @@ export type GetPageQueryResult = {
               _key: string
             }
           | {
+              _key: string
+              _type: 'faqAccordion'
+              items: Array<{
+                question: string
+                answer: Array<
+                  | {
+                      _key: string
+                      _type: 'anchorLinks'
+                      links?: Array<{
+                        label: string
+                        link?: Link
+                        icon?: 'download' | 'link'
+                        _type: 'anchorLink'
+                        _key: string
+                      }>
+                      markDefs: null
+                    }
+                  | {
+                      children?: Array<{
+                        marks?: Array<string>
+                        text?: string
+                        _type: 'span'
+                        _key: string
+                      }>
+                      style?: 'blockquote' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+                      listItem?: 'bullet' | 'number'
+                      markDefs: Array<{
+                        linkType?: 'href' | 'page'
+                        href?: string
+                        page: string | null
+                        openInNewTab?: boolean
+                        _type: 'link'
+                        _key: string
+                      }> | null
+                      level?: number
+                      _type: 'block'
+                      _key: string
+                    }
+                  | {
+                      asset?: SanityImageAssetReference
+                      media?: unknown
+                      hotspot?: SanityImageHotspot
+                      crop?: SanityImageCrop
+                      alt?: string
+                      _type: 'image'
+                      _key: string
+                      markDefs: null
+                    }
+                >
+                _type: 'faqAccordionItem'
+                _key: string
+              }> | null
+              markDefs: null
+            }
+          | {
               asset?: SanityImageAssetReference
               media?: unknown
               hotspot?: SanityImageHotspot
@@ -2148,6 +2630,45 @@ export type GetPageQueryResult = {
             }
         > | null
         disabled?: boolean
+      }
+    | {
+        _key: string
+        _type: 'mapPreview'
+        heading?: string
+        body?: string
+        disabled?: boolean
+        properties: Array<{
+          _id: string
+          name: string
+          slug: string
+          boundaryIds: Array<string> | null
+          location: Geopoint | null
+          disablePopup: boolean | null
+          description: string | null
+          link: string | null
+          image: {
+            url: string | null
+            alt: string | null
+          } | null
+          propertyTypes: Array<{
+            slug: string
+            title: string
+          }> | null
+          resources: Array<{
+            slug: string
+            title: string
+          }> | null
+        }>
+        settings: {
+          eyebrow: string | null
+          heading: string | null
+          intro: string | null
+          boundaryDataUrl: string | null
+          boundaryIdProperty: string
+          trailsDataUrl: string | null
+          defaultCenter: Geopoint | null
+          defaultZoom: number | null
+        } | null
       }
     | {
         _key: string
@@ -2201,8 +2722,34 @@ export type GetPageQueryResult = {
       }
     | {
         _key: string
+        _type: 'newsArchive'
+        showFilters?: boolean
+        disabled?: boolean
+        articles: Array<{
+          _id: string
+          title: string
+          slug: string
+          date: string
+          image: {
+            asset?: SanityImageAssetReference
+            media?: unknown
+            hotspot?: SanityImageHotspot
+            crop?: SanityImageCrop
+            alt?: string
+            _type: 'image'
+          }
+          externalUrl: string | null
+          categories: Array<{
+            slug: string
+            title: string
+          }> | null
+        }>
+      }
+    | {
+        _key: string
         _type: 'newsPreview'
         heading?: string
+        category?: NewsCategoryReference
         count: number
         ctaHeading?: string
         ctaLabel?: string
@@ -2227,13 +2774,7 @@ export type GetPageQueryResult = {
             alt?: string
             _type: 'image'
           }
-          link: {
-            _type: 'link'
-            linkType?: 'href' | 'page'
-            href?: string
-            page: string | null
-            openInNewTab?: boolean
-          } | null
+          externalUrl: string | null
           categories: Array<{
             slug: string
             title: string
@@ -2282,11 +2823,11 @@ export type GetPageQueryResult = {
         _key: string
         _type: 'projectGrid'
         heading?: string
+        showFilters?: boolean
         disabled?: boolean
         projects: Array<{
           _id: string
           name: string
-          description: string | null
           image: {
             asset?: SanityImageAssetReference
             media?: unknown
@@ -2295,12 +2836,8 @@ export type GetPageQueryResult = {
             alt?: string
             _type: 'image'
           } | null
-          link: string | null
-          propertyTypes: Array<{
-            slug: string
-            title: string
-          }> | null
-          resources: Array<{
+          slug: string
+          projectTypes: Array<{
             slug: string
             title: string
           }> | null
@@ -2333,9 +2870,116 @@ export type GetPageQueryResult = {
             alt?: string
             _type: 'image'
           } | null
-          link: string | null
+          slug: string
         }> | null
         disabled?: boolean
+      }
+    | {
+        _key: string
+        _type: 'propertiesPreview'
+        heading?: string
+        button: {
+          _type: 'button'
+          buttonText?: string
+          link: {
+            _type: 'link'
+            linkType?: 'href' | 'page'
+            href?: string
+            page: string | null
+            openInNewTab?: boolean
+          } | null
+        } | null
+        properties: Array<{
+          _id: string
+          name: string
+          description: string | null
+          link: string | null
+          image: {
+            asset?: SanityImageAssetReference
+            media?: unknown
+            hotspot?: SanityImageHotspot
+            crop?: SanityImageCrop
+            alt?: string
+            _type: 'image'
+          } | null
+          propertyTypes: Array<{
+            slug: string
+            title: string
+            order: null
+          }> | null
+          resources: Array<{
+            slug: string
+            title: string
+            order: null
+          }> | null
+        }> | null
+        disabled?: boolean
+        defaultImage: {
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          alt?: string
+          _type: 'image'
+        } | null
+      }
+    | {
+        _key: string
+        _type: 'propertyArchive'
+        disabled?: boolean
+        properties: Array<{
+          _id: string
+          name: string
+          description: string | null
+          link: string | null
+          image: {
+            asset?: SanityImageAssetReference
+            media?: unknown
+            hotspot?: SanityImageHotspot
+            crop?: SanityImageCrop
+            alt?: string
+            _type: 'image'
+          } | null
+          propertyTypes: Array<{
+            slug: string
+            title: string
+            order: null
+          }> | null
+          resources: Array<{
+            slug: string
+            title: string
+            order: null
+          }> | null
+        }>
+        defaultImage: {
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          alt?: string
+          _type: 'image'
+        } | null
+      }
+    | {
+        _key: string
+        _type: 'recordsArchive'
+        disabled?: boolean
+        categories: Array<{
+          _id: string
+          title: string
+          slug: string
+          order: number | null
+          sortBy: 'dateDesc' | 'titleAsc'
+          filters: Array<string> | null
+        }>
+        records: Array<{
+          _id: string
+          title: string | null
+          date: string | null
+          fileUrl: string
+          fileName: string | null
+          categorySlug: string
+        }>
       }
     | {
         _key: string
@@ -2354,7 +2998,7 @@ export type GetPageQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: landingPageQuery
-// Query: *[    _type == "page" && !coalesce(pathOnly, false)    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref  ][0]{      _id,  _type,  name,  slug,  "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),    pageBuilder[$includeHidden || !coalesce(disabled, false)]{    ...,    _type == "heroVideo" => {      ...,      "videoUrl": video.asset->url    },    _type == "basicLeftRightText" => {      ...,      buttons[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      rightContent[]{        ...,        _type == "anchorLinks" => {          links[]{            ...,              link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }          }        },        _type == "formEmbed" => {          ...,          form->{  _id,  title,  submitLabel,  successMessage,  sections[]{    _key,    heading,    columns,    fields[]{      _key,      "name": name.current,      label,      helperText,      placeholder,      fieldType,      required,      width,      maxLength,      options,      showIf{field, equals}    }  }}        },          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },    _type == "contactForm" => {      ...,      details[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      },      form->{  _id,  title,  submitLabel,  successMessage,  sections[]{    _key,    heading,    columns,    fields[]{      _key,      "name": name.current,      label,      helperText,      placeholder,      fieldType,      required,      width,      maxLength,      options,      showIf{field, equals}    }  }}    },    _type == "missionStatement" => {      ...,      links[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "ctaContact" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "newsPreview" => {      ...,      ctaLink{        ...,          _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      },      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) [0...12] {          _id,  title,  "slug": slug.current,  date,  image,  link{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  },  "categories": categories[]->{"slug": slug.current, title}      }    },    _type == "eventsPreview" => {      ...,      "events": *[        _type == "event" && defined(start)        && dateTime(coalesce(end, start)) >= dateTime($now)      ] | order(start asc) [0...12] {        _id,        title,        start,        end,        location,        description      }    },    _type == "faqList" => {      ...,      "ungrouped": *[_type == "faq" && !defined(category->_id)] | order(order asc, question asc) {        _id,        question,        answer[]{          ...,            markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }        }      },      "groups": *[_type == "faqCategory"] | order(order asc, title asc) {        _id,        title,        "faqs": *[_type == "faq" && category._ref == ^._id] | order(order asc, question asc) {          _id,          question,          answer[]{            ...,              markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }          }        }      }[count(faqs) > 0]    },    _type == "jobListings" => {      ...,      "jobs": *[_type == "job"] | order(order asc, title asc) {        _id,        title,        description,        location,        employmentType,        "department": department->{"slug": slug.current, title},        applyLink{          ...,            _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }        }      }    },    _type == "peopleGrid" => {      ...,      "staff": *[_type == "staffMember" && ^.source == "staff"] | order(order asc, name asc) {        _id,        name,        title,        headshot,        "department": department->{"slug": slug.current, title, order}      },      "commissioners": *[_type == "commissioner" && ^.source == "commissioners"] | order(order asc, name asc) {        _id,        name,        title,        termDate,        headshot      }    },    _type == "projectGrid" => {      ...,      "projects": *[_type == "project" && defined(slug.current)] | order(name asc) {        _id,        name,        description,        image,        link,        "propertyTypes": propertyTypes[]->{"slug": slug.current, title},        "resources": resources[]->{"slug": slug.current, title}      }    },    _type == "imageCarousel" => {      ...,      images[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "projectPreview" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      "projects": projects[]->{        _id,        name,        image,        link      }    },    _type == "mapTeaser" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      "featuredProject": featuredProject->{name, description, image}    },    _type == "downloadBlock" => {      ...,      downloads[]{        ...,        "fileUrl": file.asset->url,        "fileName": file.asset->originalFilename      }    },    _type == "jumpNavContent" => {      ...,      content[]{        ...,        _type == "anchorLinks" => {          links[]{            ...,              link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }          }        },          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },  }  }
+// Query: *[    _type == "page" && !coalesce(pathOnly, false)    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref  ][0]{      _id,  _type,  name,  slug,  "path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current),    pageBuilder[$includeHidden || !coalesce(disabled, false)]{    ...,    _type == "heroVideo" => {      ...,      "videoUrl": video.asset->url    },    _type == "basicLeftRightText" => {      ...,      buttons[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      rightContent[]{        ...,        _type == "anchorLinks" => {          links[]{            ...,              link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }          }        },        _type == "formEmbed" => {          ...,          form->{  _id,  title,  submitLabel,  successMessage,  sections[]{    _key,    heading,    columns,    fields[]{      _key,      "name": name.current,      label,      helperText,      placeholder,      fieldType,      required,      width,      maxLength,      options,      showIf{field, equals}    }  }}        },          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },    _type == "contactForm" => {      ...,      details[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      },      form->{  _id,  title,  submitLabel,  successMessage,  sections[]{    _key,    heading,    columns,    fields[]{      _key,      "name": name.current,      label,      helperText,      placeholder,      fieldType,      required,      width,      maxLength,      options,      showIf{field, equals}    }  }}    },    _type == "missionStatement" => {      ...,      links[]{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "ctaContact" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    },    _type == "newsPreview" => {      ...,      ctaLink{        ...,          _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      },      // A chosen category narrows the list; none means the latest of all news.      "articles": *[        _type == "article" && defined(slug.current)        && (!defined(^.category) || ^.category._ref in categories[]._ref)      ] | order(date desc) [0...12] {          _id,  title,  "slug": slug.current,  date,  image,  externalUrl,  "categories": categories[]->{"slug": slug.current, title}      }    },    _type == "newsArchive" => {      ...,      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) {          _id,  title,  "slug": slug.current,  date,  image,  externalUrl,  "categories": categories[]->{"slug": slug.current, title}      }    },    _type == "recordsArchive" => {      ...,      "categories": *[_type == "recordCategory" && defined(slug.current)] | order(order asc, title asc) {        _id,        title,        "slug": slug.current,        order,        sortBy,        filters      },      "records": *[        _type == "record" && defined(file.asset) && defined(category->slug.current)      ] {        _id,        title,        date,        "fileUrl": file.asset->url,        "fileName": file.asset->originalFilename,        "categorySlug": category->slug.current      }    },    _type == "eventsGrid" => {      ...,      "events": *[        _type == "event" && defined(start)        && dateTime(coalesce(end, start)) >= dateTime($now)      ] | order(start asc) {        _id,        title,        "slug": slug.current,        start,        end,        location,        description,        image      }    },    _type == "eventsPreview" => {      ...,      "events": *[        _type == "event" && defined(start)        && dateTime(coalesce(end, start)) >= dateTime($now)      ] | order(start asc) [0...12] {        _id,        title,        "slug": slug.current,        start,        end,        location,        description      }    },    _type == "faqList" => {      ...,      "ungrouped": *[_type == "faq" && !defined(category->_id)] | order(order asc, question asc) {        _id,        question,        answer[]{          ...,            markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }        }      },      "groups": *[_type == "faqCategory"] | order(order asc, title asc) {        _id,        title,        "faqs": *[_type == "faq" && category._ref == ^._id] | order(order asc, question asc) {          _id,          question,          answer[]{            ...,              markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }          }        }      }[count(faqs) > 0]    },    _type == "jobListings" => {      ...,      "jobs": *[_type == "job"] | order(order asc, title asc) {        _id,        title,        description,        location,        employmentType,        "department": department->{"slug": slug.current, title},        applyLink{          ...,            _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }        }      }    },    _type == "peopleGrid" => {      ...,      "staff": *[_type == "staffMember" && ^.source == "staff"] | order(order asc, name asc) {        _id,        name,        title,        headshot,        "department": department->{"slug": slug.current, title, order}      },      "commissioners": *[_type == "commissioner" && ^.source == "commissioners"] | order(order asc, name asc) {        _id,        name,        title,        termDate,        headshot      }    },    _type == "projectGrid" => {      ...,      "projects": *[_type == "project" && defined(slug.current)] | order(name asc) {        _id,        name,        image,        "slug": slug.current,        "projectTypes": projectTypes[]->{"slug": slug.current, title}      }    },    _type == "propertyArchive" => {      ...,      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {        _id,        name,        description,        link,        image,        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},        "resources": resources[]->{"slug": slug.current, title, order}      },      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage    },    _type == "imageCarousel" => {      ...,      "projects": select(        source == "category" => *[          _type == "project" && defined(slug.current)          && ^.category._ref in projectTypes[]._ref        ] | order(name asc) {          _id,          name,          image,          "slug": slug.current        },        projects[]->{          _id,          name,          image,          "slug": slug.current        }      ),      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage    },    _type == "projectPreview" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      "projects": projects[]->{        _id,        name,        image,        "slug": slug.current      }    },    _type == "growers" => {      ...,      growers[]{        _key,        name,        tag,        image      }    },    _type == "propertiesPreview" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      "properties": properties[]->{        _id,        name,        description,        link,        image,        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},        "resources": resources[]->{"slug": slug.current, title, order}      },      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage    },    _type == "mapPreview" => {      ...,      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {          _id,  name,  "slug": slug.current,  boundaryIds,  location,  disablePopup,  description,  link,  "image": image{"url": asset->url, alt},  "propertyTypes": propertyTypes[]->{"slug": slug.current, title},  "resources": resources[]->{"slug": slug.current, title}      },      "settings": *[_type == "projectSettings" && _id == "projectSettings"][0]{          eyebrow,  heading,  intro,  "boundaryDataUrl": boundaryData.asset->url,  "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),  "trailsDataUrl": trailsData.asset->url,  defaultCenter,  defaultZoom      }    },    _type == "mapTeaser" => {      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      },      "featuredProject": featuredProject->{name, description, image}    },    _type == "downloadBlock" => {      ...,      downloads[]{        ...,        "fileUrl": file.asset->url,        "fileName": file.asset->originalFilename      }    },    _type == "jumpNavContent" => {      ...,      content[]{        ...,        _type == "anchorLinks" => {          links[]{            ...,              link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }          }        },        _type == "faqAccordion" => {          items[]{            ...,            answer[]{              ...,                markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }            }          }        },          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },  }  }
 export type LandingPageQueryResult = {
   _id: string
   _type: 'page'
@@ -2614,6 +3258,29 @@ export type LandingPageQueryResult = {
       }
     | {
         _key: string
+        _type: 'eventsGrid'
+        emptyText?: string
+        disabled?: boolean
+        events: Array<{
+          _id: string
+          title: string
+          slug: string
+          start: string
+          end: string | null
+          location: string | null
+          description: string | null
+          image: {
+            asset?: SanityImageAssetReference
+            media?: unknown
+            hotspot?: SanityImageHotspot
+            crop?: SanityImageCrop
+            alt?: string
+            _type: 'image'
+          } | null
+        }>
+      }
+    | {
+        _key: string
         _type: 'eventsPreview'
         eyebrow?: string
         count: number
@@ -2621,6 +3288,7 @@ export type LandingPageQueryResult = {
         events: Array<{
           _id: string
           title: string
+          slug: string
           start: string
           end: string | null
           location: string | null
@@ -2738,6 +3406,19 @@ export type LandingPageQueryResult = {
       }
     | {
         _key: string
+        _type: 'growers'
+        heading?: string
+        body?: string
+        growers: Array<{
+          _key: string
+          name: string
+          tag: string | null
+          image: GrowerImage
+        }> | null
+        disabled?: boolean
+      }
+    | {
+        _key: string
         _type: 'hero'
         eyebrow?: string
         heading?: string
@@ -2755,7 +3436,7 @@ export type LandingPageQueryResult = {
     | {
         _key: string
         _type: 'heroImage'
-        eyebrow: string
+        eyebrow?: string
         heading: string
         image: {
           asset?: SanityImageAssetReference
@@ -2816,20 +3497,30 @@ export type LandingPageQueryResult = {
         _key: string
         _type: 'imageCarousel'
         eyebrow?: string
-        images: Array<{
-          image: CarouselImageImage
-          caption?: string
-          link: {
-            _type: 'link'
-            linkType?: 'href' | 'page'
-            href?: string
-            page: string | null
-            openInNewTab?: boolean
+        source?: 'category' | 'manual'
+        projects: Array<{
+          _id: string
+          name: string
+          image: {
+            asset?: SanityImageAssetReference
+            media?: unknown
+            hotspot?: SanityImageHotspot
+            crop?: SanityImageCrop
+            alt?: string
+            _type: 'image'
           } | null
-          _type: 'carouselImage'
-          _key: string
+          slug: string
         }> | null
+        category?: ProjectTypeReference
         disabled?: boolean
+        defaultImage: {
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          alt?: string
+          _type: 'image'
+        } | null
       }
     | {
         _key: string
@@ -2902,6 +3593,61 @@ export type LandingPageQueryResult = {
               _key: string
             }
           | {
+              _key: string
+              _type: 'faqAccordion'
+              items: Array<{
+                question: string
+                answer: Array<
+                  | {
+                      _key: string
+                      _type: 'anchorLinks'
+                      links?: Array<{
+                        label: string
+                        link?: Link
+                        icon?: 'download' | 'link'
+                        _type: 'anchorLink'
+                        _key: string
+                      }>
+                      markDefs: null
+                    }
+                  | {
+                      children?: Array<{
+                        marks?: Array<string>
+                        text?: string
+                        _type: 'span'
+                        _key: string
+                      }>
+                      style?: 'blockquote' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+                      listItem?: 'bullet' | 'number'
+                      markDefs: Array<{
+                        linkType?: 'href' | 'page'
+                        href?: string
+                        page: string | null
+                        openInNewTab?: boolean
+                        _type: 'link'
+                        _key: string
+                      }> | null
+                      level?: number
+                      _type: 'block'
+                      _key: string
+                    }
+                  | {
+                      asset?: SanityImageAssetReference
+                      media?: unknown
+                      hotspot?: SanityImageHotspot
+                      crop?: SanityImageCrop
+                      alt?: string
+                      _type: 'image'
+                      _key: string
+                      markDefs: null
+                    }
+                >
+                _type: 'faqAccordionItem'
+                _key: string
+              }> | null
+              markDefs: null
+            }
+          | {
               asset?: SanityImageAssetReference
               media?: unknown
               hotspot?: SanityImageHotspot
@@ -2913,6 +3659,45 @@ export type LandingPageQueryResult = {
             }
         > | null
         disabled?: boolean
+      }
+    | {
+        _key: string
+        _type: 'mapPreview'
+        heading?: string
+        body?: string
+        disabled?: boolean
+        properties: Array<{
+          _id: string
+          name: string
+          slug: string
+          boundaryIds: Array<string> | null
+          location: Geopoint | null
+          disablePopup: boolean | null
+          description: string | null
+          link: string | null
+          image: {
+            url: string | null
+            alt: string | null
+          } | null
+          propertyTypes: Array<{
+            slug: string
+            title: string
+          }> | null
+          resources: Array<{
+            slug: string
+            title: string
+          }> | null
+        }>
+        settings: {
+          eyebrow: string | null
+          heading: string | null
+          intro: string | null
+          boundaryDataUrl: string | null
+          boundaryIdProperty: string
+          trailsDataUrl: string | null
+          defaultCenter: Geopoint | null
+          defaultZoom: number | null
+        } | null
       }
     | {
         _key: string
@@ -2966,8 +3751,34 @@ export type LandingPageQueryResult = {
       }
     | {
         _key: string
+        _type: 'newsArchive'
+        showFilters?: boolean
+        disabled?: boolean
+        articles: Array<{
+          _id: string
+          title: string
+          slug: string
+          date: string
+          image: {
+            asset?: SanityImageAssetReference
+            media?: unknown
+            hotspot?: SanityImageHotspot
+            crop?: SanityImageCrop
+            alt?: string
+            _type: 'image'
+          }
+          externalUrl: string | null
+          categories: Array<{
+            slug: string
+            title: string
+          }> | null
+        }>
+      }
+    | {
+        _key: string
         _type: 'newsPreview'
         heading?: string
+        category?: NewsCategoryReference
         count: number
         ctaHeading?: string
         ctaLabel?: string
@@ -2992,13 +3803,7 @@ export type LandingPageQueryResult = {
             alt?: string
             _type: 'image'
           }
-          link: {
-            _type: 'link'
-            linkType?: 'href' | 'page'
-            href?: string
-            page: string | null
-            openInNewTab?: boolean
-          } | null
+          externalUrl: string | null
           categories: Array<{
             slug: string
             title: string
@@ -3047,11 +3852,11 @@ export type LandingPageQueryResult = {
         _key: string
         _type: 'projectGrid'
         heading?: string
+        showFilters?: boolean
         disabled?: boolean
         projects: Array<{
           _id: string
           name: string
-          description: string | null
           image: {
             asset?: SanityImageAssetReference
             media?: unknown
@@ -3060,12 +3865,8 @@ export type LandingPageQueryResult = {
             alt?: string
             _type: 'image'
           } | null
-          link: string | null
-          propertyTypes: Array<{
-            slug: string
-            title: string
-          }> | null
-          resources: Array<{
+          slug: string
+          projectTypes: Array<{
             slug: string
             title: string
           }> | null
@@ -3098,9 +3899,116 @@ export type LandingPageQueryResult = {
             alt?: string
             _type: 'image'
           } | null
-          link: string | null
+          slug: string
         }> | null
         disabled?: boolean
+      }
+    | {
+        _key: string
+        _type: 'propertiesPreview'
+        heading?: string
+        button: {
+          _type: 'button'
+          buttonText?: string
+          link: {
+            _type: 'link'
+            linkType?: 'href' | 'page'
+            href?: string
+            page: string | null
+            openInNewTab?: boolean
+          } | null
+        } | null
+        properties: Array<{
+          _id: string
+          name: string
+          description: string | null
+          link: string | null
+          image: {
+            asset?: SanityImageAssetReference
+            media?: unknown
+            hotspot?: SanityImageHotspot
+            crop?: SanityImageCrop
+            alt?: string
+            _type: 'image'
+          } | null
+          propertyTypes: Array<{
+            slug: string
+            title: string
+            order: null
+          }> | null
+          resources: Array<{
+            slug: string
+            title: string
+            order: null
+          }> | null
+        }> | null
+        disabled?: boolean
+        defaultImage: {
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          alt?: string
+          _type: 'image'
+        } | null
+      }
+    | {
+        _key: string
+        _type: 'propertyArchive'
+        disabled?: boolean
+        properties: Array<{
+          _id: string
+          name: string
+          description: string | null
+          link: string | null
+          image: {
+            asset?: SanityImageAssetReference
+            media?: unknown
+            hotspot?: SanityImageHotspot
+            crop?: SanityImageCrop
+            alt?: string
+            _type: 'image'
+          } | null
+          propertyTypes: Array<{
+            slug: string
+            title: string
+            order: null
+          }> | null
+          resources: Array<{
+            slug: string
+            title: string
+            order: null
+          }> | null
+        }>
+        defaultImage: {
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          alt?: string
+          _type: 'image'
+        } | null
+      }
+    | {
+        _key: string
+        _type: 'recordsArchive'
+        disabled?: boolean
+        categories: Array<{
+          _id: string
+          title: string
+          slug: string
+          order: number | null
+          sortBy: 'dateDesc' | 'titleAsc'
+          filters: Array<string> | null
+        }>
+        records: Array<{
+          _id: string
+          title: string | null
+          date: string | null
+          fileUrl: string
+          fileName: string | null
+          categorySlug: string
+        }>
       }
     | {
         _key: string
@@ -3210,7 +4118,7 @@ export type ArticleQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: moreNewsQuery
-// Query: *[_type == "article" && defined(slug.current) && slug.current != $slug]    | order(count(coalesce(categories, [])[_ref in $categoryIds]) desc, date desc) [0...12] {      _id,  title,  "slug": slug.current,  date,  image,  link{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  },  "categories": categories[]->{"slug": slug.current, title}  }
+// Query: *[_type == "article" && defined(slug.current) && slug.current != $slug]    | order(count(coalesce(categories, [])[_ref in $categoryIds]) desc, date desc) [0...12] {      _id,  title,  "slug": slug.current,  date,  image,  externalUrl,  "categories": categories[]->{"slug": slug.current, title}  }
 export type MoreNewsQueryResult = Array<{
   _id: string
   title: string
@@ -3224,13 +4132,7 @@ export type MoreNewsQueryResult = Array<{
     alt?: string
     _type: 'image'
   }
-  link: {
-    _type: 'link'
-    linkType?: 'href' | 'page'
-    href?: string
-    page: string | null
-    openInNewTab?: boolean
-  } | null
+  externalUrl: string | null
   categories: Array<{
     slug: string
     title: string
@@ -3247,6 +4149,7 @@ export type SingleNewsPageQueryResult = {
   moreNews: {
     _type: 'newsPreview'
     heading?: string
+    category?: NewsCategoryReference
     count: number
     ctaHeading?: string
     ctaLabel?: string
@@ -3276,24 +4179,301 @@ export type ArticleSitemapDataResult = Array<{
   slug: string
 }>
 
+// Source: sanity/lib/queries.ts
+// Variable: projectQuery
+// Query: *[_type == "project" && slug.current == $slug][0]{    _id,    _type,    name,    "slug": slug.current,    description,    image,    // This project's own types, to find related projects.    "projectTypeIds": projectTypes[]._ref,    body[]{      ...,      _type == "anchorLinks" => {        links[]{          ...,            link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }        }      },      _type == "faqAccordion" => {        items[]{          ...,          answer[]{            ...,              markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }          }        }      },        markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }    }  }
+export type ProjectQueryResult = {
+  _id: string
+  _type: 'project'
+  name: string
+  slug: string
+  description: string | null
+  image: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  } | null
+  projectTypeIds: Array<string> | null
+  body: Array<
+    | {
+        _key: string
+        _type: 'anchorLinks'
+        links: Array<{
+          label: string
+          link: {
+            _type: 'link'
+            linkType?: 'href' | 'page'
+            href?: string
+            page: string | null
+            openInNewTab?: boolean
+          } | null
+          icon?: 'download' | 'link'
+          _type: 'anchorLink'
+          _key: string
+        }> | null
+        markDefs: null
+      }
+    | {
+        children?: Array<{
+          marks?: Array<string>
+          text?: string
+          _type: 'span'
+          _key: string
+        }>
+        style?: 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+        listItem?: 'bullet' | 'number'
+        markDefs: Array<{
+          _key: string
+          _type: 'link'
+          linkType?: 'href' | 'page'
+          href?: string
+          page: string | null
+          openInNewTab?: boolean
+        }> | null
+        level?: number
+        _type: 'block'
+        _key: string
+      }
+    | {
+        _key: string
+        _type: 'faqAccordion'
+        items: Array<{
+          question: string
+          answer: Array<
+            | {
+                _key: string
+                _type: 'anchorLinks'
+                links?: Array<{
+                  label: string
+                  link?: Link
+                  icon?: 'download' | 'link'
+                  _type: 'anchorLink'
+                  _key: string
+                }>
+                markDefs: null
+              }
+            | {
+                children?: Array<{
+                  marks?: Array<string>
+                  text?: string
+                  _type: 'span'
+                  _key: string
+                }>
+                style?: 'blockquote' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+                listItem?: 'bullet' | 'number'
+                markDefs: Array<{
+                  linkType?: 'href' | 'page'
+                  href?: string
+                  page: string | null
+                  openInNewTab?: boolean
+                  _type: 'link'
+                  _key: string
+                }> | null
+                level?: number
+                _type: 'block'
+                _key: string
+              }
+            | {
+                asset?: SanityImageAssetReference
+                media?: unknown
+                hotspot?: SanityImageHotspot
+                crop?: SanityImageCrop
+                alt?: string
+                _type: 'image'
+                _key: string
+                markDefs: null
+              }
+          >
+          _type: 'faqAccordionItem'
+          _key: string
+        }> | null
+        markDefs: null
+      }
+    | {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        _type: 'image'
+        _key: string
+        markDefs: null
+      }
+  > | null
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: moreProjectsQuery
+// Query: *[_type == "project" && defined(slug.current) && slug.current != $slug]{    _id,    _createdAt,    name,    image,    "slug": slug.current,    "projectTypeIds": projectTypes[]._ref  }
+export type MoreProjectsQueryResult = Array<{
+  _id: string
+  _createdAt: string
+  name: string
+  image: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  } | null
+  slug: string
+  projectTypeIds: Array<string> | null
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: singleProjectPageQuery
+// Query: *[_type == "singleProjectPage" && _id == "singleProjectPage"][0]{    eyebrow,    archiveLink{      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }    },    moreProjects{      ...,      button{        ...,          link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }      }    }  }
+export type SingleProjectPageQueryResult = {
+  eyebrow: string | null
+  archiveLink: {
+    _type: 'link'
+    linkType?: 'href' | 'page'
+    href?: string
+    page: string | null
+    openInNewTab?: boolean
+  } | null
+  moreProjects: {
+    disabled?: boolean
+    eyebrow?: string
+    body?: string
+    button: {
+      _type: 'button'
+      buttonText?: string
+      link: {
+        _type: 'link'
+        linkType?: 'href' | 'page'
+        href?: string
+        page: string | null
+        openInNewTab?: boolean
+      } | null
+    } | null
+    count?: number
+  } | null
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: projectSlugs
+// Query: *[_type == "project" && defined(slug.current)]{"slug": slug.current}
+export type ProjectSlugsResult = Array<{
+  slug: string
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: projectSitemapData
+// Query: *[_type == "project" && defined(slug.current)]{_updatedAt, "slug": slug.current}
+export type ProjectSitemapDataResult = Array<{
+  _updatedAt: string
+  slug: string
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: eventQuery
+// Query: *[_type == "event" && slug.current == $slug][0]{    _id,    _type,    title,    "slug": slug.current,    start,    end,    location,    description,    body[]{      ...,        markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }    }  }
+export type EventQueryResult = {
+  _id: string
+  _type: 'event'
+  title: string
+  slug: string
+  start: string
+  end: string | null
+  location: string | null
+  description: string | null
+  body: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>
+          text?: string
+          _type: 'span'
+          _key: string
+        }>
+        style?: 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+        listItem?: 'bullet' | 'number'
+        markDefs: Array<{
+          _key: string
+          _type: 'link'
+          linkType?: 'href' | 'page'
+          href?: string
+          page: string | null
+          openInNewTab?: boolean
+        }> | null
+        level?: number
+        _type: 'block'
+        _key: string
+      }
+    | {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        _type: 'image'
+        _key: string
+        markDefs: null
+      }
+  > | null
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: moreEventsQuery
+// Query: *[    _type == "event" && defined(start) && slug.current != $slug    && dateTime(coalesce(end, start)) >= dateTime($now)  ] | order(start asc) [0...12] {    _id,    title,    "slug": slug.current,    start,    end,    location,    description  }
+export type MoreEventsQueryResult = Array<{
+  _id: string
+  title: string
+  slug: string
+  start: string
+  end: string | null
+  location: string | null
+  description: string | null
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: eventSlugs
+// Query: *[_type == "event" && defined(slug.current)]{"slug": slug.current}
+export type EventSlugsResult = Array<{
+  slug: string
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: eventSitemapData
+// Query: *[_type == "event" && defined(slug.current)]{_updatedAt, "slug": slug.current}
+export type EventSitemapDataResult = Array<{
+  _updatedAt: string
+  slug: string
+}>
+
 // Query TypeMap
 import '@sanity/client'
 declare module '@sanity/client' {
   interface SanityQueries {
     '*[_type == "settings"][0]': SettingsQueryResult
-    '\n  *[_type == "footer" && _id == "footer"][0]{\n    newsletterHeading,\n    organizationName,\n    infoColumns[]{\n      _key,\n      heading,\n      lines[]{\n        _key,\n        text,\n        href\n      }\n    },\n    socialLinks[]{\n      _key,\n      platform,\n      url\n    },\n    "footerMenu": footerMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n    "legalMenu": legalMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n  }\n': FooterQueryResult
-    '\n  *[_type == "project" && defined(slug.current)] | order(name asc) {\n    _id,\n    name,\n    "slug": slug.current,\n    boundaryId,\n    location,\n    description,\n    link,\n    "image": image{"url": asset->url, alt},\n    "propertyTypes": propertyTypes[]->{"slug": slug.current, title},\n    "resources": resources[]->{"slug": slug.current, title}\n  }\n': ProjectsQueryResult
+    '\n  *[_type == "footer" && _id == "footer"][0]{\n    newsletterHeading,\n    organizationName,\n    infoColumns[]{\n      _key,\n      heading,\n      lines[]{\n        _key,\n        text,\n        href\n      }\n    },\n    socialLinks[]{\n      _key,\n      platform,\n      url\n    },\n    "footerMenu": footerMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      group,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n    "legalMenu": legalMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      group,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n  }\n': FooterQueryResult
+    '\n  *[_type == "header" && _id == "header"][0]{\n    "mainMenu": mainMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      group,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    }\n  }\n': HeaderQueryResult
+    '\n  *[_type == "siteBanner" && _id == "siteBanner" && enabled == true][0]{\n    message,\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  }\n': SiteBannerQueryResult
+    '\n  *[_type == "property" && defined(slug.current)] | order(name asc) {\n    \n  _id,\n  name,\n  "slug": slug.current,\n  boundaryIds,\n  location,\n  disablePopup,\n  description,\n  link,\n  "image": image{"url": asset->url, alt},\n  "propertyTypes": propertyTypes[]->{"slug": slug.current, title},\n  "resources": resources[]->{"slug": slug.current, title}\n\n  }\n': PropertiesQueryResult
     '{\n  "propertyTypes": *[_type == "propertyType" && defined(slug.current)] | order(title asc){\n    "slug": slug.current,\n    title\n  },\n  "resources": *[_type == "resource" && defined(slug.current)] | order(title asc){\n    "slug": slug.current,\n    title\n  }\n}': MapFiltersQueryResult
-    '\n  *[_type == "projectSettings" && _id == "projectSettings"][0]{\n    eyebrow,\n    heading,\n    intro,\n    "boundaryDataUrl": boundaryData.asset->url,\n    "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),\n    "trailsDataUrl": trailsData.asset->url,\n    defaultCenter,\n    defaultZoom\n  }\n': MapSettingsQueryResult
+    '\n  *[_type == "projectSettings" && _id == "projectSettings"][0]{\n    \n  eyebrow,\n  heading,\n  intro,\n  "boundaryDataUrl": boundaryData.asset->url,\n  "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),\n  "trailsDataUrl": trailsData.asset->url,\n  defaultCenter,\n  defaultZoom\n\n  }\n': MapSettingsQueryResult
     '*[_type == "form" && _id == $id][0]{\n  _id,\n  title,\n  submitLabel,\n  successMessage,\n  sections[]{\n    _key,\n    heading,\n    columns,\n    fields[]{\n      _key,\n      "name": name.current,\n      label,\n      helperText,\n      placeholder,\n      fieldType,\n      required,\n      width,\n      maxLength,\n      options,\n      showIf{field, equals}\n    }\n  }\n}': FORM_FOR_SUBMIT_QUERY_RESULT
-    '\n  *[_type == \'page\' && slug.current == $leaf && !coalesce(pathOnly, false)]{\n    \n  _id,\n  _type,\n  name,\n  slug,\n  "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  \n  pageBuilder[$includeHidden || !coalesce(disabled, false)]{\n    ...,\n    _type == "heroVideo" => {\n      ...,\n      "videoUrl": video.asset->url\n    },\n    _type == "basicLeftRightText" => {\n      ...,\n      buttons[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      rightContent[]{\n        ...,\n        _type == "anchorLinks" => {\n          links[]{\n            ...,\n            \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n          }\n        },\n        _type == "formEmbed" => {\n          ...,\n          form->{\n  _id,\n  title,\n  submitLabel,\n  successMessage,\n  sections[]{\n    _key,\n    heading,\n    columns,\n    fields[]{\n      _key,\n      "name": name.current,\n      label,\n      helperText,\n      placeholder,\n      fieldType,\n      required,\n      width,\n      maxLength,\n      options,\n      showIf{field, equals}\n    }\n  }\n}\n        },\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n    _type == "contactForm" => {\n      ...,\n      details[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      },\n      form->{\n  _id,\n  title,\n  submitLabel,\n  successMessage,\n  sections[]{\n    _key,\n    heading,\n    columns,\n    fields[]{\n      _key,\n      "name": name.current,\n      label,\n      helperText,\n      placeholder,\n      fieldType,\n      required,\n      width,\n      maxLength,\n      options,\n      showIf{field, equals}\n    }\n  }\n}\n    },\n    _type == "missionStatement" => {\n      ...,\n      links[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "ctaContact" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "newsPreview" => {\n      ...,\n      ctaLink{\n        ...,\n        \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      },\n      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) [0...12] {\n        \n  _id,\n  title,\n  "slug": slug.current,\n  date,\n  image,\n  link{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  },\n  "categories": categories[]->{"slug": slug.current, title}\n\n      }\n    },\n    _type == "eventsPreview" => {\n      ...,\n      "events": *[\n        _type == "event" && defined(start)\n        && dateTime(coalesce(end, start)) >= dateTime($now)\n      ] | order(start asc) [0...12] {\n        _id,\n        title,\n        start,\n        end,\n        location,\n        description\n      }\n    },\n    _type == "faqList" => {\n      ...,\n      "ungrouped": *[_type == "faq" && !defined(category->_id)] | order(order asc, question asc) {\n        _id,\n        question,\n        answer[]{\n          ...,\n          \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n        }\n      },\n      "groups": *[_type == "faqCategory"] | order(order asc, title asc) {\n        _id,\n        title,\n        "faqs": *[_type == "faq" && category._ref == ^._id] | order(order asc, question asc) {\n          _id,\n          question,\n          answer[]{\n            ...,\n            \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n          }\n        }\n      }[count(faqs) > 0]\n    },\n    _type == "jobListings" => {\n      ...,\n      "jobs": *[_type == "job"] | order(order asc, title asc) {\n        _id,\n        title,\n        description,\n        location,\n        employmentType,\n        "department": department->{"slug": slug.current, title},\n        applyLink{\n          ...,\n          \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n        }\n      }\n    },\n    _type == "peopleGrid" => {\n      ...,\n      "staff": *[_type == "staffMember" && ^.source == "staff"] | order(order asc, name asc) {\n        _id,\n        name,\n        title,\n        headshot,\n        "department": department->{"slug": slug.current, title, order}\n      },\n      "commissioners": *[_type == "commissioner" && ^.source == "commissioners"] | order(order asc, name asc) {\n        _id,\n        name,\n        title,\n        termDate,\n        headshot\n      }\n    },\n    _type == "projectGrid" => {\n      ...,\n      "projects": *[_type == "project" && defined(slug.current)] | order(name asc) {\n        _id,\n        name,\n        description,\n        image,\n        link,\n        "propertyTypes": propertyTypes[]->{"slug": slug.current, title},\n        "resources": resources[]->{"slug": slug.current, title}\n      }\n    },\n    _type == "imageCarousel" => {\n      ...,\n      images[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "projectPreview" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      "projects": projects[]->{\n        _id,\n        name,\n        image,\n        link\n      }\n    },\n    _type == "mapTeaser" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      "featuredProject": featuredProject->{name, description, image}\n    },\n    _type == "downloadBlock" => {\n      ...,\n      downloads[]{\n        ...,\n        "fileUrl": file.asset->url,\n        "fileName": file.asset->originalFilename\n      }\n    },\n    _type == "jumpNavContent" => {\n      ...,\n      content[]{\n        ...,\n        _type == "anchorLinks" => {\n          links[]{\n            ...,\n            \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n          }\n        },\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n  }\n\n\n  }[path == $path][0]\n': GetPageQueryResult
-    '\n  *[\n    _type == "page" && !coalesce(pathOnly, false)\n    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref\n  ][0]{\n    \n  _id,\n  _type,\n  name,\n  slug,\n  "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  \n  pageBuilder[$includeHidden || !coalesce(disabled, false)]{\n    ...,\n    _type == "heroVideo" => {\n      ...,\n      "videoUrl": video.asset->url\n    },\n    _type == "basicLeftRightText" => {\n      ...,\n      buttons[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      rightContent[]{\n        ...,\n        _type == "anchorLinks" => {\n          links[]{\n            ...,\n            \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n          }\n        },\n        _type == "formEmbed" => {\n          ...,\n          form->{\n  _id,\n  title,\n  submitLabel,\n  successMessage,\n  sections[]{\n    _key,\n    heading,\n    columns,\n    fields[]{\n      _key,\n      "name": name.current,\n      label,\n      helperText,\n      placeholder,\n      fieldType,\n      required,\n      width,\n      maxLength,\n      options,\n      showIf{field, equals}\n    }\n  }\n}\n        },\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n    _type == "contactForm" => {\n      ...,\n      details[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      },\n      form->{\n  _id,\n  title,\n  submitLabel,\n  successMessage,\n  sections[]{\n    _key,\n    heading,\n    columns,\n    fields[]{\n      _key,\n      "name": name.current,\n      label,\n      helperText,\n      placeholder,\n      fieldType,\n      required,\n      width,\n      maxLength,\n      options,\n      showIf{field, equals}\n    }\n  }\n}\n    },\n    _type == "missionStatement" => {\n      ...,\n      links[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "ctaContact" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "newsPreview" => {\n      ...,\n      ctaLink{\n        ...,\n        \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      },\n      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) [0...12] {\n        \n  _id,\n  title,\n  "slug": slug.current,\n  date,\n  image,\n  link{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  },\n  "categories": categories[]->{"slug": slug.current, title}\n\n      }\n    },\n    _type == "eventsPreview" => {\n      ...,\n      "events": *[\n        _type == "event" && defined(start)\n        && dateTime(coalesce(end, start)) >= dateTime($now)\n      ] | order(start asc) [0...12] {\n        _id,\n        title,\n        start,\n        end,\n        location,\n        description\n      }\n    },\n    _type == "faqList" => {\n      ...,\n      "ungrouped": *[_type == "faq" && !defined(category->_id)] | order(order asc, question asc) {\n        _id,\n        question,\n        answer[]{\n          ...,\n          \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n        }\n      },\n      "groups": *[_type == "faqCategory"] | order(order asc, title asc) {\n        _id,\n        title,\n        "faqs": *[_type == "faq" && category._ref == ^._id] | order(order asc, question asc) {\n          _id,\n          question,\n          answer[]{\n            ...,\n            \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n          }\n        }\n      }[count(faqs) > 0]\n    },\n    _type == "jobListings" => {\n      ...,\n      "jobs": *[_type == "job"] | order(order asc, title asc) {\n        _id,\n        title,\n        description,\n        location,\n        employmentType,\n        "department": department->{"slug": slug.current, title},\n        applyLink{\n          ...,\n          \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n        }\n      }\n    },\n    _type == "peopleGrid" => {\n      ...,\n      "staff": *[_type == "staffMember" && ^.source == "staff"] | order(order asc, name asc) {\n        _id,\n        name,\n        title,\n        headshot,\n        "department": department->{"slug": slug.current, title, order}\n      },\n      "commissioners": *[_type == "commissioner" && ^.source == "commissioners"] | order(order asc, name asc) {\n        _id,\n        name,\n        title,\n        termDate,\n        headshot\n      }\n    },\n    _type == "projectGrid" => {\n      ...,\n      "projects": *[_type == "project" && defined(slug.current)] | order(name asc) {\n        _id,\n        name,\n        description,\n        image,\n        link,\n        "propertyTypes": propertyTypes[]->{"slug": slug.current, title},\n        "resources": resources[]->{"slug": slug.current, title}\n      }\n    },\n    _type == "imageCarousel" => {\n      ...,\n      images[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "projectPreview" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      "projects": projects[]->{\n        _id,\n        name,\n        image,\n        link\n      }\n    },\n    _type == "mapTeaser" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      "featuredProject": featuredProject->{name, description, image}\n    },\n    _type == "downloadBlock" => {\n      ...,\n      downloads[]{\n        ...,\n        "fileUrl": file.asset->url,\n        "fileName": file.asset->originalFilename\n      }\n    },\n    _type == "jumpNavContent" => {\n      ...,\n      content[]{\n        ...,\n        _type == "anchorLinks" => {\n          links[]{\n            ...,\n            \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n          }\n        },\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n  }\n\n\n  }\n': LandingPageQueryResult
+    '\n  *[_type == \'page\' && slug.current == $leaf && !coalesce(pathOnly, false)]{\n    \n  _id,\n  _type,\n  name,\n  slug,\n  "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  \n  pageBuilder[$includeHidden || !coalesce(disabled, false)]{\n    ...,\n    _type == "heroVideo" => {\n      ...,\n      "videoUrl": video.asset->url\n    },\n    _type == "basicLeftRightText" => {\n      ...,\n      buttons[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      rightContent[]{\n        ...,\n        _type == "anchorLinks" => {\n          links[]{\n            ...,\n            \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n          }\n        },\n        _type == "formEmbed" => {\n          ...,\n          form->{\n  _id,\n  title,\n  submitLabel,\n  successMessage,\n  sections[]{\n    _key,\n    heading,\n    columns,\n    fields[]{\n      _key,\n      "name": name.current,\n      label,\n      helperText,\n      placeholder,\n      fieldType,\n      required,\n      width,\n      maxLength,\n      options,\n      showIf{field, equals}\n    }\n  }\n}\n        },\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n    _type == "contactForm" => {\n      ...,\n      details[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      },\n      form->{\n  _id,\n  title,\n  submitLabel,\n  successMessage,\n  sections[]{\n    _key,\n    heading,\n    columns,\n    fields[]{\n      _key,\n      "name": name.current,\n      label,\n      helperText,\n      placeholder,\n      fieldType,\n      required,\n      width,\n      maxLength,\n      options,\n      showIf{field, equals}\n    }\n  }\n}\n    },\n    _type == "missionStatement" => {\n      ...,\n      links[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "ctaContact" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "newsPreview" => {\n      ...,\n      ctaLink{\n        ...,\n        \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      },\n      // A chosen category narrows the list; none means the latest of all news.\n      "articles": *[\n        _type == "article" && defined(slug.current)\n        && (!defined(^.category) || ^.category._ref in categories[]._ref)\n      ] | order(date desc) [0...12] {\n        \n  _id,\n  title,\n  "slug": slug.current,\n  date,\n  image,\n  externalUrl,\n  "categories": categories[]->{"slug": slug.current, title}\n\n      }\n    },\n    _type == "newsArchive" => {\n      ...,\n      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) {\n        \n  _id,\n  title,\n  "slug": slug.current,\n  date,\n  image,\n  externalUrl,\n  "categories": categories[]->{"slug": slug.current, title}\n\n      }\n    },\n    _type == "recordsArchive" => {\n      ...,\n      "categories": *[_type == "recordCategory" && defined(slug.current)] | order(order asc, title asc) {\n        _id,\n        title,\n        "slug": slug.current,\n        order,\n        sortBy,\n        filters\n      },\n      "records": *[\n        _type == "record" && defined(file.asset) && defined(category->slug.current)\n      ] {\n        _id,\n        title,\n        date,\n        "fileUrl": file.asset->url,\n        "fileName": file.asset->originalFilename,\n        "categorySlug": category->slug.current\n      }\n    },\n    _type == "eventsGrid" => {\n      ...,\n      "events": *[\n        _type == "event" && defined(start)\n        && dateTime(coalesce(end, start)) >= dateTime($now)\n      ] | order(start asc) {\n        _id,\n        title,\n        "slug": slug.current,\n        start,\n        end,\n        location,\n        description,\n        image\n      }\n    },\n    _type == "eventsPreview" => {\n      ...,\n      "events": *[\n        _type == "event" && defined(start)\n        && dateTime(coalesce(end, start)) >= dateTime($now)\n      ] | order(start asc) [0...12] {\n        _id,\n        title,\n        "slug": slug.current,\n        start,\n        end,\n        location,\n        description\n      }\n    },\n    _type == "faqList" => {\n      ...,\n      "ungrouped": *[_type == "faq" && !defined(category->_id)] | order(order asc, question asc) {\n        _id,\n        question,\n        answer[]{\n          ...,\n          \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n        }\n      },\n      "groups": *[_type == "faqCategory"] | order(order asc, title asc) {\n        _id,\n        title,\n        "faqs": *[_type == "faq" && category._ref == ^._id] | order(order asc, question asc) {\n          _id,\n          question,\n          answer[]{\n            ...,\n            \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n          }\n        }\n      }[count(faqs) > 0]\n    },\n    _type == "jobListings" => {\n      ...,\n      "jobs": *[_type == "job"] | order(order asc, title asc) {\n        _id,\n        title,\n        description,\n        location,\n        employmentType,\n        "department": department->{"slug": slug.current, title},\n        applyLink{\n          ...,\n          \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n        }\n      }\n    },\n    _type == "peopleGrid" => {\n      ...,\n      "staff": *[_type == "staffMember" && ^.source == "staff"] | order(order asc, name asc) {\n        _id,\n        name,\n        title,\n        headshot,\n        "department": department->{"slug": slug.current, title, order}\n      },\n      "commissioners": *[_type == "commissioner" && ^.source == "commissioners"] | order(order asc, name asc) {\n        _id,\n        name,\n        title,\n        termDate,\n        headshot\n      }\n    },\n    _type == "projectGrid" => {\n      ...,\n      "projects": *[_type == "project" && defined(slug.current)] | order(name asc) {\n        _id,\n        name,\n        image,\n        "slug": slug.current,\n        "projectTypes": projectTypes[]->{"slug": slug.current, title}\n      }\n    },\n    _type == "propertyArchive" => {\n      ...,\n      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {\n        _id,\n        name,\n        description,\n        link,\n        image,\n        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},\n        "resources": resources[]->{"slug": slug.current, title, order}\n      },\n      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage\n    },\n    _type == "imageCarousel" => {\n      ...,\n      "projects": select(\n        source == "category" => *[\n          _type == "project" && defined(slug.current)\n          && ^.category._ref in projectTypes[]._ref\n        ] | order(name asc) {\n          _id,\n          name,\n          image,\n          "slug": slug.current\n        },\n        projects[]->{\n          _id,\n          name,\n          image,\n          "slug": slug.current\n        }\n      ),\n      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage\n    },\n    _type == "projectPreview" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      "projects": projects[]->{\n        _id,\n        name,\n        image,\n        "slug": slug.current\n      }\n    },\n    _type == "growers" => {\n      ...,\n      growers[]{\n        _key,\n        name,\n        tag,\n        image\n      }\n    },\n    _type == "propertiesPreview" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      "properties": properties[]->{\n        _id,\n        name,\n        description,\n        link,\n        image,\n        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},\n        "resources": resources[]->{"slug": slug.current, title, order}\n      },\n      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage\n    },\n    _type == "mapPreview" => {\n      ...,\n      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {\n        \n  _id,\n  name,\n  "slug": slug.current,\n  boundaryIds,\n  location,\n  disablePopup,\n  description,\n  link,\n  "image": image{"url": asset->url, alt},\n  "propertyTypes": propertyTypes[]->{"slug": slug.current, title},\n  "resources": resources[]->{"slug": slug.current, title}\n\n      },\n      "settings": *[_type == "projectSettings" && _id == "projectSettings"][0]{\n        \n  eyebrow,\n  heading,\n  intro,\n  "boundaryDataUrl": boundaryData.asset->url,\n  "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),\n  "trailsDataUrl": trailsData.asset->url,\n  defaultCenter,\n  defaultZoom\n\n      }\n    },\n    _type == "mapTeaser" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      "featuredProject": featuredProject->{name, description, image}\n    },\n    _type == "downloadBlock" => {\n      ...,\n      downloads[]{\n        ...,\n        "fileUrl": file.asset->url,\n        "fileName": file.asset->originalFilename\n      }\n    },\n    _type == "jumpNavContent" => {\n      ...,\n      content[]{\n        ...,\n        _type == "anchorLinks" => {\n          links[]{\n            ...,\n            \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n          }\n        },\n        _type == "faqAccordion" => {\n          items[]{\n            ...,\n            answer[]{\n              ...,\n              \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n            }\n          }\n        },\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n  }\n\n\n  }[path == $path][0]\n': GetPageQueryResult
+    '\n  *[\n    _type == "page" && !coalesce(pathOnly, false)\n    && _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref\n  ][0]{\n    \n  _id,\n  _type,\n  name,\n  slug,\n  "path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  \n  pageBuilder[$includeHidden || !coalesce(disabled, false)]{\n    ...,\n    _type == "heroVideo" => {\n      ...,\n      "videoUrl": video.asset->url\n    },\n    _type == "basicLeftRightText" => {\n      ...,\n      buttons[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      rightContent[]{\n        ...,\n        _type == "anchorLinks" => {\n          links[]{\n            ...,\n            \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n          }\n        },\n        _type == "formEmbed" => {\n          ...,\n          form->{\n  _id,\n  title,\n  submitLabel,\n  successMessage,\n  sections[]{\n    _key,\n    heading,\n    columns,\n    fields[]{\n      _key,\n      "name": name.current,\n      label,\n      helperText,\n      placeholder,\n      fieldType,\n      required,\n      width,\n      maxLength,\n      options,\n      showIf{field, equals}\n    }\n  }\n}\n        },\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n    _type == "contactForm" => {\n      ...,\n      details[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      },\n      form->{\n  _id,\n  title,\n  submitLabel,\n  successMessage,\n  sections[]{\n    _key,\n    heading,\n    columns,\n    fields[]{\n      _key,\n      "name": name.current,\n      label,\n      helperText,\n      placeholder,\n      fieldType,\n      required,\n      width,\n      maxLength,\n      options,\n      showIf{field, equals}\n    }\n  }\n}\n    },\n    _type == "missionStatement" => {\n      ...,\n      links[]{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "ctaContact" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    },\n    _type == "newsPreview" => {\n      ...,\n      ctaLink{\n        ...,\n        \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      },\n      // A chosen category narrows the list; none means the latest of all news.\n      "articles": *[\n        _type == "article" && defined(slug.current)\n        && (!defined(^.category) || ^.category._ref in categories[]._ref)\n      ] | order(date desc) [0...12] {\n        \n  _id,\n  title,\n  "slug": slug.current,\n  date,\n  image,\n  externalUrl,\n  "categories": categories[]->{"slug": slug.current, title}\n\n      }\n    },\n    _type == "newsArchive" => {\n      ...,\n      "articles": *[_type == "article" && defined(slug.current)] | order(date desc) {\n        \n  _id,\n  title,\n  "slug": slug.current,\n  date,\n  image,\n  externalUrl,\n  "categories": categories[]->{"slug": slug.current, title}\n\n      }\n    },\n    _type == "recordsArchive" => {\n      ...,\n      "categories": *[_type == "recordCategory" && defined(slug.current)] | order(order asc, title asc) {\n        _id,\n        title,\n        "slug": slug.current,\n        order,\n        sortBy,\n        filters\n      },\n      "records": *[\n        _type == "record" && defined(file.asset) && defined(category->slug.current)\n      ] {\n        _id,\n        title,\n        date,\n        "fileUrl": file.asset->url,\n        "fileName": file.asset->originalFilename,\n        "categorySlug": category->slug.current\n      }\n    },\n    _type == "eventsGrid" => {\n      ...,\n      "events": *[\n        _type == "event" && defined(start)\n        && dateTime(coalesce(end, start)) >= dateTime($now)\n      ] | order(start asc) {\n        _id,\n        title,\n        "slug": slug.current,\n        start,\n        end,\n        location,\n        description,\n        image\n      }\n    },\n    _type == "eventsPreview" => {\n      ...,\n      "events": *[\n        _type == "event" && defined(start)\n        && dateTime(coalesce(end, start)) >= dateTime($now)\n      ] | order(start asc) [0...12] {\n        _id,\n        title,\n        "slug": slug.current,\n        start,\n        end,\n        location,\n        description\n      }\n    },\n    _type == "faqList" => {\n      ...,\n      "ungrouped": *[_type == "faq" && !defined(category->_id)] | order(order asc, question asc) {\n        _id,\n        question,\n        answer[]{\n          ...,\n          \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n        }\n      },\n      "groups": *[_type == "faqCategory"] | order(order asc, title asc) {\n        _id,\n        title,\n        "faqs": *[_type == "faq" && category._ref == ^._id] | order(order asc, question asc) {\n          _id,\n          question,\n          answer[]{\n            ...,\n            \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n          }\n        }\n      }[count(faqs) > 0]\n    },\n    _type == "jobListings" => {\n      ...,\n      "jobs": *[_type == "job"] | order(order asc, title asc) {\n        _id,\n        title,\n        description,\n        location,\n        employmentType,\n        "department": department->{"slug": slug.current, title},\n        applyLink{\n          ...,\n          \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n        }\n      }\n    },\n    _type == "peopleGrid" => {\n      ...,\n      "staff": *[_type == "staffMember" && ^.source == "staff"] | order(order asc, name asc) {\n        _id,\n        name,\n        title,\n        headshot,\n        "department": department->{"slug": slug.current, title, order}\n      },\n      "commissioners": *[_type == "commissioner" && ^.source == "commissioners"] | order(order asc, name asc) {\n        _id,\n        name,\n        title,\n        termDate,\n        headshot\n      }\n    },\n    _type == "projectGrid" => {\n      ...,\n      "projects": *[_type == "project" && defined(slug.current)] | order(name asc) {\n        _id,\n        name,\n        image,\n        "slug": slug.current,\n        "projectTypes": projectTypes[]->{"slug": slug.current, title}\n      }\n    },\n    _type == "propertyArchive" => {\n      ...,\n      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {\n        _id,\n        name,\n        description,\n        link,\n        image,\n        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},\n        "resources": resources[]->{"slug": slug.current, title, order}\n      },\n      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage\n    },\n    _type == "imageCarousel" => {\n      ...,\n      "projects": select(\n        source == "category" => *[\n          _type == "project" && defined(slug.current)\n          && ^.category._ref in projectTypes[]._ref\n        ] | order(name asc) {\n          _id,\n          name,\n          image,\n          "slug": slug.current\n        },\n        projects[]->{\n          _id,\n          name,\n          image,\n          "slug": slug.current\n        }\n      ),\n      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage\n    },\n    _type == "projectPreview" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      "projects": projects[]->{\n        _id,\n        name,\n        image,\n        "slug": slug.current\n      }\n    },\n    _type == "growers" => {\n      ...,\n      growers[]{\n        _key,\n        name,\n        tag,\n        image\n      }\n    },\n    _type == "propertiesPreview" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      "properties": properties[]->{\n        _id,\n        name,\n        description,\n        link,\n        image,\n        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},\n        "resources": resources[]->{"slug": slug.current, title, order}\n      },\n      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage\n    },\n    _type == "mapPreview" => {\n      ...,\n      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {\n        \n  _id,\n  name,\n  "slug": slug.current,\n  boundaryIds,\n  location,\n  disablePopup,\n  description,\n  link,\n  "image": image{"url": asset->url, alt},\n  "propertyTypes": propertyTypes[]->{"slug": slug.current, title},\n  "resources": resources[]->{"slug": slug.current, title}\n\n      },\n      "settings": *[_type == "projectSettings" && _id == "projectSettings"][0]{\n        \n  eyebrow,\n  heading,\n  intro,\n  "boundaryDataUrl": boundaryData.asset->url,\n  "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),\n  "trailsDataUrl": trailsData.asset->url,\n  defaultCenter,\n  defaultZoom\n\n      }\n    },\n    _type == "mapTeaser" => {\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      },\n      "featuredProject": featuredProject->{name, description, image}\n    },\n    _type == "downloadBlock" => {\n      ...,\n      downloads[]{\n        ...,\n        "fileUrl": file.asset->url,\n        "fileName": file.asset->originalFilename\n      }\n    },\n    _type == "jumpNavContent" => {\n      ...,\n      content[]{\n        ...,\n        _type == "anchorLinks" => {\n          links[]{\n            ...,\n            \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n          }\n        },\n        _type == "faqAccordion" => {\n          items[]{\n            ...,\n            answer[]{\n              ...,\n              \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n            }\n          }\n        },\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n  }\n\n\n  }\n': LandingPageQueryResult
     '\n  *[\n    _type == "page" && defined(slug.current) && !coalesce(pathOnly, false)\n  ] {\n    _type,\n    _updatedAt,\n    "slug": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n),\n  }\n': SitemapDataResult
     '\n  *[_type == "page" && defined(slug.current) && !coalesce(pathOnly, false)]\n  {"slug": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}\n': PagesSlugsResult
     '\n  *[_type == "article" && slug.current == $slug][0]{\n    _id,\n    _type,\n    title,\n    "slug": slug.current,\n    date,\n    image,\n    "categories": categories[]->{"slug": slug.current, title},\n    // The article\'s own category documents, to find related articles.\n    "categoryIds": categories[]._ref,\n    body[]{\n      ...,\n      _type == "anchorLinks" => {\n        links[]{\n          ...,\n          \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n        }\n      },\n      \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n    }\n  }\n': ArticleQueryResult
-    '\n  *[_type == "article" && defined(slug.current) && slug.current != $slug]\n    | order(count(coalesce(categories, [])[_ref in $categoryIds]) desc, date desc) [0...12] {\n    \n  _id,\n  title,\n  "slug": slug.current,\n  date,\n  image,\n  link{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  },\n  "categories": categories[]->{"slug": slug.current, title}\n\n  }\n': MoreNewsQueryResult
+    '\n  *[_type == "article" && defined(slug.current) && slug.current != $slug]\n    | order(count(coalesce(categories, [])[_ref in $categoryIds]) desc, date desc) [0...12] {\n    \n  _id,\n  title,\n  "slug": slug.current,\n  date,\n  image,\n  externalUrl,\n  "categories": categories[]->{"slug": slug.current, title}\n\n  }\n': MoreNewsQueryResult
     '\n  *[_type == "singleNewsPage" && _id == "singleNewsPage"][0]{\n    eyebrow,\n    publishedLabel,\n    shareLabel,\n    moreNews{\n      ...,\n      ctaLink{\n        ...,\n        \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n    }\n  }\n': SingleNewsPageQueryResult
     '\n  *[_type == "article" && defined(slug.current)]{"slug": slug.current}\n': ArticleSlugsResult
     '\n  *[_type == "article" && defined(slug.current)]{_updatedAt, "slug": slug.current}\n': ArticleSitemapDataResult
+    '\n  *[_type == "project" && slug.current == $slug][0]{\n    _id,\n    _type,\n    name,\n    "slug": slug.current,\n    description,\n    image,\n    // This project\'s own types, to find related projects.\n    "projectTypeIds": projectTypes[]._ref,\n    body[]{\n      ...,\n      _type == "anchorLinks" => {\n        links[]{\n          ...,\n          \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n        }\n      },\n      _type == "faqAccordion" => {\n        items[]{\n          ...,\n          answer[]{\n            ...,\n            \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n          }\n        }\n      },\n      \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n    }\n  }\n': ProjectQueryResult
+    '\n  *[_type == "project" && defined(slug.current) && slug.current != $slug]{\n    _id,\n    _createdAt,\n    name,\n    image,\n    "slug": slug.current,\n    "projectTypeIds": projectTypes[]._ref\n  }\n': MoreProjectsQueryResult
+    '\n  *[_type == "singleProjectPage" && _id == "singleProjectPage"][0]{\n    eyebrow,\n    archiveLink{\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n    },\n    moreProjects{\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    }\n  }\n': SingleProjectPageQueryResult
+    '\n  *[_type == "project" && defined(slug.current)]{"slug": slug.current}\n': ProjectSlugsResult
+    '\n  *[_type == "project" && defined(slug.current)]{_updatedAt, "slug": slug.current}\n': ProjectSitemapDataResult
+    '\n  *[_type == "event" && slug.current == $slug][0]{\n    _id,\n    _type,\n    title,\n    "slug": slug.current,\n    start,\n    end,\n    location,\n    description,\n    body[]{\n      ...,\n      \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n    }\n  }\n': EventQueryResult
+    '\n  *[\n    _type == "event" && defined(start) && slug.current != $slug\n    && dateTime(coalesce(end, start)) >= dateTime($now)\n  ] | order(start asc) [0...12] {\n    _id,\n    title,\n    "slug": slug.current,\n    start,\n    end,\n    location,\n    description\n  }\n': MoreEventsQueryResult
+    '\n  *[_type == "event" && defined(slug.current)]{"slug": slug.current}\n': EventSlugsResult
+    '\n  *[_type == "event" && defined(slug.current)]{_updatedAt, "slug": slug.current}\n': EventSitemapDataResult
   }
 }

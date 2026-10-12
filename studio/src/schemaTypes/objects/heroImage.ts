@@ -4,9 +4,8 @@ import {defineField} from 'sanity'
 import {defineBlock, eyebrowField, imageWithAltField} from './blockFields'
 
 /**
- * Full-bleed photo with a light card holding the eyebrow and headline. All three fields are
- * required: the theme fell back to placeholder copy and the page's featured image, and a Sanity
- * page has neither.
+ * Full-bleed photo with a light card holding the eyebrow and headline. Heading and image are
+ * required; an empty eyebrow falls back to the page title at render.
  */
 export const heroImage = defineBlock({
   name: 'heroImage',
@@ -14,7 +13,10 @@ export const heroImage = defineBlock({
   type: 'object',
   icon: ImageIcon,
   fields: [
-    defineField({...eyebrowField(), validation: (rule) => rule.required()}),
+    defineField({
+      ...eyebrowField(),
+      description: 'Short label above the heading. Leave empty to use the page title.',
+    }),
     defineField({
       name: 'heading',
       title: 'Heading',
