@@ -9,7 +9,8 @@ import {event} from './documents/event'
 import {faq} from './documents/faq'
 import {job} from './documents/job'
 import {staffMember} from './documents/staffMember'
-import {department, faqCategory, newsCategory} from './documents/taxonomies'
+import {record} from './documents/record'
+import {department, faqCategory, newsCategory, recordCategory} from './documents/taxonomies'
 import {propertyType} from './documents/propertyType'
 import {resource} from './documents/resource'
 import {heroVideo} from './objects/heroVideo'
@@ -35,6 +36,7 @@ import {anchorLinks} from './objects/anchorLinks'
 import {peopleGrid} from './objects/peopleGrid'
 import {projectGrid} from './objects/projectGrid'
 import {propertyArchive} from './objects/propertyArchive'
+import {recordsArchive} from './objects/recordsArchive'
 import {projectPreview} from './objects/projectPreview'
 import {faqList} from './objects/faqList'
 import {jobListings} from './objects/jobListings'
@@ -73,10 +75,12 @@ export const schemaTypes = [
   commissioner,
   faq,
   job,
+  record,
   // Categorisation for the above - referenced, so the client can extend them without a deploy
   newsCategory,
   department,
   faqCategory,
+  recordCategory,
   // Categorisation for properties - referenced, so the client can extend either without a deploy
   propertyType,
   projectType,
@@ -107,6 +111,7 @@ export const schemaTypes = [
   peopleGrid,
   projectGrid,
   propertyArchive,
+  recordsArchive,
   projectPreview,
   eventsPreview,
   ctaContact,

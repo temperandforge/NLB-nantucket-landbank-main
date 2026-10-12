@@ -57,6 +57,8 @@ const DISABLED_TYPES = [
   'department',
   'faq',
   'faqCategory',
+  'record',
+  'recordCategory',
   'job',
   // Internal to sanity-plugin-media. Tags are managed inside the Media tool, so listing them at
   // the root would just be a dead end for an editor.
@@ -145,6 +147,18 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
               S.documentTypeListItem('faq').title('FAQs').icon(HelpCircleIcon),
               S.divider(),
               S.documentTypeListItem('faqCategory').title('FAQ Categories').icon(TagIcon),
+            ]),
+        ),
+      S.listItem()
+        .title('Records')
+        .icon(DocumentsIcon)
+        .child(
+          S.list()
+            .title('Records')
+            .items([
+              S.documentTypeListItem('record').title('Records').icon(DocumentsIcon),
+              S.divider(),
+              S.documentTypeListItem('recordCategory').title('Record Categories').icon(TagIcon),
             ]),
         ),
       S.documentTypeListItem('job').title('Jobs').icon(CaseIcon),

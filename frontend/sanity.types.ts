@@ -123,6 +123,11 @@ export type ProjectPreview = {
   disabled?: boolean
 }
 
+export type RecordsArchive = {
+  _type: 'recordsArchive'
+  disabled?: boolean
+}
+
 export type PropertyArchive = {
   _type: 'propertyArchive'
   disabled?: boolean
@@ -514,6 +519,42 @@ export type NewsCategory = {
   title: string
   slug: Slug
   order?: number
+}
+
+export type RecordCategoryReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'recordCategory'
+}
+
+export type Record = {
+  _id: string
+  _type: 'record'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title?: string
+  date?: string
+  file: {
+    asset?: SanityFileAssetReference
+    media?: unknown
+    _type: 'file'
+  }
+  category: RecordCategoryReference
+}
+
+export type RecordCategory = {
+  _id: string
+  _type: 'recordCategory'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  order?: number
+  sortBy: 'dateDesc' | 'titleAsc'
+  filters?: Array<string>
 }
 
 export type DepartmentReference = {
@@ -988,6 +1029,9 @@ export type Page = {
       } & PropertyArchive)
     | ({
         _key: string
+      } & RecordsArchive)
+    | ({
+        _key: string
       } & Timeline)
   >
 }
@@ -1129,6 +1173,23 @@ export type SanityAssistSchemaTypeField = {
   >
 }
 
+export type MediaFolderReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'media.folder'
+}
+
+export type MediaFolder = {
+  _id: string
+  _type: 'media.folder'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name?: string
+  parent?: MediaFolderReference
+}
+
 export type MediaTag = {
   _id: string
   _type: 'media.tag'
@@ -1241,6 +1302,7 @@ export type AllSanitySchemaTypes =
   | EventsPreview
   | ProjectReference
   | ProjectPreview
+  | RecordsArchive
   | PropertyArchive
   | ProjectGrid
   | PeopleGrid
@@ -1274,6 +1336,9 @@ export type AllSanitySchemaTypes =
   | ProjectType
   | PropertyType
   | NewsCategory
+  | RecordCategoryReference
+  | Record
+  | RecordCategory
   | DepartmentReference
   | Job
   | FaqCategoryReference
@@ -1314,6 +1379,8 @@ export type AllSanitySchemaTypes =
   | SanityAssistInstructionFieldRef
   | SanityAssistInstruction
   | SanityAssistSchemaTypeField
+  | MediaFolderReference
+  | MediaFolder
   | MediaTag
   | SanityImagePaletteSwatch
   | SanityImagePalette
@@ -2274,6 +2341,11 @@ export type GetPageQueryResult = {
       }
     | {
         _key: string
+        _type: 'recordsArchive'
+        disabled?: boolean
+      }
+    | {
+        _key: string
         _type: 'timeline'
         entries?: Array<{
           year: string
@@ -2983,6 +3055,11 @@ export type LandingPageQueryResult = {
           alt?: string
           _type: 'image'
         } | null
+      }
+    | {
+        _key: string
+        _type: 'recordsArchive'
+        disabled?: boolean
       }
     | {
         _key: string

@@ -23,6 +23,7 @@ import {propertyArchive} from '../objects/propertyArchive'
 import {projectPreview} from '../objects/projectPreview'
 import {newsPreview} from '../objects/newsPreview'
 import {newsArchive} from '../objects/newsArchive'
+import {recordsArchive} from '../objects/recordsArchive'
 import {timeline} from '../objects/timeline'
 import {buildPagePath, MAX_PAGE_DEPTH, slugifySegment} from '../../lib/pageHierarchy'
 
@@ -53,6 +54,7 @@ const pageBuilderBlocks = [
   projectGrid,
   projectPreview,
   propertyArchive,
+  recordsArchive,
   timeline,
 ]
   .sort((a, b) => (a.title ?? a.name).localeCompare(b.title ?? b.name))
