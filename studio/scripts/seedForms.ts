@@ -16,6 +16,9 @@
  * stays the question, so validation messages, screen readers and stored `answers[].label` name it.
  * (scripts/updateFormHeadings.ts brings forms seeded before this change in line.)
  *
+ * Placeholders are the Figma's example values where it gives one (email, phone, the two address
+ * lines). Where it only shows the stand-in word "Placeholder", the field has none.
+ *
  * OUTSTANDING / UNCONFIRMED client content:
  * - The Event type, Preferred location, Entertainment and Transportation options are
  *   "Option 1/2/3" samples.
@@ -78,6 +81,8 @@ const section = (heading: string | undefined, columns: 1 | 2, fields: ReturnType
   fields,
 })
 
+const EMAIL_PLACEHOLDER = 'janesmith92@gmail.com'
+const PHONE_PLACEHOLDER = '(123) 456-7890'
 const SAMPLE = ['Option 1', 'Option 2', 'Option 3']
 
 const FORMS = [
@@ -90,12 +95,12 @@ const FORMS = [
       section('Requestees info', 2, [
         field('text', 'First name', {required: true, width: 'half'}),
         field('text', 'Last name', {required: true, width: 'half'}),
-        field('email', 'Email', {required: true, width: 'half'}),
-        field('phone', 'Phone', {required: true, width: 'half'}),
+        field('email', 'Email', {required: true, width: 'half', placeholder: EMAIL_PLACEHOLDER}),
+        field('phone', 'Phone', {required: true, width: 'half', placeholder: PHONE_PLACEHOLDER}),
       ]),
       section('Mailing address', 2, [
-        field('text', 'Address line 1', {required: true}),
-        field('text', 'Address line 2', {helperText: 'Optional'}),
+        field('text', 'Address line 1', {required: true, placeholder: 'Address line 1'}),
+        field('text', 'Address line 2', {helperText: 'Optional', placeholder: 'Address line 2 (optional)'}),
         field('text', 'Country', {required: true, width: 'half'}),
         field('text', 'State/Province', {required: true, width: 'half'}),
         field('text', 'City', {width: 'half'}),
@@ -175,8 +180,8 @@ const FORMS = [
       section(undefined, 2, [
         field('text', 'First name', {required: true, width: 'half'}),
         field('text', 'Last name', {required: true, width: 'half'}),
-        field('email', 'Email', {required: true, width: 'half'}),
-        field('phone', 'Phone', {required: true, width: 'half'}),
+        field('email', 'Email', {required: true, width: 'half', placeholder: EMAIL_PLACEHOLDER}),
+        field('phone', 'Phone', {required: true, width: 'half', placeholder: PHONE_PLACEHOLDER}),
       ]),
       section('Choose a topic', 1, [
         field('select', 'Topic', {
