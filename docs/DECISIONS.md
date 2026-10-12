@@ -989,6 +989,8 @@ Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-desig
 - Nine menu links and three social URLs are `#` placeholders awaiting real values.
 - Newsletter submission has no provider, action, or validation.
 - Cookie Settings needs a consent manager; it is a JS trigger, not a URL.
+- Google Tag Manager is not loaded. It needs the client's container id and a consent decision, which
+  belongs with Cookie Settings ([#49](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/49)).
 - The Studio's Pages list is flat. It shows each page's resolved path in the subtitle,
   but does not nest children under their parent, which gets harder to scan as pages are added.
 - Markers and boundaries render only once Mapbox fires `load`, which needs the style request to
