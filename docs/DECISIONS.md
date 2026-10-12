@@ -1054,3 +1054,22 @@ background curve SVGs (see the plan, Task 7). Issue [#23](https://github.com/tem
 
 The jump-nav column is capped to the visible height with the nav scrolling inside it, and its offset
 follows the header's hide/show state (`--header-offset`, set by `HeaderShell`).
+
+## 18. Event pages and the Events Grid
+
+**Status:** Implemented (2026-10-12), not yet checked in a browser.
+
+An `event` has a page of its own at `/events/<slug>`, a static route like `/news/<slug>`. The page
+address is derived from the slug. `event` gained `slug`, `image` (the grid row's photo) and `body`
+(sections and images only: the `jumpNavBodyMembers` block and image members, with no jump nav and no
+FAQ accordion, so "Activities" and "Rain Date" are H2s in the body). The page closes with the existing
+events strip: `EventsPreview` was split into `EventsPreviewView` (shared with the page, which shows the
+next two *other* upcoming events) and the block. Tiles link to the event when it has a slug.
+
+The Events Grid block (`eventsGrid`) lists every upcoming event as a row: image with a date badge,
+title, time, place, summary and "View details". Upcoming is computed at render, as for the Events
+Preview (9.2). The page's heading is a separate Hero - Tertiary block, as on the News page.
+Seeds: `seedEvents.ts` (draft events, no images) and `seedEventsPage.ts` (fills the empty Events page).
+
+**Not done:** the calendar icon is drawn to match the clock and pin, not exported from Figma.
+Event images must be added in Studio.

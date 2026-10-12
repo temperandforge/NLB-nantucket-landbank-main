@@ -75,6 +75,11 @@ export default defineConfig({
             route: '/projects/:slug',
             filter: `_type == "project" && slug.current == $slug`,
           },
+          // An event page, /events/<slug>; same ordering reason as the two above.
+          {
+            route: '/events/:slug',
+            filter: `_type == "event" && slug.current == $slug`,
+          },
           // One route per URL depth, defined in src/lib/pageHierarchy.ts so the same filters can
           // be exercised by scripts/verifyPageRouting.ts instead of being restated there.
           ...PAGE_PRESENTATION_ROUTES,
@@ -93,6 +98,15 @@ export default defineConfig({
                 ? [{title: doc.title || 'Untitled', href: `/news/${doc.slug}`}]
                 : [],
               message: doc?.slug ? undefined : 'Add a slug to preview this article.',
+            }),
+          }),
+          event: defineLocations({
+            select: {title: 'title', slug: 'slug.current'},
+            resolve: (doc) => ({
+              locations: doc?.slug
+                ? [{title: doc.title || 'Untitled', href: `/events/${doc.slug}`}]
+                : [],
+              message: doc?.slug ? undefined : 'Add a slug to preview this event.',
             }),
           }),
           project: defineLocations({

@@ -41,6 +41,7 @@ import {projectPreview} from './objects/projectPreview'
 import {faqList} from './objects/faqList'
 import {jobListings} from './objects/jobListings'
 import {newsPreview} from './objects/newsPreview'
+import {eventsGrid} from './objects/eventsGrid'
 import {newsArchive} from './objects/newsArchive'
 import {eventsPreview} from './objects/eventsPreview'
 import {missionStatement} from './objects/missionStatement'
@@ -113,6 +114,7 @@ export const schemaTypes = [
   propertyArchive,
   projectPreview,
   eventsPreview,
+  eventsGrid,
   ctaContact,
   // Menu building blocks - menuGroup nests menuLink, capped at two levels
   menuGroup,
