@@ -1308,6 +1308,43 @@
     }
   },
   {
+    "name": "mapPreview",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "mapPreview"
+          }
+        },
+        "heading": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "body": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "disabled": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
     "name": "downloadBlock",
     "type": "type",
     "value": {
@@ -6319,6 +6356,21 @@
                 },
                 "rest": {
                   "type": "inline",
+                  "name": "mapTeaser"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
                   "name": "jobListings"
                 }
               },
@@ -6349,7 +6401,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "mapTeaser"
+                  "name": "mapPreview"
                 }
               },
               {

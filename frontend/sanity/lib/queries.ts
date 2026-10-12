@@ -124,19 +124,24 @@ export const siteBannerQuery = defineQuery(`
  * Boundary geometry is not here - it lives in the single GeoJSON file on Project Settings, and
  * boundaryId says which feature in it belongs to this property.
  */
+/** What the map needs from a property. Shared by the map page and the Map Preview block. */
+const mapPropertyFields = /* groq */ `
+  _id,
+  name,
+  "slug": slug.current,
+  boundaryIds,
+  location,
+  disablePopup,
+  description,
+  link,
+  "image": image{"url": asset->url, alt},
+  "propertyTypes": propertyTypes[]->{"slug": slug.current, title},
+  "resources": resources[]->{"slug": slug.current, title}
+`
+
 export const propertiesQuery = defineQuery(`
   *[_type == "property" && defined(slug.current)] | order(name asc) {
-    _id,
-    name,
-    "slug": slug.current,
-    boundaryIds,
-    location,
-    disablePopup,
-    description,
-    link,
-    "image": image{"url": asset->url, alt},
-    "propertyTypes": propertyTypes[]->{"slug": slug.current, title},
-    "resources": resources[]->{"slug": slug.current, title}
+    ${mapPropertyFields}
   }
 `)
 
@@ -155,19 +160,23 @@ export const mapFiltersQuery = defineQuery(`{
   }
 }`)
 
+/** The map's settings. Shared by the map page and the Map Preview block. */
+const mapSettingsFields = /* groq */ `
+  eyebrow,
+  heading,
+  intro,
+  "boundaryDataUrl": boundaryData.asset->url,
+  "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),
+  "trailsDataUrl": trailsData.asset->url,
+  defaultCenter,
+  defaultZoom
+`
+
 export const mapSettingsQuery = defineQuery(`
   *[_type == "projectSettings" && _id == "projectSettings"][0]{
-    eyebrow,
-    heading,
-    intro,
-    "boundaryDataUrl": boundaryData.asset->url,
-    "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),
-    "trailsDataUrl": trailsData.asset->url,
-    defaultCenter,
-    defaultZoom
+    ${mapSettingsFields}
   }
 `)
-
 /**
  * Resolves page references inside a Portable Text field's link annotations. A constant, not a
  * function of the field name: a function call inside a template literal widens the query's type
@@ -395,6 +404,15 @@ const pageBuilderFields = /* groq */ `
         name,
         image,
         "slug": slug.current
+      }
+    },
+    _type == "mapPreview" => {
+      ...,
+      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {
+        ${mapPropertyFields}
+      },
+      "settings": *[_type == "projectSettings" && _id == "projectSettings"][0]{
+        ${mapSettingsFields}
       }
     },
     _type == "mapTeaser" => {

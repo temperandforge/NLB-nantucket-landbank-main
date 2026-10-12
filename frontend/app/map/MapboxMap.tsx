@@ -22,6 +22,8 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? ''
 interface MapboxMapProps {
   projects: Property[]
   settings: MapSettings | null
+  /** Off for an embedded preview, where wheel-zooming would hijack the page scroll. */
+  scrollZoom?: boolean
 }
 
 /** Popup content is injected as HTML, so any authored value must be escaped first. */
@@ -80,7 +82,7 @@ function buildPopupHtml(project: Property): string {
     `
 }
 
-export function MapboxMap({projects, settings}: MapboxMapProps) {
+export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<mapboxgl.Map | null>(null)
   const markersRef = useRef<mapboxgl.Marker[]>([])
@@ -126,6 +128,7 @@ export function MapboxMap({projects, settings}: MapboxMapProps) {
       zoom: settings?.defaultZoom ?? DEFAULT_ZOOM,
     })
     mapRef.current = map
+    if (!scrollZoom) map.scrollZoom.disable()
 
     /**
      * Trails track, uploaded on Project Settings. Separate from the property boundaries: nothing

@@ -16,6 +16,7 @@ import PropertyArchive from '@/components/blocks/PropertyArchive'
 import MissionStatement from '@/components/blocks/MissionStatement'
 import ContactForm from '@/components/blocks/ContactForm'
 import DownloadBlock from '@/components/blocks/DownloadBlock'
+import MapPreview from '@/components/blocks/MapPreview'
 import MapTeaser from '@/components/blocks/MapTeaser'
 import JumpNavContent from '@/components/blocks/JumpNavContent'
 import ImageCarousel from '@/components/blocks/ImageCarousel'
@@ -50,6 +51,7 @@ const Blocks = {
   imageCarousel: ImageCarousel,
   timeline: Timeline,
   downloadBlock: DownloadBlock,
+  mapPreview: MapPreview,
   mapTeaser: MapTeaser,
   contactForm: ContactForm,
   ctaContact: CtaContact,
