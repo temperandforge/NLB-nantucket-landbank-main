@@ -59,9 +59,13 @@ export default function NavSearch(props: DesktopProps | MobileProps) {
           id={panelId}
           role="region"
           aria-label="Search"
-          className="absolute inset-x-0 top-full z-40 bg-background p-gap-lg shadow-layer"
+          // Full-bleed: as wide as the viewport and centred on the bar (HeaderShell clips any overhang),
+          // with the field inset to line up with the bar's content.
+          className="absolute left-1/2 top-full z-40 w-screen -translate-x-1/2 bg-background py-gap-lg shadow-layer"
         >
-          <SearchField autoFocus onSearch={onSearch} />
+          <div className="tf-px">
+            <SearchField autoFocus onSearch={onSearch} />
+          </div>
         </div>
       )}
     </>
