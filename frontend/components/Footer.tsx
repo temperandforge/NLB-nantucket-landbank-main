@@ -77,7 +77,7 @@ export default async function Footer() {
       </div>
 
       <div className="relative px-6 py-section-p-sm md:px-global-margin">
-        <div className="mx-auto flex max-w-site flex-col gap-gap-2xl">
+        <div className="flex flex-col gap-gap-2xl">
           {/* Band 1: newsletter signup alongside the contact / address / hours columns. */}
           <div className="flex flex-col gap-gap-2xl xl:flex-row xl:items-start xl:justify-between">
             {newsletterHeading ? <NewsletterSignup heading={newsletterHeading} /> : null}
