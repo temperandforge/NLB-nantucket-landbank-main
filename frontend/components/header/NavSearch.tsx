@@ -26,6 +26,8 @@ type DesktopProps = {
 
 type MobileProps = {
   variant: 'mobile'
+  /** The query to show: the results page's own, so the menu field and the page agree. Empty elsewhere. */
+  query: string
   /** Called after a search is submitted, so the menu can close. */
   onSearch: () => void
   className?: string
@@ -35,7 +37,8 @@ export default function NavSearch(props: DesktopProps | MobileProps) {
   if (props.variant === 'mobile') {
     return (
       <div className={`rounded bg-input px-gap-md py-4 text-on-background ${props.className ?? ''}`}>
-        <SearchField onSearch={props.onSearch} />
+        {/* Keyed on the query: the menu stays mounted, so the field is reset whenever the owner hands it a new one. */}
+        <SearchField key={props.query} defaultValue={props.query} onSearch={props.onSearch} />
       </div>
     )
   }
