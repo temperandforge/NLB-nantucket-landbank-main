@@ -27,16 +27,14 @@ In scope:
 - GROQ queries and generated types; a seed script for the header menu.
 - A `docs/DECISIONS.md` entry.
 
-Out of scope (see [Deferred work](#deferred-work)):
-
-- Search itself: the results page and the "No search results" state.
+Out of scope: nothing. (Search was built later; see [Search](#search) and DECISIONS 4.10.)
 
 ## Decisions taken in brainstorming
 
 | Question | Decision |
 | --- | --- |
 | About Us shows Purpose / People / Other columns, but menus are capped at two levels | The headings are **not** menu items. `menuLink` gains an optional `group` label; the two-level cap is unchanged. |
-| Search | UI only, **disabled** in every state. |
+| Search | Built (originally disabled): submits to `/search`, see [Search](#search). |
 | Banner authoring | A `siteBanner` singleton under **Globals**. |
 | Placement | Root layout, one header for the whole site, **sticky**. |
 | Scroll behaviour | Hide on scroll down, reveal on scroll up. |
@@ -191,8 +189,18 @@ scroll down and back on scroll up.
 
 ### Search
 
-`NavSearch` renders the field in every state shown in the design, but the input and button are
-`disabled` and carry `aria-disabled`. Nothing submits. See [Deferred work](#deferred-work).
+Built after the rest of the header; the design is the "Search" frames in the website file
+([1910:9834](https://www.figma.com/design/jDXhDNzEJS26VpXp9JWzIv/Nantucket---Website?node-id=1910-9834&m=dev)).
+
+- **Desktop.** The yellow square is a toggle (`aria-expanded`, becomes a close ×). It opens a
+  full-width cream panel under the bar holding the field: tracked "Search" label, input, arrow
+  button, rule. `DesktopNav` owns it with the dropdowns, so one panel is open at a time and Escape,
+  an outside click and a route change close it, and the header stays visible while it is open.
+- **Mobile.** The same field sits on the input surface at the bottom of the menu panel.
+- **States.** Empty (bare arrow), typing (the arrow button takes the yellow square), error ("No
+  search results" in red beneath the rule). The error shows on the results page's own field.
+- **Results.** `/search?q=` is server-rendered (`app/search/page.tsx`); there is no Figma frame for it.
+  See DECISIONS 4.10 for what is searchable and how it is ranked.
 
 ### Banner
 
@@ -249,11 +257,9 @@ The seed script is run with `--dry` first and its plan read before the real run.
 
 ## Deferred work (a GitHub issue each, linked here before merge)
 
-1. **Site search.** The search field is disabled. Missing: a results page, the GROQ search over
-   pages, news, projects and other content, and the "No search results" state. Deferred because the
-   design covers only the field, not results, and the scope is a separate feature. Tracked in
-   [#29](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/29); the `NavSearch`
-   component carries a `TODO` referencing it.
+1. **Site search gaps.** The search itself is built ([#29](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/29)).
+   Not searchable yet: people, FAQs and properties without a link; typo tolerance; pagination.
+   Tracked in [#50](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/50).
 
 ## Notes
 

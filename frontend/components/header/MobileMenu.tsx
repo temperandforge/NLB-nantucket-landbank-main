@@ -224,7 +224,7 @@ export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
                 )
               })}
             </ul>
-            <NavSearch variant="mobile" className="mt-gap-md" />
+            <NavSearch variant="mobile" onSearch={close} className="mt-gap-md" />
           </nav>
         )}
       </div>

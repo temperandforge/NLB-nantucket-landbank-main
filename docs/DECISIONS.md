@@ -461,7 +461,36 @@ space to the content; revealing on scroll up keeps navigation close.
   size new full-height regions from it rather than a literal.
 - The real content seed, `studio/scripts/seedHeaderContent.ts`, is idempotent and non-destructive
   (it supports `--dry`).
-- Search is disabled; see [#29](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/29).
+- Search is built; see 4.10.
+
+### 4.10 Site search is a server-rendered `/search` page, fed by one GROQ query
+
+**Status:** Implemented
+
+The header's search field (a toggle and full-width panel on desktop, a field in the menu on mobile)
+submits to `/search?q=<words>`. The page reads `q` on the server, runs `searchQuery` and renders the
+ranked results; `?type=<kind>` narrows them client-side, like every archive filter. No Figma frame
+exists for the results page, so it is composed from the archive patterns (record-row hover, filter
+tabs, tracked mono labels) and the nav field itself.
+
+**Why:** Server rendering keeps the page working without JavaScript (the field is a plain GET form)
+and makes a results address shareable. One query keeps ranking in one place.
+
+**Implication:**
+- A word is a prefix pattern and every word must match, in any field. Titles weigh 8x the rest.
+  Parsing, snippets, highlighting and tabs are in `frontend/sanity/lib/search.ts` and are checked by
+  `frontend/scripts/verifySearch.mts`; change them there.
+- Searchable means "has a destination": pages (not `pathOnly`), news, projects, events, records with
+  a file, and properties that have a `link`. Adding a type means the GROQ filter, `SEARCH_TYPES`,
+  its label and its href in `search.ts`, together.
+- `/search` is a static route, so it wins over the catch-all: a CMS page cannot be published at
+  `/search`.
+- The field's label uses the website file's 14px / 1.54px tracking, not the 12px / 1.32px
+  "mono/tracked" style the dropdown headings use.
+- The "No search results" error renders under the field on the results page, not in the header
+  panel: a search is a navigation, so the zero-result answer arrives with the page.
+- What is not searchable, and why, is tracked in
+  [#50](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/50).
 
 ---
 
@@ -1002,8 +1031,8 @@ Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-desig
 - Renaming an ancestor's slug silently changes every descendant URL (2.3). There is no redirect
   mechanism for the old paths (tracked in [#9](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/9)).
 - Mobile footer breakpoints are assumptions awaiting designer confirmation.
-- Site search is not built: the header search field is disabled
-  ([#29](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/29)).
+- Site search covers only content with a destination; people, FAQs and properties without a `link`
+  are not searchable ([#50](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/50)).
 - `frontend/tailwind.config.ts` is vestigial under Tailwind v4 — `globals.css` uses
   `@import 'tailwindcss'` with `@theme` and no `@config`, so the file is never loaded. Its
   `green` / `yellow` scales are unrelated to the brand palette.

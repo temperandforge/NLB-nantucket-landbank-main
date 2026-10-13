@@ -118,6 +118,25 @@ export type EventsPreview = {
   disabled?: boolean
 }
 
+export type PropertyReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'property'
+}
+
+export type PropertiesPreview = {
+  _type: 'propertiesPreview'
+  heading?: string
+  button?: Button
+  properties?: Array<
+    {
+      _key: string
+    } & PropertyReference
+  >
+  disabled?: boolean
+}
+
 export type ProjectReference = {
   _ref: string
   _type: 'reference'
@@ -183,9 +202,17 @@ export type NewsArchive = {
   disabled?: boolean
 }
 
+export type NewsCategoryReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'newsCategory'
+}
+
 export type NewsPreview = {
   _type: 'newsPreview'
   heading?: string
+  category?: NewsCategoryReference
   count: number
   ctaHeading?: string
   ctaLabel?: string
@@ -248,13 +275,6 @@ export type ContactForm = {
   disabled?: boolean
 }
 
-export type PropertyReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'property'
-}
-
 export type MapTeaser = {
   _type: 'mapTeaser'
   eyebrow?: string
@@ -269,6 +289,11 @@ export type MapPreview = {
   _type: 'mapPreview'
   heading?: string
   body?: string
+  disabled?: boolean
+}
+
+export type MapExplorer = {
+  _type: 'mapExplorer'
   disabled?: boolean
 }
 
@@ -774,13 +799,6 @@ export type Event = {
   >
 }
 
-export type NewsCategoryReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'newsCategory'
-}
-
 export type Article = {
   _id: string
   _type: 'article'
@@ -1152,6 +1170,9 @@ export type Page = {
       } & JumpNavContent)
     | ({
         _key: string
+      } & MapExplorer)
+    | ({
+        _key: string
       } & MapPreview)
     | ({
         _key: string
@@ -1171,6 +1192,9 @@ export type Page = {
     | ({
         _key: string
       } & ProjectPreview)
+    | ({
+        _key: string
+      } & PropertiesPreview)
     | ({
         _key: string
       } & PropertyArchive)
@@ -1432,6 +1456,8 @@ export type AllSanitySchemaTypes =
   | CtaContact
   | EventsGrid
   | EventsPreview
+  | PropertyReference
+  | PropertiesPreview
   | ProjectReference
   | ProjectPreview
   | RecordsArchive
@@ -1441,6 +1467,7 @@ export type AllSanitySchemaTypes =
   | JobListings
   | FaqList
   | NewsArchive
+  | NewsCategoryReference
   | NewsPreview
   | MissionStatement
   | FaqAccordion
@@ -1448,9 +1475,9 @@ export type AllSanitySchemaTypes =
   | PageReference
   | Link
   | ContactForm
-  | PropertyReference
   | MapTeaser
   | MapPreview
+  | MapExplorer
   | Growers
   | DownloadBlock
   | Timeline
@@ -1485,7 +1512,6 @@ export type AllSanitySchemaTypes =
   | StaffMember
   | Department
   | Event
-  | NewsCategoryReference
   | Article
   | Project
   | PropertyTypeReference
