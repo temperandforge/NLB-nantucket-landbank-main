@@ -50,7 +50,7 @@ export function BoundaryIdInput(props: StringInputProps) {
             setState({
               status: 'notice',
               message:
-                'No boundary data file has been uploaded yet. Add one under Projects → Project Settings, then reopen this property.',
+                'No boundary data file has been uploaded yet. Add one under Properties → Properties Settings, then reopen this property.',
             })
           }
           return
@@ -85,7 +85,7 @@ export function BoundaryIdInput(props: StringInputProps) {
         if (!options.length) {
           setState({
             status: 'notice',
-            message: `The uploaded file has ${features.length} feature(s), but none carry a "${idProperty}" property. Check the Boundary ID property setting under Project Settings.`,
+            message: `The uploaded file has ${features.length} feature(s), but none carry a "${idProperty}" property. Check the Boundary ID property setting under Properties Settings.`,
           })
           return
         }

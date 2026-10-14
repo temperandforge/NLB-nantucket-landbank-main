@@ -20,7 +20,7 @@ export type MapSettings = NonNullable<MapPreviewBlock['settings']>
 /** A filter option as the dropdowns consume it. */
 export type FilterOption = {value: string; label: string}
 
-/** Fallback view when Project Settings has no default centre, i.e. the whole island. */
+/** Fallback view when Properties Settings has no default centre, i.e. the whole island. */
 export const NANTUCKET_CENTER: [number, number] = [-70.0995, 41.2835]
 export const DEFAULT_ZOOM = 11
 

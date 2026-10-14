@@ -9,11 +9,11 @@
  *   - 5 propertyType and 6 resource documents (matched on slug)
  *   - 8 project documents (matched on slug), referencing those and carrying their marker
  *     coordinates and boundary id
- *   - the Project Settings singleton, with scripts/data/boundaries.geojson uploaded as the
+ *   - the Properties Settings singleton, with scripts/data/boundaries.geojson uploaded as the
  *     boundary data file
  *
  * Idempotent. Existing documents are matched on their natural key and reused, never overwritten -
- * including Project Settings, whose fields are only filled in where they are still empty, so a
+ * including Properties Settings, whose fields are only filled in where they are still empty, so a
  * re-run cannot discard a boundary file the client has since uploaded.
  *
  * Pass --dry to print the plan without writing.
@@ -32,7 +32,7 @@ const BOUNDARY_FILE = join(__dirname, 'data', 'boundaries.geojson')
 
 /**
  * The trails track that used to be fetched from a hardcoded /geojson/sample.geojson path. Seeded
- * into Project Settings so the layer is authored rather than shipped in the bundle.
+ * into Properties Settings so the layer is authored rather than shipped in the bundle.
  */
 const TRAILS_FILE = join(__dirname, '..', '..', 'frontend', 'public', 'geojson', 'sample.geojson')
 
@@ -199,7 +199,7 @@ async function main() {
     console.log(`  + project created: ${spec.slug} (${created._id})`)
   }
 
-  console.log('\nProject Settings:')
+  console.log('\nProperties Settings:')
   const settings = await client.fetch<{
     _id: string
     hasBoundaryData: boolean

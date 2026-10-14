@@ -29,7 +29,7 @@ async function main() {
       "idProperty": boundaryIdProperty
     }`,
   )
-  if (!settings?.url) throw new Error('No boundary file uploaded on Project Settings.')
+  if (!settings?.url) throw new Error('No boundary file uploaded on Properties Settings.')
   if (settings.idProperty !== 'FID') {
     throw new Error(
       `This script assumes boundaryIdProperty is "FID", got "${settings.idProperty}". Update the script's grouping key if the file has changed.`,

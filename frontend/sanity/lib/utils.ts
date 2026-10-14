@@ -76,3 +76,12 @@ export function dataAttr(config: DataAttributeConfig) {
 export function projectHref(slug: string): string {
   return `/projects/${slug}`
 }
+
+/**
+ * The address of a property's page, derived from the slug alone for the same reason as
+ * projectHref. Keep in step with the `/properties/:slug` Presentation route in
+ * studio/sanity.config.ts.
+ */
+export function propertyHref(slug: string): string {
+  return `/properties/${slug}`
+}

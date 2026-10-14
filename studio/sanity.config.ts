@@ -75,6 +75,11 @@ export default defineConfig({
             route: '/projects/:slug',
             filter: `_type == "project" && slug.current == $slug`,
           },
+          // A property page, /properties/<slug>; same ordering reason as /projects/:slug.
+          {
+            route: '/properties/:slug',
+            filter: `_type == "property" && slug.current == $slug`,
+          },
           // An event page, /events/<slug>; same ordering reason as the two above.
           {
             route: '/events/:slug',
@@ -116,6 +121,15 @@ export default defineConfig({
                 ? [{title: doc.name || 'Untitled', href: `/projects/${doc.slug}`}]
                 : [],
               message: doc?.slug ? undefined : 'Add a slug to preview this project.',
+            }),
+          }),
+          property: defineLocations({
+            select: {name: 'name', slug: 'slug.current'},
+            resolve: (doc) => ({
+              locations: doc?.slug
+                ? [{title: doc.name || 'Untitled', href: `/properties/${doc.slug}`}]
+                : [],
+              message: doc?.slug ? undefined : 'Add a slug to preview this property.',
             }),
           }),
           page: defineLocations({

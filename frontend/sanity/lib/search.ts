@@ -75,7 +75,7 @@ export type SearchResult = {
   href: string
   /** A record is a file to download rather than a page to open. */
   download: boolean
-  /** A property's link and an uploaded file are outside the site's own routes. */
+  /** An uploaded file is outside the site's own routes. */
   external: boolean
 }
 
@@ -162,11 +162,8 @@ function hrefFor(row: Row): {href: string; external: boolean} | null {
       return row.slug ? {href: `/projects/${row.slug}`, external: false} : null
     case 'event':
       return row.slug ? {href: `/events/${row.slug}`, external: false} : null
-    case 'property': {
-      // A property has no page of its own; it is a result only when it links somewhere.
-      const link = realHref(row.link)
-      return link ? {href: link, external: /^https?:\/\//i.test(link)} : null
-    }
+    case 'property':
+      return row.slug ? {href: `/properties/${row.slug}`, external: false} : null
     case 'record':
       return row.fileUrl ? {href: row.fileUrl, external: true} : null
     default:

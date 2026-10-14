@@ -1,6 +1,8 @@
+import Link from 'next/link'
+
 import BlockImage from '@/components/blocks/BlockImage'
 import Tag from '@/components/ui/Tag'
-import {realHref} from '@/sanity/lib/utils'
+import {propertyHref} from '@/sanity/lib/utils'
 
 import type {PropertyDefaultImage, PropertyItem} from './types'
 
@@ -51,12 +53,12 @@ export default function CardProperty({
       </div>
     </div>
   )
-  // The property's own link, when it has one; otherwise a plain card, never a dead anchor.
-  const href = realHref(property.link)
+  // A property with no slug (unreachable through the queries) is a plain card, never a dead anchor.
+  const href = property.slug ? propertyHref(property.slug) : null
   return href ? (
-    <a href={href} className="block w-full">
+    <Link href={href} className="block w-full">
       {card}
-    </a>
+    </Link>
   ) : (
     card
   )

@@ -94,7 +94,7 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
               S.documentTypeListItem('resource').title('Resources').icon(DropIcon),
               S.divider(),
               S.listItem()
-                .title('Project Settings')
+                .title('Properties Settings')
                 .icon(CogIcon)
                 .child(
                   S.document().schemaType('projectSettings').documentId('projectSettings'),

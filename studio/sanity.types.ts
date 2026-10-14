@@ -899,6 +899,13 @@ export type ResourceReference = {
   [internalGroqTypeReferenceTo]?: 'resource'
 }
 
+export type FaqReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'faq'
+}
+
 export type Property = {
   _id: string
   _type: 'property'
@@ -916,7 +923,6 @@ export type Property = {
     _type: 'image'
   }
   description?: string
-  link?: string
   propertyTypes?: Array<
     {
       _key: string
@@ -926,6 +932,23 @@ export type Property = {
     {
       _key: string
     } & ResourceReference
+  >
+  about?: BlockContent
+  body?: BlockContent
+  gallery?: Array<{
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    caption?: string
+    _type: 'image'
+    _key: string
+  }>
+  faqs?: Array<
+    {
+      _key: string
+    } & FaqReference
   >
   boundaryIds?: Array<string>
   location?: Geopoint
@@ -937,6 +960,32 @@ export type Geopoint = {
   lat?: number
   lng?: number
   alt?: number
+}
+
+export type SinglePropertyPage = {
+  _id: string
+  _type: 'singlePropertyPage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  reportIssueLabel?: string
+  reportIssueLink?: Link
+  map?: {
+    heading?: string
+    body?: string
+    disabled?: boolean
+  }
+  faqs?: {
+    eyebrow?: string
+    heading?: string
+    description?: string
+  }
+  moreProperties?: {
+    disabled?: boolean
+    heading?: string
+    button?: Button
+    count?: number
+  }
 }
 
 export type SingleProjectPage = {
@@ -1516,8 +1565,10 @@ export type AllSanitySchemaTypes =
   | Project
   | PropertyTypeReference
   | ResourceReference
+  | FaqReference
   | Property
   | Geopoint
+  | SinglePropertyPage
   | SingleProjectPage
   | SingleNewsPage
   | ProjectSettings

@@ -14,17 +14,18 @@ import {altTextField} from './blockFields'
  *
  * Learn more: https://www.sanity.io/docs/block-content
  */
-export const blockContent = defineType({
-  title: 'Block Content',
-  name: 'blockContent',
-  type: 'array',
-  of: [
+/**
+ * The members of the rich text. No H1: a page's main heading belongs to the block's own heading
+ * field. H3 is the top level by default; `h2` adds Heading 2 for a field that stands in for a page
+ * section, such as a property's About text, where the editor writes the section heading.
+ */
+export function blockContentMembers({h2 = false}: {h2?: boolean} = {}) {
+  return [
     defineArrayMember({
       type: 'block',
-      // No H1 or H2: a page's main heading belongs to the block's own heading field, and H3 is
-      // the top level of rich text.
       styles: [
         {title: 'Normal', value: 'normal'},
+        ...(h2 ? [{title: 'Heading 2', value: 'h2'}] : []),
         {title: 'Heading 3', value: 'h3'},
         {title: 'Heading 4', value: 'h4'},
         {title: 'Heading 5', value: 'h5'},
@@ -57,13 +58,17 @@ export const blockContent = defineType({
                 type: 'url',
                 hidden: ({parent}) => parent?.linkType !== 'href' && parent?.linkType != null,
                 validation: (Rule) =>
-                  Rule.custom((value, context) => {
-                    const parent = context.parent as Link
-                    if (parent?.linkType === 'href' && !value) {
-                      return 'URL is required when Link Type is URL'
-                    }
-                    return true
-                  }),
+                  // The default accepts only http(s), which rejects mailto: and tel: links. Relative
+                  // paths and # (the placeholder convention) are allowed, as on the shared link.
+                  Rule.uri({allowRelative: true, scheme: ['http', 'https', 'mailto', 'tel']}).custom(
+                    (value, context) => {
+                      const parent = context.parent as Link
+                      if (parent?.linkType === 'href' && !value) {
+                        return 'URL is required when Link Type is URL'
+                      }
+                      return true
+                    },
+                  ),
               }),
               defineField({
                 name: 'page',
@@ -99,5 +104,12 @@ export const blockContent = defineType({
       fields: [altTextField()],
     }),
     defineArrayMember({type: 'anchorLinks'}),
-  ],
+  ]
+}
+
+export const blockContent = defineType({
+  title: 'Block Content',
+  name: 'blockContent',
+  type: 'array',
+  of: blockContentMembers(),
 })
