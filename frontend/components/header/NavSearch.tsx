@@ -1,57 +1,77 @@
-import {ArrowRightIcon, SearchIcon} from '@/components/icons'
+import {CloseIcon, SearchIcon} from '@/components/icons'
+import SearchField from '@/components/search/SearchField'
 
 /**
- * Site search - UI only. Search itself (a results page and the "No search results" state) is
- * deferred, so every control is disabled and nothing submits. See the spec's deferred section.
+ * Site search in the header (Figma: Nav search). Submitting goes to /search, which does the work.
  *
- * TODO: wire to site search once it exists - see
- * https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/29 and
- * docs/superpowers/specs/2026-10-07-site-navigation-design.md
+ * Desktop is a yellow square toggle at the end of the bar; the field itself opens in a full-width
+ * panel under the bar. DesktopNav owns whether it is open (one panel at a time with the menu
+ * dropdowns), which is also what closes it on Escape, an outside click or a route change, and what
+ * keeps the header on screen while it is open. Mobile is the field inside the menu panel, on the
+ * input surface.
  */
 
-type Props = {
+/** The key DesktopNav files the search panel under, beside the menu items' own keys. */
+export const NAV_SEARCH_KEY = 'search'
+
+type DesktopProps = {
+  variant: 'desktop'
+  open: boolean
+  onToggle: () => void
+  /** Called after a search is submitted, so the panel can close. */
+  onSearch: () => void
+  panelId: string
   className?: string
-  variant?: 'desktop' | 'mobile'
 }
 
-/** Tracked uppercase label - Figma type style mono/tracked. */
-const LABEL_CLASS = 'font-mono-tracked text-[12px] uppercase tracking-[1.32px] leading-[1.6]'
+type MobileProps = {
+  variant: 'mobile'
+  /** The query to show: the results page's own, so the menu field and the page agree. Empty elsewhere. */
+  query: string
+  /** Called after a search is submitted, so the menu can close. */
+  onSearch: () => void
+  className?: string
+}
 
-export default function NavSearch({className, variant = 'desktop'}: Props) {
-  if (variant === 'desktop') {
+export default function NavSearch(props: DesktopProps | MobileProps) {
+  if (props.variant === 'mobile') {
     return (
-      <button
-        type="button"
-        disabled
-        aria-label="Search (coming soon)"
-        className={`flex size-12 items-center justify-center bg-secondary text-on-secondary disabled:cursor-not-allowed ${className ?? ''}`}
-      >
-        <SearchIcon className="size-6" />
-      </button>
+      <div className={`rounded bg-input px-gap-md py-4 text-on-background ${props.className ?? ''}`}>
+        {/* Keyed on the query: the menu stays mounted, so the field is reset whenever the owner hands it a new one. */}
+        <SearchField key={props.query} defaultValue={props.query} onSearch={props.onSearch} />
+      </div>
     )
   }
 
+  const {open, onToggle, onSearch, panelId, className} = props
   return (
-    <form
-      role="search"
-      onSubmit={(event) => event.preventDefault()}
-      className={`flex flex-col gap-gap-mini bg-input p-gap-sm ${className ?? ''}`}
-    >
-      <label htmlFor="nav-search-mobile" className={LABEL_CLASS}>
-        Search
-      </label>
-      <div className="flex items-center gap-gap-sm border-b border-border-light">
-        <input
-          id="nav-search-mobile"
-          type="search"
-          disabled
-          placeholder="Search here..."
-          className="min-w-0 grow bg-transparent py-gap-mini font-secondary text-body-base placeholder:text-on-input-placeholder disabled:cursor-not-allowed"
-        />
-        <button type="submit" disabled aria-label="Search (coming soon)" className="disabled:cursor-not-allowed">
-          <ArrowRightIcon className="size-6" />
-        </button>
-      </div>
-    </form>
+    <>
+      <button
+        type="button"
+        data-nav-trigger={NAV_SEARCH_KEY}
+        aria-expanded={open}
+        aria-controls={panelId}
+        aria-label={open ? 'Close search' : 'Open search'}
+        onClick={onToggle}
+        className={`flex size-12 cursor-pointer items-center justify-center rounded bg-secondary text-on-secondary transition-colors hover:bg-goldenrod-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500 ${className ?? ''}`}
+      >
+        {open ? <CloseIcon className="size-3" /> : <SearchIcon className="size-6" />}
+      </button>
+      {open && (
+        <div
+          id={panelId}
+          role="region"
+          aria-label="Search"
+          // Full-bleed: `fixed` resolves against the header (its translate is the containing block), so
+          // the panel spans the header's full width, just under it, with no overflow to clip. The field is
+          // inset to line up with the bar's content.
+          className="fixed inset-x-0 top-full z-40 bg-background py-gap-lg border-b border-border-light"
+        >
+          <div className="tf-px">
+            <SearchField autoFocus onSearch={onSearch} />
+          </div>
+        </div>
+      )}
+    </>
   )
 }

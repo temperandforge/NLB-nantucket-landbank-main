@@ -461,7 +461,36 @@ space to the content; revealing on scroll up keeps navigation close.
   size new full-height regions from it rather than a literal.
 - The real content seed, `studio/scripts/seedHeaderContent.ts`, is idempotent and non-destructive
   (it supports `--dry`).
-- Search is disabled; see [#29](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/29).
+- Search is built; see 4.10.
+
+### 4.10 Site search is a server-rendered `/search` page, fed by one GROQ query
+
+**Status:** Implemented
+
+The header's search field (a toggle and full-width panel on desktop, a field in the menu on mobile)
+submits to `/search?q=<words>`. The page reads `q` on the server, runs `searchQuery` and renders the
+ranked results; `?type=<kind>` narrows them client-side, like every archive filter. No Figma frame
+exists for the results page, so it is composed from the archive patterns (record-row hover, filter
+tabs, tracked mono labels) and the nav field itself.
+
+**Why:** Server rendering keeps the page working without JavaScript (the field is a plain GET form)
+and makes a results address shareable. One query keeps ranking in one place.
+
+**Implication:**
+- A word is a prefix pattern and every word must match, in any field. Titles weigh 8x the rest.
+  Parsing, snippets, highlighting and tabs are in `frontend/sanity/lib/search.ts` and are checked by
+  `frontend/scripts/verifySearch.mts`; change them there.
+- Searchable means "has a destination": pages (not `pathOnly`), news, projects, events, records with
+  a file, and properties that have a `link`. Adding a type means the GROQ filter, `SEARCH_TYPES`,
+  its label and its href in `search.ts`, together.
+- `/search` is a static route, so it wins over the catch-all: a CMS page cannot be published at
+  `/search`.
+- The field's label uses the website file's 14px / 1.54px tracking, not the 12px / 1.32px
+  "mono/tracked" style the dropdown headings use.
+- The "No search results" error renders under the field on the results page, not in the header
+  panel: a search is a navigation, so the zero-result answer arrives with the page.
+- What is not searchable, and why, is tracked in
+  [#50](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/50).
 
 ---
 
@@ -1004,8 +1033,8 @@ Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-desig
 - Renaming an ancestor's slug silently changes every descendant URL (2.3). There is no redirect
   mechanism for the old paths (tracked in [#9](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/9)).
 - Mobile footer breakpoints are assumptions awaiting designer confirmation.
-- Site search is not built: the header search field is disabled
-  ([#29](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/29)).
+- Site search covers only content with a destination; people, FAQs and properties without a `link`
+  are not searchable ([#50](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/50)).
 - `frontend/tailwind.config.ts` is vestigial under Tailwind v4 — `globals.css` uses
   `@import 'tailwindcss'` with `@theme` and no `@config`, so the file is never loaded. Its
   `green` / `yellow` scales are unrelated to the brand palette.
@@ -1254,3 +1283,22 @@ The browser and keyboard pass, and the live POST checks, were not run. To do:
 
 A form that exists only as a draft resolves in Presentation but cannot be submitted there: the route
 reads published forms only and answers 404.
+
+## 22. Error pages share one synthesised template
+
+**Status:** Implemented
+
+The Figma design has no error screen, so `app/not-found.tsx` (every 404), `app/error.tsx` (a route
+threw) and `app/global-error.tsx` (the root layout threw) share `components/ErrorPage.tsx`, built
+from existing pieces: the Hero Tertiary layout, the cream background, the site's topographic line
+art, the Button family and the search field. The art is a footpath that ends at a survey pin tagged
+with the status; it draws in once and respects `prefers-reduced-motion`.
+
+**Why:** A broken link is a likely first impression for a public land-conservation site, and the
+default Next.js screen is unstyled. Nothing here is Figma-sourced, so it should be replaced if the
+client designs one.
+
+**Implication:** The 404 links only to home and search. A CMS page's URL can't be known from a slug
+(section 2), and an invented one would 404 too. `global-error.tsx` has no site chrome, content
+fetches or Sanity: it loads its own stylesheet and fonts. `/` still 404s when no landing page is set
+(section 20), so "Back to home" can land on this screen until one is.

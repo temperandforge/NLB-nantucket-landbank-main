@@ -6,6 +6,7 @@ import {useEffect, useId, useRef, useState} from 'react'
 import ResolvedLink from '@/components/ResolvedLink'
 import {ArrowLeftIcon, ChevronDownIcon, MenuToggleIcon} from '@/components/icons'
 import {groupMenuLinks} from '@/sanity/lib/menuGroups'
+import {SEARCH_PARAM, cleanQuery} from '@/sanity/lib/search'
 import type {HeaderMenuData} from '@/sanity/lib/types'
 
 import NavSearch from './NavSearch'
@@ -32,6 +33,9 @@ export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
   const [swap, setSwap] = useState<'forward' | 'back' | null>(null)
   // Where the bar's bottom edge was when the panel opened (see the toggle's click handler).
   const [barBottom, setBarBottom] = useState<number | null>(null)
+  // The results page's query, read from the address each time the panel opens (not with
+  // useSearchParams, whose Suspense boundary in a site-wide header may never swap in on a hard load).
+  const [searchQuery, setSearchQuery] = useState('')
   const toggleRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
@@ -125,6 +129,11 @@ export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
             setBarBottom(bar ? bar.getBoundingClientRect().bottom : null)
             setDrilledKey(null)
             setSwap(null)
+            setSearchQuery(
+              window.location.pathname === '/search'
+                ? cleanQuery(new URLSearchParams(window.location.search).get(SEARCH_PARAM))
+                : '',
+            )
             setOpen(true)
           }
         }}
@@ -224,7 +233,7 @@ export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
                 )
               })}
             </ul>
-            <NavSearch variant="mobile" className="mt-gap-md" />
+            <NavSearch variant="mobile" query={searchQuery} onSearch={close} className="mt-gap-md" />
           </nav>
         )}
       </div>

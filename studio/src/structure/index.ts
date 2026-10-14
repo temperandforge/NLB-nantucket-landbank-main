@@ -51,6 +51,9 @@ const DISABLED_TYPES = [
   'propertyType',
   'resource',
   'projectSettings',
+  // Handled explicitly under Projects below.
+  'project',
+  'projectType',
   // Handled explicitly below: news, events, people and FAQs.
   'article',
   'newsCategory',

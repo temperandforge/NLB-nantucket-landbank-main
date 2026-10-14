@@ -11,6 +11,9 @@
  * NOTE: the footer singleton is written with createOrReplace, so re-running this script
  * discards any edits made to the footer in the Studio. Pages are never overwritten.
  *
+ * NOTE: the page slugs below predate the page hierarchy and no longer match the live pages; to link
+ * the footer to existing pages, use linkFooterMenuToPages.ts instead of re-running this.
+ *
  * Several links are deliberately '#' placeholders: the real relative paths are to be supplied
  * later. Those entries get no page created for them.
  */

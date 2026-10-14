@@ -783,3 +783,51 @@ export const eventSlugs = defineQuery(`
 export const eventSitemapData = defineQuery(`
   *[_type == "event" && defined(slug.current)]{_updatedAt, "slug": slug.current}
 `)
+
+/**
+ * Site search (/search). $terms is an array of prefix patterns, one per word: `match` against an
+ * array means every pattern must match, so "rain garden" needs both words (any field of the
+ * document, in any order).
+ *
+ * What is searchable is whatever has a destination: pages (not pathOnly ones, which 404), news,
+ * projects, events, properties that carry a link (they have no page of their own), and records
+ * with a file. People, FAQs and the like have nowhere to send a visitor. A page is searched on its
+ * name and the headings and plain-text bodies of its visible blocks.
+ *
+ * Titles weigh most, then everything else equally. One more row than the page shows is fetched so
+ * the page can say the list was cut. Keep the types in search.ts (SEARCH_TYPES) in step.
+ */
+export const searchQuery = defineQuery(`
+  *[
+    (
+      (_type == "page" && !coalesce(pathOnly, false) && defined(slug.current))
+      || (_type in ["article", "project", "event"] && defined(slug.current))
+      || (_type == "property" && defined(link))
+      || (_type == "record" && defined(file.asset))
+    )
+    && [
+      title, name, description, pt::text(body),
+      pageBuilder[!coalesce(disabled, false)].heading,
+      pageBuilder[!coalesce(disabled, false)].body
+    ] match $terms
+  ] | score(
+    boost(title match $terms, 8),
+    boost(name match $terms, 8),
+    description match $terms,
+    pt::text(body) match $terms
+  ) | order(_score desc, _updatedAt desc) [0...$limit] {
+    _id,
+    _type,
+    "title": coalesce(title, name),
+    "slug": slug.current,
+    "path": select(_type == "page" => ${pagePath}),
+    date,
+    start,
+    externalUrl,
+    link,
+    "fileUrl": file.asset->url,
+    description,
+    "body": pt::text(body),
+    "blocks": pageBuilder[!coalesce(disabled, false)].body
+  }
+`)

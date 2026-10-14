@@ -8,11 +8,11 @@ import {ChevronDownIcon, ChevronUpIcon} from '@/components/icons'
 import type {HeaderMenuData} from '@/sanity/lib/types'
 
 import NavDropdown from './NavDropdown'
-import NavSearch from './NavSearch'
+import NavSearch, {NAV_SEARCH_KEY} from './NavSearch'
 import {resolveItemHref} from './resolveItemHref'
 
 /**
- * The desktop bar. Owns which dropdown is open: one at a time, closed by Escape (focus returns
+ * The desktop bar. Owns which dropdown (or the search panel) is open: one at a time, closed by Escape (focus returns
  * to its trigger), by a click outside, or by opening another. While one is open the root carries
  * data-header-lock so HeaderShell keeps the header visible.
  */
@@ -123,7 +123,14 @@ export default function DesktopNav({menu}: {menu: HeaderMenuData}) {
           })}
         </ul>
       </nav>
-      <NavSearch variant="desktop" className="self-center" />
+      <NavSearch
+        variant="desktop"
+        open={openKey === NAV_SEARCH_KEY}
+        onToggle={() => setOpenKey(openKey === NAV_SEARCH_KEY ? null : NAV_SEARCH_KEY)}
+        onSearch={() => setOpenKey(null)}
+        panelId={`${baseId}-search-panel`}
+        className="self-center"
+      />
     </div>
   )
 }

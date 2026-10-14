@@ -4491,6 +4491,102 @@ export type EventSitemapDataResult = Array<{
   slug: string
 }>
 
+// Source: sanity/lib/queries.ts
+// Variable: searchQuery
+// Query: *[    (      (_type == "page" && !coalesce(pathOnly, false) && defined(slug.current))      || (_type in ["article", "project", "event"] && defined(slug.current))      || (_type == "property" && defined(link))      || (_type == "record" && defined(file.asset))    )    && [      title, name, description, pt::text(body),      pageBuilder[!coalesce(disabled, false)].heading,      pageBuilder[!coalesce(disabled, false)].body    ] match $terms  ] | score(    boost(title match $terms, 8),    boost(name match $terms, 8),    description match $terms,    pt::text(body) match $terms  ) | order(_score desc, _updatedAt desc) [0...$limit] {    _id,    _type,    "title": coalesce(title, name),    "slug": slug.current,    "path": select(_type == "page" => select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)),    date,    start,    externalUrl,    link,    "fileUrl": file.asset->url,    description,    "body": pt::text(body),    "blocks": pageBuilder[!coalesce(disabled, false)].body  }
+export type SearchQueryResult = Array<
+  | {
+      _id: string
+      _type: 'article'
+      title: string
+      slug: string
+      path: null
+      date: string
+      start: null
+      externalUrl: string | null
+      link: null
+      fileUrl: null
+      description: null
+      body: string
+      blocks: null
+    }
+  | {
+      _id: string
+      _type: 'event'
+      title: string
+      slug: string
+      path: null
+      date: null
+      start: string
+      externalUrl: null
+      link: null
+      fileUrl: null
+      description: string | null
+      body: string
+      blocks: null
+    }
+  | {
+      _id: string
+      _type: 'page'
+      title: string
+      slug: string
+      path: string | null
+      date: null
+      start: null
+      externalUrl: null
+      link: null
+      fileUrl: null
+      description: null
+      body: string
+      blocks: Array<null | string> | null
+    }
+  | {
+      _id: string
+      _type: 'project'
+      title: string
+      slug: string
+      path: null
+      date: null
+      start: null
+      externalUrl: null
+      link: null
+      fileUrl: null
+      description: string | null
+      body: string
+      blocks: null
+    }
+  | {
+      _id: string
+      _type: 'property'
+      title: string
+      slug: string
+      path: null
+      date: null
+      start: null
+      externalUrl: null
+      link: string | null
+      fileUrl: null
+      description: string | null
+      body: string
+      blocks: null
+    }
+  | {
+      _id: string
+      _type: 'record'
+      title: string | null
+      slug: null
+      path: null
+      date: string | null
+      start: null
+      externalUrl: null
+      link: null
+      fileUrl: string | null
+      description: null
+      body: string
+      blocks: null
+    }
+>
+
 // Query TypeMap
 import '@sanity/client'
 declare module '@sanity/client' {
@@ -4518,5 +4614,6 @@ declare module '@sanity/client' {
     '\n  *[\n    _type == "event" && defined(start) && slug.current != $slug\n    && dateTime(coalesce(end, start)) >= dateTime($now)\n  ] | order(start asc) [0...12] {\n    _id,\n    title,\n    "slug": slug.current,\n    start,\n    end,\n    location,\n    description\n  }\n': MoreEventsQueryResult
     '\n  *[_type == "event" && defined(slug.current)]{"slug": slug.current}\n': EventSlugsResult
     '\n  *[_type == "event" && defined(slug.current)]{_updatedAt, "slug": slug.current}\n': EventSitemapDataResult
+    '\n  *[\n    (\n      (_type == "page" && !coalesce(pathOnly, false) && defined(slug.current))\n      || (_type in ["article", "project", "event"] && defined(slug.current))\n      || (_type == "property" && defined(link))\n      || (_type == "record" && defined(file.asset))\n    )\n    && [\n      title, name, description, pt::text(body),\n      pageBuilder[!coalesce(disabled, false)].heading,\n      pageBuilder[!coalesce(disabled, false)].body\n    ] match $terms\n  ] | score(\n    boost(title match $terms, 8),\n    boost(name match $terms, 8),\n    description match $terms,\n    pt::text(body) match $terms\n  ) | order(_score desc, _updatedAt desc) [0...$limit] {\n    _id,\n    _type,\n    "title": coalesce(title, name),\n    "slug": slug.current,\n    "path": select(_type == "page" => select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)),\n    date,\n    start,\n    externalUrl,\n    link,\n    "fileUrl": file.asset->url,\n    description,\n    "body": pt::text(body),\n    "blocks": pageBuilder[!coalesce(disabled, false)].body\n  }\n': SearchQueryResult
   }
 }
