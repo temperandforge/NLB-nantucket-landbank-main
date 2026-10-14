@@ -1154,3 +1154,22 @@ in Studio. A block can.
 **Implication:** There is no redirect: old `/map` links 404. `/` with no landing page also 404s.
 `projectSettings.heading`, `intro` and `eyebrow` no longer feed the map and can be removed
 (tracked in [#44](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/44)). Two Map Explorers on one page share their URL filters.
+
+## 21. Error pages share one synthesised template
+
+**Status:** Implemented
+
+The Figma design has no error screen, so `app/not-found.tsx` (every 404), `app/error.tsx` (a route
+threw) and `app/global-error.tsx` (the root layout threw) share `components/ErrorPage.tsx`, built
+from existing pieces: the Hero Tertiary layout, the cream background, the site's topographic line
+art, the Button family and the search field. The art is a footpath that ends at a survey pin tagged
+with the status; it draws in once and respects `prefers-reduced-motion`.
+
+**Why:** A broken link is a likely first impression for a public land-conservation site, and the
+default Next.js screen is unstyled. Nothing here is Figma-sourced, so it should be replaced if the
+client designs one.
+
+**Implication:** The 404 links only to home and search. A CMS page's URL can't be known from a slug
+(section 2), and an invented one would 404 too. `global-error.tsx` has no site chrome, content
+fetches or Sanity: it loads its own stylesheet and fonts. `/` still 404s when no landing page is set
+(section 20), so "Back to home" can land on this screen until one is.
