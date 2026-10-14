@@ -5,7 +5,7 @@ import {defineBlock} from './blockFields'
 
 /**
  * A preview of the interactive map (Figma: Map Preview): a heading and intro above the live map,
- * showing every property, boundary and trail from Project Settings. Distinct from Interactive Map,
+ * showing every property, boundary and trail from Properties Settings. Distinct from Interactive Map,
  * which is a static illustration with one featured property.
  */
 export const mapPreview = defineBlock({

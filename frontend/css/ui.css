@@ -289,6 +289,7 @@
   margin-top: 1.5rem;
 }
 
+.rich-text-basic > h2,
 .rich-text-basic > h3,
 .rich-text-basic > h4,
 .rich-text-basic > h5,
@@ -300,6 +301,7 @@
   line-height: 1.1;
 }
 
+.rich-text-basic > h2,
 .rich-text-basic > h3 {
   font-size: var(--text-headline-lg);
 }

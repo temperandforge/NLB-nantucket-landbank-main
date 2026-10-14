@@ -5,6 +5,8 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import '../../css/popup.css'
 
+import {propertyHref} from '@/sanity/lib/utils'
+
 import {geometryCenterOfMany, loadBoundaryIndex, type BoundaryIndex} from './boundaries'
 import {
   DEFAULT_ZOOM,
@@ -62,8 +64,8 @@ function buildPopupHtml(project: Property): string {
     ? `<p class="map-popup-desc">${escapeHtml(project.description)}</p>`
     : ''
 
-  const link = project.link
-    ? `<a class="map-popup-link" href="${encodeURI(project.link)}">Find out more</a>`
+  const link = project.slug
+    ? `<a class="map-popup-link" href="${encodeURI(propertyHref(project.slug))}">Find out more</a>`
     : ''
 
   return `
@@ -131,7 +133,7 @@ export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProp
     if (!scrollZoom) map.scrollZoom.disable()
 
     /**
-     * Trails track, uploaded on Project Settings. Separate from the property boundaries: nothing
+     * Trails track, uploaded on Properties Settings. Separate from the property boundaries: nothing
      * points into this file, so every line in it is drawn.
      *
      * Guarded rather than returned early - the control and the cleanup below must still run when no

@@ -3,7 +3,7 @@ import {PinIcon} from '@sanity/icons'
 import {defineBlock} from './blockFields'
 
 /**
- * The filterable interactive map: every property, boundary and trail from Project Settings, with
+ * The filterable interactive map: every property, boundary and trail from Properties Settings, with
  * Property Type and Resources filters. It has no text of its own: put a Hero Tertiary above it for
  * the page heading and intro. Distinct from Map Preview, which is the lightweight embed with a
  * heading and no filters. Filters live in the URL, so two Map Explorers on one page share them.

@@ -9,14 +9,14 @@
  * What it writes: a draft for every featured property. A featured property that matches an
  * existing property (by slug, or by the `existing` slug where the migrated name differs) is NOT
  * duplicated - its draft is created from the published copy if it has none, and only its EMPTY
- * fields (description, image, link, propertyTypes, resources) are filled. Name, slug, boundaryIds
+ * fields (description, image, propertyTypes, resources) are filled. Name, slug, boundaryIds
  * and location are never touched, and no existing value is overwritten. Properties with no match
  * are new drafts with no boundary, so they list on the Properties archive but do not draw on the
  * map until a boundary is assigned in Studio. Idempotent: a second run finds every field filled.
  *
  * Images: every property without one gets the placeholder asset PLACEHOLDER_IMAGE (already in the
  * media library), because the originals were deliberately not downloaded. Replace them in Studio.
- * `link` is the `#` placeholder until property detail pages exist (issue #23).
+ * Properties have no link field: their page is /properties/<slug>.
  * Amenities are limited to the icons the listing shows (Handicap Accessible) - the listing's "Trail
  * Map Available" has no matching resource document, so it is not invented.
  *
@@ -288,7 +288,6 @@ async function main() {
     const fill = {
       description: f.description,
       image: image(f.name),
-      link: '#',
       propertyTypes: refs(f.types.map((t) => lookup(typeId, t)), 'propertyType'),
       ...(f.resources
         ? {resources: refs(f.resources.map((r) => lookup(resourceId, r)), 'resource')}

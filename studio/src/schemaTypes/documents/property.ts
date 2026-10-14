@@ -2,18 +2,20 @@ import {defineArrayMember, defineField, defineType} from 'sanity'
 import {PinIcon} from '@sanity/icons'
 
 import {BoundaryIdsInput} from '../../components/BoundaryIdsInput'
+import {blockContentMembers} from '../objects/blockContent'
 
 /**
  * A Land Bank property - the parcels, beaches, trails and ponds shown on the interactive map.
  *
- * Listed on the Properties archive too. It replaced the `project` type (migrated by
+ * Each property has a page of its own at /properties/<slug>; its address is derived from the slug, so
+ * there is no link field. Listed on the Properties archive too. It replaced the `project` type (migrated by
  * scripts/migrateProjectsToProperties.ts), which itself replaced the hardcoded list that used to
  * live in frontend/app/map/properties.ts. Categorisation
  * is by reference to propertyType and resource documents so the client can extend either without
  * a deploy.
  *
  * Boundary geometry is NOT stored here. The client maintains one GeoJSON file covering every
- * boundary (uploaded on Project Settings) and each property points into it by identifier - see
+ * boundary (uploaded on Properties Settings) and each property points into it by identifier - see
  * boundaryId below.
  */
 
@@ -24,6 +26,7 @@ export const property = defineType({
   icon: PinIcon,
   groups: [
     {name: 'details', title: 'Details', default: true},
+    {name: 'page', title: 'Page content'},
     {name: 'map', title: 'Map'},
   ],
   fields: [
@@ -39,7 +42,7 @@ export const property = defineType({
       title: 'Slug',
       type: 'slug',
       group: 'details',
-      description: 'Used if this property gets a page of its own later.',
+      description: 'The property page lives at /properties/<slug>.',
       options: {source: 'name', maxLength: 96},
       validation: (Rule) => Rule.required(),
     }),
@@ -49,7 +52,7 @@ export const property = defineType({
       type: 'image',
       group: 'details',
       description:
-        'Shown in the map popup and on the Properties archive. A property without one shows the default property image from Site Settings.',
+        'The large image at the top of the property page, and the one shown in the map popup and on the Properties archive. A property without one shows the default property image from Site Settings.',
       options: {hotspot: true},
       fields: [
         defineField({
@@ -66,17 +69,7 @@ export const property = defineType({
       type: 'text',
       rows: 3,
       group: 'details',
-      description: 'Short summary shown in the map popup.',
-    }),
-    defineField({
-      name: 'link',
-      title: 'Find out more link',
-      type: 'url',
-      group: 'details',
-      description:
-        'Optional. Where the popup’s "Find out more" link points. Accepts a path on this site, or # as a placeholder.',
-      // allowRelative because these are site-relative paths, and # is the placeholder convention.
-      validation: (Rule) => Rule.uri({allowRelative: true, scheme: ['http', 'https']}),
+      description: 'Short summary shown in the map popup and on the Properties archive.',
     }),
     defineField({
       name: 'propertyTypes',
@@ -93,6 +86,66 @@ export const property = defineType({
       group: 'details',
       of: [defineArrayMember({type: 'reference', to: [{type: 'resource'}]})],
       description: 'Amenities available here. Drives the Resources filter on the map.',
+    }),
+    defineField({
+      name: 'about',
+      title: 'About',
+      type: 'array',
+      of: blockContentMembers({h2: true}),
+      group: 'page',
+      description:
+        'The main text beside the property name. Add an “About” heading yourself (Heading 2) if you want one; none is added for you.',
+    }),
+    defineField({
+      name: 'gallery',
+      title: 'Gallery',
+      type: 'array',
+      group: 'page',
+      description:
+        'The image carousel on the property page. The caption appears over the image when a visitor hovers it. Leave empty to hide the carousel.',
+      of: [
+        defineArrayMember({
+          type: 'image',
+          options: {hotspot: true},
+          fields: [
+            defineField({
+              name: 'alt',
+              title: 'Alternative text',
+              type: 'string',
+              description: 'Important for accessibility and SEO.',
+            }),
+            defineField({
+              name: 'caption',
+              title: 'Caption',
+              type: 'string',
+              description: 'Optional. Shown over the image on hover, e.g. “Trails”.',
+            }),
+          ],
+        }),
+      ],
+    }),
+    defineField({
+      name: 'mapHeading',
+      title: 'Map heading',
+      type: 'string',
+      group: 'page',
+      description: 'The heading above the map on the property page. Default: “<property name> Trails and Properties”.',
+    }),
+    defineField({
+      name: 'mapBody',
+      title: 'Map intro',
+      type: 'text',
+      rows: 4,
+      group: 'page',
+      description: 'The paragraph beside the map heading. Leave empty to show none.',
+    }),
+    defineField({
+      name: 'faqs',
+      title: 'FAQs',
+      type: 'array',
+      group: 'page',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'faq'}]})],
+      description: 'Questions shown in the Property FAQs section. Leave empty to hide the section.',
     }),
     defineField({
       name: 'boundaryIds',

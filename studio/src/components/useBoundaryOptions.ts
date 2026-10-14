@@ -39,7 +39,7 @@ export function useBoundaryOptions(): BoundaryOptionsState {
             setState({
               status: 'notice',
               message:
-                'No boundary data file has been uploaded yet. Add one under Projects → Project Settings, then reopen this project.',
+                'No boundary data file has been uploaded yet. Add one under Properties → Properties Settings, then reopen this project.',
             })
           }
           return
@@ -72,7 +72,7 @@ export function useBoundaryOptions(): BoundaryOptionsState {
         if (!options.length) {
           setState({
             status: 'notice',
-            message: `The uploaded file has ${features.length} feature(s), but none carry a "${idProperty}" property. Check the Boundary ID property setting under Project Settings.`,
+            message: `The uploaded file has ${features.length} feature(s), but none carry a "${idProperty}" property. Check the Boundary ID property setting under Properties Settings.`,
           })
           return
         }

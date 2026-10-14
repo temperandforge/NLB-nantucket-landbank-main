@@ -121,7 +121,7 @@ export const siteBannerQuery = defineQuery(`
  * filters use, the title is what a visitor reads. A dereferenced entry is null when the referenced
  * document is unpublished, so consumers must filter those out.
  *
- * Boundary geometry is not here - it lives in the single GeoJSON file on Project Settings, and
+ * Boundary geometry is not here - it lives in the single GeoJSON file on Properties Settings, and
  * boundaryId says which feature in it belongs to this property.
  */
 /** What the map needs from a property. Shared by the Map Preview and Map Explorer blocks. */
@@ -133,7 +133,6 @@ const mapPropertyFields = /* groq */ `
   location,
   disablePopup,
   description,
-  link,
   "image": image{"url": asset->url, alt},
   "propertyTypes": propertyTypes[]->{"slug": slug.current, title},
   "resources": resources[]->{"slug": slug.current, title}
@@ -372,8 +371,8 @@ const pageBuilderFields = /* groq */ `
       "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {
         _id,
         name,
+        "slug": slug.current,
         description,
-        link,
         image,
         "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
         "resources": resources[]->{"slug": slug.current, title, order}
@@ -432,8 +431,8 @@ const pageBuilderFields = /* groq */ `
       "properties": properties[]->{
         _id,
         name,
+        "slug": slug.current,
         description,
-        link,
         image,
         "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
         "resources": resources[]->{"slug": slug.current, title, order}
@@ -687,6 +686,101 @@ export const singleProjectPageQuery = defineQuery(`
   }
 `)
 
+/** What a property card needs; the property page's "more properties" projection too. */
+const propertyCardFields = /* groq */ `
+  _id,
+  name,
+  "slug": slug.current,
+  description,
+  image,
+  "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
+  "resources": resources[]->{"slug": slug.current, title, order}
+`
+
+export const propertyQuery = defineQuery(`
+  *[_type == "property" && slug.current == $slug][0]{
+    _id,
+    _type,
+    name,
+    "slug": slug.current,
+    description,
+    image,
+    location,
+    mapHeading,
+    mapBody,
+    "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
+    "propertyTypeIds": propertyTypes[]._ref,
+    about[]{
+      ...,
+      _type == "anchorLinks" => {
+        links[]{
+          ...,
+          ${linkFields}
+        }
+      },
+      ${markDefsFields}
+    },
+    gallery[]{_key, asset, hotspot, crop, alt, caption},
+    // A reference to an unpublished FAQ dereferences to null.
+    "faqs": faqs[]->{
+      _id,
+      question,
+      answer[]{
+        ...,
+        ${markDefsFields}
+      }
+    },
+    "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage
+  }
+`)
+
+/** Every property but this one, to be ordered and trimmed by orderRelatedProperties(). */
+export const morePropertiesQuery = defineQuery(`
+  *[_type == "property" && defined(slug.current) && slug.current != $slug]{
+    _createdAt,
+    ${propertyCardFields},
+    "propertyTypeIds": propertyTypes[]._ref
+  }
+`)
+
+/** What the property page's map shows: every property, as on the Map Preview block. */
+export const propertyMapQuery = defineQuery(`
+  {
+    "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {
+      ${mapPropertyFields}
+    },
+    "settings": *[_type == "projectSettings" && _id == "projectSettings"][0]{
+      ${mapSettingsFields}
+    }
+  }
+`)
+
+/**
+ * Content shared by every property page, from the Single tab of Properties Settings
+ * (a singleton, so matched on its type and fixed id).
+ */
+export const singlePropertyPageQuery = defineQuery(`
+  *[_type == "projectSettings" && _id == "projectSettings"][0]{
+    hideMap,
+    faqs,
+    moreProperties{
+      ...,
+      button{
+        ...,
+        ${linkFields}
+      }
+    }
+  }
+`)
+
+export const propertySlugs = defineQuery(`
+  *[_type == "property" && defined(slug.current)]{"slug": slug.current}
+`)
+
+export const propertySitemapData = defineQuery(`
+  *[_type == "property" && defined(slug.current)]{_updatedAt, "slug": slug.current}
+`)
+
 export const projectSlugs = defineQuery(`
   *[_type == "project" && defined(slug.current)]{"slug": slug.current}
 `)
@@ -753,8 +847,7 @@ export const searchQuery = defineQuery(`
   *[
     (
       (_type == "page" && !coalesce(pathOnly, false) && defined(slug.current))
-      || (_type in ["article", "project", "event"] && defined(slug.current))
-      || (_type == "property" && defined(link))
+      || (_type in ["article", "project", "event", "property"] && defined(slug.current))
       || (_type == "record" && defined(file.asset))
     )
     && [
@@ -776,7 +869,6 @@ export const searchQuery = defineQuery(`
     date,
     start,
     externalUrl,
-    link,
     "fileUrl": file.asset->url,
     description,
     "body": pt::text(body),

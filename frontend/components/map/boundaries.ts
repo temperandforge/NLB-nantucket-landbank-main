@@ -2,7 +2,7 @@
  * Reading the single boundary-data file.
  *
  * The client maintains one GeoJSON FeatureCollection covering every property boundary, uploaded on
- * Project Settings. A project points at one feature in it by identifier, and which feature property
+ * Properties Settings. A project points at one feature in it by identifier, and which feature property
  * holds that identifier is configurable, because it depends on how the client's file is structured.
  */
 

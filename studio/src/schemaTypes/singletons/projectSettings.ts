@@ -2,23 +2,27 @@ import {CogIcon} from '@sanity/icons'
 import {defineField, defineType} from 'sanity'
 
 /**
- * Project Settings schema Singleton.
+ * Properties Settings schema Singleton (the document id and type keep their original name,
+ * `projectSettings`, from before properties were called projects).
  *
- * Two concerns, kept in one document because they are both "the things that configure the
- * Projects section", and split into field groups so the form does not read as a grab bag:
+ * Three concerns, kept in one document because they all configure the Properties section, and split
+ * into field groups so the form does not read as a grab bag:
  *
- *  - Page content: the fixed intro above the projects grid,.
+ *  - Page content: the fixed intro above the properties archive.
  *  - Map: the single GeoJSON file holding every property boundary, plus how to read it.
+ *  - Single: what every property page shares (the map switch, the FAQ wording and the
+ *    "more properties" section), as opposed to one property's own content.
  */
 
 export const projectSettings = defineType({
   name: 'projectSettings',
-  title: 'Project Settings',
+  title: 'Properties Settings',
   type: 'document',
   icon: CogIcon,
   groups: [
     {name: 'page', title: 'Page content', default: true},
     {name: 'map', title: 'Map'},
+    {name: 'singleProperty', title: 'Single'},
   ],
   fields: [
     defineField({
@@ -91,11 +95,62 @@ export const projectSettings = defineType({
       description: 'Mapbox zoom level the map opens at. 11 shows the whole island.',
       validation: (Rule) => Rule.min(0).max(22),
     }),
+    defineField({
+      name: 'hideMap',
+      title: 'Hide the map section',
+      type: 'boolean',
+      group: 'singleProperty',
+      description: 'Hides the map on every property page. Its heading and intro are set on each property.',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'faqs',
+      title: 'FAQ section',
+      type: 'object',
+      group: 'singleProperty',
+      description: 'Wording around each property’s own FAQs (picked on the property).',
+      fields: [
+        defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
+        defineField({name: 'heading', title: 'Heading', type: 'string'}),
+        defineField({name: 'description', title: 'Description', type: 'string'}),
+      ],
+    }),
+    defineField({
+      name: 'moreProperties',
+      title: 'More properties',
+      type: 'object',
+      group: 'singleProperty',
+      description:
+        'The section under a property: other properties (those sharing a property type first, then the newest), never the one being read.',
+      fields: [
+        defineField({
+          name: 'disabled',
+          title: 'Hide this section',
+          type: 'boolean',
+          initialValue: false,
+        }),
+        defineField({name: 'heading', title: 'Heading', type: 'string'}),
+        defineField({
+          name: 'button',
+          title: 'Button',
+          type: 'button',
+          description: 'Leave the label or link empty to hide it.',
+        }),
+        defineField({
+          name: 'count',
+          title: 'How many properties',
+          type: 'number',
+          initialValue: 3,
+          validation: (rule) => rule.min(1).max(3).integer(),
+        }),
+      ],
+      initialValue: {disabled: false, count: 3},
+    }),
   ],
   preview: {
     prepare() {
       return {
-        title: 'Project Settings',
+        title: 'Properties Settings',
       }
     },
   },
