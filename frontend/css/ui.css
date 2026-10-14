@@ -504,3 +504,34 @@
     animation: none;
   }
 }
+
+/* ---- Scroll reveal -------------------------------------------------------------------------------
+   Blocks opt in with [data-reveal] (see BlockRenderer). RevealObserver adds .js-reveal to <html>
+   and sets [data-revealed] as each block scrolls into view. Without JS the hidden state never
+   applies, so content is always visible. Only opacity and transform animate: no layout shift. */
+:root {
+  --motion-reveal-distance: 20px;
+  --motion-reveal-duration: 500ms;
+  --motion-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-reveal] {
+  transition:
+    opacity var(--motion-reveal-duration) var(--motion-ease-out),
+    transform var(--motion-reveal-duration) var(--motion-ease-out);
+}
+
+.js-reveal [data-reveal]:not([data-revealed]) {
+  opacity: 0;
+  transform: translateY(var(--motion-reveal-distance));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    transition: none;
+  }
+  .js-reveal [data-reveal]:not([data-revealed]) {
+    opacity: 1;
+    transform: none;
+  }
+}
