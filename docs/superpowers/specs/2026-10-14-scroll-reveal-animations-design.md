@@ -19,6 +19,10 @@ Motion is subtle: a fade plus a 48px rise, ~800ms, whole blocks only.
 
 ## Design
 
+> Blocks that have parts no longer rise as a slab: their parts stagger instead (see
+> [the choreographed-entrance spec](2026-10-14-choreographed-entrance-design.md)). The whole-block rise
+> below remains the fallback for blocks with no parts.
+
 ### Seam
 
 `components/BlockRenderer.tsx` already wraps every block in one `<div>`. That wrapper gets a

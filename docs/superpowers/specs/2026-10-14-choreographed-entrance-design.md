@@ -1,7 +1,7 @@
 # Choreographed entrance and inside-block stagger
 
 Date: 2026-10-14
-Status: draft, awaiting review
+Status: implemented
 Builds on: [2026-10-14-scroll-reveal-animations-design.md](2026-10-14-scroll-reveal-animations-design.md)
 
 ## Goal
@@ -34,6 +34,9 @@ content always visible without JS, off under reduced motion.
 - Candidates: `h1, h2, h3, h4, p, figure, img, video, blockquote, ul, ol` and any element already
   carrying `data-reveal-part`.
 - Excluded: anything inside `.splide`, `.mapboxgl-map`, `form`, or `[data-reveal-skip]`.
+- Excluded: elements that are `position: absolute|fixed` or already carry their own `translate` or
+  `transform` (a centred pin, a floating image). Animating `translate` on them would override their own
+  offset and make them jump when the animation ends. Found during the whole-site pass.
 - Nested matches collapse to the outermost (a `p` inside a `blockquote` is not its own part).
 - At most 8 parts per block, in DOM order. Long archives therefore stagger their first screen
   and leave the rest static.
@@ -163,10 +166,13 @@ No test framework exists; verify in the browser.
 
 ## Deferred
 
-- Page transitions between routes via `viewTransition`.
-- Scroll-scrubbed motion (GSAP and ScrollTrigger, scoped and dynamically imported).
-- A per-block motion setting in Sanity: [#52](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/52).
-- Per-card stagger inside grids beyond the first screen. Issue
-  [#51](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/51) is to be closed when
-  the inside-block stagger ships, for the first 8 parts; stagger of later grid cards is not covered and needs
-  its own issue if wanted.
+- Page transitions between routes via `viewTransition`:
+  [#53](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/53)
+- Scroll-scrubbed motion (GSAP and ScrollTrigger, scoped and dynamically imported):
+  [#54](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/54)
+- Stagger of grid and list cards beyond the first 8 parts (a list is one part, so e.g. the properties
+  archive fades as one element):
+  [#55](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/55). The inside-block stagger
+  delivers the first-8-parts half of [#51](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/51),
+  which is closed.
+- A per-block motion setting in Sanity: [#52](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/52)
