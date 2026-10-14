@@ -526,7 +526,8 @@
   transform: translateY(var(--motion-reveal-distance));
 }
 
-@media (prefers-reduced-motion: reduce) {
+/* Print never scrolls, so IntersectionObserver would leave unseen blocks blank. */
+@media (prefers-reduced-motion: reduce), print {
   [data-reveal] {
     transition: none;
   }
