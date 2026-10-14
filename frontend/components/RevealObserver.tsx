@@ -25,9 +25,25 @@ function pickParts(block: HTMLElement): HTMLElement[] {
     if (parts.length >= MAX_PARTS) break
     if (el.closest(SKIP_SELECTOR)) continue
     if (parts.some((part) => part.contains(el))) continue
+    if (isPositionedDecoration(el)) continue
     parts.push(el)
   }
   return parts
+}
+
+/**
+ * An element that is out of flow or already moved by its own translate/transform (a centred pin, a
+ * floating image) is decoration, not content. Animating `translate` on it would override its own
+ * offset and make it jump when the animation ends.
+ */
+function isPositionedDecoration(el: HTMLElement) {
+  const style = getComputedStyle(el)
+  return (
+    style.position === 'absolute' ||
+    style.position === 'fixed' ||
+    style.translate !== 'none' ||
+    style.transform !== 'none'
+  )
 }
 
 /** Tag a block's parts once. A block with no parts keeps the whole-block rise. */
