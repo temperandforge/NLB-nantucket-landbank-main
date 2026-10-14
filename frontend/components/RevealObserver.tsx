@@ -3,17 +3,52 @@
 import {usePathname} from 'next/navigation'
 import {useLayoutEffect} from 'react'
 
+const PART_SELECTOR = 'h1, h2, h3, h4, p, figure, img, video, blockquote, ul, ol, [data-reveal-part]'
+const SKIP_SELECTOR = '.splide, .mapboxgl-map, form, [data-reveal-skip]'
+const MAX_PARTS = 8
+
 /** Anything whose top edge is above the bottom of the viewport is on screen or already scrolled past. */
 function shouldShowNow(el: Element) {
   return el.getBoundingClientRect().top < window.innerHeight
 }
 
 /**
- * Show an element with no transition. A block inserted after `js-reveal` is on <html> (client
- * navigation, a live-content refresh) is already styled hidden, so without this it would fade in
- * from hidden even though it is on screen.
+ * The elements of a block that arrive one after another: headings, copy, media. Backgrounds and
+ * decorative art are not candidates, so they stay still while the content staggers over them.
+ * querySelectorAll is in document order (parents before children), so skipping anything an earlier
+ * part contains collapses nested matches to the outermost. Capped so a long archive staggers only
+ * its first screen.
+ */
+function pickParts(block: HTMLElement): HTMLElement[] {
+  const parts: HTMLElement[] = []
+  for (const el of block.querySelectorAll<HTMLElement>(PART_SELECTOR)) {
+    if (parts.length >= MAX_PARTS) break
+    if (el.closest(SKIP_SELECTOR)) continue
+    if (parts.some((part) => part.contains(el))) continue
+    parts.push(el)
+  }
+  return parts
+}
+
+/** Tag a block's parts once. A block with no parts keeps the whole-block rise. */
+function markParts(block: HTMLElement) {
+  if (block.hasAttribute('data-reveal-staggered')) return
+  const parts = pickParts(block)
+  if (parts.length === 0) return
+  parts.forEach((part, index) => {
+    part.setAttribute('data-reveal-part', '')
+    part.style.setProperty('--reveal-index', String(index))
+  })
+  block.setAttribute('data-reveal-staggered', '')
+}
+
+/**
+ * Show an element with no transition or stagger. A block inserted after `js-reveal` is on <html>
+ * (client navigation, a live-content refresh) is already styled hidden, so without this it would
+ * animate in from hidden even though it is on screen.
  */
 function revealInstantly(el: HTMLElement) {
+  el.setAttribute('data-reveal-instant', '')
   el.style.transition = 'none'
   el.setAttribute('data-revealed', '')
   void el.offsetHeight // commit the un-transitioned state
@@ -27,8 +62,9 @@ function revealInstantly(el: HTMLElement) {
  *
  * Blocks opt in with [data-reveal]. Content already in the viewport is shown immediately (no
  * animation, no hidden frame); everything below the fold is revealed once, as it scrolls into
- * view. A MutationObserver picks up blocks that appear or change after mount, so nothing is left
- * hidden and unobserved. Pass `disabled` in draft mode so editors always see content.
+ * view, with the block's parts staggered. A MutationObserver picks up blocks that appear or
+ * change after mount, so nothing is left hidden and unobserved. Pass `disabled` in draft mode so
+ * editors always see content.
  */
 export default function RevealObserver({disabled = false}: {disabled?: boolean}) {
   const pathname = usePathname()
@@ -59,6 +95,7 @@ export default function RevealObserver({disabled = false}: {disabled?: boolean})
       const pending = document.querySelectorAll<HTMLElement>('[data-reveal]:not([data-revealed])')
       for (const el of pending) {
         if (watching.has(el)) continue
+        markParts(el) // before js-reveal is added, so a part is never hidden before its block is ready
         if (shouldShowNow(el)) {
           revealInstantly(el)
         } else {

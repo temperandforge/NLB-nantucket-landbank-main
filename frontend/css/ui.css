@@ -513,6 +513,9 @@
   --motion-reveal-distance: 48px;
   --motion-reveal-duration: 800ms;
   --motion-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-part-distance: 32px;
+  --motion-part-duration: 700ms;
+  --motion-part-stagger: 90ms;
 }
 
 [data-reveal] {
@@ -526,6 +529,40 @@
   transform: translateY(var(--motion-reveal-distance));
 }
 
+/* A block with parts does not rise as a slab: the wrapper stays put and each part moves instead. */
+.js-reveal [data-reveal-staggered]:not([data-revealed]) {
+  opacity: 1;
+  transform: none;
+}
+
+.js-reveal [data-reveal]:not([data-revealed]) [data-reveal-part] {
+  opacity: 0;
+  translate: 0 var(--motion-part-distance);
+}
+
+/* An animation with backwards fill, not a transition: it holds the first keyframe through the
+   delay, then releases the element, so a part's own hover and focus transitions are untouched. */
+@keyframes reveal-part {
+  from {
+    opacity: 0;
+    translate: 0 var(--motion-part-distance);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+[data-revealed] [data-reveal-part] {
+  animation: reveal-part var(--motion-part-duration) var(--motion-ease-out)
+    calc(var(--reveal-index, 0) * var(--motion-part-stagger)) backwards;
+}
+
+/* On screen at load: shown, not animated. */
+[data-reveal-instant] [data-reveal-part] {
+  animation: none;
+}
+
 /* Print never scrolls, so IntersectionObserver would leave unseen blocks blank. */
 @media (prefers-reduced-motion: reduce), print {
   [data-reveal] {
@@ -534,6 +571,11 @@
   .js-reveal [data-reveal]:not([data-revealed]) {
     opacity: 1;
     transform: none;
+  }
+  [data-reveal-part] {
+    opacity: 1 !important;
+    translate: none !important;
+    animation: none !important;
   }
 }
 
