@@ -1,7 +1,7 @@
 # Scroll-reveal animations
 
 Date: 2026-10-14
-Status: draft, awaiting review
+Status: implemented
 
 ## Goal
 
@@ -22,28 +22,31 @@ Motion is subtle: a fade plus a 20px rise, ~500ms, whole blocks only.
 ### Seam
 
 `components/BlockRenderer.tsx` already wraps every block in one `<div>`. That wrapper gets a
-`data-reveal` attribute. No individual block component changes.
+`data-reveal` attribute. No individual block component changes. `BlockRenderer` renders on the client
+(it is imported by the `'use client'` `PageBuilder`), so it cannot read `draftMode()`.
 
 `data-reveal` is omitted when:
 
 - `index === 0` — the first block is the LCP candidate and must never start hidden.
-- Draft mode / Studio Presentation is active — Visual Editing overlays and click-to-edit must be
-  untouched, and editors must always see content.
 
 ### Client island
 
 `components/RevealObserver.tsx` is the only new client code. It renders `null` and is mounted once
 in `app/layout.tsx`.
 
+The layout passes `disabled={isDraftMode}`. When disabled, the effect returns early and never adds
+`js-reveal`, so `data-reveal` is inert and editors always see content (Visual Editing / Presentation
+are untouched).
+
 On mount (`useLayoutEffect`, so it runs before first paint):
 
-1. Add `js-reveal` to `<html>`.
-2. Create one shared `IntersectionObserver` (`rootMargin: '0px 0px -8% 0px'`, `threshold: 0.1`).
-3. Observe every `[data-reveal]` element.
-4. For elements already intersecting on the first callback, set `data-revealed` with the transition
-   suppressed (no animation for content already in view on load). Later intersections set
-   `data-revealed` normally.
-5. Unobserve an element once revealed, so each animates at most once.
+1. Show every `[data-reveal]` element whose top edge is above the bottom of the viewport
+   immediately, with the transition suppressed (no animation for content already on screen, and
+   none for blocks scrolled past by a hash jump).
+2. Add `js-reveal` to `<html>`.
+3. Create one shared `IntersectionObserver` (`rootMargin: '0px 0px -8% 0px'`, `threshold: 0.1`) and
+   observe the remaining (below-the-fold) elements; each sets `data-revealed` when it intersects.
+4. Unobserve an element once revealed, so each animates at most once.
 
 On client-side navigation, re-run the query when `usePathname()` changes and observe the new
 elements. Disconnect the observer on unmount.
@@ -92,7 +95,5 @@ Then `npm run sanity:typegen`, `npm run type-check`, `npm run lint` in `frontend
 
 ## Deferred
 
-- Per-card stagger inside grids.
-- Per-block opt-out field in Sanity.
-
-Each gets a GitHub issue; numbers are added here when filed.
+- Per-card stagger inside grids: [#51](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/51)
+- Per-block opt-out field in Sanity: [#52](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/52)
