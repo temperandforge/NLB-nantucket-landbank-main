@@ -65,7 +65,7 @@ export default function NavSearch(props: DesktopProps | MobileProps) {
           // Full-bleed: `fixed` resolves against the header (its translate is the containing block), so
           // the panel spans the header's full width, just under it, with no overflow to clip. The field is
           // inset to line up with the bar's content.
-          className="fixed inset-x-0 top-full z-40 bg-background py-gap-lg shadow-layer"
+          className="fixed inset-x-0 top-full z-40 bg-background py-gap-lg border-b border-border-light"
         >
           <div className="tf-px">
             <SearchField autoFocus onSearch={onSearch} />
