@@ -8,7 +8,7 @@ Status: implemented
 Page-builder blocks fade and rise into view as they scroll into the viewport, without hurting
 Core Web Vitals (LCP, CLS, INP) or adding an animation library.
 
-Motion is subtle: a fade plus a 20px rise, ~500ms, whole blocks only.
+Motion is subtle: a fade plus a 48px rise, ~800ms, whole blocks only.
 
 ## Non-goals
 
@@ -44,7 +44,7 @@ On mount (`useLayoutEffect`, so it runs before first paint):
    immediately, with the transition suppressed (no animation for content already on screen, and
    none for blocks scrolled past by a hash jump).
 2. Add `js-reveal` to `<html>`.
-3. Create one shared `IntersectionObserver` (`rootMargin: '0px 0px -8% 0px'`, `threshold: 0.1`) and
+3. Create one shared `IntersectionObserver` (`rootMargin: '0px 0px -15% 0px'`, `threshold: 0.1`) and
    observe the remaining (below-the-fold) elements; each sets `data-revealed` when it intersects.
 4. Unobserve an element once revealed, so each animates at most once.
 
@@ -58,12 +58,12 @@ In `css/ui.css`, next to the existing motion rules, using `--motion-*` tokens:
 ```css
 .js-reveal [data-reveal]:not([data-revealed]) {
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(48px);
 }
 [data-reveal] {
   transition:
-    opacity 500ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 800ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 @media (prefers-reduced-motion: reduce) {
   .js-reveal [data-reveal]:not([data-revealed]) {

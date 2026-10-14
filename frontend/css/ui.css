@@ -510,8 +510,8 @@
    and sets [data-revealed] as each block scrolls into view. Without JS the hidden state never
    applies, so content is always visible. Only opacity and transform animate: no layout shift. */
 :root {
-  --motion-reveal-distance: 20px;
-  --motion-reveal-duration: 500ms;
+  --motion-reveal-distance: 48px;
+  --motion-reveal-duration: 800ms;
   --motion-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 

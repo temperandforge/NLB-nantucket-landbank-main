@@ -51,7 +51,7 @@ export default function RevealObserver({disabled = false}: {disabled?: boolean})
           observer.unobserve(entry.target)
         }
       },
-      {rootMargin: '0px 0px -8% 0px', threshold: 0},
+      {rootMargin: '0px 0px -15% 0px', threshold: 0},
     )
 
     const watching = new WeakSet<Element>()
