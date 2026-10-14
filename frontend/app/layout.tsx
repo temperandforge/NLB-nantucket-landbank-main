@@ -101,6 +101,7 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
   return (
     <html
       lang="en"
+      data-draft={isDraftMode ? '' : undefined}
       className={`${inter.variable} ${ibmPlexMono.variable} ${ebGaramond.variable} ${dmSans.variable} ${dmMono.variable} bg-white text-black`}
     >
       {/*
