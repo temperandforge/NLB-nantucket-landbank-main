@@ -1,8 +1,10 @@
-import {ArrowRightIcon} from '@/components/icons'
+import {ArrowLeftIcon, ArrowRightIcon} from '@/components/icons'
 
 type ButtonLinkProps = {
   label: string
   href: string
+  /** An arrow before the label, for a link that goes back. */
+  leftIcon?: boolean
   /** An arrow after the label. */
   rightIcon?: boolean
   variant?: 'primary' | 'secondary' | 'ghost'
@@ -22,6 +24,7 @@ export default function ButtonLink({
   href,
   variant = 'primary',
   newTab = false,
+  leftIcon = false,
   rightIcon = false,
   className,
 }: ButtonLinkProps) {
@@ -32,6 +35,7 @@ export default function ButtonLink({
       rel={newTab ? 'noopener noreferrer' : undefined}
       className={`button ${VARIANT_CLASSES[variant]} ${className ?? ''}`}
     >
+      {leftIcon && <ArrowLeftIcon className="size-6 shrink-0" />}
       {label}
       {rightIcon && <ArrowRightIcon className="size-6 shrink-0" />}
     </a>
