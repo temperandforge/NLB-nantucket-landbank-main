@@ -28,6 +28,12 @@ export type FooterInfoColumnData = NonNullable<FooterData['infoColumns']>[number
 export type FooterSocialLinkData = NonNullable<FooterData['socialLinks']>[number]
 
 /**
+ * A form as the page renders it, derived from the query result so it cannot drift from the
+ * projection. Null when the reference is missing or unpublished.
+ */
+export type FormContent = NonNullable<ExtractPageBuilderType<'contactForm'>['form']>
+
+/**
  * Header shapes, derived from the query result like the footer's. A top-level menuGroup is a
  * dropdown; a top-level menuLink is a plain link. A group's children carry the optional `group`
  * column heading that groupMenuLinks() turns into columns.

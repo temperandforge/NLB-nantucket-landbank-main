@@ -1018,6 +1018,8 @@ Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-desig
 - Nine menu links and three social URLs are `#` placeholders awaiting real values.
 - Newsletter submission has no provider, action, or validation.
 - Cookie Settings needs a consent manager; it is a JS trigger, not a URL.
+- Google Tag Manager is not loaded. It needs the client's container id and a consent decision, which
+  belongs with Cookie Settings ([#49](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/49)).
 - The Studio's Pages list is flat. It shows each page's resolved path in the subtitle,
   but does not nest children under their parent, which gets harder to scan as pages are added.
 - Markers and boundaries render only once Mapbox fires `load`, which needs the style request to
@@ -1155,7 +1157,134 @@ in Studio. A block can.
 `projectSettings.heading`, `intro` and `eyebrow` no longer feed the map and can be removed
 (tracked in [#44](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/44)). Two Map Explorers on one page share their URL filters.
 
-## 21. Error pages share one synthesised template
+## 21. Forms
+
+### 21.1 A form is a document of sections of typed fields
+
+**Status:** Implemented; type-checked and linted but not yet verified in a browser (see 21.5)
+
+**Verified:** schema and generated types (`tsc`, typegen), lint, and `verifyForms.ts` (run with zero
+forms present, so vacuous). Not verified: rendering of either placement.
+
+`form` has `sections[]`, each with an optional heading, a column count, and `formField` objects
+(one type with a `fieldType`). A form is placed by reference: embedded in Basic Left Right Text's
+right-column rich text (`blockContentWithForm`), or chosen on a Contact Form block. Options are
+plain strings, and the stored answer is the option text. A show-if may target a dropdown,
+multi-select, checkbox group or radio group.
+
+**Why:** Both Figma layouts, and any later form, are the same shape; editors can extend forms
+without a deploy.
+
+**Implication:** Choice answers are stored as the option text, so renaming an option detaches
+earlier answers and any show-if that names it (Studio flags the show-if).
+
+### 21.2 Validation is shared and always repeated on the server
+
+**Status:** Implemented; logic checked, route not exercised against a live dataset (see 21.5)
+
+**Verified:** type-check, lint, the node check script `verifyFormLogic.mts` for the pure logic
+(validation, visibility, listbox keys, rate limit), and code review of the route. Not verified: a
+live request, Turnstile, or a stored submission.
+
+`frontend/sanity/lib/forms.ts` decides visibility and validity for both the browser (`FormRenderer`)
+and `POST /api/forms/[formId]`. The route re-reads the **published** form and keeps only the answers
+the form asks for. It rejects form ids that do not match `/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/` (404),
+rate-limits per IP, drops honeypot hits silently with a 200, verifies Turnstile when
+`TURNSTILE_SECRET_KEY` is set, and reports a failed Sanity read as a 500.
+
+**Why:** A visitor's JSON is untrusted. One implementation means the two cannot disagree.
+
+### 21.3 Submissions are stored, not emailed (yet)
+
+**Status:** Implemented; email deferred; not yet exercised against a live dataset (see 21.5)
+
+**Verified:** schema type-check and code review. Not verified: a stored submission, or the weak
+reference, against a real dataset with the write token.
+
+`formSubmission` documents hold a snapshot of each question and answer, with a weak reference to
+the form, written with a server-only `SANITY_WRITE_TOKEN`. Deferred, each with an issue: email
+notification (#17), retention (#18), file uploads (#19), role-based access to submissions (#20).
+Interim: the in-memory per-IP rate limiter, which is per instance, capped and evicts the oldest
+entry (#21), and the general-purpose write token (#22). Issue #12 (the contact form had no backend)
+is closed by the storage work, except for email.
+
+**Requires action before go-live (OPEN, the project owner's decision).** Submissions are written to
+the content dataset, and `npx sanity dataset visibility get production` returned `public` on
+2026-10-07. While it is public, anyone who knows the project id can query stored submissions
+(names, emails, phones, addresses) through the Sanity API. Before any real form is published the
+dataset must be made private (the frontend already sends its read token), or submissions must go to
+a separate private dataset. Related to #20: in draft mode, the browser token used for live preview
+can read submissions.
+
+Turnstile: set both `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`, or neither. With
+only the secret set, every submission fails the captcha check.
+
+### 21.4 Accessibility choices that differ from the obvious
+
+**Status:** Implemented; type-checked and linted but not yet verified in a browser (see 21.5)
+
+**Verified:** type-check, lint, `verifyFormLogic.mts` (listbox key handling) and code review. Not
+verified: keyboard, focus and screen-reader behaviour, focus-ring contrast, or the ARIA wiring in a
+browser.
+
+- **Focus on form controls adds an outline to the design system's border.** The Input's focus state
+  is a 1px `border-light` border, below 3:1 contrast, so focus also draws a 2px `border-dark`
+  outline.
+- **Radio groups** put `role="radiogroup"` on the fieldset; `required` and `invalid` are exposed
+  only there. Choice inputs are named by their field (`name` is the field name).
+- **Checkbox groups** carry the `*` in the legend and their error through `aria-describedby`.
+- **The multi-select trigger** is `role="combobox"`; focus moves into a listbox while it is open.
+- **No native `maxLength`.** Validation and the counter report overflow instead of silently
+  truncating typed text.
+- **Icons.** Time fields use the Figma clock-2 icon (`Clock2Icon`). The design system has no radio
+  icons and the Figma draws the Yes/No pair as squares, so radio groups use the same square icons
+  as checkboxes and keep radio behaviour (one answer, arrow keys, one tab stop).
+- **A field's `prompt`** is the small text above the control when the section heading already asks
+  the question (Figma: the mono heading plus "Select one"). The `label` stays the question: it is
+  in the accessible name (as visually hidden text before the prompt), in validation messages and in
+  stored answers. The asterisk moves to the section heading.
+
+### 21.5 Verification still to do by a person
+
+**Status:** Not yet run (needs seeded, published forms, a dev server and the write token)
+
+The browser and keyboard pass, and the live POST checks, were not run. To do:
+
+1. **Decide dataset visibility (OPEN, project owner).** See the requirement under 21.3: submissions
+   must not go live while the dataset is public.
+2. Seed the forms: `cd studio && npx sanity exec scripts/seedForms.ts --with-user-token -- --dry`,
+   read the plan, then run it again without `--dry`.
+3. Publish the forms and place them on pages (a Contact Form block with "Contact Us", and a Basic
+   Left Right Text block with a form in the right column).
+4. Run `cd studio && npx sanity exec scripts/verifyForms.ts --with-user-token`.
+5. Set `SANITY_WRITE_TOKEN` (and, if using Turnstile, both `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`, or neither: with only the secret set every submission fails the captcha check) in `frontend/.env.local`, then start
+   the dev server.
+6. Keyboard-only pass at desktop and mobile widths:
+   - Tab reaches every control in visual order, never the honeypot, and a focus indicator shows on
+     every stop including radios and checkboxes; a radio group is one tab stop.
+   - Space and arrows operate checkboxes and radios.
+   - Single and multi-select share one custom listbox (`ListSelect`); a single select closes and
+     returns focus to the button on Enter, Space or a click, and a multi-select stays open. A
+     single select cannot be cleared once chosen.
+   - Multi-select: Enter, Space and ArrowDown open it with focus in the list; Up/Down/Home/End move;
+     typing a letter jumps; Space toggles; Tab closes it and moves on. Escape returns focus to the
+     trigger with no validation flash.
+   - Tab order after a show-if toggles: "Yes" inserts the dependent field after the radio, "No"
+     removes it, and submitting with it hidden does not report it.
+   - A failed submit focuses the first invalid field, the alert announces the count, each error is
+     read with its field (`aria-invalid`, `aria-describedby`, `aria-required`), and a valid answer
+     clears its error.
+   - A double submit makes one request; the button reads "Sending…" and is disabled in between.
+   - Compare each Input state with the design system node `499-209`.
+7. POST against the route: a 422 (invalid answers), a 429 (rate limit), a honeypot hit (200, nothing
+   stored), and a valid submission stored with the weak `form` reference.
+8. Needs a real browser: the multi-select Escape-focus path, and the Turnstile case with two forms
+   on one page.
+
+A form that exists only as a draft resolves in Presentation but cannot be submitted there: the route
+reads published forms only and answers 404.
+
+## 22. Error pages share one synthesised template
 
 **Status:** Implemented
 

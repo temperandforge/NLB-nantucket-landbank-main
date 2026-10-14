@@ -173,25 +173,6 @@ export function ClockIcon({className}: IconProps) {
   )
 }
 
-/**
- * Calendar, for the event page's date row. Drawn to match the clock and map pin (24 x 24, 2px
- * stroke) because the Figma export could not be downloaded; swap in the exported path if it differs.
- */
-export function CalendarIcon({className}: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" className={className}>
-      <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" />
-      <path
-        d="M16 2V6M8 2V6M3 10H21"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
 /** Map pin, from nlb-design's events preview. 24 x 24. */
 export function MapPinIcon({className}: IconProps) {
   return (
@@ -335,6 +316,111 @@ export function MenuToggleIcon({className, open}: IconProps & {open: boolean}) {
         <path d="M1 7H17" className={`${bar} ${open ? 'scale-x-0 opacity-0' : ''}`} />
         <path d="M1 13H17" className={`${bar} ${open ? '-translate-y-[6px] -rotate-45' : ''}`} />
       </g>
+    </svg>
+  )
+}
+
+/** Figma: calendar (I2406:29002;627:617), the icon in the Date field. 24 x 24, 2px stroke. */
+export function CalendarIcon({className}: IconProps) {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      className={className}
+    >
+      <path
+        d="M8 2V6M16 2V6M3 10H21M5 4H19C20.1046 4 21 4.89543 21 6V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V6C3 4.89543 3.89543 4 5 4Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+/** Figma: clock-2 (I2406:29003;627:617), the icon in the Time field. 24 x 24, 2px stroke. */
+export function Clock2Icon({className}: IconProps) {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      className={className}
+    >
+      <path
+        d="M12 6V12L16 10M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+/** Figma: square-check (2411:29145), a checked checkbox. 24 x 24, 2px stroke. */
+export function SquareCheckIcon({className}: IconProps) {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      className={className}
+    >
+      <path
+        d="M9 12L11 14L15 10M5 3H19C20.1046 3 21 3.89543 21 5V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+/** Figma: square (2411:29153), an unchecked checkbox. 24 x 24, 2px stroke. */
+export function SquareIcon({className}: IconProps) {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      className={className}
+    >
+      <path
+        d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+/** Tick, marking the chosen row of a single-choice list. 24 x 24, 2px stroke; drawn, not exported from Figma. */
+export function CheckIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }

@@ -4,10 +4,11 @@ import {defineArrayMember, defineField} from 'sanity'
 import {defineBlock, eyebrowField, headingLevelField} from './blockFields'
 
 /**
- * Two columns (Figma: Basic - Left Right). The left holds the eyebrow, heading and optional
- * buttons; the right is rich text (section headings, paragraphs) and anchor links. The theme's
+ * Two columns (Figma: Basic - Left Right). The left holds the eyebrow, heading, optional
+ * description and optional buttons; the right is rich text (section headings, paragraphs) and anchor links. The theme's
  * left-column text and single button no longer exist. The button styles are the design system's
  * three, defaulting to Primary: the Figma links given did not specify one.
+ * The right column can embed a form (Figma: Property Use Form).
  */
 export const basicLeftRightText = defineBlock({
   name: 'basicLeftRightText',
@@ -18,6 +19,13 @@ export const basicLeftRightText = defineBlock({
     eyebrowField(),
     defineField({name: 'heading', title: 'Heading', type: 'string'}),
     headingLevelField('h2'),
+    defineField({
+      name: 'description',
+      title: 'Description',
+      type: 'text',
+      rows: 5,
+      description: 'Plain text shown on the left, under the heading. Optional. A blank line starts a new paragraph.',
+    }),
     defineField({
       name: 'buttons',
       title: 'Buttons',
@@ -57,9 +65,9 @@ export const basicLeftRightText = defineBlock({
     defineField({
       name: 'rightContent',
       title: 'Right column',
-      type: 'blockContent',
+      type: 'blockContentWithForm',
       description:
-        'Section headings (Heading 3), paragraphs, and anchor links for downloads or related pages.',
+        'Section headings (Heading 3), paragraphs, anchor links for downloads or related pages, and forms. A form can go anywhere in the column.',
     }),
   ],
   preview: {
