@@ -27,7 +27,7 @@ type ErrorPageProps = {
 
 export default function ErrorPage({heading, eyebrow, body, children}: ErrorPageProps) {
   return (
-    <section className="relative flex w-full items-center overflow-clip bg-background tf-px pt-s6 pb-60 md:min-h-[34rem] md:py-s6">
+    <section className="relative flex w-full items-center overflow-clip bg-background tf-px pt-s6 pb-72 md:min-h-[34rem] md:py-s6">
       {/*
         The art is the section's background, with a fade from the background colour over it so the
         copy always sits on a plain ground. On desktop its box starts a third of the way in and
