@@ -167,6 +167,6 @@ No test framework exists; verify in the browser.
 - Scroll-scrubbed motion (GSAP and ScrollTrigger, scoped and dynamically imported).
 - A per-block motion setting in Sanity: [#52](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/52).
 - Per-card stagger inside grids beyond the first screen. Issue
-  [#51](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/51) is closed by the
-  inside-block stagger for the first 8 parts; stagger of later grid cards is not covered and needs
+  [#51](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/51) is to be closed when
+  the inside-block stagger ships, for the first 8 parts; stagger of later grid cards is not covered and needs
   its own issue if wanted.
