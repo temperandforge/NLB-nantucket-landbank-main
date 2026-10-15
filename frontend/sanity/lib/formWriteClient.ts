@@ -11,7 +11,7 @@ import {apiVersion, dataset, projectId} from '@/sanity/lib/api'
  * https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/22
  */
 export function getFormWriteClient() {
-  const token = process.env.SANITY_WRITE_TOKEN
-  if (!token) throw new Error('Missing SANITY_WRITE_TOKEN')
+  const token = process.env.SANITY_API_WRITE_TOKEN
+  if (!token) throw new Error('Missing SANITY_API_WRITE_TOKEN')
   return createClient({projectId, dataset, apiVersion, token, useCdn: false, perspective: 'raw'})
 }

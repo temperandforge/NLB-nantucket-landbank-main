@@ -175,7 +175,7 @@ and the discrepancy flagged.
 
 ### Environment
 
-- `SANITY_WRITE_TOKEN` (server only, a role limited to creating `formSubmission` documents where
+- `SANITY_API_WRITE_TOKEN` (server only, a role limited to creating `formSubmission` documents where
   Sanity permits).
 - `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY`. Set both or neither: with only the
   secret set, every submission fails the captcha check.
@@ -229,7 +229,7 @@ and the discrepancy flagged.
   abuser; the honeypot and reCAPTCHA are the real defences. A shared store (for example Vercel KV
   or Upstash) is chosen once the deployment target is settled. Issue: #21.
 - **Scoping the write token to creating submissions only.** v1 uses a general server-only
-  `SANITY_WRITE_TOKEN` (Editor role), used only in the route handler and never exposed to the
+  `SANITY_API_WRITE_TOKEN` (Editor role), used only in the route handler and never exposed to the
   client or to Studio. Whether Sanity can issue a create-only, `formSubmission`-only token on this
   plan, or whether the writes should move behind a Sanity Function, is investigated separately.
   Issue: #22.
