@@ -1209,7 +1209,7 @@ rate-limits per IP, drops honeypot hits silently with a 200, verifies reCAPTCHA 
 reference, against a real dataset with the write token.
 
 `formSubmission` documents hold a snapshot of each question and answer, with a weak reference to
-the form, written with a server-only `SANITY_WRITE_TOKEN`. Deferred, each with an issue: email
+the form, written with a server-only `SANITY_API_WRITE_TOKEN`. Deferred, each with an issue: email
 notification (#17), retention (#18), file uploads (#19), role-based access to submissions (#20).
 Interim: the in-memory per-IP rate limiter, which is per instance, capped and evicts the oldest
 entry (#21), and the general-purpose write token (#22). Issue #12 (the contact form had no backend)
@@ -1299,7 +1299,7 @@ The browser and keyboard pass, and the live POST checks, were not run. To do:
 3. Publish the forms and place them on pages (a Contact Form block with "Contact Us", and a Basic
    Left Right Text block with a form in the right column).
 4. Run `cd studio && npx sanity exec scripts/verifyForms.ts --with-user-token`.
-5. Set `SANITY_WRITE_TOKEN` (and, if using reCAPTCHA, both `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` and `RECAPTCHA_SECRET_KEY`, or neither: with only the secret set every submission fails the captcha check) in `frontend/.env.local`, then start
+5. Set `SANITY_API_WRITE_TOKEN` (and, if using reCAPTCHA, both `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` and `RECAPTCHA_SECRET_KEY`, or neither: with only the secret set every submission fails the captcha check) in `frontend/.env.local`, then start
    the dev server.
 6. Keyboard-only pass at desktop and mobile widths:
    - Tab reaches every control in visual order, never the honeypot, and a focus indicator shows on
