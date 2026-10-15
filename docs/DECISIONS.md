@@ -442,6 +442,13 @@ not-yet-available.
 
 **Implication:** Record the missing work in the relevant spec's deferred section.
 
+**Update (2026-10-15):** The footer signup is now the `Newsletter Signup` `form` document, referenced
+from `footer.newsletterForm` and rendered inline by `FormRenderer variant="inline"`, so it uses the
+same validation, honeypot, Turnstile and stored `formSubmission` as every other form. It is still
+disabled when the reference is unset, unpublished or has no fields, so the rule above still holds
+for the fallback. Seeded by `studio/scripts/seedNewsletterForm.ts`, which only fills an empty
+reference. Signups are stored, not synced to a list ([#63](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/63)).
+
 ### 4.9 The header and banner are Globals singletons, and the header hides on scroll down
 
 **Status:** Implemented
@@ -1016,7 +1023,7 @@ Spec: [properties archive design](superpowers/specs/2026-10-07-properties-archiv
 Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-design.md):
 
 - Nine menu links and three social URLs are `#` placeholders awaiting real values.
-- Newsletter submission has no provider, action, or validation.
+- Newsletter signups are stored in Sanity but not synced to a mailing list ([#63](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/63)).
 - Cookie Settings needs a consent manager; it is a JS trigger, not a URL.
 - Google Tag Manager is not loaded. It needs the client's container id and a consent decision, which
   belongs with Cookie Settings ([#49](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/49)).
@@ -1218,6 +1225,30 @@ can read submissions.
 
 Turnstile: set both `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`, or neither. With
 only the secret set, every submission fails the captcha check.
+
+### 21.3a Turnstile is the only captcha; notifications will use SMTP
+
+**Status:** Turnstile implemented; SMTP not built ([#17](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/17))
+
+Cloudflare Turnstile is the one captcha, and reCAPTCHA is not offered as an alternative.
+
+**Why:** Visitors never see the choice, so a provider switch is configuration cost with no user
+benefit: a second client widget and verifier, a provider setting, and mismatched-key cases on top of
+the existing "set both or neither" rule. reCAPTCHA also loads Google scripts and cookies, which
+raises consent and privacy questions for a public site. The captcha is isolated in
+`components/ui/form/Turnstile.tsx` and `sanity/lib/turnstile.ts`, so a provider interface can be
+added later if a client requires Google.
+
+**Setup:** create the widget in the Cloudflare dashboard with "Add widget manually" (not Spin, which
+rewrites verification that already exists), Managed mode, hostnames for production, staging and
+`localhost`. Set `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` together in
+`frontend/.env.local` and in Vercel. The site key is inlined at build time, so redeploy after
+changing it. Cloudflare's published dummy keys (`1x00000000000000000000AA` always passes,
+`2x00000000000000000000AB` always blocks) are for testing both paths.
+
+**Decided, not built:** staff are notified of submissions over SMTP (nodemailer in the submit route,
+env-var configured, skipped when unset), recipients per `form` in Studio, sent after the Sanity
+write and never failing the submission, with no confirmation email to the submitter.
 
 ### 21.4 Accessibility choices that differ from the obvious
 

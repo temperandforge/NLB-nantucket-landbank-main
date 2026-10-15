@@ -52,8 +52,15 @@ export default async function Footer() {
 
   if (!footer) return null
 
-  const {newsletterHeading, infoColumns, footerMenu, legalMenu, socialLinks, organizationName} =
-    footer
+  const {
+    newsletterHeading,
+    newsletterForm,
+    infoColumns,
+    footerMenu,
+    legalMenu,
+    socialLinks,
+    organizationName,
+  } = footer
 
   return (
     <footer className="siteFooter relative overflow-hidden bg-lowlands-500 text-warm-neutral-50">
@@ -80,7 +87,7 @@ export default async function Footer() {
         <div className="flex flex-col gap-gap-2xl">
           {/* Band 1: newsletter signup alongside the contact / address / hours columns. */}
           <div className="flex flex-col gap-gap-2xl xl:flex-row xl:items-start xl:justify-between">
-            {newsletterHeading ? <NewsletterSignup heading={newsletterHeading} /> : null}
+            {newsletterHeading ? <NewsletterSignup heading={newsletterHeading} form={newsletterForm} /> : null}
             {infoColumns?.length ? (
               <div className="grid grid-cols-1 gap-x-gap-lg gap-y-gap-lg sm:grid-cols-2 lg:grid-cols-3 xl:w-[841px]">
                 {infoColumns.map((column) => (

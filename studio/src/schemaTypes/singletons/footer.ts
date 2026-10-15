@@ -26,6 +26,14 @@ export const footer = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'newsletterForm',
+      title: 'Newsletter form',
+      type: 'reference',
+      to: [{type: 'form'}],
+      description:
+        'The signup form. Use a form with a single email field. Until one is chosen the footer shows a disabled signup. Submissions are stored under Forms.',
+    }),
+    defineField({
       name: 'infoColumns',
       title: 'Info columns',
       type: 'array',

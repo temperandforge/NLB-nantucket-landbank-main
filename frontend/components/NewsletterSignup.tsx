@@ -1,18 +1,35 @@
 import {ArrowForwardIcon} from '@/components/icons'
+import FormView from '@/components/ui/form/FormView'
+import {allFields} from '@/sanity/lib/forms'
+import type {FormContent} from '@/sanity/lib/types'
 
 /**
- * Newsletter signup - PRESENTATIONAL ONLY.
- *
- * Deliberately has no submit handler, no action, and no client-side state: the email provider
- * has not been chosen yet, so there is nothing to submit to. Wiring this up (provider, server
- * action, validation, success/error states) is tracked as deferred work in
- * docs/superpowers/specs/2026-07-29-footer-globals-design.md.
- *
- * The input is disabled so the form cannot be filled in and silently do nothing, which would
- * read as a bug to a visitor.
+ * Newsletter signup. When the footer references a published form with at least one field, it is
+ * that form, rendered inline through the shared form pipeline (validation, honeypot, Turnstile,
+ * stored as a `formSubmission`). Otherwise - no reference, an unpublished form, an empty one - it
+ * falls back to the disabled presentational form, so the footer never throws or shows a form that
+ * silently does nothing. The email-provider sync is deferred; see DECISIONS.md.
  */
 
-export default function NewsletterSignup({heading}: {heading: string}) {
+export default function NewsletterSignup({
+  heading,
+  form,
+}: {
+  heading: string
+  form?: FormContent | null
+}) {
+  if (form?._id && allFields(form).length > 0) {
+    return (
+      <div className="flex w-full max-w-[346px] flex-col gap-gap-md">
+        <p className="font-primary text-headline-base leading-[1.3] text-balance">{heading}</p>
+        <FormView form={form} variant="inline" />
+      </div>
+    )
+  }
+  return <DisabledSignup heading={heading} />
+}
+
+function DisabledSignup({heading}: {heading: string}) {
   return (
     <div className="flex w-full max-w-[346px] flex-col gap-gap-md">
       <p className="font-primary text-headline-base leading-[1.3] text-balance">{heading}</p>

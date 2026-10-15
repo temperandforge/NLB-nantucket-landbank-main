@@ -62,11 +62,43 @@ const menuFields = /* groq */ `
   }
 `
 
+/**
+ * A form as the page renders it. `name` is the slug's string; the other field properties come
+ * through as authored. Used by the page builder and by the submit route, so the browser and the
+ * server see the same shape.
+ */
+const formProjection = /* groq */ `{
+  _id,
+  title,
+  submitLabel,
+  successMessage,
+  sections[]{
+    _key,
+    heading,
+    columns,
+    fields[]{
+      _key,
+      "name": name.current,
+      label,
+      prompt,
+      helperText,
+      placeholder,
+      fieldType,
+      required,
+      width,
+      maxLength,
+      options,
+      showIf{field, equals}
+    }
+  }
+}`
+
 // Matched on both _type and the fixed singleton id: the id alone would let any document type
 // satisfy the filter, which makes the generated result type a union with an all-null variant.
 export const footerQuery = defineQuery(`
   *[_type == "footer" && _id == "footer"][0]{
     newsletterHeading,
+    "newsletterForm": newsletterForm->${formProjection},
     organizationName,
     infoColumns[]{
       _key,
@@ -184,37 +216,6 @@ const articleCardFields = /* groq */ `
   externalUrl,
   "categories": categories[]->{"slug": slug.current, title}
 `
-
-/**
- * A form as the page renders it. `name` is the slug's string; the other field properties come
- * through as authored. Used by the page builder and by the submit route, so the browser and the
- * server see the same shape.
- */
-const formProjection = /* groq */ `{
-  _id,
-  title,
-  submitLabel,
-  successMessage,
-  sections[]{
-    _key,
-    heading,
-    columns,
-    fields[]{
-      _key,
-      "name": name.current,
-      label,
-      prompt,
-      helperText,
-      placeholder,
-      fieldType,
-      required,
-      width,
-      maxLength,
-      options,
-      showIf{field, equals}
-    }
-  }
-}`
 
 /** The published form with this id, for validating a submission. Drafts never match. */
 export const FORM_FOR_SUBMIT_QUERY = defineQuery(

@@ -3,7 +3,7 @@
 import {useCallback, useEffect, useId, useRef, useState, type FormEvent} from 'react'
 import {flushSync} from 'react-dom'
 
-import {ArrowRightIcon} from '@/components/icons'
+import {ArrowForwardIcon, ArrowRightIcon} from '@/components/icons'
 import {
   HONEYPOT_FIELD,
   validateField,
@@ -50,8 +50,18 @@ function Control(props: ControlProps) {
  * shown and what is valid, and the route repeats the same checks on the server. Validation runs
  * on blur and on submit; a failed submit moves focus to the first invalid field and announces
  * the problem. What the visitor typed is kept through every failure.
+ *
+ * `variant="inline"` is the footer's newsletter row: the form's first field only, with its label
+ * visually hidden and an icon-only submit button, on the footer's dark background. Everything
+ * else (validation, honeypot, Turnstile, the route) is the same code path.
  */
-export default function FormRenderer({form}: {form: FormContent}) {
+export default function FormRenderer({
+  form,
+  variant = 'default',
+}: {
+  form: FormContent
+  variant?: 'default' | 'inline'
+}) {
   const baseId = useId()
   const formRef = useRef<HTMLFormElement>(null)
   const successRef = useRef<HTMLDivElement>(null)
@@ -163,10 +173,81 @@ export default function FormRenderer({form}: {form: FormContent}) {
         ref={successRef}
         role="status"
         tabIndex={-1}
-        className="w-full text-body-base text-on-background"
+        className={
+          variant === 'inline'
+            ? 'w-full font-secondary text-body-small'
+            : 'w-full text-body-base text-on-background'
+        }
       >
         {form.successMessage}
       </div>
+    )
+  }
+
+  if (variant === 'inline') {
+    const field = (form.sections ?? [])
+      .flatMap((section) => section.fields ?? [])
+      .find((candidate) => shownNames.has(candidate.name as string))
+    if (!field) return null
+    const name = field.name as string
+    const id = `${baseId}-${name}`
+    const error = errors[name] ?? null
+    return (
+      <form ref={formRef} onSubmit={submit} noValidate className="flex w-full flex-col gap-gap-mini">
+        <div className="flex items-center gap-gap-mini" data-field-name={name}>
+          <label className="sr-only" htmlFor={id}>
+            {field.label}
+          </label>
+          <input
+            id={id}
+            name={name}
+            type="email"
+            autoComplete="email"
+            placeholder={field.placeholder ?? undefined}
+            aria-required={field.required || undefined}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? `${id}-message` : undefined}
+            value={typeof values[name] === 'string' ? (values[name] as string) : ''}
+            onChange={(event) => change(field, event.target.value)}
+            onBlur={() => setError(field, values[name])}
+            className="h-[42px] min-w-0 flex-1 rounded-[4px] bg-warm-neutral-50 px-gap-sm py-[10px] font-secondary text-body-small text-lowlands-500 placeholder:text-lowlands-500/70"
+          />
+          <button
+            type="submit"
+            disabled={status === 'submitting'}
+            className="flex size-[42px] shrink-0 items-center justify-center rounded-[4px] bg-goldenrod-500 text-lowlands-500 disabled:opacity-60"
+          >
+            <span className="sr-only">{status === 'submitting' ? 'Sending' : form.submitLabel || 'Subscribe'}</span>
+            <ArrowForwardIcon className="size-[24px]" />
+          </button>
+        </div>
+
+        <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+          <label>
+            Leave this field empty
+            <input
+              type="text"
+              name={HONEYPOT_FIELD}
+              tabIndex={-1}
+              autoComplete="off"
+              value={honeypot}
+              onChange={(event) => setHoneypot(event.target.value)}
+            />
+          </label>
+        </div>
+
+        {SITE_KEY && <Turnstile siteKey={SITE_KEY} resetKey={resetKey} onToken={onToken} />}
+
+        {(error || serverError) && (
+          <p
+            id={`${id}-message`}
+            role="alert"
+            className="font-secondary text-body-small text-warm-neutral-50"
+          >
+            {error || serverError}
+          </p>
+        )}
+      </form>
     )
   }
 

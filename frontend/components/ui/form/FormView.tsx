@@ -15,14 +15,16 @@ import FormRenderer from './FormRenderer'
 export default function FormView({
   form,
   className,
+  variant,
 }: {
   form: FormContent | null | undefined
   className?: string
+  variant?: 'default' | 'inline'
 }) {
   if (!form?._id || allFields(form).length === 0) return null
   return (
     <div className={className}>
-      <FormRenderer form={stegaClean(form)} />
+      <FormRenderer form={stegaClean(form)} variant={variant} />
     </div>
   )
 }

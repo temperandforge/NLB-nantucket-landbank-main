@@ -9,7 +9,7 @@ Implement the designed site footer on the Next.js frontend, driven by Sanity con
 reusable, nestable menu content type — used here for the footer and legal menus, extended later to
 the header — and a `Globals` section in the Studio to hold footer settings and menus.
 
-The newsletter signup form is presentational only in this work; see [Deferred Work](#deferred-work).
+The newsletter signup was presentational only in this work. It has since been wired to the shared forms pipeline (DECISIONS 4.8); list sync is still deferred, see [Deferred Work](#deferred-work).
 
 ## Scope
 
@@ -122,6 +122,7 @@ Document type `footer`, fixed id `footer`.
 | Field | Type | Design source |
 | --- | --- | --- |
 | `newsletterHeading` | `string` | "Stay up to date on what is happening on the island." |
+| `newsletterForm` | `reference` → `form` | the signup form; absent or unpublished falls back to the disabled form |
 | `infoColumns` | `array` of `infoColumn` | CONTACT / ADDRESS / OFFICE HOURS |
 | `footerMenu` | `reference` → `menu` | the five-column nav |
 | `legalMenu` | `reference` → `menu` | Cookie Settings, Privacy Policy |
@@ -214,7 +215,7 @@ this scope.
 | --- | --- |
 | `components/Footer.tsx` | Server component: fetches the footer query, composes the three bands and the wave |
 | `components/FooterMenu.tsx` | Renders a `menu`'s groups and links; groups become column headings |
-| `components/NewsletterSignup.tsx` | Presentational form — no submit handler (deferred) |
+| `components/NewsletterSignup.tsx` | The referenced `form` rendered inline (`FormRenderer variant="inline"`); disabled fallback if none |
 | `components/SocialLinks.tsx` | Maps `platform` → icon component |
 | `components/icons/` | Facebook, Instagram, LinkedIn from the exported Figma SVGs |
 
@@ -395,9 +396,9 @@ rather than the catch-all.
 
 Recorded here, not built:
 
-1. **Newsletter submission.** The form is presentational — no handler, no action, both controls
-   disabled so it cannot silently do nothing. Needs a provider decision (Mailchimp / Constant
-   Contact / other), a server action, validation, and success/error states.
+1. **Newsletter list sync.** Signups are stored as `formSubmission` documents, but nothing
+   subscribes them to a mailing list. Needs a provider decision, consent and unsubscribe handling
+   ([#63](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/63)). Staff notification by SMTP is [#17](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/17).
 2. **The `#` placeholder links.** Nine menu items and three social URLs need their real values;
    see [Seeded Content](#seeded-content).
 3. **Cookie Settings.** A consent-manager trigger, not a URL. It sits in the legal menu as a

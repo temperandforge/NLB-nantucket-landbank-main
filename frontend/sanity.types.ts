@@ -736,28 +736,6 @@ export type FormSubmission = {
   }>
 }
 
-export type Form = {
-  _id: string
-  _type: 'form'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  title: string
-  submitLabel?: string
-  successMessage: string
-  sections: Array<{
-    heading?: string
-    columns?: 1 | 2
-    fields: Array<
-      {
-        _key: string
-      } & FormField
-    >
-    _type: 'formSection'
-    _key: string
-  }>
-}
-
 export type DepartmentReference = {
   _ref: string
   _type: 'reference'
@@ -1223,6 +1201,7 @@ export type Footer = {
   _updatedAt: string
   _rev: string
   newsletterHeading: string
+  newsletterForm?: FormReference
   infoColumns?: Array<
     {
       _key: string
@@ -1253,6 +1232,28 @@ export type Menu = {
         _key: string
       } & MenuLink)
   >
+}
+
+export type Form = {
+  _id: string
+  _type: 'form'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  submitLabel?: string
+  successMessage: string
+  sections: Array<{
+    heading?: string
+    columns?: 1 | 2
+    fields: Array<
+      {
+        _key: string
+      } & FormField
+    >
+    _type: 'formSection'
+    _key: string
+  }>
 }
 
 export type Settings = {
@@ -1704,7 +1705,6 @@ export type AllSanitySchemaTypes =
   | Record
   | RecordCategory
   | FormSubmission
-  | Form
   | DepartmentReference
   | Job
   | FaqCategoryReference
@@ -1731,6 +1731,7 @@ export type AllSanitySchemaTypes =
   | Header
   | Footer
   | Menu
+  | Form
   | Settings
   | Page
   | SanityAssistInstructionTask
@@ -1808,9 +1809,48 @@ export type SettingsQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: footerQuery
-// Query: *[_type == "footer" && _id == "footer"][0]{    newsletterHeading,    organizationName,    infoColumns[]{      _key,      heading,      lines[]{        _key,        text,        href      }    },    socialLinks[]{      _key,      platform,      url    },    "footerMenu": footerMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,      group,        link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }    }  }  }    },    "legalMenu": legalMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,      group,        link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }    }  }  }    },  }
+// Query: *[_type == "footer" && _id == "footer"][0]{    newsletterHeading,    "newsletterForm": newsletterForm->{  _id,  title,  submitLabel,  successMessage,  sections[]{    _key,    heading,    columns,    fields[]{      _key,      "name": name.current,      label,      prompt,      helperText,      placeholder,      fieldType,      required,      width,      maxLength,      options,      showIf{field, equals}    }  }},    organizationName,    infoColumns[]{      _key,      heading,      lines[]{        _key,        text,        href      }    },    socialLinks[]{      _key,      platform,      url    },    "footerMenu": footerMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,      group,        link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }    }  }  }    },    "legalMenu": legalMenu->{        _id,  title,  items[]{      _key,  _type,  label,  _type == "menuLink" => {      link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }  },  _type == "menuGroup" => {    children[]{      _key,      label,      group,        link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }    }  }  }    },  }
 export type FooterQueryResult = {
   newsletterHeading: string
+  newsletterForm: {
+    _id: string
+    title: string
+    submitLabel: string | null
+    successMessage: string
+    sections: Array<{
+      _key: string
+      heading: string | null
+      columns: 1 | 2 | null
+      fields: Array<{
+        _key: string
+        name: string
+        label: string
+        prompt: string | null
+        helperText: string | null
+        placeholder: string | null
+        fieldType:
+          | 'checkboxGroup'
+          | 'date'
+          | 'email'
+          | 'multiSelect'
+          | 'number'
+          | 'phone'
+          | 'radioGroup'
+          | 'select'
+          | 'text'
+          | 'textarea'
+          | 'time'
+        required: boolean | null
+        width: 'full' | 'half' | null
+        maxLength: number | null
+        options: Array<string> | null
+        showIf: {
+          field: string | null
+          equals: string | null
+        } | null
+      }>
+    }>
+  } | null
   organizationName: string
   infoColumns: Array<{
     _key: string
@@ -4904,7 +4944,7 @@ import '@sanity/client'
 declare module '@sanity/client' {
   interface SanityQueries {
     '*[_type == "settings"][0]': SettingsQueryResult
-    '\n  *[_type == "footer" && _id == "footer"][0]{\n    newsletterHeading,\n    organizationName,\n    infoColumns[]{\n      _key,\n      heading,\n      lines[]{\n        _key,\n        text,\n        href\n      }\n    },\n    socialLinks[]{\n      _key,\n      platform,\n      url\n    },\n    "footerMenu": footerMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      group,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n    "legalMenu": legalMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      group,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n  }\n': FooterQueryResult
+    '\n  *[_type == "footer" && _id == "footer"][0]{\n    newsletterHeading,\n    "newsletterForm": newsletterForm->{\n  _id,\n  title,\n  submitLabel,\n  successMessage,\n  sections[]{\n    _key,\n    heading,\n    columns,\n    fields[]{\n      _key,\n      "name": name.current,\n      label,\n      prompt,\n      helperText,\n      placeholder,\n      fieldType,\n      required,\n      width,\n      maxLength,\n      options,\n      showIf{field, equals}\n    }\n  }\n},\n    organizationName,\n    infoColumns[]{\n      _key,\n      heading,\n      lines[]{\n        _key,\n        text,\n        href\n      }\n    },\n    socialLinks[]{\n      _key,\n      platform,\n      url\n    },\n    "footerMenu": footerMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      group,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n    "legalMenu": legalMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      group,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n  }\n': FooterQueryResult
     '\n  *[_type == "header" && _id == "header"][0]{\n    "mainMenu": mainMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      group,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    }\n  }\n': HeaderQueryResult
     '\n  *[_type == "siteBanner" && _id == "siteBanner" && enabled == true][0]{\n    message,\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  }\n': SiteBannerQueryResult
     '*[_type == "form" && _id == $id][0]{\n  _id,\n  title,\n  submitLabel,\n  successMessage,\n  sections[]{\n    _key,\n    heading,\n    columns,\n    fields[]{\n      _key,\n      "name": name.current,\n      label,\n      prompt,\n      helperText,\n      placeholder,\n      fieldType,\n      required,\n      width,\n      maxLength,\n      options,\n      showIf{field, equals}\n    }\n  }\n}': FORM_FOR_SUBMIT_QUERY_RESULT
