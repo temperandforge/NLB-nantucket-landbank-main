@@ -97,6 +97,10 @@ export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProp
       listener: (e: mapboxgl.MapLayerMouseEvent) => void
     }[]
   >([])
+  // TODO(all-boundaries): remove with the temporary all-boundaries layers
+  const allBoundaryListenersRef = useRef<
+    {layerId: string; listener: (e: mapboxgl.MapLayerMouseEvent) => void}[]
+  >([])
 
   // Boundaries come from one file shared by every project, so they are fetched once and indexed
   // rather than re-read whenever the filters change.
@@ -219,9 +223,21 @@ export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProp
       }
       polygonListenersRef.current = []
 
-      for (const layerId of ['property-lines', 'property-polygons']) {
+      // TODO(all-boundaries): remove with the temporary all-boundaries layers
+      for (const {layerId, listener} of allBoundaryListenersRef.current) {
+        map.off('click', layerId, listener)
+      }
+      allBoundaryListenersRef.current = []
+
+      for (const layerId of [
+        'all-boundaries-lines',
+        'all-boundaries-polygons',
+        'property-lines',
+        'property-polygons',
+      ]) {
         if (map.getLayer(layerId)) map.removeLayer(layerId)
       }
+      if (map.getSource('all-boundaries-geojson')) map.removeSource('all-boundaries-geojson')
       if (map.getSource('property-geojson')) map.removeSource('property-geojson')
 
       /**
@@ -236,8 +252,10 @@ export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProp
       // Every id in a project's own parcel group maps back to that same group array, so hovering
       // any one of a multi-parcel project's polygons highlights all of them together.
       const featureIdToGroupIds = new Map<number, number[]>()
+      const assignedBoundaryIds = new Set<string>()
 
       for (const project of projects) {
+        for (const id of project.boundaryIds ?? []) assignedBoundaryIds.add(id)
         const projectBoundaries = (project.boundaryIds ?? [])
           .map((id) => boundaries.get(id))
           .filter((feature): feature is GeoJSON.Feature => Boolean(feature?.geometry))
@@ -277,6 +295,57 @@ export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProp
           marker.setPopup(new mapboxgl.Popup({offset: 24}).setHTML(buildPopupHtml(project)))
         }
         markersRef.current.push(marker)
+      }
+
+      /**
+       * Temporary: draws every boundary in the file that no project points at, so the unnamed
+       * parcels from the client's GPX (auto-numbered track_1, track_2, ...) can be matched to
+       * properties by hand. Added before the assigned layers so an assigned parcel draws on top.
+       *
+       * TODO(all-boundaries): remove this block, the listener ref and the cleanup above once every
+       * parcel is matched to a property. See docs/superpowers/specs/2026-07-31-render-all-boundaries-design.md.
+       */
+      if (boundaries.size > 0) {
+        map.addSource('all-boundaries-geojson', {
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features: Array.from(boundaries)
+              .filter(([id]) => !assignedBoundaryIds.has(id))
+              .map(([id, feature]) => ({
+                ...feature,
+                properties: {...feature.properties, boundaryIdValue: id},
+              })),
+          },
+        })
+
+        map.addLayer({
+          id: 'all-boundaries-lines',
+          type: 'line',
+          source: 'all-boundaries-geojson',
+          filter: ['==', ['geometry-type'], 'LineString'],
+          paint: {'line-color': '#f59e0b', 'line-width': 1, 'line-dasharray': [2, 2]},
+        })
+        map.addLayer({
+          id: 'all-boundaries-polygons',
+          type: 'fill',
+          source: 'all-boundaries-geojson',
+          filter: ['==', ['geometry-type'], 'Polygon'],
+          paint: {'fill-color': '#f59e0b', 'fill-opacity': 0.15},
+        })
+
+        const onAllBoundaryClick = (e: mapboxgl.MapLayerMouseEvent) => {
+          const value = e.features?.[0]?.properties?.boundaryIdValue
+          if (typeof value !== 'string') return
+          new mapboxgl.Popup({offset: 12})
+            .setLngLat(e.lngLat)
+            .setHTML(`<div class="map-popup-title">${escapeHtml(value)}</div>`)
+            .addTo(map)
+        }
+        for (const layerId of ['all-boundaries-lines', 'all-boundaries-polygons']) {
+          map.on('click', layerId, onAllBoundaryClick)
+          allBoundaryListenersRef.current.push({layerId, listener: onAllBoundaryClick})
+        }
       }
 
       if (features.length > 0) {
