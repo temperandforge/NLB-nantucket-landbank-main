@@ -444,7 +444,7 @@ not-yet-available.
 
 **Update (2026-10-15):** The footer signup is now the `Newsletter Signup` `form` document, referenced
 from `footer.newsletterForm` and rendered inline by `FormRenderer variant="inline"`, so it uses the
-same validation, honeypot, Turnstile and stored `formSubmission` as every other form. It is still
+same validation, honeypot, reCAPTCHA and stored `formSubmission` as every other form. It is still
 disabled when the reference is unset, unpublished or has no fields, so the rule above still holds
 for the fallback. Seeded by `studio/scripts/seedNewsletterForm.ts`, which only fills an empty
 reference. Signups are stored, not synced to a list ([#63](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/63)).
@@ -1191,13 +1191,13 @@ earlier answers and any show-if that names it (Studio flags the show-if).
 
 **Verified:** type-check, lint, the node check script `verifyFormLogic.mts` for the pure logic
 (validation, visibility, listbox keys, rate limit), and code review of the route. Not verified: a
-live request, Turnstile, or a stored submission.
+live request, reCAPTCHA, or a stored submission.
 
 `frontend/sanity/lib/forms.ts` decides visibility and validity for both the browser (`FormRenderer`)
 and `POST /api/forms/[formId]`. The route re-reads the **published** form and keeps only the answers
 the form asks for. It rejects form ids that do not match `/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/` (404),
-rate-limits per IP, drops honeypot hits silently with a 200, verifies Turnstile when
-`TURNSTILE_SECRET_KEY` is set, and reports a failed Sanity read as a 500.
+rate-limits per IP, drops honeypot hits silently with a 200, verifies reCAPTCHA when
+`RECAPTCHA_SECRET_KEY` is set, and reports a failed Sanity read as a 500.
 
 **Why:** A visitor's JSON is untrusted. One implementation means the two cannot disagree.
 
@@ -1223,28 +1223,39 @@ dataset must be made private (the frontend already sends its read token), or sub
 a separate private dataset. Related to #20: in draft mode, the browser token used for live preview
 can read submissions.
 
-Turnstile: set both `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`, or neither. With
+reCAPTCHA: set both `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` and `RECAPTCHA_SECRET_KEY`, or neither. With
 only the secret set, every submission fails the captcha check.
 
-### 21.3a Turnstile is the only captcha; notifications will use SMTP
+### 21.3a reCAPTCHA v3 is the captcha; notifications will use SMTP
 
-**Status:** Turnstile implemented; SMTP not built ([#17](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/17))
+**Status:** reCAPTCHA v3 implemented; SMTP not built ([#17](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/17))
 
-Cloudflare Turnstile is the one captcha, and reCAPTCHA is not offered as an alternative.
+Google reCAPTCHA v3 protects every form. It replaced Cloudflare Turnstile (2026-10-15). There is one
+captcha, not a choice between providers.
 
-**Why:** Visitors never see the choice, so a provider switch is configuration cost with no user
-benefit: a second client widget and verifier, a provider setting, and mismatched-key cases on top of
-the existing "set both or neither" rule. reCAPTCHA also loads Google scripts and cookies, which
-raises consent and privacy questions for a public site. The captcha is isolated in
-`components/ui/form/Turnstile.tsx` and `sanity/lib/turnstile.ts`, so a provider interface can be
-added later if a client requires Google.
+**Why:** The client wanted no widget in the form. Turnstile's Managed mode drew a visible "Verify
+you are human" box in the dark footer; v3 shows only Google's small floating badge, bottom right.
+Keeping one provider avoids a second client widget, a provider setting and mismatched-key cases. The
+captcha is isolated in `components/ui/form/Recaptcha.tsx` and `sanity/lib/recaptcha.ts`.
 
-**Setup:** create the widget in the Cloudflare dashboard with "Add widget manually" (not Spin, which
-rewrites verification that already exists), Managed mode, hostnames for production, staging and
-`localhost`. Set `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` together in
-`frontend/.env.local` and in Vercel. The site key is inlined at build time, so redeploy after
-changing it. Cloudflare's published dummy keys (`1x00000000000000000000AA` always passes,
-`2x00000000000000000000AB` always blocks) are for testing both paths.
+**How it works:** the browser loads `api.js?render=<site key>` and, on submit, requests a
+single-use token for the action `form_submit`. The route posts it to Google's `siteverify` and
+rejects it unless Google accepts it, the score is at least 0.5 and the action matches. The action
+string is duplicated in the route because a server module cannot import a value from a `'use client'`
+file. Keys: `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` and `RECAPTCHA_SECRET_KEY`, set both or neither. With
+neither (local dev) the check is skipped; with only the secret set, every submission fails it.
+
+**Implication:** the script and badge load on every page that has a form, which includes the
+sitewide footer, so the badge appears on every page. It sets Google cookies, so it needs the consent
+decision tracked with Cookie Settings ([#49](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/49)).
+Hiding the badge is allowed only with visible text saying the site is protected by reCAPTCHA and
+linking Google's Privacy Policy and Terms of Service. The 0.5 threshold is Google's default and has
+not been tuned against real traffic. The badge can overlap content at the bottom right on small
+screens.
+
+**Setup:** create a v3 key at google.com/recaptcha/admin for the production, staging and
+`localhost` domains. Set the two variables in `frontend/.env.local` and in Vercel. The site key is
+inlined at build time, so redeploy after changing it.
 
 **Decided, not built:** staff are notified of submissions over SMTP (nodemailer in the submit route,
 env-var configured, skipped when unset), recipients per `form` in Studio, sent after the Sanity
@@ -1288,7 +1299,7 @@ The browser and keyboard pass, and the live POST checks, were not run. To do:
 3. Publish the forms and place them on pages (a Contact Form block with "Contact Us", and a Basic
    Left Right Text block with a form in the right column).
 4. Run `cd studio && npx sanity exec scripts/verifyForms.ts --with-user-token`.
-5. Set `SANITY_WRITE_TOKEN` (and, if using Turnstile, both `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`, or neither: with only the secret set every submission fails the captcha check) in `frontend/.env.local`, then start
+5. Set `SANITY_WRITE_TOKEN` (and, if using reCAPTCHA, both `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` and `RECAPTCHA_SECRET_KEY`, or neither: with only the secret set every submission fails the captcha check) in `frontend/.env.local`, then start
    the dev server.
 6. Keyboard-only pass at desktop and mobile widths:
    - Tab reaches every control in visual order, never the honeypot, and a focus indicator shows on
@@ -1309,8 +1320,8 @@ The browser and keyboard pass, and the live POST checks, were not run. To do:
    - Compare each Input state with the design system node `499-209`.
 7. POST against the route: a 422 (invalid answers), a 429 (rate limit), a honeypot hit (200, nothing
    stored), and a valid submission stored with the weak `form` reference.
-8. Needs a real browser: the multi-select Escape-focus path, and the Turnstile case with two forms
-   on one page.
+8. Needs a real browser: the multi-select Escape-focus path, and the reCAPTCHA case with two forms
+   on one page (the script is loaded once).
 
 A form that exists only as a draft resolves in Presentation but cannot be submitted there: the route
 reads published forms only and answers 404.

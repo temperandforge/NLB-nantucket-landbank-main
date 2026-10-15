@@ -3,9 +3,12 @@ import {isRateLimited} from '@/sanity/lib/formRateLimit'
 import {getFormWriteClient} from '@/sanity/lib/formWriteClient'
 import {answerRows, HONEYPOT_FIELD, validateForm, type Values} from '@/sanity/lib/forms'
 import {FORM_FOR_SUBMIT_QUERY} from '@/sanity/lib/queries'
-import {verifyTurnstile} from '@/sanity/lib/turnstile'
+import {verifyRecaptcha} from '@/sanity/lib/recaptcha'
 
 const MAX_BODY_BYTES = 50_000
+
+// Must match the action the browser requests the token for (components/ui/form/Recaptcha.tsx).
+const RECAPTCHA_ACTION = 'form_submit'
 
 // Sanity document ids; anything else (including `drafts.`/`versions.` ids) is not a form we serve.
 const FORM_ID = /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/
@@ -52,8 +55,8 @@ export async function POST(request: Request, ctx: {params: Promise<{formId: stri
     return json({error: 'invalid'}, 400)
   }
 
-  const token = typeof body.turnstileToken === 'string' ? body.turnstileToken : undefined
-  if (!(await verifyTurnstile(token, ip))) return json({error: 'captcha'}, 400)
+  const token = typeof body.recaptchaToken === 'string' ? body.recaptchaToken : undefined
+  if (!(await verifyRecaptcha(token, ip, RECAPTCHA_ACTION))) return json({error: 'captcha'}, 400)
 
   let form
   try {

@@ -1,6 +1,6 @@
 'use client'
 
-import {useCallback, useEffect, useId, useRef, useState, type FormEvent} from 'react'
+import {useEffect, useId, useRef, useState, type FormEvent} from 'react'
 import {flushSync} from 'react-dom'
 
 import {ArrowForwardIcon, ArrowRightIcon} from '@/components/icons'
@@ -17,10 +17,10 @@ import ChoiceGroup from './ChoiceGroup'
 import ListSelect from './ListSelect'
 import Textarea from './Textarea'
 import TextInput from './TextInput'
-import Turnstile from './Turnstile'
+import Recaptcha, {getRecaptchaToken, RECAPTCHA_ACTION} from './Recaptcha'
 import type {ControlProps, FormField} from './types'
 
-const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
 
 const MESSAGES = {
   network: 'We could not reach the server. Check your connection and try again.',
@@ -53,7 +53,7 @@ function Control(props: ControlProps) {
  *
  * `variant="inline"` is the footer's newsletter row: the form's first field only, with its label
  * visually hidden and an icon-only submit button, on the footer's dark background. Everything
- * else (validation, honeypot, Turnstile, the route) is the same code path.
+ * else (validation, honeypot, reCAPTCHA, the route) is the same code path.
  */
 export default function FormRenderer({
   form,
@@ -73,9 +73,6 @@ export default function FormRenderer({
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle')
   const [serverError, setServerError] = useState<string | null>(null)
   const [honeypot, setHoneypot] = useState('')
-  const [token, setToken] = useState('')
-  const [resetKey, setResetKey] = useState(0)
-  const onToken = useCallback((next: string) => setToken(next), [])
 
   const shown = visibleFields(form, values)
   const shownNames = new Set(shown.map((field) => field.name as string))
@@ -123,11 +120,23 @@ export default function FormRenderer({
     const sent = values
     sending.current = true
     setStatus('submitting')
+    // v3 issues a single-use token per submission, so ask for it now rather than on page load.
+    let recaptchaToken = ''
+    if (SITE_KEY) {
+      try {
+        recaptchaToken = await getRecaptchaToken(SITE_KEY, RECAPTCHA_ACTION)
+      } catch {
+        setServerError(MESSAGES.captcha)
+        sending.current = false
+        setStatus('idle')
+        return
+      }
+    }
     try {
       const response = await fetch(`/api/forms/${form._id}`, {
         method: 'POST',
         headers: {'content-type': 'application/json'},
-        body: JSON.stringify({values, turnstileToken: token, [HONEYPOT_FIELD]: honeypot}),
+        body: JSON.stringify({values, recaptchaToken, [HONEYPOT_FIELD]: honeypot}),
       })
       if (response.ok) {
         setStatus('success')
@@ -161,9 +170,6 @@ export default function FormRenderer({
     } finally {
       sending.current = false
     }
-    // A Turnstile token is single-use, so ask for a new one after any failed attempt.
-    setToken('')
-    setResetKey((key) => key + 1)
     setStatus('idle')
   }
 
@@ -236,7 +242,7 @@ export default function FormRenderer({
           </label>
         </div>
 
-        {SITE_KEY && <Turnstile siteKey={SITE_KEY} resetKey={resetKey} onToken={onToken} />}
+        {SITE_KEY && <Recaptcha siteKey={SITE_KEY} />}
 
         {(error || serverError) && (
           <p
@@ -312,7 +318,7 @@ export default function FormRenderer({
         </label>
       </div>
 
-      {SITE_KEY && <Turnstile siteKey={SITE_KEY} resetKey={resetKey} onToken={onToken} />}
+      {SITE_KEY && <Recaptcha siteKey={SITE_KEY} />}
 
       {serverError && (
         <p role="alert" className="form-helper form-helper-error">

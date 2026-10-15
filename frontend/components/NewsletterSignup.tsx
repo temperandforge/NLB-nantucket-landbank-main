@@ -5,7 +5,7 @@ import type {FormContent} from '@/sanity/lib/types'
 
 /**
  * Newsletter signup. When the footer references a published form with at least one field, it is
- * that form, rendered inline through the shared form pipeline (validation, honeypot, Turnstile,
+ * that form, rendered inline through the shared form pipeline (validation, honeypot, reCAPTCHA,
  * stored as a `formSubmission`). Otherwise - no reference, an unpublished form, an empty one - it
  * falls back to the disabled presentational form, so the footer never throws or shows a form that
  * silently does nothing. The email-provider sync is deferred; see DECISIONS.md.
