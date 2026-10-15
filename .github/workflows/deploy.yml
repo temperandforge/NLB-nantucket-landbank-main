@@ -37,6 +37,9 @@ jobs:
       SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
       SANITY_STUDIO_DATASET: ${{ vars.SANITY_STUDIO_DATASET }}
       SANITY_STUDIO_STUDIO_HOST: ${{ vars.SANITY_STUDIO_STUDIO_HOST }}
+      # Presentation's preview origin. Without it the deployed Studio falls back to
+      # http://localhost:3000 (the local .env.production is gitignored, so CI never sees it).
+      SANITY_STUDIO_PREVIEW_URL: ${{ vars.SANITY_STUDIO_PREVIEW_URL }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
