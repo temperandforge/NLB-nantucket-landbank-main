@@ -2,7 +2,7 @@
  * A best-effort per-key limiter for the submit route.
  *
  * The counters live in this process's memory. On serverless hosting each instance counts
- * separately, so this only slows one abuser; the honeypot and Turnstile are the real defences.
+ * separately, so this only slows one abuser; the honeypot and reCAPTCHA are the real defences.
  * A shared store is tracked in https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/21
  * and can replace the Map without changing this interface.
  */

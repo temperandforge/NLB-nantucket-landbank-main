@@ -26,7 +26,7 @@ flagged in the PR.
 | On submit | Store a `formSubmission` in Sanity. Email is deferred. |
 | Form model | Sections of typed fields. |
 | Conditional fields | Yes, a simple show-if rule. |
-| Spam protection | Honeypot, rate limit and Cloudflare Turnstile, layered. |
+| Spam protection | Honeypot, rate limit and Google reCAPTCHA v3, layered (was Turnstile; DECISIONS 21.3a). |
 | Contact block | Update the existing `contactForm`. |
 | Left Right placement | `formEmbed` inside the right column's rich text, not a replacement for it. |
 | Sanity write token | A server-only token is acceptable. Auto-delete window is deferred. |
@@ -153,7 +153,7 @@ and the discrepancy flagged.
 
 1. `FormRenderer` validates on blur (after first touch) and on submit. A failed submit moves focus to
    the first invalid field and shows a summary `role="alert"`.
-2. POST `/api/forms/[formId]` with `{values, turnstileToken, honeypot}`.
+2. POST `/api/forms/[formId]` with `{values, recaptchaToken, honeypot}`.
 3. The route handler rejects a malformed form id (`/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/`, 404), then fetches the published form from Sanity (never trusting the
    client's copy), evaluates `showIf`, re-validates every shown field (required, type, option membership, `maxLength`), drops
    hidden fields' values, then creates a `formSubmission` with the server-only token.
@@ -168,15 +168,16 @@ and the discrepancy flagged.
 - **Rate limit**: per-IP limit in the route handler. The interim implementation is in-memory, capped,
   and evicts the oldest entry; it is per instance, so it is not reliable on serverless. #21 will
   choose a shared store once the host is settled.
-- **Turnstile**: shown when the site key is configured; the server verifies the token when the secret
-  is configured. With no keys (local dev) it is skipped and the form works. Turnstile's widget is
-  rendered in a way that keeps tab order sensible and has an accessible label.
+- **reCAPTCHA v3**: the script loads when the site key is configured and shows Google's floating
+  badge; a token is requested at submit and the server verifies it (score at least 0.5, action
+  `form_submit`) when the secret is configured. With no keys (local dev) it is skipped and the form
+  works. There is no widget in the form, so tab order is unaffected.
 
 ### Environment
 
 - `SANITY_WRITE_TOKEN` (server only, a role limited to creating `formSubmission` documents where
   Sanity permits).
-- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`. Set both or neither: with only the
+- `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY`. Set both or neither: with only the
   secret set, every submission fails the captcha check.
 
 ## Keyboard and screen-reader accessibility
@@ -225,7 +226,7 @@ and the discrepancy flagged.
 - Splitting `formSubmission` access by Studio role. Issue: #20.
 - **Where the rate-limit counter lives.** v1 ships a best-effort, in-memory per-IP limiter in the
   route handler. On serverless hosting each instance has its own counter, so it only slows a single
-  abuser; the honeypot and Turnstile are the real defences. A shared store (for example Vercel KV
+  abuser; the honeypot and reCAPTCHA are the real defences. A shared store (for example Vercel KV
   or Upstash) is chosen once the deployment target is settled. Issue: #21.
 - **Scoping the write token to creating submissions only.** v1 uses a general server-only
   `SANITY_WRITE_TOKEN` (Editor role), used only in the route handler and never exposed to the
@@ -233,7 +234,7 @@ and the discrepancy flagged.
   plan, or whether the writes should move behind a Sanity Function, is investigated separately.
   Issue: #22.
 - **Go-live hardening and review follow-ups.** Before the forms go live: timeouts on the
-  Turnstile and Sanity calls in the submit route, a byte-accurate streaming body-size cap, the
+  reCAPTCHA and Sanity calls in the submit route, a byte-accurate streaming body-size cap, the
   three env vars in `frontend/.env.example`, and settling `X-Forwarded-For` trust with the hosting
   target (with #21). The issue also lists the smaller accessibility, Studio and script-check
   follow-ups from the branch review. Issue: #27.
