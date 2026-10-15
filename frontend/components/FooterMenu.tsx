@@ -11,10 +11,10 @@ import type {FooterMenuData, FooterMenuItem, FooterMenuLeaf} from '@/sanity/lib/
  */
 
 const LINK_CLASS =
-  'font-secondary text-body-small opacity-75 transition-opacity hover:opacity-100 focus-visible:opacity-100'
+  'font-secondary text-body-base opacity-75 md:text-body-small transition-opacity hover:opacity-100 focus-visible:opacity-100'
 
-/** Tracked uppercase label - Figma type style mono/tracked (DM Mono 14, 11% tracking). */
-const LABEL_CLASS = 'font-mono-tracked text-[14px] uppercase tracking-[1.54px] leading-[1.6]'
+/** Tracked uppercase label - Figma type style mono/tracked (DM Mono 14, tracking-wide). */
+const LABEL_CLASS = 'font-mono-tracked text-body-small uppercase tracking-wide leading-[1.6]'
 
 /**
  * A menu item's link, as it comes back from GROQ with page references resolved to slugs.
@@ -42,9 +42,9 @@ function MenuColumn({item}: {item: FooterMenuItem}) {
   // gets a column to itself so the grid stays aligned.
   if (item._type === 'menuGroup') {
     return (
-      <div className="flex flex-col gap-gap-md">
+      <div className="flex flex-col gap-5 md:gap-gap-md">
         <h2 className={LABEL_CLASS}>{item.label}</h2>
-        <ul className="flex flex-col gap-gap-mini leading-[1.6]">
+        <ul className="flex flex-col gap-2 leading-[1.6] md:gap-gap-mini">
           {item.children.map((child) => (
             <MenuLeaf key={child._key} label={child.label} link={child.link} />
           ))}
@@ -54,8 +54,8 @@ function MenuColumn({item}: {item: FooterMenuItem}) {
   }
 
   return (
-    <div className="flex flex-col gap-gap-md">
-      <ul className="flex flex-col gap-gap-mini leading-[1.6]">
+    <div className="flex flex-col gap-5 md:gap-gap-md">
+      <ul className="flex flex-col gap-2 leading-[1.6] md:gap-gap-mini">
         <MenuLeaf label={item.label} link={item.link} />
       </ul>
     </div>
@@ -69,7 +69,7 @@ export default function FooterMenu({menu}: {menu: FooterMenuData | null}) {
     <nav aria-label={menu.title}>
       {/* Five columns with 90px gutters at the designed 1440 width, collapsing to three, two
           and finally one as the viewport narrows. */}
-      <div className="grid grid-cols-1 gap-x-gap-lg gap-y-gap-2xl sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 xl:gap-x-[90px]">
+      <div className="grid grid-cols-1 gap-x-gap-lg gap-y-gap-lg sm:grid-cols-2 md:gap-y-gap-2xl lg:grid-cols-3 xl:grid-cols-5 xl:gap-x-[90px]">
         {menu.items.map((item) => (
           <MenuColumn key={item._key} item={item} />
         ))}
@@ -91,7 +91,7 @@ export function FooterInlineMenu({menu}: {menu: FooterMenuData | null}) {
 
   return (
     <nav aria-label={menu.title}>
-      <ul className="flex flex-wrap items-center gap-x-gap-md gap-y-gap-mini leading-[1.6]">
+      <ul className="flex flex-wrap items-center gap-x-5 gap-y-gap-mini leading-[1.6]">
         {links.map(({key, label, link}) => (
           <MenuLeaf key={key} label={label} link={link} />
         ))}
