@@ -13,6 +13,7 @@ import {Toaster} from 'sonner'
 import DraftModeToast from '@/components/DraftModeToast'
 import Footer from '@/components/Footer'
 import Header from '@/components/header/Header'
+import RevealObserver from '@/components/RevealObserver'
 import * as demo from '@/sanity/lib/demo'
 import {sanityFetch, SanityLive} from '@/sanity/lib/live'
 import {settingsQuery} from '@/sanity/lib/queries'
@@ -100,6 +101,7 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
   return (
     <html
       lang="en"
+      data-draft={isDraftMode ? '' : undefined}
       className={`${inter.variable} ${ibmPlexMono.variable} ${ebGaramond.variable} ${dmSans.variable} ${dmMono.variable} bg-white text-black`}
     >
       {/*
@@ -121,6 +123,7 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
         )}
         {/* The <SanityLive> component is responsible for making all sanityFetch calls in your application live, so should always be rendered. */}
         <SanityLive onError={handleError} />
+        <RevealObserver disabled={isDraftMode} />
         <Header />
         <main className="pageMain grow" id="pageMain">
           {children}

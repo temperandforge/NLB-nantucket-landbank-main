@@ -88,6 +88,8 @@ export default function BlockRenderer({block, index, pageId, pageType, pageName}
       <div
         key={block._key}
         className={hidden ? 'relative' : undefined}
+        data-reveal={index > 0 ? '' : undefined}
+        data-entrance={index === 0 ? '' : undefined}
         data-sanity={dataAttr({
           id: pageId,
           type: pageType,

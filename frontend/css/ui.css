@@ -507,6 +507,45 @@
   }
 }
 
+/* ---- Scroll reveal -------------------------------------------------------------------------------
+   Blocks opt in with [data-reveal] (see BlockRenderer). RevealObserver adds .js-reveal to <html>
+   and sets [data-revealed] as each block scrolls into view. Without JS the hidden state never
+   applies, so content is always visible. Only opacity and transform animate: no layout shift. */
+:root {
+  --motion-reveal-distance: 48px;
+  --motion-reveal-duration: 800ms;
+  --motion-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-reveal] {
+  transition:
+    opacity var(--motion-reveal-duration) var(--motion-ease-out),
+    transform var(--motion-reveal-duration) var(--motion-ease-out);
+}
+
+.js-reveal [data-reveal]:not([data-revealed]) {
+  opacity: 0;
+  transform: translateY(var(--motion-reveal-distance));
+}
+
+/* A block with parts does not rise as a slab: the wrapper stays put and each part moves instead
+   (RevealObserver animates the parts with the Web Animations API). */
+.js-reveal [data-reveal-staggered]:not([data-revealed]) {
+  opacity: 1;
+  transform: none;
+}
+
+/* Print never scrolls, so IntersectionObserver would leave unseen blocks blank. */
+@media (prefers-reduced-motion: reduce), print {
+  [data-reveal] {
+    transition: none;
+  }
+  .js-reveal [data-reveal]:not([data-revealed]) {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ---- Error pages. The footpath draws in, then the pin drops: one moment, played once. ------- */
 @keyframes error-trail-draw {
   from {
@@ -541,5 +580,60 @@
   .error-trail-reveal,
   .error-pin {
     animation: none;
+  }
+}
+
+/* ---- Page-load entrance ---------------------------------------------------------------------------
+   CSS-only, so it plays at first paint with no wait for hydration. The header slides with
+   `translate` alone (never opacity) so the logo cannot delay LCP. The first block's text rises in
+   order of element type, because no index exists before JS runs. Media is never animated. */
+:root {
+  --motion-entrance-header-distance: -12px;
+  --motion-entrance-header-duration: 500ms;
+  --motion-entrance-text-distance: 24px;
+  --motion-entrance-text-duration: 600ms;
+}
+
+/* No `to` frame: each animation finishes at the element's own opacity and translate, so an element
+   with its own value for either is not overridden or snapped back when it ends. */
+@keyframes entrance-header {
+  from {
+    translate: 0 var(--motion-entrance-header-distance);
+  }
+}
+
+@keyframes entrance-text {
+  from {
+    opacity: 0;
+    translate: 0 var(--motion-entrance-text-distance);
+  }
+}
+
+html:not([data-draft]) [data-header-bar] {
+  animation: entrance-header var(--motion-entrance-header-duration) var(--motion-ease-out) backwards;
+}
+
+/* :where() keeps this base rule's specificity low, so the per-type delays below can override it. */
+html:not([data-draft]) [data-entrance] :where(h1, h2, h3, p, ul, ol, a):where(:not([data-reveal-skip] *)) {
+  animation: entrance-text var(--motion-entrance-text-duration) var(--motion-ease-out) 200ms backwards;
+}
+html:not([data-draft]) [data-entrance] [data-eyebrow] {
+  animation-delay: 0ms;
+}
+html:not([data-draft]) [data-entrance] :is(h1, h2, h3) {
+  animation-delay: 100ms;
+}
+/* A link inside a paragraph, heading or list rides with its parent; only standalone links (buttons) get their own beat. */
+html:not([data-draft]) [data-entrance] :is(p, h1, h2, h3, li) a {
+  animation: none;
+}
+html:not([data-draft]) [data-entrance] a:not(:is(p, h1, h2, h3, li) a) {
+  animation-delay: 300ms;
+}
+
+@media (prefers-reduced-motion: reduce), print {
+  [data-header-bar],
+  [data-entrance] :is(h1, h2, h3, p, ul, ol, a) {
+    animation: none !important;
   }
 }
