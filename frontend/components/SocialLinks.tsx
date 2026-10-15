@@ -11,31 +11,37 @@ import type {FooterSocialLinkData} from '@/sanity/lib/types'
  * an icon has to be exported from Figma before they will appear.
  *
  * Each glyph carries its own size because the design insets them differently inside the
- * shared 29px box: Facebook is 24.1667px (8.33% inset), Instagram and LinkedIn are 21.75px
- * (12.5% inset). Sizing them all alike would stretch two of the three.
+ * shared box (24px mobile, 29px desktop): Facebook fills 83.33% (8.33% inset), Instagram and
+ * LinkedIn 75% (12.5% inset). Sizing them all alike would stretch two of the three.
  */
 
 type PlatformIcon = {
   Icon: ComponentType<{className?: string}>
   label: string
-  /** Glyph size inside the 29px box, from the Figma export. */
+  /** Glyph size as a share of the box, from the Figma export. */
   sizeClass: string
 }
 
 const PLATFORM_ICONS: Partial<Record<FooterSocialLinkData['platform'], PlatformIcon>> = {
-  facebook: {Icon: FacebookIcon, label: 'Facebook', sizeClass: 'size-[24.1667px]'},
-  instagram: {Icon: InstagramIcon, label: 'Instagram', sizeClass: 'size-[21.75px]'},
-  linkedin: {Icon: LinkedInIcon, label: 'LinkedIn', sizeClass: 'size-[21.75px]'},
+  facebook: {Icon: FacebookIcon, label: 'Facebook', sizeClass: 'size-[83.33%]'},
+  instagram: {Icon: InstagramIcon, label: 'Instagram', sizeClass: 'size-[75%]'},
+  linkedin: {Icon: LinkedInIcon, label: 'LinkedIn', sizeClass: 'size-[75%]'},
 }
 
-export default function SocialLinks({links}: {links: FooterSocialLinkData[] | null}) {
+export default function SocialLinks({
+  links,
+  className = '',
+}: {
+  links: FooterSocialLinkData[] | null
+  className?: string
+}) {
   if (!links?.length) return null
 
   const withIcons = links.filter((link) => PLATFORM_ICONS[link.platform])
   if (!withIcons.length) return null
 
   return (
-    <ul className="flex items-center justify-end gap-gap-sm">
+    <ul className={`flex items-center gap-4 md:justify-end md:gap-gap-sm ${className}`}>
       {withIcons.map((link) => {
         // Non-null: withIcons is filtered on this lookup succeeding.
         const {Icon, label, sizeClass} = PLATFORM_ICONS[link.platform]!
@@ -45,7 +51,7 @@ export default function SocialLinks({links}: {links: FooterSocialLinkData[] | nu
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex size-[29px] items-center justify-center transition-opacity hover:opacity-75 focus-visible:opacity-75"
+              className="flex size-6 items-center md:size-[29px] justify-center transition-opacity hover:opacity-75 focus-visible:opacity-75"
             >
               <span className="sr-only">{label}</span>
               <Icon className={sizeClass} />
