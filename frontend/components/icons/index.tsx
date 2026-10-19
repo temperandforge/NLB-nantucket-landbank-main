@@ -283,15 +283,12 @@ export function SearchIcon({className}: IconProps) {
   )
 }
 
-/**
- * Close x. Figma: banner dismiss glyph (x). 10 x 10, 2px stroke. The viewBox keeps the
- * export's own page offset (1385, 12) so the path data is exactly as exported.
- */
+/** Close x. Figma: banner dismiss glyph (x). 20 x 20 box, 10px glyph, 2px stroke. */
 export function CloseIcon({className}: IconProps) {
   return (
-    <svg overflow="visible" viewBox="1385 12 10 10" fill="none" aria-hidden="true" focusable="false" className={className}>
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false" className={className}>
       <path
-        d="M1395 12L1385 22M1385 12L1395 22"
+        d="M15 5L5 15M5 5L15 15"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"

@@ -29,7 +29,7 @@ export default function SiteBanner({banner}: {banner: SiteBannerData}) {
 
   if (!message || !key || dismissedNow || dismissedBefore) return null
 
-  const text = <span className="font-secondary text-body-base leading-[1.6] opacity-80">{message}</span>
+  const text = <span className="font-secondary text-body-base text-center text-pretty leading-[1.6] opacity-80">{message}</span>
 
   const hideIfDismissed = `try{if(localStorage.getItem(${JSON.stringify(key)})==='1')document.currentScript.previousElementSibling.style.display='none'}catch(e){}`
 
@@ -41,8 +41,9 @@ export default function SiteBanner({banner}: {banner: SiteBannerData}) {
       <div
         suppressHydrationWarning
         data-site-banner
-        className="relative flex min-h-[34px] items-center justify-center bg-lowlands-500 px-14 py-1 text-on-accent-secondary"
+        className="siteBanner relative flex gap-x-2 min-h-[34px] items-center justify-between bg-lowlands-500 tf-px py-1 text-on-accent-secondary"
       >
+        <span className="visually-hidden" aria-hidden="true"></span>
         {banner.link ? (
           <ResolvedLink link={banner.link} className="underline-offset-4 hover:underline">
             {text}
@@ -58,7 +59,7 @@ export default function SiteBanner({banner}: {banner: SiteBannerData}) {
             setDismissedNow(true)
           }}
           // p-1 makes the hit area 28px (WCAG 2.5.8); right-4 / md:right-9 keep the 20px icon 20px (mobile) / 40px (desktop) from the edge, per Figma 293:344 / 59:20.
-          className="absolute right-4 md:right-9 top-1/2 -translate-y-1/2 p-1"
+          className="closeButton _absolute _right-0 _top-1/2 _-translate-y-1/2"
         >
           <CloseIcon className="size-5" />
         </button>

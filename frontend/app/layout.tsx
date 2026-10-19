@@ -106,7 +106,7 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
         No vertical padding on body or main: the nav, page header, map and footer are meant to sit
         flush against one another, so each section owns its own spacing.
       */}
-      <body className="flex flex-col min-h-screen">
+      <body className="bg-background flex flex-col min-h-screen">
         <a href="#pageMain" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:bg-brand focus:text-white focus:px-4 focus:py-2">
           Skip to main content
         </a>
