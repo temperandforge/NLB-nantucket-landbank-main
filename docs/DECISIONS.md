@@ -615,6 +615,21 @@ should be read before the real run.
 
 ---
 
+### 6.x `next-sanity` is pinned to an exact version
+
+**Status:** Implemented
+
+`frontend/package.json` pins `next-sanity` to `13.0.8` (no caret).
+
+**Why:** `13.3.x` types every string from `sanityFetch` as `StegaString` by default (the client has
+`stega.studioUrl` and `defineLive` has a `serverToken`). Every component prop typed from the
+generated query types then fails `next build`'s type check - the dev server hides it, Vercel does
+not. A lockfile refresh (the Node 26 bump) pulled it in silently and broke the deploy.
+
+**Implication:** Bump it deliberately, and in the same change either handle `StegaString` (clean with
+`stegaClean`, or pass `stega: false` where visual editing overlays aren't needed) or confirm
+`npm run type-check` passes. Run `type-check` before pushing any dependency or lockfile change.
+
 ## 7. Page-builder blocks
 
 Ported from the nlb-v2 WordPress theme. Design: [the blocks spec](superpowers/specs/2026-10-07-wp-blocks-migration-design.md).
