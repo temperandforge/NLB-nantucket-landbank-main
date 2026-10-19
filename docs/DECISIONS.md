@@ -477,6 +477,23 @@ space to the content; revealing on scroll up keeps navigation close.
   (it supports `--dry`).
 - Search is built; see 4.10.
 
+### 4.9a The desktop footer is four stacked bands (2026-10)
+
+**Status:** Implemented
+
+The footer's contact info no longer sits beside the newsletter signup. Desktop is four bands 80px
+apart: newsletter with the social icons top-right, the contact grid, the menu, then the legal row.
+The contact grid and the menu share one five-column grid (240px columns, 40px gutters), so their
+columns line up. Footer text is 16px (`body-base`) on desktop; the newsletter headline is
+`headline-lg` and its input and button are 48px. There is a single `SocialLinks` instance, which
+sits under the form on mobile and top-right from `md`.
+
+**Why:** It follows the revised Figma frame (node 89:131; mobile 636:1331). Measured values are in the
+[footer spec](superpowers/specs/2026-07-29-footer-globals-design.md#measured-values).
+
+**Implication:** The contact columns render in CMS order (Contact, Address, Office Hours), where Figma
+shows Office Hours second. That is content in Sanity, not layout.
+
 ### 4.10 Site search is a server-rendered `/search` page, fed by one GROQ query
 
 **Status:** Implemented

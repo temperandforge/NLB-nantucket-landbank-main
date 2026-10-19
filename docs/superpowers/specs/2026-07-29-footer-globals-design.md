@@ -32,14 +32,16 @@ Out of scope:
 ## Design Reference
 
 The footer is a single full-bleed section on `brand/Lowlands` with one decorative wave vector
-spanning it, and three content bands stacked at `gap-2xl` (96px):
+spanning it, and four content bands stacked 80px apart (revised 2026-10 to the current Figma node
+89:131; the mobile frame is node 636:1331):
 
-1. **Newsletter + info.** Left: a 346px column with an EB Garamond headline and the signup form.
-   Right: an 841px three-column grid — CONTACT, ADDRESS, OFFICE HOURS — each a DM Mono tracked
-   uppercase label above DM Sans 16px lines.
-2. **Navigation.** A five-column grid (200px columns, 90px gutters) of DM Mono labels above DM Sans
-   13px links at 75% opacity.
-3. **Legal.** Copyright left; legal links and three social icons right, baseline-aligned.
+1. **Newsletter + social.** Left: a 440px column with an EB Garamond 44px headline and the signup
+   form. Right (top-aligned): the three social icons. On mobile the icons sit under the form.
+2. **Contact info.** A three-column grid - CONTACT, ADDRESS, OFFICE HOURS - each a DM Mono tracked
+   uppercase label above DM Sans 16px lines. It is its own band, no longer beside the newsletter.
+3. **Navigation.** A five-column grid of DM Mono labels above DM Sans 16px links at 75% opacity.
+   The contact grid and the menu share the same columns so they line up.
+4. **Legal.** Copyright left; legal links right, baseline-aligned. The social icons are no longer here.
 
 ### Measured values
 
@@ -47,21 +49,21 @@ Taken from the Figma node, for implementation reference:
 
 | Element | Values |
 | --- | --- |
-| Footer root | bg `brand/Lowlands`, `px` 40 (`global-margin`), `py` 64 (`section-p-sm`), overflow clipped |
-| Container | max 1440 total / 1360 content, `flex-col`, gap 96 (`gap-2xl`) |
+| Footer root | bg `brand/Lowlands`, `px` 40 and `py` 40 (`global-margin`), overflow clipped |
+| Container | 1440 total / 1360 content, `flex-col`, gap 80 between bands |
 | Wave vector | 4758×760, absolute, `top-0`, horizontally centered, decorative |
-| Newsletter column | 346 wide, gap 24 (`gap-md`) |
-| Headline | `font/family-primary` (EB Garamond) 32 (`headline-base`), line-height 1.3, `warm-neutral/50` |
-| Input | bg `warm-neutral/50`, h 42, flex-1, `px` 12 / `py` 10, radius 4, DM Sans 13, text `brand/Lowlands` |
-| Submit button | bg `brand/Goldenrod`, 42×42, radius 4, 24×24 arrow icon centered |
+| Newsletter column | 440 wide, gap 40 (`gap-lg`; 32 on mobile) |
+| Headline | `font/family-primary` (EB Garamond) 44 (`headline-lg`), line-height 1.1 |
+| Input | bg `input`, h 48, flex-1, `px` 12, radius 4, DM Sans 16 (`body-base`), text `brand/Lowlands` |
+| Submit button | bg `brand/Goldenrod`, 48×48, radius 4, 24×24 arrow icon centered |
 | Form row gap | 4 (`gap-mini`) |
-| Info grid | 3 columns, 253.67 wide, 40 gutter (841 total) |
-| Info lines | DM Sans 16 (`body-base`), line-height 1.6, gap 12 (`gap-sm`) |
-| Column labels | DM Mono 14, letter-spacing 1.54px (11% of 14), uppercase, line-height 1.6 |
-| Nav grid | 5 columns, 200 wide, 90 gutter (1360 total) |
-| Nav links | DM Sans 13 (`body-small`), gap 4 (`gap-mini`), opacity 75% |
-| Legal row | `justify-between`, `items-end`; links gap 24, social gap 12 |
-| Social icons | 29×29 outer box each |
+| Info grid | 3 columns, 240 wide, 40 gutter, left-aligned in the same 5-column grid as the nav |
+| Info lines | DM Sans 16 (`body-base`), line-height 1.6, gap 8 |
+| Column labels | DM Mono 14, letter-spacing 1.54px (11% of 14), uppercase, line-height 1.6; 20 above the list |
+| Nav grid | 5 columns, 240 wide, 40 gutter (1360 total) |
+| Nav links | DM Sans 16 (`body-base`), gap 8, opacity 75% |
+| Legal row | `justify-between`, `items-end` |
+| Social icons | 24×24 each, 16 apart (40 pitch) |
 
 The Figma grids carry large `gap-y` values (90px, 337px) — auto-layout wrap artifacts on
 single-row grids. Ignore them.
@@ -213,7 +215,7 @@ this scope.
 
 | File | Responsibility |
 | --- | --- |
-| `components/Footer.tsx` | Server component: fetches the footer query, composes the three bands and the wave |
+| `components/Footer.tsx` | Server component: fetches the footer query, composes the four bands and the wave |
 | `components/FooterMenu.tsx` | Renders a `menu`'s groups and links; groups become column headings |
 | `components/NewsletterSignup.tsx` | The referenced `form` rendered inline (`FormRenderer variant="inline"`); disabled fallback if none |
 | `components/SocialLinks.tsx` | Maps `platform` → icon component |
