@@ -40,6 +40,7 @@ export default function SiteBanner({banner}: {banner: SiteBannerData}) {
           differs from the server markup, hence suppressHydrationWarning. */}
       <div
         suppressHydrationWarning
+        data-site-banner
         className="relative flex min-h-[34px] items-center justify-center bg-lowlands-500 px-14 py-1 text-on-accent-secondary"
       >
         {banner.link ? (

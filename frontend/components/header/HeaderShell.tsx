@@ -2,7 +2,7 @@
 
 import {useEffect, useRef, useState} from 'react'
 
-import {nextHeaderScroll, type HeaderScrollState} from './headerScroll'
+import {DEFAULT_TOP_OFFSET, nextHeaderScroll, type HeaderScrollState} from './headerScroll'
 
 /**
  * Sticky wrapper that hides on scroll down and reveals on scroll up (rule in headerScroll.ts).
@@ -43,7 +43,20 @@ export default function HeaderShell({children}: {children: React.ReactNode}) {
       if (frame) return
       frame = requestAnimationFrame(() => {
         frame = 0
-        apply(nextHeaderScroll(state.current, {y: window.scrollY, locked: locked()}))
+        // The banner above scrolls away with the page, so the bar only sticks once the page has
+        // scrolled past it. Hiding earlier slides the bar out of its flow position and leaves a
+        // blank gap under the banner (a wrapped mobile banner is taller than the default offset).
+        // Read at scroll time: the banner can be dismissed, or re-wrap on resize. Measure the
+        // banner, NOT el.offsetTop: once stuck, a sticky element's offsetTop is its current
+        // stuck position (= scrollY), so the offset would track the scroll and never hide the bar.
+        const bannerHeight = document.querySelector<HTMLElement>('[data-site-banner]')?.offsetHeight ?? 0
+        apply(
+          nextHeaderScroll(
+            state.current,
+            {y: window.scrollY, locked: locked()},
+            {topOffset: bannerHeight + DEFAULT_TOP_OFFSET},
+          ),
+        )
       })
     }
     const onReveal = () => apply({hidden: false, lastY: window.scrollY})

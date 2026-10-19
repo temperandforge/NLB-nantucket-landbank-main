@@ -464,6 +464,13 @@ space to the content; revealing on scroll up keeps navigation close.
 **Implication:**
 - The scroll rule lives in `frontend/components/header/headerScroll.ts` and is checked by
   `frontend/scripts/verifyHeader.mts`. Change it there, not in the component.
+- **The hide threshold must clear the banner.** The banner scrolls away with the page; only the bar
+  is sticky, so the bar sticks only once the page has scrolled past the banner. `HeaderShell`
+  passes `topOffset = banner height + 80` (the banner is found by `[data-site-banner]`, so keep
+  that attribute on `SiteBanner`). Two regressions to avoid: a fixed 80px offset hides the bar
+  before it sticks, sliding it out of flow and leaving a blank strip under a tall (wrapped mobile)
+  banner; and using `el.offsetTop` instead of the banner's height never hides the bar, because a
+  stuck sticky element's `offsetTop` equals the scroll position.
 - `--header-height` is the single source for anything sized against the bar. The map uses it;
   size new full-height regions from it rather than a literal.
 - The real content seed, `studio/scripts/seedHeaderContent.ts`, is idempotent and non-destructive

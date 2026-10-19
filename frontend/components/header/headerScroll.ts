@@ -10,12 +10,14 @@
 
 export type HeaderScrollState = {hidden: boolean; lastY: number}
 
+export const DEFAULT_TOP_OFFSET = 80
+
 type Options = {topOffset?: number; delta?: number}
 
 export function nextHeaderScroll(
   prev: HeaderScrollState,
   input: {y: number; locked: boolean},
-  {topOffset = 80, delta = 8}: Options = {},
+  {topOffset = DEFAULT_TOP_OFFSET, delta = 8}: Options = {},
 ): HeaderScrollState {
   const {y, locked} = input
   if (locked || y <= topOffset) return {hidden: false, lastY: y}
