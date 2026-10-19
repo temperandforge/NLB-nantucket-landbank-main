@@ -216,12 +216,12 @@ export default function FormRenderer({
             value={typeof values[name] === 'string' ? (values[name] as string) : ''}
             onChange={(event) => change(field, event.target.value)}
             onBlur={() => setError(field, values[name])}
-            className="h-[42px] min-w-0 flex-1 rounded-[4px] bg-warm-neutral-50 px-gap-sm py-[10px] font-secondary text-body-small text-lowlands-500 placeholder:text-lowlands-500/70"
+            className="h-12 min-w-0 flex-1 rounded-[4px] bg-warm-neutral-50 px-gap-sm font-secondary text-body-base text-lowlands-500 placeholder:text-lowlands-500/70"
           />
           <button
             type="submit"
             disabled={status === 'submitting'}
-            className="flex size-[42px] shrink-0 items-center justify-center rounded-[4px] bg-goldenrod-500 text-lowlands-500 disabled:opacity-60"
+            className="flex size-12 shrink-0 items-center justify-center rounded-[4px] bg-goldenrod-500 text-lowlands-500 disabled:opacity-60"
           >
             <span className="sr-only">{status === 'submitting' ? 'Sending' : form.submitLabel || 'Subscribe'}</span>
             <ArrowForwardIcon className="size-[24px]" />

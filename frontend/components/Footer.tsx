@@ -8,7 +8,7 @@ import type {FooterInfoColumnData} from '@/sanity/lib/types'
 /**
  * Site footer.
  *
- * Owns only layout - the three bands and the decorative wave. What a menu item, an info line
+ * Owns only layout - the four bands and the decorative wave. What a menu item, an info line
  * or a social icon looks like belongs to the child components.
  *
  * Every band is guarded independently: a missing footer document, or a footerMenu reference
@@ -23,9 +23,9 @@ function InfoColumn({column}: {column: FooterInfoColumnData}) {
   if (!column.lines?.length) return null
 
   return (
-    <div className="flex flex-col gap-5 md:gap-gap-md">
+    <div className="flex flex-col gap-5">
       <h2 className={LABEL_CLASS}>{column.heading}</h2>
-      <ul className="flex flex-col gap-2 font-secondary text-body-base leading-[1.6] opacity-75 md:gap-gap-sm">
+      <ul className="flex flex-col gap-2 font-secondary text-body-base leading-[1.6] opacity-75">
         {column.lines.map((line) => (
           <li key={line._key}>
             {/* href is optional per line, so an email or phone number can be actionable
@@ -83,40 +83,34 @@ export default async function Footer() {
         />
       </div>
 
-      <div className="relative px-5 pt-10 pb-12 md:px-global-margin md:py-section-p-sm">
-        <div className="flex flex-col gap-20 md:gap-gap-2xl">
-          {/* Band 1: newsletter signup alongside the contact / address / hours columns. */}
-          <div className="flex flex-col gap-20 md:gap-gap-2xl xl:flex-row xl:items-start xl:justify-between">
-            {/* Below md the design puts the social icons under the signup form; from md they
-                sit in the legal row. One set of links per breakpoint, the other is display:none. */}
-            <div className="flex flex-col gap-8 md:block">
-              {newsletterHeading ? (
-                <NewsletterSignup heading={newsletterHeading} form={newsletterForm} />
-              ) : null}
-              <SocialLinks links={socialLinks} className="md:hidden" />
-            </div>
-            {infoColumns?.length ? (
-              <div className="grid grid-cols-1 gap-x-gap-lg gap-y-gap-lg sm:grid-cols-2 lg:grid-cols-3 xl:w-[841px]">
-                {infoColumns.map((column) => (
-                  <InfoColumn key={column._key} column={column} />
-                ))}
-              </div>
+      <div className="relative px-5 pt-10 pb-12 md:px-global-margin md:py-global-margin">
+        {/* Four bands stacked with 80px between them: newsletter and social, contact info,
+            navigation, then the legal row. */}
+        <div className="flex flex-col gap-20">
+          {/* One set of social links: under the signup form on mobile, top-right from md. */}
+          <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
+            {newsletterHeading ? (
+              <NewsletterSignup heading={newsletterHeading} form={newsletterForm} />
             ) : null}
+            <SocialLinks links={socialLinks} />
           </div>
 
-          {/* Band 2 and 3: navigation, then the legal row. */}
-          <div className="flex flex-col gap-20 md:gap-gap-lg">
-            <FooterMenu menu={footerMenu} />
-
-            <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-              <p className="font-secondary text-body-base leading-[1.6] opacity-75 md:text-body-small md:opacity-100">
-                Copyright © {new Date().getFullYear()} {organizationName}
-              </p>
-              <div className="flex flex-col gap-5 md:gap-gap-md sm:flex-row sm:items-end">
-                <FooterInlineMenu menu={legalMenu} />
-                <SocialLinks links={socialLinks} className="hidden md:flex" />
-              </div>
+          {/* Same five-column grid as the menu below, so the columns line up. */}
+          {infoColumns?.length ? (
+            <div className="grid grid-cols-1 gap-x-gap-lg gap-y-gap-lg sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+              {infoColumns.map((column) => (
+                <InfoColumn key={column._key} column={column} />
+              ))}
             </div>
+          ) : null}
+
+          <FooterMenu menu={footerMenu} />
+
+          <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+            <p className="font-secondary text-body-base leading-[1.6] opacity-75 md:opacity-100">
+              Copyright © {new Date().getFullYear()} {organizationName}
+            </p>
+            <FooterInlineMenu menu={legalMenu} />
           </div>
         </div>
       </div>

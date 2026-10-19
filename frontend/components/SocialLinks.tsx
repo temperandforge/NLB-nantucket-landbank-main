@@ -11,7 +11,7 @@ import type {FooterSocialLinkData} from '@/sanity/lib/types'
  * an icon has to be exported from Figma before they will appear.
  *
  * Each glyph carries its own size because the design insets them differently inside the
- * shared box (24px mobile, 29px desktop): Facebook fills 83.33% (8.33% inset), Instagram and
+ * shared 24px box: Facebook fills 83.33% (8.33% inset), Instagram and
  * LinkedIn 75% (12.5% inset). Sizing them all alike would stretch two of the three.
  */
 
@@ -41,7 +41,7 @@ export default function SocialLinks({
   if (!withIcons.length) return null
 
   return (
-    <ul className={`flex items-center gap-4 md:justify-end md:gap-gap-sm ${className}`}>
+    <ul className={`flex items-center gap-4 md:justify-end ${className}`}>
       {withIcons.map((link) => {
         // Non-null: withIcons is filtered on this lookup succeeding.
         const {Icon, label, sizeClass} = PLATFORM_ICONS[link.platform]!
@@ -51,7 +51,7 @@ export default function SocialLinks({
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex size-6 items-center md:size-[29px] justify-center transition-opacity hover:opacity-75 focus-visible:opacity-75"
+              className="flex size-6 items-center justify-center transition-opacity hover:opacity-75 focus-visible:opacity-75"
             >
               <span className="sr-only">{label}</span>
               <Icon className={sizeClass} />

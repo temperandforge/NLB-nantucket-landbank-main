@@ -20,8 +20,8 @@ export default function NewsletterSignup({
 }) {
   if (form?._id && allFields(form).length > 0) {
     return (
-      <div className="flex w-full max-w-[346px] flex-col gap-gap-md">
-        <p className="font-primary text-headline-base leading-[1.3] text-balance">{heading}</p>
+      <div className="flex w-full max-w-[440px] flex-col gap-8 md:gap-gap-lg">
+        <p className="font-primary text-headline-lg leading-[1.1] text-balance">{heading}</p>
         <FormView form={form} variant="inline" />
       </div>
     )
@@ -31,8 +31,8 @@ export default function NewsletterSignup({
 
 function DisabledSignup({heading}: {heading: string}) {
   return (
-    <div className="flex w-full max-w-[346px] flex-col gap-8 md:gap-gap-md">
-      <p className="font-primary text-headline-lg leading-[1.1] text-balance md:text-headline-base md:leading-[1.3]">
+    <div className="flex w-full max-w-[440px] flex-col gap-8 md:gap-gap-lg">
+      <p className="font-primary text-headline-lg leading-[1.1] text-balance">
         {heading}
       </p>
       {/* No action and no onSubmit: both controls are disabled, so the form cannot be
@@ -47,12 +47,12 @@ function DisabledSignup({heading}: {heading: string}) {
           name="email"
           disabled
           placeholder="Email"
-          className="h-12 min-w-0 flex-1 rounded-[4px] bg-input px-gap-sm font-secondary text-body-base text-lowlands-500 placeholder:text-on-input-placeholder md:h-[42px] md:py-[10px] md:text-body-small disabled:cursor-not-allowed"
+          className="h-12 min-w-0 flex-1 rounded-[4px] bg-input px-gap-sm font-secondary text-body-base text-lowlands-500 placeholder:text-on-input-placeholder disabled:cursor-not-allowed"
         />
         <button
           type="submit"
           disabled
-          className="flex size-12 shrink-0 md:size-[42px] items-center justify-center rounded-[4px] bg-goldenrod-500 text-lowlands-500 disabled:cursor-not-allowed"
+          className="flex size-12 shrink-0 items-center justify-center rounded-[4px] bg-goldenrod-500 text-lowlands-500 disabled:cursor-not-allowed"
         >
           <span className="sr-only">Subscribe</span>
           <ArrowForwardIcon className="size-[24px]" />
