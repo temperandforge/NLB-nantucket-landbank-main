@@ -107,7 +107,7 @@ export default async function Footer() {
           <FooterMenu menu={footerMenu} />
 
           <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-            <p className="font-secondary text-body-base leading-[1.6] opacity-75 md:opacity-100">
+            <p className="font-secondary text-body-base leading-[1.6] opacity-75 text-pretty md:opacity-100">
               Copyright © {new Date().getFullYear()} {organizationName}
             </p>
             <FooterInlineMenu menu={legalMenu} />
