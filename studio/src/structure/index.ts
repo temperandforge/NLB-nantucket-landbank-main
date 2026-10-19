@@ -17,7 +17,7 @@ import {
   TagIcon,
   UsersIcon,
 } from '@sanity/icons'
-import type {StructureBuilder, StructureResolver} from 'sanity/structure'
+import type { StructureBuilder, StructureResolver } from 'sanity/structure'
 import pluralize from 'pluralize-esm'
 
 /**
@@ -82,6 +82,75 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
         .icon(DocumentsIcon)
         .child(S.documentTypeList('page').title('Pages')),
       S.divider(),
+      S.documentTypeListItem('event').title('Events').icon(CalendarIcon),
+      S.listItem()
+        .title('FAQs')
+        .icon(HelpCircleIcon)
+        .child(
+          S.list()
+            .title('FAQs')
+            .items([
+              S.documentTypeListItem('faq').title('FAQs').icon(HelpCircleIcon),
+              S.divider(),
+              S.documentTypeListItem('faqCategory').title('FAQ Categories').icon(TagIcon),
+            ]),
+        ),
+      // Forms: the forms editors build, and what visitors sent. Submissions hold personal data, so
+      // they sit in their own clearly named list rather than among content.
+      S.listItem()
+        .title('Forms')
+        .icon(ClipboardIcon)
+        .child(
+          S.list()
+            .title('Forms')
+            .items([
+              S.documentTypeListItem('form').title('Forms').icon(ClipboardIcon),
+              S.divider(),
+              S.documentTypeListItem('formSubmission')
+                .title('Submissions (personal data)')
+                .icon(InboxIcon),
+            ]),
+        ),
+      S.documentTypeListItem('job').title('Jobs').icon(CaseIcon),
+      S.listItem()
+        .title('News')
+        .icon(DocumentTextIcon)
+        .child(
+          S.list()
+            .title('News')
+            .items([
+              S.documentTypeListItem('article').title('Articles').icon(DocumentTextIcon),
+              S.divider(),
+              S.documentTypeListItem('newsCategory').title('News Categories').icon(TagIcon),
+            ]),
+        ),
+      S.listItem()
+        .title('People')
+        .icon(UsersIcon)
+        .child(
+          S.list()
+            .title('People')
+            .items([
+              S.documentTypeListItem('staffMember').title('Staff').icon(UsersIcon),
+              S.documentTypeListItem('commissioner').title('Commissioners').icon(UsersIcon),
+              S.divider(),
+              S.documentTypeListItem('department').title('Departments').icon(TagIcon),
+            ]),
+        ),
+      // Projects: initiatives the Land Bank runs, with their own categories. Separate from
+      // properties (the map's parcels).
+      S.listItem()
+        .title('Projects')
+        .icon(ProjectsIcon)
+        .child(
+          S.list()
+            .title('Projects')
+            .items([
+              S.documentTypeListItem('project').title('Projects').icon(ProjectsIcon),
+              S.divider(),
+              S.documentTypeListItem('projectType').title('Project Types').icon(TagIcon),
+            ]),
+        ),
       // Properties: the Land Bank's properties, their categorisation, and the settings that
       // configure both the properties pages and the interactive map. Grouped together because the
       // taxonomies are meaningless outside this section.
@@ -105,58 +174,6 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
                 ),
             ]),
         ),
-      // Projects: initiatives the Land Bank runs, with their own categories. Separate from
-      // properties (the map's parcels).
-      S.listItem()
-        .title('Projects')
-        .icon(ProjectsIcon)
-        .child(
-          S.list()
-            .title('Projects')
-            .items([
-              S.documentTypeListItem('project').title('Projects').icon(ProjectsIcon),
-              S.divider(),
-              S.documentTypeListItem('projectType').title('Project Types').icon(TagIcon),
-            ]),
-        ),
-      S.listItem()
-        .title('News')
-        .icon(DocumentTextIcon)
-        .child(
-          S.list()
-            .title('News')
-            .items([
-              S.documentTypeListItem('article').title('Articles').icon(DocumentTextIcon),
-              S.divider(),
-              S.documentTypeListItem('newsCategory').title('News Categories').icon(TagIcon),
-            ]),
-        ),
-      S.documentTypeListItem('event').title('Events').icon(CalendarIcon),
-      S.listItem()
-        .title('People')
-        .icon(UsersIcon)
-        .child(
-          S.list()
-            .title('People')
-            .items([
-              S.documentTypeListItem('staffMember').title('Staff').icon(UsersIcon),
-              S.documentTypeListItem('commissioner').title('Commissioners').icon(UsersIcon),
-              S.divider(),
-              S.documentTypeListItem('department').title('Departments').icon(TagIcon),
-            ]),
-        ),
-      S.listItem()
-        .title('FAQs')
-        .icon(HelpCircleIcon)
-        .child(
-          S.list()
-            .title('FAQs')
-            .items([
-              S.documentTypeListItem('faq').title('FAQs').icon(HelpCircleIcon),
-              S.divider(),
-              S.documentTypeListItem('faqCategory').title('FAQ Categories').icon(TagIcon),
-            ]),
-        ),
       S.listItem()
         .title('Records')
         .icon(DocumentsIcon)
@@ -167,23 +184,6 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
               S.documentTypeListItem('record').title('Records').icon(DocumentsIcon),
               S.divider(),
               S.documentTypeListItem('recordCategory').title('Record Categories').icon(TagIcon),
-            ]),
-        ),
-      S.documentTypeListItem('job').title('Jobs').icon(CaseIcon),
-      // Forms: the forms editors build, and what visitors sent. Submissions hold personal data, so
-      // they sit in their own clearly named list rather than among content.
-      S.listItem()
-        .title('Forms')
-        .icon(ClipboardIcon)
-        .child(
-          S.list()
-            .title('Forms')
-            .items([
-              S.documentTypeListItem('form').title('Forms').icon(ClipboardIcon),
-              S.divider(),
-              S.documentTypeListItem('formSubmission')
-                .title('Submissions (personal data)')
-                .icon(InboxIcon),
             ]),
         ),
       S.divider(),

@@ -1,5 +1,6 @@
 import {useEffect, useMemo, useState} from 'react'
-import {Autocomplete, Box, Card, Flex, Spinner, Stack, Text} from '@sanity/ui'
+import {Box, Card, Flex, Spinner, Stack, Text} from '@sanity/ui'
+import {Autocomplete} from '@sanity/ui/autocomplete'
 import {set, unset, useClient, type StringInputProps} from 'sanity'
 
 /**
@@ -127,7 +128,7 @@ export function BoundaryIdInput(props: StringInputProps) {
   // why it cannot be edited here - never silently render an empty control.
   if (state.status === 'notice') {
     return (
-      <Stack space={3}>
+      <Stack gap={3}>
         <Card padding={3} radius={2} shadow={1} tone="caution">
           <Text size={1}>{state.message}</Text>
         </Card>
@@ -141,7 +142,7 @@ export function BoundaryIdInput(props: StringInputProps) {
   }
 
   return (
-    <Stack space={3}>
+    <Stack gap={3}>
       <Autocomplete
         id={elementProps.id}
         ref={elementProps.ref}

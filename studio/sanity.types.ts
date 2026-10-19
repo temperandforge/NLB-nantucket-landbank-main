@@ -736,28 +736,6 @@ export type FormSubmission = {
   }>
 }
 
-export type Form = {
-  _id: string
-  _type: 'form'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  title: string
-  submitLabel?: string
-  successMessage: string
-  sections: Array<{
-    heading?: string
-    columns?: 1 | 2
-    fields: Array<
-      {
-        _key: string
-      } & FormField
-    >
-    _type: 'formSection'
-    _key: string
-  }>
-}
-
 export type DepartmentReference = {
   _ref: string
   _type: 'reference'
@@ -1223,6 +1201,7 @@ export type Footer = {
   _updatedAt: string
   _rev: string
   newsletterHeading: string
+  newsletterForm?: FormReference
   infoColumns?: Array<
     {
       _key: string
@@ -1253,6 +1232,28 @@ export type Menu = {
         _key: string
       } & MenuLink)
   >
+}
+
+export type Form = {
+  _id: string
+  _type: 'form'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  submitLabel?: string
+  successMessage: string
+  sections: Array<{
+    heading?: string
+    columns?: 1 | 2
+    fields: Array<
+      {
+        _key: string
+      } & FormField
+    >
+    _type: 'formSection'
+    _key: string
+  }>
 }
 
 export type Settings = {
@@ -1541,6 +1542,23 @@ export type SanityAssistSchemaTypeField = {
   >
 }
 
+export type MediaFolderReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'media.folder'
+}
+
+export type MediaFolder = {
+  _id: string
+  _type: 'media.folder'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name?: string
+  parent?: MediaFolderReference
+}
+
 export type MediaTag = {
   _id: string
   _type: 'media.tag'
@@ -1704,7 +1722,6 @@ export type AllSanitySchemaTypes =
   | Record
   | RecordCategory
   | FormSubmission
-  | Form
   | DepartmentReference
   | Job
   | FaqCategoryReference
@@ -1731,6 +1748,7 @@ export type AllSanitySchemaTypes =
   | Header
   | Footer
   | Menu
+  | Form
   | Settings
   | Page
   | SanityAssistInstructionTask
@@ -1746,6 +1764,8 @@ export type AllSanitySchemaTypes =
   | SanityAssistInstructionFieldRef
   | SanityAssistInstruction
   | SanityAssistSchemaTypeField
+  | MediaFolderReference
+  | MediaFolder
   | MediaTag
   | SanityImagePaletteSwatch
   | SanityImagePalette

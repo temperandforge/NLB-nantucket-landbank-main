@@ -1,4 +1,5 @@
-import {Autocomplete, Card, Flex, Spinner, Stack, Text} from '@sanity/ui'
+import {Card, Flex, Spinner, Stack, Text} from '@sanity/ui'
+import {Autocomplete} from '@sanity/ui/autocomplete'
 import type {ArrayOfPrimitivesInputProps} from 'sanity'
 import {set, unset} from 'sanity'
 
@@ -41,12 +42,12 @@ export function BoundaryIdsInput(props: ArrayOfPrimitivesInputProps) {
 
   if (state.status === 'notice') {
     return (
-      <Stack space={3}>
+      <Stack gap={3}>
         <Card padding={3} radius={2} shadow={1} tone="caution">
           <Text size={1}>{state.message}</Text>
         </Card>
         {selected.length ? (
-          <Stack space={2}>
+          <Stack gap={2}>
             {selected.map((id) => (
               <Text key={id} size={1} muted>
                 Current value: <code>{id}</code>
@@ -62,7 +63,7 @@ export function BoundaryIdsInput(props: ArrayOfPrimitivesInputProps) {
   const availableOptions = state.options.filter((option) => !selected.includes(option.value))
 
   return (
-    <Stack space={3}>
+    <Stack gap={3}>
       <Autocomplete
         id={elementProps.id}
         ref={elementProps.ref}
@@ -86,7 +87,7 @@ export function BoundaryIdsInput(props: ArrayOfPrimitivesInputProps) {
           if (nextValue) addId(nextValue)
         }}
       />
-      <Stack space={2}>
+      <Stack gap={2}>
         {selected.map((id) => {
           const isOrphaned = !labelById.has(id)
           return (
