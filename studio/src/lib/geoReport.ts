@@ -42,3 +42,35 @@ export type ConversionReport = {
   bytesIn: number
   bytesOut: number
 }
+
+/**
+ * Checks the configured boundary identifier across `features`. Uses explicit undefined/null/''
+ * tests and `String(value)` rather than truthiness: the client's first feature has `FID` 0.
+ */
+export function checkIdProperty(features: GeoJSON.Feature[], idProperty: string): IdPropertyReport {
+  const available = new Set<string>()
+  const seen = new Map<string, number>()
+  let missingCount = 0
+
+  for (const feature of features) {
+    const properties = feature.properties ?? {}
+    for (const key of Object.keys(properties)) available.add(key)
+    const value = properties[idProperty]
+    if (value === undefined || value === null || value === '') {
+      missingCount++
+      continue
+    }
+    const key = String(value)
+    seen.set(key, (seen.get(key) ?? 0) + 1)
+  }
+
+  const duplicateValues = [...seen].filter(([, n]) => n > 1).map(([value]) => value)
+  const status = missingCount > 0 ? 'missing' : duplicateValues.length ? 'duplicated' : 'found'
+  return {
+    name: idProperty,
+    status,
+    missingCount,
+    duplicateValues,
+    available: [...available].sort(),
+  }
+}

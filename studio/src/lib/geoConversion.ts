@@ -7,7 +7,13 @@
  */
 
 import {normalizeCollection} from './geoNormalize'
-import {GeoConversionError, type ConversionReport, type GeoLayer, type ParseXml} from './geoReport'
+import {
+  checkIdProperty,
+  GeoConversionError,
+  type ConversionReport,
+  type GeoLayer,
+  type ParseXml,
+} from './geoReport'
 import {detectFormat, readSource} from './geoSources'
 
 export {GeoConversionError, type ParseXml}
@@ -25,7 +31,18 @@ export type ConversionResult = {geojson: GeoJSON.FeatureCollection; report: Conv
 
 const KIND: Record<GeoLayer, string> = {boundaries: 'polygon', trails: 'line'}
 
+/** Any failure surfaces as GeoConversionError, so callers have exactly one error type to handle. */
 export function convertGeoFile(input: ConvertInput): ConversionResult {
+  try {
+    return convert(input)
+  } catch (error) {
+    if (error instanceof GeoConversionError) throw error
+    const detail = error instanceof Error ? error.message : String(error)
+    throw new GeoConversionError(`The file could not be converted: ${detail}`)
+  }
+}
+
+function convert(input: ConvertInput): ConversionResult {
   const {bytes, filename, layer, parseXml} = input
   const format = detectFormat(filename, bytes)
   const raw = readSource(format, bytes, parseXml)
@@ -45,7 +62,8 @@ export function convertGeoFile(input: ConvertInput): ConversionResult {
       featuresKept: features.length,
       geometriesMerged: merged,
       dropped,
-      idProperty: null, // checked for boundaries once the KML attribute table is parsed
+      idProperty:
+        layer === 'boundaries' ? checkIdProperty(features, input.idProperty ?? 'FID') : null,
       bytesIn: bytes.length,
       bytesOut: JSON.stringify(geojson).length,
     },

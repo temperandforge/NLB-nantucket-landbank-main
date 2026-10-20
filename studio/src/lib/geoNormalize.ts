@@ -56,8 +56,14 @@ function count(dropped: Record<string, number>, type: string) {
 /** Every non-collection geometry inside `geometry`, recursing through nested collections. */
 type Part = Exclude<GeoJSON.Geometry, GeoJSON.GeometryCollection>
 
-function members(geometry: GeoJSON.Geometry): Part[] {
-  return geometry.type === 'GeometryCollection' ? geometry.geometries.flatMap(members) : [geometry]
+function members(geometry: GeoJSON.Geometry | null, dropped: Record<string, number>): Part[] {
+  if (!geometry) {
+    count(dropped, 'null')
+    return []
+  }
+  if (geometry.type !== 'GeometryCollection') return [geometry]
+  const inner = Array.isArray(geometry.geometries) ? geometry.geometries : []
+  return inner.flatMap((g) => members(g, dropped))
 }
 
 export function normalizeCollection(
@@ -80,12 +86,13 @@ export function normalizeCollection(
 
     // The layer's geometries as single parts (one Polygon / LineString coordinate array each).
     const kept: unknown[] = []
-    for (const part of members(geometry)) {
+    for (const part of members(geometry, dropped)) {
       if (part.type === single) kept.push(part.coordinates)
       else if (part.type === multi && Array.isArray(part.coordinates)) {
         kept.push(...(part.coordinates as unknown[]))
+      } else {
+        count(dropped, part.type)
       }
-      else count(dropped, part.type)
     }
 
     const cleaned =

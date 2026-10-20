@@ -20,6 +20,7 @@ import {DOMParser} from '@xmldom/xmldom'
 import {strToU8, zipSync} from 'fflate'
 
 import {convertGeoFile, GeoConversionError, type ParseXml} from '../src/lib/geoConversion'
+import {checkIdProperty} from '../src/lib/geoReport'
 import {detectFormat, parseAttributeTable, readSource} from '../src/lib/geoSources'
 
 const parseXml: ParseXml = (xml, mime) =>
@@ -292,6 +293,75 @@ check('malformed geojson degrades instead of throwing a TypeError', () => {
   })
   assert(result.geojson.features.length === 1, `kept ${result.geojson.features.length}`)
   assert(result.report.dropped.Polygon === 3, JSON.stringify(result.report.dropped))
+})
+
+console.log('\nID property and error wrapping:')
+
+const feat = (properties: Record<string, unknown> | null): GeoJSON.Feature => ({
+  type: 'Feature',
+  properties,
+  geometry: {type: 'Point', coordinates: [0, 0]},
+})
+
+check('id: FID 0 counts as present', () => {
+  for (const zero of ['0', 0]) {
+    const r = checkIdProperty([feat({FID: zero}), feat({FID: 1})], 'FID')
+    assert(r.missingCount === 0 && r.status === 'found', `${typeof zero}: ${JSON.stringify(r)}`)
+  }
+})
+
+check('id: reports missing', () => {
+  const r = checkIdProperty([feat({b: 1, a: 2}), feat({a: 1, c: 3}), feat(null)], 'FID')
+  assert(r.status === 'missing' && r.missingCount === 3, JSON.stringify(r))
+  assert(JSON.stringify(r.available) === '["a","b","c"]', JSON.stringify(r.available))
+})
+
+check('id: reports duplicates', () => {
+  const r = checkIdProperty([feat({FID: 7}), feat({FID: '7'}), feat({FID: 8})], 'FID')
+  assert(r.status === 'duplicated', r.status)
+  assert(JSON.stringify(r.duplicateValues) === '["7"]', JSON.stringify(r.duplicateValues))
+})
+
+check('id: blank string counts as missing', () => {
+  const r = checkIdProperty([feat({FID: ''}), feat({FID: 1})], 'FID')
+  assert(r.missingCount === 1, `missingCount ${r.missingCount}`)
+})
+
+check('id: not computed for trails', () => {
+  const r = convertGeoFile({bytes: gpxBytes, filename: 'trails.gpx', layer: 'trails', parseXml})
+  assert(r.report.idProperty === null, JSON.stringify(r.report.idProperty))
+})
+
+check('id: defaults to FID', () => {
+  const p = boundaries().report.idProperty
+  assert(p && p.name === 'FID' && p.status === 'found', JSON.stringify(p))
+})
+
+check('id: honours a supplied property', () => {
+  const p = convertGeoFile({
+    bytes: kmlBytes, filename: 'boundaries.kml', layer: 'boundaries', idProperty: 'nope', parseXml,
+  }).report.idProperty
+  assert(p && p.name === 'nope' && p.status === 'missing' && p.available.includes('FID'), JSON.stringify(p))
+})
+
+check('unexpected exceptions are wrapped as GeoConversionError', () => {
+  // A TypeError from outside any wrapped step (here: no bytes at all) must still be a GeoConversionError.
+  const bad = null as unknown as Uint8Array
+  throwsGeo(() => convertGeoFile({bytes: bad, filename: 'a.kml', layer: 'boundaries', parseXml}))
+})
+
+check('geojson: GeometryCollection without geometries or with null member degrades', () => {
+  const polygon = {type: 'Polygon', coordinates: [ring]}
+  const feature = (geometry: unknown) => ({type: 'Feature', properties: {}, geometry})
+  const r = geojsonConvert({
+    type: 'FeatureCollection',
+    features: [
+      feature({type: 'GeometryCollection'}),
+      feature({type: 'GeometryCollection', geometries: [null, polygon]}),
+    ],
+  })
+  assert(r.geojson.features.length === 1, `kept ${r.geojson.features.length}`)
+  assert(r.report.dropped.null === 1, JSON.stringify(r.report.dropped))
 })
 
 console.log('\nAll geo conversion checks passed.')
