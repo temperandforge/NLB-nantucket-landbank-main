@@ -7,10 +7,10 @@
  */
 
 import {normalizeCollection} from './geoNormalize'
-import type {ConversionReport, GeoLayer} from './geoReport'
+import {GeoConversionError, type ConversionReport, type GeoLayer, type ParseXml} from './geoReport'
 import {detectFormat, readSource} from './geoSources'
 
-export type ParseXml = (xml: string, mime: 'text/xml' | 'text/html') => Document
+export {GeoConversionError, type ParseXml}
 
 export type ConvertInput = {
   bytes: Uint8Array
@@ -22,13 +22,6 @@ export type ConvertInput = {
 }
 
 export type ConversionResult = {geojson: GeoJSON.FeatureCollection; report: ConversionReport}
-
-export class GeoConversionError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'GeoConversionError'
-  }
-}
 
 const KIND: Record<GeoLayer, string> = {boundaries: 'polygon', trails: 'line'}
 

@@ -5,8 +5,7 @@
 
 import {gpx} from '@tmcw/togeojson'
 
-import {GeoConversionError, type ParseXml} from './geoConversion'
-import type {GeoFormat} from './geoReport'
+import {GeoConversionError, type GeoFormat, type ParseXml} from './geoReport'
 
 const ZIP_MAGIC = [0x50, 0x4b, 0x03, 0x04] // "PK\x03\x04"
 
@@ -20,11 +19,13 @@ const EXTENSIONS: Record<string, GeoFormat> = {
 
 /** By extension (case-insensitive); a zip signature makes a `.kml`-named upload a KMZ. */
 export function detectFormat(filename: string, bytes: Uint8Array): GeoFormat {
-  const extension = filename.toLowerCase().split('.').pop() ?? ''
+  // A name with no dot has no extension; split().pop() would return the whole name.
+  const dot = filename.lastIndexOf('.')
+  const extension = dot === -1 ? '' : filename.slice(dot + 1).toLowerCase()
   const format = EXTENSIONS[extension]
   if (!format) {
     throw new GeoConversionError(
-      `Unsupported file type ".${extension}". Use .gpx, .kml, .kmz, .geojson or .json.`,
+      `Unsupported file type ${extension ? `".${extension}"` : '(no extension)'}. Use .gpx, .kml, .kmz, .geojson or .json.`,
     )
   }
   const isZip = ZIP_MAGIC.every((b, i) => bytes[i] === b)
@@ -34,7 +35,13 @@ export function detectFormat(filename: string, bytes: Uint8Array): GeoFormat {
 const decode = (bytes: Uint8Array) => new TextDecoder('utf-8').decode(bytes)
 
 function parseDocument(xml: string, parseXml: ParseXml): Document {
-  const doc = parseXml(xml, 'text/xml')
+  let doc: Document
+  try {
+    doc = parseXml(xml, 'text/xml')
+  } catch {
+    // xmldom throws on fatal errors.
+    throw new GeoConversionError('The file is not valid XML.')
+  }
   // Browsers report a parse failure as a <parsererror> document rather than throwing.
   if (doc.getElementsByTagName('parsererror').length) {
     throw new GeoConversionError('The file is not valid XML.')
@@ -72,7 +79,13 @@ export function readSource(
 ): GeoJSON.FeatureCollection {
   switch (format) {
     case 'gpx': {
-      const raw = gpx(parseDocument(decode(bytes), parseXml))
+      const doc = parseDocument(decode(bytes), parseXml)
+      let raw: GeoJSON.FeatureCollection
+      try {
+        raw = gpx(doc)
+      } catch {
+        throw new GeoConversionError('The file is not valid GPX.')
+      }
       return {
         type: 'FeatureCollection',
         features: raw.features.map((feature) => {

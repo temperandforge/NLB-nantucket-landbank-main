@@ -1,7 +1,18 @@
 /**
- * Types describing what a geo-file conversion did, shown to the editor before anything is written.
- * Pure types, shared by the conversion modules and the Studio input.
+ * Types (and the error class) shared by the geo conversion modules and the Studio input. Kept
+ * apart from geoConversion.ts so geoSources.ts does not import from the module that imports it.
  */
+
+/** Injected XML parser: `DOMParser` in the browser, `@xmldom/xmldom` in scripts. */
+export type ParseXml = (xml: string, mime: 'text/xml' | 'text/html') => Document
+
+/** Any failure to convert a file; the message is shown to the editor. */
+export class GeoConversionError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'GeoConversionError'
+  }
+}
 
 /** The two map files on Properties Settings; each keeps only the geometry its layer draws. */
 export type GeoLayer = 'boundaries' | 'trails'

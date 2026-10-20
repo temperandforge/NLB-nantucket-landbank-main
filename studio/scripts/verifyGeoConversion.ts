@@ -100,6 +100,26 @@ check('zero usable features throws', () => {
   throw new Error('did not throw')
 })
 
+check('malformed gpx throws GeoConversionError', () => {
+  try {
+    convertGeoFile({bytes: enc.encode('<gpx><trk>'), filename: 'bad.gpx', layer: 'trails', parseXml})
+  } catch (error) {
+    assert(error instanceof GeoConversionError, `wrong error type: ${error}`)
+    return
+  }
+  throw new Error('did not throw')
+})
+
+check('filename without extension is rejected', () => {
+  try {
+    detectFormat('gpx', gpxBytes)
+  } catch (error) {
+    assert(error instanceof GeoConversionError, `wrong error type: ${error}`)
+    return
+  }
+  throw new Error('did not throw')
+})
+
 check('report sizes', () => {
   const {geojson, report} = trails()
   assert(report.bytesIn === gpxBytes.length, `bytesIn ${report.bytesIn}`)
