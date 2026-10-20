@@ -124,14 +124,23 @@ Studio: `@tmcw/togeojson`, `fflate`. Dev only: `@xmldom/xmldom` (for the verify 
 
 ## Deferred
 
-File an issue for each before finishing (search existing issues first):
+Each is tracked in a GitHub issue:
 
 - Reporting which identifiers a replacement file loses, so properties left pointing at them are
-  surfaced at upload time rather than after.
-- Populating empty `boundaryIds` on existing properties — the 150 distinct names in the KMZ match the 150
-  properties, so name-matching is plausible. Separate migration script with `--dry`.
-- Waypoints (GPX) and point features (KML) are dropped; no map layer draws them.
-- Elevation is discarded.
+  surfaced at upload time rather than after: https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/64
+- Populating empty `boundaryIds` on existing properties (150 properties, none populated; the KMZ has 150
+  distinct names across 276 features, so name-matching is plausible but unconfirmed). Separate script with
+  `--dry`: https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/65
+- Waypoints (GPX) and point features (KML) are dropped, and elevation is discarded; no map layer draws
+  them: https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/66
+- Conversion hardening from review (`unzipKml` junk entries and size cap, uncounted drops): https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/67
+- GeoFileInput polish from review: https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/68
+
+### Not yet verified live
+
+The live Studio upload, one-Apply-one-edit, the draft id path, real-browser parsing of the client's
+KMZ/GPX, and map rendering have not been exercised (that writes to the production dataset). Checklist:
+https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/69
 
 ## Decision record
 
