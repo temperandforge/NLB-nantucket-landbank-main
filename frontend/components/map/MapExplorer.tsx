@@ -121,7 +121,7 @@ export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
   return (
     <div id="mapWrap" className="container flex flex-col gap-10 py-10">
       <div className="container--inner flex flex-col gap-2">
-        <div className="flex flex-col gap-3 bg-white sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <MultiSelectDropdown
             label="Property Type"
             options={propertyTypeOptions}
@@ -148,7 +148,7 @@ export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
           )}
         </div>
         {activeFilters.length > 0 && (
-          <div className="flex flex-wrap gap-2 bg-white py-3 dark:bg-neutral-950">
+          <div className="flex flex-wrap gap-2 py-3 dark:bg-neutral-950">
             {activeFilters.map((filter) => (
               <span
                 key={`${filter.group}-${filter.value}`}

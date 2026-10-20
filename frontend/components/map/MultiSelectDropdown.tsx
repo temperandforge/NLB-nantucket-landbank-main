@@ -53,7 +53,7 @@ export function MultiSelectDropdown({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between gap-2 border border-black bg-white p-3 text-black hover:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+        className="flex w-full items-center justify-between gap-2 border border-black p-3 text-black hover:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
       >
         <span className="dropdown-container flex gap-2 items-center truncate">
           {selected.length ? (
@@ -77,12 +77,12 @@ export function MultiSelectDropdown({
         </svg>
       </button>
       {open && (
-        <div className="absolute right-0 z-20 mt-1 max-h-64 md:w-[85%] w-full overflow-auto border border-black bg-white lg:py-3 py-1 dark:border-neutral-700 dark:bg-neutral-900 scrollbar-thin">
+        <div className="absolute right-0 z-20 mt-1 max-h-64 md:w-[85%] w-full overflow-auto border border-black bg-background lg:py-3 py-1 dark:border-neutral-700 dark:bg-neutral-900 scrollbar-thin">
           {selected.length > 0 && (
             <button
               type="button"
               onClick={() => onChange([])}
-              className="mb-1 w-full rounded lg:px-6 px-3 py-1 text-left text-xs text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              className="mb-1 w-full rounded lg:px-6 px-3 py-1 text-left text-xs text-neutral-500 hover:bg-red-500 dark:hover:bg-red-500"
             >
               Clear all
             </button>

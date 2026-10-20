@@ -100,7 +100,7 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${ibmPlexMono.variable} ${ebGaramond.variable} ${dmSans.variable} ${dmMono.variable} bg-white text-black`}
+      className={`${inter.variable} ${ibmPlexMono.variable} ${ebGaramond.variable} ${dmSans.variable} ${dmMono.variable} bg-background text-black`}
     >
       {/*
         No vertical padding on body or main: the nav, page header, map and footer are meant to sit

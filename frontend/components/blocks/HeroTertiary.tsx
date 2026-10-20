@@ -9,7 +9,7 @@ export default function HeroTertiary({block}: BlockProps<'heroTertiary'>) {
   const Heading = stegaClean(block.headingLevel) === 'h2' ? 'h2' : 'h1'
 
   return (
-    <section className="relative w-full overflow-clip bg-white md:bg-warm-neutral-50">
+    <section className="relative w-full overflow-clip">
       {/* The frame the art is positioned against. The SVG is the Figma line with its rotation baked
           in and extended past the 1440px frame, in the frame's own pixel coordinates, so it is
           placed at fixed offsets and never scaled. The full-bleed section does the clipping. The
