@@ -30,17 +30,22 @@ function roundPosition(p: Position): Position {
   return [Math.round(p[0] * FACTOR) / FACTOR, Math.round(p[1] * FACTOR) / FACTOR]
 }
 
+const isPosition = (p: unknown): p is Position =>
+  Array.isArray(p) && Number.isFinite(p[0]) && Number.isFinite(p[1])
+
 function dedupe(points: Position[]): Position[] {
   return points.filter((p, i) => i === 0 || p[0] !== points[i - 1][0] || p[1] !== points[i - 1][1])
 }
 
-const cleanLine = (line: Position[]) => dedupe(line.map(roundPosition))
+/** Malformed input (non-array, null or NaN positions) is cleaned away rather than thrown on. */
+const cleanLine = (line: Position[]) =>
+  dedupe((Array.isArray(line) ? line : []).filter(isPosition).map(roundPosition))
 
 /** A ring needs 4 positions to enclose area; fewer means it collapsed after deduping. */
 function cleanPolygon(rings: Position[][]): Position[][] | null {
-  const cleaned = rings.map(cleanLine)
+  const cleaned = (Array.isArray(rings) ? rings : []).map(cleanLine)
   // The outer ring decides whether there is a polygon at all; a collapsed hole is just omitted.
-  if (cleaned[0].length < 4) return null
+  if (!cleaned.length || cleaned[0].length < 4) return null
   return cleaned.filter((r) => r.length >= 4)
 }
 
@@ -65,7 +70,7 @@ export function normalizeCollection(
   let merged = 0
 
   for (const feature of raw.features) {
-    const geometry = feature.geometry
+    const geometry = feature?.geometry
     if (!geometry) {
       count(dropped, 'null')
       continue
@@ -77,7 +82,9 @@ export function normalizeCollection(
     const kept: unknown[] = []
     for (const part of members(geometry)) {
       if (part.type === single) kept.push(part.coordinates)
-      else if (part.type === multi) kept.push(...(part.coordinates as unknown[]))
+      else if (part.type === multi && Array.isArray(part.coordinates)) {
+        kept.push(...(part.coordinates as unknown[]))
+      }
       else count(dropped, part.type)
     }
 

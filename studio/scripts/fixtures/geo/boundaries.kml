@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <Style id="s"><PolyStyle><color>ff00ff00</color></PolyStyle><LineStyle><color>ff0000ff</color><width>2</width></LineStyle></Style>
+    <Placemark>
+      <name>Alpha</name>
+      <styleUrl>#s</styleUrl>
+      <description><![CDATA[<html><body><table><tr><td><table><tr><td>FID</td><td>0</td></tr><tr><td>Owner</td><td>NLB</td></tr><tr><td>Name</td><td>Alpha</td></tr><tr><td>Acres</td><td>1.5</td></tr><tr><td>Seller_Nam</td><td></td></tr></table></td></tr></table></body></html>]]></description>
+      <Polygon><outerBoundaryIs><LinearRing><coordinates>-70.1,41.2,0 -70.08999999999999,41.2,0 -70.08999999999999,41.21,0 -70.1,41.21,0 -70.1,41.2,0</coordinates></LinearRing></outerBoundaryIs></Polygon>
+    </Placemark>
+    <Placemark>
+      <name>Beta</name>
+      <styleUrl>#s</styleUrl>
+      <description><![CDATA[<html><body><table><tr><td><table><tr><td>FID</td><td>1</td></tr><tr><td>Owner</td><td>NLB</td></tr><tr><td>Name</td><td>Beta</td></tr><tr><td>Acres</td><td>1.5</td></tr><tr><td>Seller_Nam</td><td></td></tr></table></td></tr></table></body></html>]]></description>
+      <MultiGeometry><Polygon><outerBoundaryIs><LinearRing><coordinates>-70.2,41.2,0 -70.19,41.2,0 -70.19,41.21,0 -70.2,41.21,0 -70.2,41.2,0</coordinates></LinearRing></outerBoundaryIs></Polygon><Polygon><outerBoundaryIs><LinearRing><coordinates>-70.3,41.2,0 -70.28999999999999,41.2,0 -70.28999999999999,41.21,0 -70.3,41.21,0 -70.3,41.2,0</coordinates></LinearRing></outerBoundaryIs></Polygon></MultiGeometry>
+    </Placemark>
+    <Placemark>
+      <name></name>
+      <styleUrl>#s</styleUrl>
+      <description><![CDATA[<html><body><table><tr><td><table><tr><td>FID</td><td>2</td></tr><tr><td>Owner</td><td>NLB</td></tr><tr><td>Name</td><td></td></tr><tr><td>Acres</td><td>1.5</td></tr><tr><td>Seller_Nam</td><td></td></tr></table></td></tr></table></body></html>]]></description>
+      <MultiGeometry><Polygon><outerBoundaryIs><LinearRing><coordinates>-70.4,41.2,0 -70.39,41.2,0 -70.39,41.21,0 -70.4,41.21,0 -70.4,41.2,0</coordinates></LinearRing></outerBoundaryIs></Polygon><Point><coordinates>-70.4,41.3,0</coordinates></Point></MultiGeometry>
+    </Placemark>
+    <Placemark>
+      <name>Alpha</name>
+      <styleUrl>#s</styleUrl>
+      <description><![CDATA[<html><body><table><tr><td><table><tr><td>FID</td><td>3</td></tr><tr><td>Owner</td><td>NLB</td></tr><tr><td>Name</td><td>Alpha</td></tr><tr><td>Acres</td><td>1.5</td></tr><tr><td>Seller_Nam</td><td></td></tr></table></td></tr></table></body></html>]]></description>
+      <Polygon><outerBoundaryIs><LinearRing><coordinates>-70.5,41.2,0 -70.4,41.2,0 -70.4,41.300000000000004,0 -70.5,41.300000000000004,0 -70.5,41.2,0</coordinates></LinearRing></outerBoundaryIs><innerBoundaryIs><LinearRing><coordinates>-70.48,41.22,0 -70.46000000000001,41.22,0 -70.46000000000001,41.24,0 -70.48,41.24,0 -70.48,41.22,0</coordinates></LinearRing></innerBoundaryIs></Polygon>
+    </Placemark>
+    <Placemark>
+      <name>Echo</name>
+      <styleUrl>#s</styleUrl>
+      <description><![CDATA[<html><body><table><tr><td><table><tr><td>FID</td><td>4</td></tr><tr><td>Owner</td><td>NLB</td></tr><tr><td>Name</td><td>Echo</td></tr><tr><td>Acres</td><td>1.5</td></tr><tr><td>Seller_Nam</td><td></td></tr></table></td></tr></table></body></html>]]></description>
+      <Point><coordinates>-70.6,41.2,0</coordinates></Point>
+    </Placemark>
+  </Document>
+</kml>

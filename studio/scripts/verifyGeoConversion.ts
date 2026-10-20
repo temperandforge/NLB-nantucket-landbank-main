@@ -2,6 +2,9 @@
  * Verifies the GPX/KML/KMZ -> GeoJSON conversion used by the map file uploads.
  *
  *   npx sanity exec scripts/verifyGeoConversion.ts
+ *   npx sanity exec scripts/verifyGeoConversion.ts -- <path to a real .kmz/.kml/.gpx/.geojson>
+ *
+ * With a path, also converts that file (read-only, as boundaries) and prints a report.
  *
  * The repo has no test infrastructure. This imports the real conversion module from
  * src/lib/geoConversion.ts (with @xmldom/xmldom standing in for the browser's DOMParser) rather
@@ -14,9 +17,10 @@ import {readFileSync} from 'node:fs'
 import {resolve} from 'node:path'
 
 import {DOMParser} from '@xmldom/xmldom'
+import {strToU8, zipSync} from 'fflate'
 
 import {convertGeoFile, GeoConversionError, type ParseXml} from '../src/lib/geoConversion'
-import {detectFormat} from '../src/lib/geoSources'
+import {detectFormat, parseAttributeTable, readSource} from '../src/lib/geoSources'
 
 const parseXml: ParseXml = (xml, mime) =>
   new DOMParser().parseFromString(xml, mime) as unknown as Document
@@ -126,4 +130,190 @@ check('report sizes', () => {
   assert(report.bytesOut === JSON.stringify(geojson).length, `bytesOut ${report.bytesOut}`)
 })
 
+const kmlBytes = fixture('boundaries.kml')
+const boundaries = (bytes = kmlBytes, filename = 'boundaries.kml') =>
+  convertGeoFile({bytes, filename, layer: 'boundaries', parseXml})
+
+function throwsGeo(fn: () => unknown, pattern?: RegExp) {
+  try {
+    fn()
+  } catch (error) {
+    assert(error instanceof GeoConversionError, `wrong error type: ${error}`)
+    if (pattern) assert(pattern.test((error as Error).message), `message: ${(error as Error).message}`)
+    return
+  }
+  throw new Error('did not throw')
+}
+
+const byFid = (fc: GeoJSON.FeatureCollection, fid: string) =>
+  fc.features.find((f) => f.properties?.FID === fid)
+
+console.log('\nKML boundaries:')
+
+check('kml: attribute table becomes properties', () => {
+  const props = byFid(boundaries().geojson, '0')?.properties ?? {}
+  assert(props.FID === '0' && props.Owner === 'NLB' && props.Acres === '1.5', JSON.stringify(props))
+  for (const key of ['Seller_Nam', 'description', 'styleUrl', 'fill', 'stroke', 'stroke-width', 'fill-opacity', 'label-color']) {
+    assert(!(key in props), `${key} was kept`)
+  }
+})
+
+check('kml: GeometryCollection flattened', () => {
+  const {geojson, report} = boundaries()
+  const beta = byFid(geojson, '1')
+  assert(beta?.geometry.type === 'MultiPolygon', `got ${beta?.geometry.type}`)
+  assert((beta!.geometry as GeoJSON.MultiPolygon).coordinates.length === 2, 'expected 2 polygons')
+  assert(report.geometriesMerged >= 1, `merged ${report.geometriesMerged}`)
+})
+
+check('kml: mixed collection keeps polygon, drops point', () => {
+  const {geojson, report} = boundaries()
+  const c = byFid(geojson, '2')
+  assert(c?.geometry.type === 'Polygon', `got ${c?.geometry.type}`)
+  assert(report.dropped.Point >= 2, `dropped ${JSON.stringify(report.dropped)}`)
+  assert(!byFid(geojson, '4'), 'point-only feature survived')
+})
+
+check('kml: z stripped', () => {
+  for (const f of boundaries().geojson.features) {
+    const g = f.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon
+    const flat = (JSON.stringify(g.coordinates).match(/\[[^\[\]]*\]/g) ?? []).map((m) => JSON.parse(m))
+    assert(flat.length > 0 && flat.every((p: number[]) => p.length === 2), 'position with z')
+  }
+})
+
+check('kml: polygon holes preserved', () => {
+  const d = byFid(boundaries().geojson, '3')?.geometry as GeoJSON.Polygon
+  assert(d?.type === 'Polygon' && d.coordinates.length === 2, `rings ${d?.coordinates?.length}`)
+})
+
+check('kml: names are not the id', () => {
+  const {geojson} = boundaries()
+  const alphas = geojson.features.filter((f) => f.properties?.Name === 'Alpha')
+  assert(alphas.length === 2, `expected 2 Alphas, got ${alphas.length}`)
+})
+
+check('kml: blank name omitted, non-blank name kept', () => {
+  const {geojson} = boundaries()
+  assert(byFid(geojson, '0')?.properties?.name === 'Alpha', 'name lost')
+  assert(!('name' in (byFid(geojson, '2')?.properties ?? {})), 'blank name kept')
+})
+
+check('attribute table: nested tables do not merge rows', () => {
+  const html =
+    '<table><tr><td><table><tr><td>A</td><td>1</td></tr><tr><td>B</td><td> two </td></tr><tr><td>C</td><td></td></tr></table></td><td>x</td></tr></table>'
+  const got = JSON.stringify(parseAttributeTable(html, parseXml))
+  assert(got === JSON.stringify({A: '1', B: 'two'}), got)
+})
+
+console.log('\nKMZ:')
+
+const kmlText = new TextDecoder().decode(kmlBytes)
+const kmz = (entries: Record<string, string>) =>
+  zipSync(Object.fromEntries(Object.entries(entries).map(([k, v]) => [k, strToU8(v)])))
+
+check('kmz: unzips doc.kml', () => {
+  const zipped = boundaries(kmz({'doc.kml': kmlText, 'x.xsl': '<x/>'}), 'a.kmz')
+  assert(
+    JSON.stringify(zipped.geojson) === JSON.stringify(boundaries().geojson),
+    'features differ from raw KML',
+  )
+  assert(zipped.report.format === 'kmz', `format ${zipped.report.format}`)
+})
+
+check('kmz: kml in a subfolder is found', () => {
+  assert(boundaries(kmz({'files/doc.kml': kmlText}), 'a.kmz').geojson.features.length === 4, 'wrong count')
+})
+
+check('kmz: no kml inside throws', () => {
+  throwsGeo(() => boundaries(kmz({'x.xsl': '<x/>'}), 'a.kmz'), /\.kml/)
+})
+
+check('kmz: not a zip throws', () => {
+  throwsGeo(() => boundaries(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]), 'a.kmz'))
+})
+
+check('kml named .kml but zipped is treated as kmz', () => {
+  const zipped = boundaries(kmz({'doc.kml': kmlText}), 'a.kml')
+  assert(zipped.report.format === 'kmz', `format ${zipped.report.format}`)
+})
+
+console.log('\nCarry-forward hardening:')
+
+check('detectFormat ignores Object.prototype names', () => {
+  for (const name of ['x.constructor', 'x.toString', 'x.__proto__', 'x.hasOwnProperty']) {
+    throwsGeo(() => detectFormat(name, new Uint8Array(0)), /Unsupported/)
+  }
+})
+
+const geojsonConvert = (value: unknown, layer: 'boundaries' | 'trails' = 'boundaries') =>
+  convertGeoFile({bytes: enc.encode(JSON.stringify(value)), filename: 'a.geojson', layer, parseXml})
+const ring = [[-70, 41], [-70.1, 41], [-70.1, 41.1], [-70, 41]]
+
+check('geojson: single Feature and bare geometry are wrapped', () => {
+  const polygon = {type: 'Polygon', coordinates: [ring]}
+  assert(geojsonConvert({type: 'Feature', properties: {a: 1}, geometry: polygon}).geojson.features.length === 1, 'feature')
+  assert(geojsonConvert(polygon).geojson.features.length === 1, 'bare geometry')
+})
+
+check('geojson: Polygon and MultiPolygon are cleaned', () => {
+  const dirty = [[-70, 41, 5], [-70, 41, 5], [-70.1, 41, 5], [-70.1, 41.1, 5], [-70, 41, 5]]
+  const poly = geojsonConvert({type: 'Polygon', coordinates: [dirty]}).geojson.features[0].geometry as GeoJSON.Polygon
+  assert(poly.coordinates[0].length === 4 && poly.coordinates[0].every((p) => p.length === 2), JSON.stringify(poly))
+  const multi = geojsonConvert({type: 'MultiPolygon', coordinates: [[dirty], [ring]]}).geojson.features[0]
+    .geometry as GeoJSON.MultiPolygon
+  assert(multi.type === 'MultiPolygon' && multi.coordinates.length === 2, JSON.stringify(multi))
+})
+
+check('geojson: polygon collapsing after rounding is dropped and counted', () => {
+  const tiny = [[-70, 41], [-70.0000001, 41], [-70.0000001, 41.0000001], [-70, 41]]
+  const result = geojsonConvert({
+    type: 'FeatureCollection',
+    features: [
+      {type: 'Feature', properties: {}, geometry: {type: 'Polygon', coordinates: [tiny]}},
+      {type: 'Feature', properties: {}, geometry: {type: 'Polygon', coordinates: [ring]}},
+    ],
+  })
+  assert(result.geojson.features.length === 1, `kept ${result.geojson.features.length}`)
+  assert(result.report.dropped.Polygon === 1, JSON.stringify(result.report.dropped))
+})
+
+check('malformed geojson degrades instead of throwing a TypeError', () => {
+  throwsGeo(() => geojsonConvert({type: 'FeatureCollection'}), /features/)
+  const good = {type: 'Feature', properties: {}, geometry: {type: 'Polygon', coordinates: [ring]}}
+  const result = geojsonConvert({
+    type: 'FeatureCollection',
+    features: [
+      good,
+      {type: 'Feature', properties: {}, geometry: {type: 'Polygon', coordinates: []}},
+      {type: 'Feature', properties: {}, geometry: {type: 'Polygon'}},
+      {type: 'Feature', properties: {}, geometry: {type: 'Polygon', coordinates: [[[null, 41], [NaN, 1], [-70, 41]]]}},
+    ],
+  })
+  assert(result.geojson.features.length === 1, `kept ${result.geojson.features.length}`)
+  assert(result.report.dropped.Polygon === 3, JSON.stringify(result.report.dropped))
+})
+
 console.log('\nAll geo conversion checks passed.')
+
+// Optional: run a real file through the converter and print what happened.
+const realPath = process.argv.slice(2).find((a) => /\.(kmz|kml|gpx|geojson|json)$/i.test(a))
+if (realPath) {
+  console.log(`\nReal file: ${realPath}`)
+  const bytes = new Uint8Array(readFileSync(realPath))
+  const raw = readSource(detectFormat(realPath, bytes), bytes, parseXml)
+  const typesOf = (fc: GeoJSON.FeatureCollection) => {
+    const t: Record<string, number> = {}
+    for (const f of fc.features) t[f.geometry?.type ?? 'null'] = (t[f.geometry?.type ?? 'null'] ?? 0) + 1
+    return t
+  }
+  const result = convertGeoFile({bytes, filename: realPath, layer: 'boundaries', parseXml})
+  const withFid = result.geojson.features.filter((f) => f.properties && 'FID' in f.properties).length
+  const names = result.geojson.features.map((f) => f.properties?.name)
+  console.log(`  features before normalisation: ${raw.features.length}`, typesOf(raw))
+  console.log(`  features after normalisation:  ${result.geojson.features.length}`, typesOf(result.geojson))
+  console.log(`  features with FID: ${withFid}`)
+  console.log(`  distinct names: ${new Set(names).size} (blank/missing: ${names.filter((n) => !n).length})`)
+  console.log('  sample properties:', JSON.stringify(result.geojson.features[0].properties))
+  console.log('  report:', JSON.stringify(result.report))
+}
