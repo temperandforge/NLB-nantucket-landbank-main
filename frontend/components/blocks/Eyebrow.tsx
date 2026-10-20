@@ -6,5 +6,9 @@ export default function Eyebrow({
   children: React.ReactNode
   className?: string
 }) {
-  return <p className={`font-mono uppercase tracking-wide text-sm ${className}`}>{children}</p>
+  return (
+    <p data-eyebrow className={`font-mono uppercase tracking-wide text-sm ${className}`}>
+      {children}
+    </p>
+  )
 }

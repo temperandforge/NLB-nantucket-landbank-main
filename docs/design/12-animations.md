@@ -1,1 +1,7 @@
-7:30 - tokens; spacing extraction
+# Animations
+
+Scroll-reveal for page-builder blocks: see
+[docs/superpowers/specs/2026-10-14-scroll-reveal-animations-design.md](../superpowers/specs/2026-10-14-scroll-reveal-animations-design.md).
+
+Page-load entrance and inside-block stagger: see
+[docs/superpowers/specs/2026-10-14-choreographed-entrance-design.md](../superpowers/specs/2026-10-14-choreographed-entrance-design.md).
