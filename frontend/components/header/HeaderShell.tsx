@@ -6,6 +6,8 @@ import {DEFAULT_TOP_OFFSET, nextHeaderScroll, type HeaderScrollState} from './he
 
 /**
  * Sticky wrapper that hides on scroll down and reveals on scroll up (rule in headerScroll.ts).
+ * The optional `banner` sits above the bar inside the same sticky element, so the two stick and hide
+ * together; it spans the full width, so the page gutters are on the inner wrapper, not on the header.
  *
  * "Locked" means a dropdown or the mobile panel is open (a descendant carries data-header-lock)
  * or keyboard focus is inside the header - in both cases the header must stay put. Anchor jumps
@@ -13,7 +15,7 @@ import {DEFAULT_TOP_OFFSET, nextHeaderScroll, type HeaderScrollState} from './he
  * with requestAnimationFrame. The slide is removed under prefers-reduced-motion. While hidden it sets
  * --header-offset to 0 on <html>, so sticky content can move up into the freed space.
  */
-export default function HeaderShell({children}: {children: React.ReactNode}) {
+export default function HeaderShell({banner, children}: {banner?: React.ReactNode; children: React.ReactNode}) {
   const ref = useRef<HTMLElement>(null)
   const state = useRef<HeaderScrollState>({hidden: false, lastY: 0})
   const [hidden, setHidden] = useState(false)
@@ -43,18 +45,11 @@ export default function HeaderShell({children}: {children: React.ReactNode}) {
       if (frame) return
       frame = requestAnimationFrame(() => {
         frame = 0
-        // The banner above scrolls away with the page, so the bar only sticks once the page has
-        // scrolled past it. Hiding earlier slides the bar out of its flow position and leaves a
-        // blank gap under the banner (a wrapped mobile banner is taller than the default offset).
-        // Read at scroll time: the banner can be dismissed, or re-wrap on resize. Measure the
-        // banner, NOT el.offsetTop: once stuck, a sticky element's offsetTop is its current
-        // stuck position (= scrollY), so the offset would track the scroll and never hide the bar.
-        const bannerHeight = document.querySelector<HTMLElement>('[data-site-banner]')?.offsetHeight ?? 0
         apply(
           nextHeaderScroll(
             state.current,
             {y: window.scrollY, locked: locked()},
-            {topOffset: bannerHeight + DEFAULT_TOP_OFFSET},
+            {topOffset: DEFAULT_TOP_OFFSET},
           ),
         )
       })
@@ -80,11 +75,12 @@ export default function HeaderShell({children}: {children: React.ReactNode}) {
   return (
     <header
       ref={ref}
-      className={`sticky top-0 z-50 shadow-[inset_0_-1px_0_var(--color-border-light)] bg-background transition-transform duration-200 ease-out tf-px motion-reduce:transition-none ${
+      className={`sticky top-0 z-50 shadow-[inset_0_-1px_0_var(--color-border-light)] bg-background transition-transform duration-200 ease-out motion-reduce:transition-none ${
         hidden ? '-translate-y-full' : 'translate-y-0'
       }`}
     >
-      {children}
+      {banner}
+      <div className="tf-px">{children}</div>
     </header>
   )
 }

@@ -13,12 +13,12 @@ const LOGO_WIDTH = 184 // natural width of public/images/nlb-logo.svg
 const LOGO_HEIGHT = 50 // natural height
 
 /**
- * Site header: the banner, then the sticky nav bar.
+ * Site header: the nav bar, with the banner above it in the same sticky shell.
  *
  * Owns only composition. Every region is guarded independently - the header is on every page,
  * so a missing banner, a missing header document or an unpublished menu reference degrades to
- * rendering less (down to the logo alone), never to a thrown render. The banner scrolls away
- * with the page; only the bar is sticky.
+ * rendering less (down to the logo alone), never to a thrown render. The banner sticks and hides
+ * with the bar, and renders on the homepage only (SiteBanner decides).
  */
 export default async function Header() {
   // Each fetch is caught on its own so one failure cannot take down the other region or the layout.
@@ -31,8 +31,7 @@ export default async function Header() {
 
   return (
     <>
-      {banner?.message && <SiteBanner banner={banner} />}
-      <HeaderShell>
+      <HeaderShell banner={banner?.message ? <SiteBanner banner={banner} /> : null}>
         <div data-header-bar className="relative flex h-(--header-height) w-full items-center justify-between">
           <Link href="/" aria-label="Nantucket Land Bank - home" className="shrink-0">
             <Image src="/images/nlb-logo.svg" alt="" width={LOGO_WIDTH} height={LOGO_HEIGHT} priority />

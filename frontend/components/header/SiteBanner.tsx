@@ -1,5 +1,6 @@
 'use client'
 
+import {usePathname} from 'next/navigation'
 import {useState, useSyncExternalStore} from 'react'
 
 import {CloseIcon} from '@/components/icons'
@@ -11,12 +12,13 @@ import {bannerKey, readDismissed, writeDismissed} from './bannerDismissal'
 const subscribeNever = () => () => {}
 
 /**
- * The dismissible bar above the header. Server-rendered visible, so first-time visitors get no
+ * The dismissible bar above the nav bar, inside the sticky header. Homepage only. Server-rendered visible, so first-time visitors get no
  * layout shift. A tiny inline script right after the bar hides it before first paint when this
  * visitor already dismissed this exact message (the server can't read localStorage), so returning
  * visitors don't see a flash; hydration then removes it from the tree.
  */
 export default function SiteBanner({banner}: {banner: SiteBannerData}) {
+  const pathname = usePathname()
   const message = banner.message?.trim()
   const key = message ? bannerKey(message) : null
   const [dismissedNow, setDismissedNow] = useState(false)
@@ -27,7 +29,7 @@ export default function SiteBanner({banner}: {banner: SiteBannerData}) {
     () => false,
   )
 
-  if (!message || !key || dismissedNow || dismissedBefore) return null
+  if (pathname !== '/' || !message || !key || dismissedNow || dismissedBefore) return null
 
   const text = <span className="font-secondary text-body-base text-center text-pretty leading-[1.6] opacity-80">{message}</span>
 
