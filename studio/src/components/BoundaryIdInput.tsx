@@ -57,7 +57,7 @@ export function BoundaryIdInput(props: StringInputProps) {
           return
         }
 
-        const idProperty = settings.idProperty || 'id'
+        const idProperty = settings.idProperty || 'FID'
         const response = await fetch(settings.url)
         if (!response.ok) {
           throw new Error(`Could not download the boundary file (${response.status}).`)

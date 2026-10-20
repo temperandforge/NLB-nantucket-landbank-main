@@ -144,5 +144,5 @@ https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/69
 
 ## Decision record
 
-On build, add `DECISIONS.md` §1.13: uploads are converted to GeoJSON in Studio; the original is retained;
+Recorded in `DECISIONS.md` §1.13: uploads are converted to GeoJSON in Studio; the original is retained;
 the frontend only ever reads GeoJSON; `FID` is the default ID property.

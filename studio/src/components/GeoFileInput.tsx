@@ -84,6 +84,7 @@ function GeoFileInput(props: FileInputProps & {layer: GeoLayer}) {
 
   const [state, setState] = useState<State>({status: 'idle'})
   const inputRef = useRef<HTMLInputElement>(null)
+  const applying = useRef(false)
   const busy = state.status === 'converting' || state.status === 'uploading'
   const patchBlocked = operations.patch.disabled
   const disabled = Boolean(readOnly) || busy
@@ -121,6 +122,7 @@ function GeoFileInput(props: FileInputProps & {layer: GeoLayer}) {
   }
 
   async function onApply() {
+    if (applying.current) return
     if (state.status !== 'review') return
     const {file, result} = state
     if (patchBlocked) {
@@ -130,6 +132,7 @@ function GeoFileInput(props: FileInputProps & {layer: GeoLayer}) {
       })
       return
     }
+    applying.current = true
     setState({status: 'uploading', filename: file.name})
     try {
       const geojson = new Blob([JSON.stringify(result.geojson)], {type: 'application/geo+json'})
@@ -142,6 +145,8 @@ function GeoFileInput(props: FileInputProps & {layer: GeoLayer}) {
       setState({status: 'idle'})
     } catch (error) {
       setState({status: 'error', error: describeError(error, 'upload')})
+    } finally {
+      applying.current = false
     }
   }
 

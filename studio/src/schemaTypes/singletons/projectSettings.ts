@@ -55,7 +55,7 @@ export const projectSettings = defineType({
       type: 'file',
       group: 'map',
       description:
-        'Upload the property boundaries as GPX, KML, KMZ or GeoJSON. It is converted to GeoJSON automatically and the original is kept here. Replacing this file does not change any project’s assignment, so check for warnings on the projects afterwards.',
+        'Upload the property boundaries as GPX, KML, KMZ or GeoJSON. It is converted to GeoJSON automatically and the original is kept here. Replacing this file does not change any property’s assignment, so check for warnings on the properties afterwards.',
       components: {input: geoFileInput('boundaries')},
       options: {
         accept: '.gpx,.kml,.kmz,.geojson,.json,application/gpx+xml,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz,application/geo+json,application/json',
@@ -67,7 +67,7 @@ export const projectSettings = defineType({
       type: 'file',
       group: 'map',
       description:
-        'Generated from the boundary file above: one GeoJSON FeatureCollection containing every property boundary. Each project then points at a single feature inside it. It cannot be edited here.',
+        'Generated from the boundary file above: one GeoJSON FeatureCollection containing every property boundary. Each property then points at a single feature inside it. It cannot be edited here.',
       readOnly: true,
       options: {
         accept: '.geojson,.json,application/geo+json,application/json',
