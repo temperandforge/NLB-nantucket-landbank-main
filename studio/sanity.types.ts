@@ -1140,12 +1140,22 @@ export type ProjectSettings = {
   eyebrow?: string
   heading?: string
   intro?: string
+  boundarySource?: {
+    asset?: SanityFileAssetReference
+    media?: unknown
+    _type: 'file'
+  }
   boundaryData?: {
     asset?: SanityFileAssetReference
     media?: unknown
     _type: 'file'
   }
   boundaryIdProperty: string
+  trailsSource?: {
+    asset?: SanityFileAssetReference
+    media?: unknown
+    _type: 'file'
+  }
   trailsData?: {
     asset?: SanityFileAssetReference
     media?: unknown

@@ -8,6 +8,9 @@
  * That loss was an explicit, confirmed decision for this migration - see
  * docs/superpowers/specs/2026-08-17-multi-parcel-boundaries-design.md.
  *
+ * Accepts either `Name` (Esri attribute table) or `name` (converted KMZ/KML Placemark name).
+ * Aborts before deleting anything if the plan is empty.
+ *
  * Run with --dry first and read the plan before the real run.
  */
 import {getCliClient} from 'sanity/cli'
@@ -42,7 +45,7 @@ async function main() {
   const groups = new Map<string, string[]>()
   const skipped: number[] = []
   for (const feature of geojson.features as {properties: Record<string, unknown>}[]) {
-    const name = feature.properties?.Name
+    const name = feature.properties?.Name ?? feature.properties?.name
     const fid = feature.properties?.FID
     if (typeof name !== 'string' || !name.trim() || fid === undefined || fid === null) {
       skipped.push(Number(fid))
@@ -73,6 +76,12 @@ async function main() {
   }
   if (skipped.length) {
     console.log(`\nSkipped ${skipped.length} feature(s) with no Name: FIDs ${skipped.join(', ')}`)
+  }
+
+  if (plan.length === 0) {
+    throw new Error(
+      'The plan is empty (0 projects): no feature has a Name/name and an FID. Aborting before deleting anything.',
+    )
   }
 
   const existing = await client.fetch<string[]>(`*[_type == "project"]._id`)

@@ -103,7 +103,7 @@ export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProp
   const [boundaries, setBoundaries] = useState<BoundaryIndex>(() => new Map())
 
   const boundaryUrl = settings?.boundaryDataUrl ?? null
-  const idProperty = settings?.boundaryIdProperty ?? 'id'
+  const idProperty = settings?.boundaryIdProperty ?? 'FID'
   const trailsUrl = settings?.trailsDataUrl ?? null
 
   useEffect(() => {

@@ -1,6 +1,8 @@
 import {CogIcon} from '@sanity/icons'
 import {defineField, defineType} from 'sanity'
 
+import {geoFileInput} from '../../components/GeoFileInput'
+
 /**
  * Properties Settings schema Singleton (the document id and type keep their original name,
  * `projectSettings`, from before properties were called projects).
@@ -48,12 +50,25 @@ export const projectSettings = defineType({
     }),
 
     defineField({
+      name: 'boundarySource',
+      title: 'Boundary file',
+      type: 'file',
+      group: 'map',
+      description:
+        'Upload the property boundaries as GPX, KML, KMZ or GeoJSON. It is converted to GeoJSON automatically and the original is kept here. Replacing this file does not change any property’s assignment, so check for warnings on the properties afterwards.',
+      components: {input: geoFileInput('boundaries')},
+      options: {
+        accept: '.gpx,.kml,.kmz,.geojson,.json,application/gpx+xml,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz,application/geo+json,application/json',
+      },
+    }),
+    defineField({
       name: 'boundaryData',
       title: 'Boundary data file',
       type: 'file',
       group: 'map',
       description:
-        'One GeoJSON FeatureCollection containing every property boundary. Each project then points at a single feature inside it. Replacing this file does not change any project’s assignment, so check for warnings on the projects afterwards.',
+        'Generated from the boundary file above: one GeoJSON FeatureCollection containing every property boundary. Each property then points at a single feature inside it. It cannot be edited here.',
+      readOnly: true,
       options: {
         accept: '.geojson,.json,application/geo+json,application/json',
       },
@@ -63,10 +78,22 @@ export const projectSettings = defineType({
       title: 'Boundary ID property',
       type: 'string',
       group: 'map',
-      initialValue: 'id',
+      initialValue: 'FID',
       description:
-        'The property on each GeoJSON feature that holds its identifier — for example "id", "MAP_ID" or "PARCEL_ID". This is configurable because it depends on how the uploaded file is structured.',
+        'The property on each GeoJSON feature that holds its identifier — for example "FID", "id", "MAP_ID" or "PARCEL_ID". This is configurable because it depends on how the uploaded file is structured.',
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'trailsSource',
+      title: 'Trails file',
+      type: 'file',
+      group: 'map',
+      description:
+        'Upload the trail tracks as GPX, KML, KMZ or GeoJSON. It is converted to GeoJSON automatically and the original is kept here. Leave empty to hide the trails layer.',
+      components: {input: geoFileInput('trails')},
+      options: {
+        accept: '.gpx,.kml,.kmz,.geojson,.json,application/gpx+xml,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz,application/geo+json,application/json',
+      },
     }),
     defineField({
       name: 'trailsData',
@@ -74,7 +101,8 @@ export const projectSettings = defineType({
       type: 'file',
       group: 'map',
       description:
-        'GeoJSON of the trail tracks, drawn as lines beneath the property boundaries. Unlike the boundary file, nothing points into this one - every line in it is drawn. Leave empty to hide the trails layer.',
+        'Generated from the trails file above: GeoJSON of the trail tracks, drawn as lines beneath the property boundaries. Unlike the boundary data, nothing points into this one - every line in it is drawn. It cannot be edited here.',
+      readOnly: true,
       options: {
         accept: '.geojson,.json,application/geo+json,application/json',
       },

@@ -135,8 +135,8 @@ since been deleted still renders as itself instead of blank.
 
 **Status:** Implemented
 
-The client maintains a single GeoJSON FeatureCollection covering every boundary, uploaded to
-`projectSettings.boundaryData`. Each project stores `boundaryIds`, naming every feature in it that belongs to that property — most projects have one, some (e.g. a preserve split across many GIS parcels) have several.
+The client maintains a single GeoJSON FeatureCollection covering every boundary, stored on
+`projectSettings.boundaryData` (generated from an uploaded file; see 1.13). Each project stores `boundaryIds`, naming every feature in it that belongs to that property — most projects have one, some (e.g. a preserve split across many GIS parcels) have several.
 
 **Why:** This is how the client works — one export from their GIS, not per-parcel geometry pasted
 into a CMS field. It also means re-exporting updates every boundary at once.
@@ -195,6 +195,36 @@ recursive objects cleanly. A third level would break both.
 interleaved headings (A, B, A) stay separate and render as three. The footer ignores `group`.
 Renaming a heading means editing each link under it. The grouping rule lives in
 `frontend/sanity/lib/menuGroups.ts` and is checked by `frontend/scripts/verifyMenuGroups.mts`.
+
+### 1.13 Map files are converted to GeoJSON in Studio; the frontend reads only the result
+
+**Status:** Implemented; live verification pending
+
+Editors upload GPX, KML or KMZ (and GeoJSON) to `boundarySource` / `trailsSource` on Properties
+Settings. The Studio input (`studio/src/components/GeoFileInput.tsx`, library in
+`studio/src/lib/geo*.ts`) converts it to GeoJSON at upload time, shows a report, and on Apply writes
+the original to `*Source` and the converted file to `boundaryData` / `trailsData`. The generated
+fields are read-only. The frontend only ever reads `boundaryData` / `trailsData`.
+
+`FID` is the default ID property (`boundaryIdProperty`). Fallbacks to it live in `queries.ts`,
+`MapboxMap.tsx`, `useBoundaryOptions.ts` and `BoundaryIdInput.tsx`.
+
+**Why:** The client supplies whatever their GIS exports, not hand-built GeoJSON. Converting once, in
+Studio, means a bad file is rejected at upload with a report instead of failing silently on the map,
+the original stays downloadable, and the frontend has one format to handle. Rejected: converting at
+render time in the frontend (every visitor pays for it, and failures surface only on the live map),
+and a server function (extra infrastructure and credentials for a task the browser can do).
+
+**Implication:** A KMZ's attribute table is not in structured fields; it is an HTML table inside each
+placemark's description, and the converter parses it out so `FID` is available. Names are not IDs: a
+KMZ has repeated and blank names (the client's has 150 distinct names across 276 features, 21 blank),
+so identifiers come from the ID property, never the name. Replacing a file does not re-point any
+property (see 1.9). Existing properties have no `boundaryIds` yet, so no boundary polygons draw until
+they are populated (#65). Waypoints, point features and elevation are dropped (#66).
+
+**Implementation status:** Conversion library, schema, input and `verifyGeoConversion.ts` are in. A
+live Studio upload, one-Apply-one-edit, the draft id path, real-browser parsing of the client's files
+and map rendering have **not** been exercised; that is tracked in #69. Follow-ups: #64, #67, #68.
 
 ---
 

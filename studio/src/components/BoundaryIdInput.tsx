@@ -19,7 +19,7 @@ import {set, unset, useClient, type StringInputProps} from 'sanity'
 
 const SETTINGS_QUERY = `*[_type == "projectSettings" && _id == "projectSettings"][0]{
   "url": boundaryData.asset->url,
-  "idProperty": coalesce(boundaryIdProperty, "id")
+  "idProperty": coalesce(boundaryIdProperty, "FID")
 }`
 
 /** Feature property names tried, in order, for a human-readable label beside the identifier. */
@@ -57,7 +57,7 @@ export function BoundaryIdInput(props: StringInputProps) {
           return
         }
 
-        const idProperty = settings.idProperty || 'id'
+        const idProperty = settings.idProperty || 'FID'
         const response = await fetch(settings.url)
         if (!response.ok) {
           throw new Error(`Could not download the boundary file (${response.status}).`)
