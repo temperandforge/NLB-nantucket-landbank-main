@@ -46,6 +46,8 @@ link; gallery carousel; the interactive map; Property FAQs;
 
 - Directions falls back to the boundary centroid when a property has no map marker (the marker
   defaults to that centroid on the map). [#59](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/59)
-- The map on a property page shows every property; it does not focus on the current one.
+- ~~The map on a property page shows every property; it does not focus on the current one.~~ Done:
+  the map still draws every property but opens zoomed to the current property's boundaries, one zoom
+  level out from a tight fit (its marker when it has no boundary), via `focusSlug` on `MapboxMap`.
   [#60](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/60)
 - The gallery eyebrow is "<name> Property and Recreation", the Figma wording, hardcoded.

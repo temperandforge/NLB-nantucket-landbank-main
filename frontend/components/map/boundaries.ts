@@ -62,6 +62,35 @@ export function geometryCenterOfMany(geometries: GeoJSON.Geometry[]): [number, n
   return [lng / positions.length, lat / positions.length]
 }
 
+/**
+ * The bounding box of several geometries as [[west, south], [east, north]] - the shape
+ * `map.fitBounds` takes - or null when there are no positions to bound.
+ *
+ * Used to zoom a map to one property's boundaries. Like `geometryCenterOfMany`, a polygon
+ * contributes only its outer ring, since a hole can never extend the box.
+ */
+export function geometryBounds(
+  geometries: GeoJSON.Geometry[],
+): [[number, number], [number, number]] | null {
+  const positions = geometries.flatMap(collectPositions)
+  if (!positions.length) return null
+
+  let west = Infinity
+  let south = Infinity
+  let east = -Infinity
+  let north = -Infinity
+  for (const [lng, lat] of positions) {
+    if (lng < west) west = lng
+    if (lng > east) east = lng
+    if (lat < south) south = lat
+    if (lat > north) north = lat
+  }
+  return [
+    [west, south],
+    [east, north],
+  ]
+}
+
 function collectPositions(geometry: GeoJSON.Geometry): [number, number][] {
   switch (geometry.type) {
     case 'Point':

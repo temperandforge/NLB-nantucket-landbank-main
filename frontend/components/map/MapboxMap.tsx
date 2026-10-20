@@ -7,7 +7,12 @@ import '../../css/popup.css'
 
 import {propertyHref} from '@/sanity/lib/utils'
 
-import {geometryCenterOfMany, loadBoundaryIndex, type BoundaryIndex} from './boundaries'
+import {
+  geometryBounds,
+  geometryCenterOfMany,
+  loadBoundaryIndex,
+  type BoundaryIndex,
+} from './boundaries'
 import {
   DEFAULT_ZOOM,
   NANTUCKET_CENTER,
@@ -21,12 +26,41 @@ import {
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? ''
 
+/** Property boundary colour. Mapbox paint can't read CSS variables, so this mirrors `--color-brand` in css/globals.css. */
+const BOUNDARY_COLOR = '#ff5500'
+
 interface MapboxMapProps {
   projects: Property[]
   settings: MapSettings | null
   /** Off for an embedded preview, where wheel-zooming would hijack the page scroll. */
   scrollZoom?: boolean
+  /**
+   * Slug of one property to zoom to, for a property's own page. Every property is still drawn; the
+   * view just opens on this one's boundaries (or its marker when it has none) instead of the whole
+   * island or trail network.
+   */
+  focusSlug?: string | null
+  /** Off to leave the "Find out more" link out of every popup, e.g. on a property's own page. */
+  showPopupLink?: boolean
 }
+
+/** Closest a focused property is allowed to zoom, so a tiny parcel doesn't fill the map with one block. */
+const FOCUS_MAX_ZOOM = 16.5
+/** How far out from a tight fit a focused property opens, in zoom levels, so it sits in some context. */
+const FOCUS_ZOOM_OUT = 1
+/**
+ * Parcel fill opacity on a focused map: the current property is shown strongly (and outlined) while
+ * its neighbours recede, so it is clear which parcels belong to the page you are on. Hover brightens
+ * either one from its own resting level. Without a focus, every parcel uses 0.2 resting, 0.4 hovered.
+ */
+const FOCUSED_FILL = 0.4
+const FOCUSED_FILL_HOVER = 0.55
+const NEIGHBOUR_FILL = 0.15
+const NEIGHBOUR_FILL_HOVER = 0.3
+/** Width of the outline drawn round the focused property's parcels. */
+const FOCUSED_OUTLINE_WIDTH = 2
+/** Zoom for a focused property that has a marker but no boundary. */
+const FOCUS_MARKER_ZOOM = 15
 
 /** Popup content is injected as HTML, so any authored value must be escaped first. */
 function escapeHtml(value: string): string {
@@ -43,7 +77,7 @@ function escapeHtml(value: string): string {
  * Every interpolated value is escaped: these come from the CMS, and setHTML would otherwise let
  * a stray angle bracket in a description break the markup.
  */
-function buildPopupHtml(project: Property): string {
+function buildPopupHtml(project: Property, showLink: boolean): string {
   const resources = projectSlugs(project.resources)
 
   const accessible = resources.includes(RESOURCE_SLUG.handicapAccessible)
@@ -64,9 +98,10 @@ function buildPopupHtml(project: Property): string {
     ? `<p class="map-popup-desc">${escapeHtml(project.description)}</p>`
     : ''
 
-  const link = project.slug
-    ? `<a class="map-popup-link" href="${encodeURI(propertyHref(project.slug))}">Find out more</a>`
-    : ''
+  const link =
+    showLink && project.slug
+      ? `<a class="map-popup-link" href="${encodeURI(propertyHref(project.slug))}">Find out more</a>`
+      : ''
 
   return `
       ${accessible}
@@ -84,10 +119,19 @@ function buildPopupHtml(project: Property): string {
     `
 }
 
-export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProps) {
+export function MapboxMap({
+  projects,
+  settings,
+  scrollZoom = true,
+  focusSlug = null,
+  showPopupLink = true,
+}: MapboxMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<mapboxgl.Map | null>(null)
   const markersRef = useRef<mapboxgl.Marker[]>([])
+  // The focused property is fitted once, when its boundaries are available, and then left alone so
+  // a later filter or data change doesn't snatch the view back from a visitor who has panned away.
+  const focusedRef = useRef(false)
   // map.on(type, layerId, listener) listeners outlive the layer they were bound to - removing and
   // re-adding 'property-polygons' on every render does not unregister them. Tracked here so each
   // render's listeners are unbound before the next render's are added, instead of stacking.
@@ -174,7 +218,8 @@ export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProp
             return []
           })
 
-          if (coordinates.length > 0) {
+          // Zooming to the whole trail network is the default view; a focused property keeps its own.
+          if (coordinates.length > 0 && !focusSlug) {
             const bounds = coordinates.reduce(
               (acc: mapboxgl.LngLatBounds, coord) => acc.extend(coord as [number, number]),
               new mapboxgl.LngLatBounds(
@@ -219,7 +264,7 @@ export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProp
       }
       polygonListenersRef.current = []
 
-      for (const layerId of ['property-lines', 'property-polygons']) {
+      for (const layerId of ['property-lines', 'property-outlines', 'property-polygons']) {
         if (map.getLayer(layerId)) map.removeLayer(layerId)
       }
       if (map.getSource('property-geojson')) map.removeSource('property-geojson')
@@ -248,7 +293,11 @@ export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProp
           features.push({
             id: featureId,
             type: 'Feature',
-            properties: {name: project.name},
+            // `focused` drives the highlight on a property's own page; false everywhere else.
+            properties: {
+              name: project.name,
+              focused: Boolean(focusSlug) && project.slug === focusSlug,
+            },
             geometry: boundary.geometry,
           })
           featureIds.push(featureId)
@@ -256,6 +305,30 @@ export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProp
         }
         for (const featureId of featureIds) {
           featureIdToGroupIds.set(featureId, featureIds)
+        }
+
+        // On a property's own page, open on that property. Done here, before the `continue`s below,
+        // because a property with boundaries never reaches the marker code. A property whose
+        // boundaries are still loading is waited for (the effect re-runs when they arrive) rather
+        // than fitted to its marker and then never corrected.
+        if (focusSlug && !focusedRef.current && project.slug === focusSlug) {
+          const bounds = geometryBounds(projectBoundaries.map((boundary) => boundary.geometry))
+          if (bounds) {
+            // The tight fit, then one level back out. cameraForBounds gives the fit without moving
+            // the map, so the zoom-out is applied in the same single jump.
+            const camera = map.cameraForBounds(bounds, {padding: 40, maxZoom: FOCUS_MAX_ZOOM})
+            if (camera?.center) {
+              map.jumpTo({
+                center: camera.center,
+                zoom: (camera.zoom ?? DEFAULT_ZOOM) - FOCUS_ZOOM_OUT,
+              })
+              focusedRef.current = true
+            }
+          } else if (!project.boundaryIds?.length || boundaries.size > 0) {
+            const centre = toLngLat(project.location)
+            if (centre) map.jumpTo({center: centre, zoom: FOCUS_MARKER_ZOOM})
+            focusedRef.current = true
+          }
         }
 
         // A project with a boundary is otherwise clicked on its polygon, not a marker - except a
@@ -274,7 +347,9 @@ export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProp
 
         const marker = new mapboxgl.Marker().setLngLat(position).addTo(map)
         if (!project.disablePopup) {
-          marker.setPopup(new mapboxgl.Popup({offset: 24}).setHTML(buildPopupHtml(project)))
+          marker.setPopup(
+            new mapboxgl.Popup({offset: 24}).setHTML(buildPopupHtml(project, showPopupLink)),
+          )
         }
         markersRef.current.push(marker)
       }
@@ -290,7 +365,7 @@ export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProp
           type: 'line',
           source: 'property-geojson',
           filter: ['==', ['geometry-type'], 'LineString'],
-          paint: {'line-color': '#dc2626', 'line-width': 3},
+          paint: {'line-color': BOUNDARY_COLOR, 'line-width': 3},
         })
 
         map.addLayer({
@@ -299,16 +374,36 @@ export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProp
           source: 'property-geojson',
           filter: ['==', ['geometry-type'], 'Polygon'],
           paint: {
-            'fill-color': '#dc2626',
-            'fill-opacity': [
-              'case',
-              ['boolean', ['feature-state', 'hover'], false],
-              0.4, // hover
-              0.2, // default
-            ],
+            'fill-color': BOUNDARY_COLOR,
+            'fill-opacity': focusSlug
+              ? [
+                  'case',
+                  ['boolean', ['feature-state', 'hover'], false],
+                  ['case', ['get', 'focused'], FOCUSED_FILL_HOVER, NEIGHBOUR_FILL_HOVER],
+                  ['case', ['get', 'focused'], FOCUSED_FILL, NEIGHBOUR_FILL],
+                ]
+              : [
+                  'case',
+                  ['boolean', ['feature-state', 'hover'], false],
+                  0.4, // hover
+                  0.2, // default
+                ],
             'fill-opacity-transition': {duration: 300},
           },
         })
+
+        // The outline marks the focused property's parcels only. Added after the fill so it sits on
+        // top, and it is not interactive - clicks and hover stay on the fill layer.
+        if (focusSlug) {
+          map.addLayer({
+            id: 'property-outlines',
+            type: 'line',
+            source: 'property-geojson',
+            filter: ['all', ['==', ['geometry-type'], 'Polygon'], ['==', ['get', 'focused'], true]],
+            layout: {'line-join': 'round'},
+            paint: {'line-color': BOUNDARY_COLOR, 'line-width': FOCUSED_OUTLINE_WIDTH},
+          })
+        }
       }
 
       if (features.length > 0) {
@@ -369,7 +464,7 @@ export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProp
 
           new mapboxgl.Popup({offset: 12})
             .setLngLat(e.lngLat)
-            .setHTML(buildPopupHtml(project))
+            .setHTML(buildPopupHtml(project, showPopupLink))
             .addTo(map)
         }
 
@@ -396,7 +491,7 @@ export function MapboxMap({projects, settings, scrollZoom = true}: MapboxMapProp
     return () => {
       map.off('load', renderMarkersAndGeojson)
     }
-  }, [projects, boundaries])
+  }, [projects, boundaries, focusSlug, showPopupLink])
 
   return <div ref={mapContainerRef} className="h-full w-full" />
 }

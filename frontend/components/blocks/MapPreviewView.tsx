@@ -10,11 +10,17 @@ export default function MapPreviewView({
   body,
   properties,
   settings,
+  focusSlug,
+  showPopupLink = true,
 }: {
   heading?: string | null
   body?: string | null
   properties: Property[]
   settings: MapSettings | null
+  /** Slug of the property to zoom to; set on a property's own page, left off for the block. */
+  focusSlug?: string | null
+  /** Off on a property's own page, where a popup's "Find out more" link is not wanted. */
+  showPopupLink?: boolean
 }) {
   return (
     <section className="w-full bg-background tf-px py-s6">
@@ -26,7 +32,13 @@ export default function MapPreviewView({
           )}
         </div>
         <div className="relative h-[420px] w-full overflow-clip rounded-[4px] md:h-[738px]">
-          <MapboxMap projects={properties} settings={settings} scrollZoom={false} />
+          <MapboxMap
+            projects={properties}
+            settings={settings}
+            scrollZoom={false}
+            focusSlug={focusSlug}
+            showPopupLink={showPopupLink}
+          />
         </div>
       </div>
     </section>
