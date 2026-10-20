@@ -23,8 +23,8 @@ export default function NewsArchive({block}: BlockProps<'newsArchive'>) {
           <Suspense
             fallback={
               <div className="flex w-full flex-col items-start gap-12 md:gap-16">
-                <FilterTabs tabs={tabs} active={null} label={NEWS_FILTER_LABEL} />
-                <div className="tf-px">
+                <FilterTabs tabs={tabs} active={null} label={NEWS_FILTER_LABEL} padInside />
+                <div className="tf-max-w tf-px">
                   <NewsList articles={articles} />
                 </div>
               </div>
@@ -33,7 +33,7 @@ export default function NewsArchive({block}: BlockProps<'newsArchive'>) {
             <NewsFilter articles={articles} />
           </Suspense>
         ) : (
-          <div className="tf-px">
+          <div className="tf-max-w tf-px">
             <NewsList articles={articles} />
           </div>
         )}

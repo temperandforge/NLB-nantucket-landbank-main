@@ -24,8 +24,8 @@ export default function ProjectGrid({block}: BlockProps<'projectGrid'>) {
           <Suspense
             fallback={
               <div className="flex w-full flex-col items-start gap-16">
-                <FilterTabs tabs={tabs} active={null} label={PROJECT_FILTER_LABEL} />
-                <div className="tf-px w-full">
+                <FilterTabs tabs={tabs} active={null} label={PROJECT_FILTER_LABEL} padInside />
+                <div className="tf-max-w tf-px">
                   <ProjectList projects={projects} />
                 </div>
               </div>
@@ -34,7 +34,7 @@ export default function ProjectGrid({block}: BlockProps<'projectGrid'>) {
             <ProjectFilter projects={projects} />
           </Suspense>
         ) : (
-          <div className="tf-px w-full">
+          <div className="tf-max-w tf-px">
             <ProjectList projects={projects} />
           </div>
         )}

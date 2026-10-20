@@ -19,8 +19,14 @@ export default function StaffFilter({people}: {people: StaffItem[]}) {
 
   return (
     <div className="flex w-full flex-col items-start gap-16 _tf-max-w">
-      <FilterTabs tabs={tabs} active={active} label={DEPARTMENT_FILTER_LABEL} onChoose={choose} />
-      <div className="tf-px mx-auto w-full">
+      <FilterTabs
+        tabs={tabs}
+        active={active}
+        label={DEPARTMENT_FILTER_LABEL}
+        onChoose={choose}
+        padInside
+      />
+      <div className="tf-max-w tf-px">
         <StaffGrid people={filterByDepartment(people, active)} />
       </div>
     </div>

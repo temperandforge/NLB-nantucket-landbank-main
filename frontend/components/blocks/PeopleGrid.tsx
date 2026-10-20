@@ -19,7 +19,7 @@ export default function PeopleGrid({block}: BlockProps<'peopleGrid'>) {
   return (
     <section className="bg-background py-s6">
       <div className="flex w-full flex-col items-start gap-10 _tf-max-w">
-        {block.heading && <h2 className="tf-px w-full text-headline-xl text-on-background">{block.heading}</h2>}
+        {block.heading && <h2 className="tf-max-w tf-px text-headline-xl text-on-background">{block.heading}</h2>}
         {staff.length > 0 &&
           (showTabs ? (
             // useSearchParams needs a Suspense boundary on a statically rendered page. The fallback
@@ -28,8 +28,8 @@ export default function PeopleGrid({block}: BlockProps<'peopleGrid'>) {
             <Suspense
               fallback={
                 <div className="flex w-full flex-col items-start gap-16">
-                  <FilterTabs tabs={tabs} active={null} label={DEPARTMENT_FILTER_LABEL} />
-                  <div className="tf-px">
+                  <FilterTabs tabs={tabs} active={null} label={DEPARTMENT_FILTER_LABEL} padInside />
+                  <div className="tf-max-w tf-px">
                     <StaffGrid people={staff} />
                   </div>
                 </div>
@@ -38,7 +38,7 @@ export default function PeopleGrid({block}: BlockProps<'peopleGrid'>) {
               <StaffFilter people={staff} />
             </Suspense>
           ) : (
-            <div className="tf-px">
+            <div className="tf-max-w tf-px">
               <StaffGrid people={staff} />
             </div>
           ))}
