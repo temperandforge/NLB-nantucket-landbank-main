@@ -119,7 +119,10 @@ export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
   }
 
   return (
-    <div id="mapWrap" className="container flex flex-col gap-10 py-10">
+    // tf-max-w with tf-px on the same element, like the heroes and the commissioners grid, so the
+    // filters and map sit under the hero heading at every width. The starter's `container` class
+    // used a different max width and padding, which left them left of the heading.
+    <div id="mapWrap" className="tf-max-w tf-px flex flex-col gap-10 py-10">
       <div className="container--inner flex flex-col gap-2">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <MultiSelectDropdown

@@ -23,6 +23,7 @@ export default function FilterTabs({
   label,
   onChoose,
   showAll = true,
+  padInside = false,
 }: {
   tabs: FilterTab[]
   active: string | null
@@ -31,6 +32,13 @@ export default function FilterTabs({
   onChoose?: (slug: string | null) => void
   /** The leading "All" tab. Off for a list where a combined view has no sensible order. Default true. */
   showAll?: boolean
+  /**
+   * Put the page padding inside the max-width box, as the heroes and the commissioners grid do,
+   * so the first tab sits under the hero heading at every width. The default keeps the padding
+   * outside the box, which leaves the tabs at the box edge, 40px left of the heading once the
+   * viewport is wider than the box.
+   */
+  padInside?: boolean
 }) {
   const groupRef = useRef<HTMLDivElement>(null)
   const mounted = useRef(false)
@@ -47,16 +55,17 @@ export default function FilterTabs({
   const cls = (pressed: boolean) =>
     `${TAB} ${pressed ? 'text-on-background' : 'text-on-background-subtle'}`
   return (
-    <div className="tf-px w-full">
+    <div className={padInside ? 'w-full' : 'tf-px w-full'}>
       {/* The mask sits on the element that clips (the scroller), so the fade lands on tab text. It
           bleeds exactly into the page padding on each side (-mx-(--tf-x), so it can't overflow the viewport) and pads back in, which
-          keeps the tabs aligned with the grid and lets "All" rest outside the fade. */}
+          keeps the tabs aligned with the grid and lets "All" rest outside the fade. With
+          `padInside` the scroller already spans the whole box, so there is nothing to bleed into. */}
       <div className="tf-max-w">
         <div
           ref={groupRef}
           role="group"
           aria-label={label}
-          className="-mx-(--tf-x) flex items-center gap-10 overflow-x-auto px-(--tf-x) py-2 scroll-pl-(--tf-x) [mask-image:linear-gradient(to_right,transparent,black_var(--tf-x),black_calc(100%-var(--tf-x)),transparent)]"
+          className={`${padInside ? '' : '-mx-(--tf-x) '}flex items-center gap-10 overflow-x-auto px-(--tf-x) py-2 scroll-pl-(--tf-x) [mask-image:linear-gradient(to_right,transparent,black_var(--tf-x),black_calc(100%-var(--tf-x)),transparent)]`}
         >
           {showAll && (
             <button
