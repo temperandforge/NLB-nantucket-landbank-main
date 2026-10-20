@@ -26,7 +26,7 @@ export const property = defineType({
   icon: PinIcon,
   groups: [
     {name: 'details', title: 'Details', default: true},
-    {name: 'page', title: 'Page content'},
+    {name: 'page', title: 'Page Content'},
     {name: 'map', title: 'Map'},
   ],
   fields: [
