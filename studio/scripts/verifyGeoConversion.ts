@@ -20,6 +20,17 @@ import {DOMParser} from '@xmldom/xmldom'
 import {strToU8, zipSync} from 'fflate'
 
 import {convertGeoFile, GeoConversionError, type ParseXml} from '../src/lib/geoConversion'
+import {
+  applyPatch,
+  checkSourceSize,
+  describeError,
+  GENERATED_FIELD,
+  generatedFilename,
+  MAX_SOURCE_BYTES,
+  removePatch,
+  reportRows,
+  SOURCE_FIELD,
+} from '../src/lib/geoFileInputModel'
 import {checkIdProperty} from '../src/lib/geoReport'
 import {detectFormat, parseAttributeTable, readSource} from '../src/lib/geoSources'
 
@@ -362,6 +373,94 @@ check('geojson: GeometryCollection without geometries or with null member degrad
   })
   assert(r.geojson.features.length === 1, `kept ${r.geojson.features.length}`)
   assert(r.report.dropped.null === 1, JSON.stringify(r.report.dropped))
+})
+
+console.log('\nStudio input helpers:')
+
+check('input: generated field derives from the layer', () => {
+  assert(GENERATED_FIELD.boundaries === 'boundaryData', GENERATED_FIELD.boundaries)
+  assert(GENERATED_FIELD.trails === 'trailsData', GENERATED_FIELD.trails)
+  assert(SOURCE_FIELD.boundaries === 'boundarySource' && SOURCE_FIELD.trails === 'trailsSource', 'source')
+})
+
+check('input: apply sets both fields in one patch; remove unsets both', () => {
+  const p = applyPatch('boundaries', 'file-a', 'file-b')
+  assert(
+    JSON.stringify(p) ===
+      JSON.stringify({
+        set: {
+          boundarySource: {_type: 'file', asset: {_type: 'reference', _ref: 'file-a'}},
+          boundaryData: {_type: 'file', asset: {_type: 'reference', _ref: 'file-b'}},
+        },
+      }),
+    JSON.stringify(p),
+  )
+  const r = removePatch('trails')
+  assert(JSON.stringify(r) === JSON.stringify({unset: ['trailsSource', 'trailsData']}), JSON.stringify(r))
+})
+
+check('input: generated filename', () => {
+  const cases: [string, string][] = [
+    ['Land_Bank.kmz', 'Land_Bank.geojson'],
+    ['a.b.gpx', 'a.b.geojson'],
+    ['noext', 'noext.geojson'],
+    ['.kml', '.kml.geojson'],
+  ]
+  for (const [input, expected] of cases) {
+    assert(generatedFilename(input) === expected, `${input} -> ${generatedFilename(input)}`)
+  }
+})
+
+check('input: size guard at 25 MB', () => {
+  assert(MAX_SOURCE_BYTES === 25 * 1024 * 1024, String(MAX_SOURCE_BYTES))
+  assert(checkSourceSize(MAX_SOURCE_BYTES) === null, 'limit itself rejected')
+  assert(/25\.0 MB/.test(checkSourceSize(MAX_SOURCE_BYTES + 1) ?? ''), 'over limit accepted')
+})
+
+check('input: report rows (boundaries, found)', () => {
+  const rows = reportRows(boundaries().report)
+  const labels = rows.map((r) => r.label)
+  for (const l of ['Format', 'Features kept', 'Geometries merged', 'Dropped', 'ID property', 'Size']) {
+    assert(labels.includes(l), `missing ${l}: ${labels}`)
+  }
+  const id = rows.find((r) => r.label === 'ID property')!
+  assert(!id.warn && !/Properties in this file/.test(id.value), id.value)
+})
+
+check('input: report rows (trails) have no ID row', () => {
+  const rows = reportRows(trails().report)
+  assert(!rows.some((r) => r.label === 'ID property'), 'trails show an ID row')
+  assert(rows.find((r) => r.label === 'Dropped')!.value === '1 Point', JSON.stringify(rows))
+})
+
+check('input: available names only when missing; duplicates when duplicated', () => {
+  const base = boundaries().report
+  const missing = reportRows({
+    ...base,
+    idProperty: {name: 'X', status: 'missing', missingCount: 2, duplicateValues: [], available: ['FID', 'name']},
+  }).find((r) => r.label === 'ID property')!
+  assert(missing.warn && /FID, name/.test(missing.value), missing.value)
+  const dup = reportRows({
+    ...base,
+    idProperty: {name: 'FID', status: 'duplicated', missingCount: 0, duplicateValues: ['3', '7'], available: ['FID', 'name']},
+  }).find((r) => r.label === 'ID property')!
+  assert(dup.warn && /3, 7/.test(dup.value) && !/name/.test(dup.value), dup.value)
+})
+
+check('input: wrapped engine error is a detail under a plain headline', () => {
+  let caught: unknown
+  try {
+    convertGeoFile({bytes: null as unknown as Uint8Array, filename: 'a.kml', layer: 'boundaries', parseXml})
+  } catch (error) {
+    caught = error
+  }
+  const d = describeError(caught, 'convert')
+  assert(d.headline === 'Could not read this file', d.headline)
+  assert(d.detail && !d.detail.startsWith('The file could not be converted'), JSON.stringify(d))
+  const plain = describeError(new GeoConversionError('The file is not valid XML.'), 'convert')
+  assert(plain.message === 'The file is not valid XML.' && !plain.detail, JSON.stringify(plain))
+  const upload = describeError(new Error('network down'), 'upload')
+  assert(/Nothing was changed/.test(upload.headline) && upload.detail === 'network down', JSON.stringify(upload))
 })
 
 console.log('\nAll geo conversion checks passed.')

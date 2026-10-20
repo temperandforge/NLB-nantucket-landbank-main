@@ -1,6 +1,8 @@
 import {CogIcon} from '@sanity/icons'
 import {defineField, defineType} from 'sanity'
 
+import {geoFileInput} from '../../components/GeoFileInput'
+
 /**
  * Properties Settings schema Singleton (the document id and type keep their original name,
  * `projectSettings`, from before properties were called projects).
@@ -54,6 +56,7 @@ export const projectSettings = defineType({
       group: 'map',
       description:
         'Upload the property boundaries as GPX, KML, KMZ or GeoJSON. It is converted to GeoJSON automatically and the original is kept here. Replacing this file does not change any project’s assignment, so check for warnings on the projects afterwards.',
+      components: {input: geoFileInput('boundaries')},
       options: {
         accept: '.gpx,.kml,.kmz,.geojson,.json,application/gpx+xml,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz,application/geo+json,application/json',
       },
@@ -87,6 +90,7 @@ export const projectSettings = defineType({
       group: 'map',
       description:
         'Upload the trail tracks as GPX, KML, KMZ or GeoJSON. It is converted to GeoJSON automatically and the original is kept here. Leave empty to hide the trails layer.',
+      components: {input: geoFileInput('trails')},
       options: {
         accept: '.gpx,.kml,.kmz,.geojson,.json,application/gpx+xml,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz,application/geo+json,application/json',
       },

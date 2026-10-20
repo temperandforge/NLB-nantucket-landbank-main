@@ -31,6 +31,12 @@ export type ConversionResult = {geojson: GeoJSON.FeatureCollection; report: Conv
 
 const KIND: Record<GeoLayer, string> = {boundaries: 'polygon', trails: 'line'}
 
+/**
+ * Prefix of the message for an unexpected (non-GeoConversionError) failure. Exported so the
+ * Studio input can show the raw engine text as a detail line rather than as the headline.
+ */
+export const WRAPPED_ERROR_PREFIX = 'The file could not be converted: '
+
 /** Any failure surfaces as GeoConversionError, so callers have exactly one error type to handle. */
 export function convertGeoFile(input: ConvertInput): ConversionResult {
   try {
@@ -38,7 +44,7 @@ export function convertGeoFile(input: ConvertInput): ConversionResult {
   } catch (error) {
     if (error instanceof GeoConversionError) throw error
     const detail = error instanceof Error ? error.message : String(error)
-    throw new GeoConversionError(`The file could not be converted: ${detail}`)
+    throw new GeoConversionError(`${WRAPPED_ERROR_PREFIX}${detail}`)
   }
 }
 
