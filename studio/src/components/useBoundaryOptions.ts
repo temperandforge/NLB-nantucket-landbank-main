@@ -8,7 +8,7 @@ import {useClient} from 'sanity'
 
 const SETTINGS_QUERY = `*[_type == "projectSettings" && _id == "projectSettings"][0]{
   "url": boundaryData.asset->url,
-  "idProperty": coalesce(boundaryIdProperty, "id")
+  "idProperty": coalesce(boundaryIdProperty, "FID")
 }`
 
 /** Feature property names tried, in order, for a human-readable label beside the identifier. */

@@ -188,7 +188,7 @@ const mapFiltersFields = /* groq */ `
 /** The map's settings. Shared by the Map Preview and Map Explorer blocks. */
 const mapSettingsFields = /* groq */ `
   "boundaryDataUrl": boundaryData.asset->url,
-  "boundaryIdProperty": coalesce(boundaryIdProperty, "id"),
+  "boundaryIdProperty": coalesce(boundaryIdProperty, "FID"),
   "trailsDataUrl": trailsData.asset->url,
   defaultCenter,
   defaultZoom
