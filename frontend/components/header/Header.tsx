@@ -34,7 +34,7 @@ export default async function Header() {
       {banner?.message && <SiteBanner banner={banner} />}
       <HeaderShell>
         <div data-header-bar className="relative flex h-(--header-height) w-full items-center justify-between">
-          <Link href="/" aria-label="Nantucket Land Bank - home">
+          <Link href="/" aria-label="Nantucket Land Bank - home" className="shrink-0">
             <Image src="/images/nlb-logo.svg" alt="" width={LOGO_WIDTH} height={LOGO_HEIGHT} priority />
           </Link>
           {menu?.items?.length ? (

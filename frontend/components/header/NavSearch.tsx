@@ -1,4 +1,4 @@
-import {CloseIcon, SearchIcon} from '@/components/icons'
+import {SearchIcon} from '@/components/icons'
 import SearchField from '@/components/search/SearchField'
 
 /**
@@ -55,7 +55,7 @@ export default function NavSearch(props: DesktopProps | MobileProps) {
         onClick={onToggle}
         className={`flex size-12 cursor-pointer items-center justify-center rounded bg-secondary text-on-secondary transition-colors hover:bg-goldenrod-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500 ${className ?? ''}`}
       >
-        {open ? <CloseIcon className="size-3" /> : <SearchIcon className="size-6" />}
+        <SearchIcon className="size-6" />
       </button>
       {open && (
         <div

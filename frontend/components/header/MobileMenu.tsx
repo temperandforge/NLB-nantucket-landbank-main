@@ -12,8 +12,6 @@ import type {HeaderMenuData} from '@/sanity/lib/types'
 import NavSearch from './NavSearch'
 import {resolveItemHref} from './resolveItemHref'
 
-const LABEL_CLASS = 'font-mono-tracked text-[12px] uppercase tracking-[1.32px] leading-[1.6]'
-
 /**
  * Hamburger plus a full-height panel under the bar. A top-level submenu drills into a
  * sub-panel with a Back link; plain links navigate directly. Body scroll is locked while open.
@@ -83,8 +81,8 @@ export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
       close()
       toggleRef.current?.focus()
     }
-    // Tailwind lg (64rem): the menu is hidden at and above it, so release the lock there.
-    const desktop = window.matchMedia('(min-width: 64rem)')
+    // Tailwind xl (80rem): the menu is hidden at and above it, so release the lock there.
+    const desktop = window.matchMedia('(min-width: 80rem)')
     const onChange = (event: MediaQueryListEvent) => {
       if (event.matches) close()
     }
@@ -109,7 +107,7 @@ export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
   const drilled = items.find((item) => item._key === drilledKey)
 
   return (
-    <div data-header-lock={open ? '' : undefined} className="lg:hidden">
+    <div data-header-lock={open ? '' : undefined} className="xl:hidden">
       <button
         ref={toggleRef}
         type="button"
@@ -164,8 +162,8 @@ export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
             className={`flex grow flex-col ${swap ? 'mobile-menu-view' : ''}`}
             style={{'--mobile-menu-slide-from': '1.5rem'} as React.CSSProperties}
           >
-            <div className="flex grow flex-col gap-gap-md overflow-y-auto">
-              <h2 ref={headingRef} tabIndex={-1} className={`${LABEL_CLASS} outline-none`}>
+            <div className="flex grow flex-col overflow-y-auto">
+              <h2 ref={headingRef} tabIndex={-1} className="sr-only outline-none">
                 {drilled.label}
               </h2>
               {groupMenuLinks(
@@ -173,13 +171,20 @@ export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
               ).map((column, index) => (
                 <div
                   key={`${column.heading ?? 'none'}-${index}`}
-                  className="flex flex-col gap-gap-sm"
+                  className="flex flex-col border-border-light not-last:border-b"
                 >
-                  {column.heading && <h3 className={LABEL_CLASS}>{column.heading}</h3>}
-                  <ul className="flex flex-col gap-gap-sm">
+                  {column.heading && (
+                    <h3 className="py-4 font-mono-tracked text-body-small uppercase leading-[1.6] tracking-wide text-on-accent-primary-tonal">
+                      {column.heading}
+                    </h3>
+                  )}
+                  <ul className="flex flex-col px-4">
                     {column.links.map((child) => (
                       <li key={child._key}>
-                        <ResolvedLink link={child.link} className="font-secondary text-body-base">
+                        <ResolvedLink
+                          link={child.link}
+                          className="flex h-14 items-center font-secondary text-body-base text-on-primary"
+                        >
                           {child.label}
                         </ResolvedLink>
                       </li>
@@ -191,9 +196,9 @@ export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
             <button
               type="button"
               onClick={() => drill(null)}
-              className="mt-gap-md inline-flex items-center gap-gap-sm self-start font-secondary text-body-small"
+              className="mt-gap-md inline-flex h-12 items-center gap-2 self-start px-5 font-mono-tracked text-body-base text-on-primary"
             >
-              <ArrowLeftIcon className="size-5" />
+              <ArrowLeftIcon className="size-6" />
               Back
             </button>
           </nav>
@@ -204,14 +209,14 @@ export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
             className={`flex grow flex-col ${swap ? 'mobile-menu-view' : ''}`}
             style={{'--mobile-menu-slide-from': '-1.5rem'} as React.CSSProperties}
           >
-            <ul className="flex grow flex-col gap-gap-md overflow-y-auto">
+            <ul className="flex grow flex-col overflow-y-auto">
               {items.map((item, index) => {
                 if (!item) return null
                 if (item._type === 'menuLink') {
                   if (!resolveItemHref(item.link)) return null
                   return (
                     <li key={item._key} {...stagger(index)}>
-                      <ResolvedLink link={item.link} className="font-secondary text-body-base">
+                      <ResolvedLink link={item.link} className="flex h-16 items-center px-2 font-secondary text-body-base text-on-background-subtle">
                         {item.label}
                       </ResolvedLink>
                     </li>
@@ -224,10 +229,10 @@ export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
                       type="button"
                       data-drill={item._key}
                       onClick={() => drill(item._key)}
-                      className="inline-flex items-center gap-gap-sm font-secondary text-body-base"
+                      className="flex h-16 items-center gap-gap-mini px-2 font-secondary text-body-base text-on-background-subtle"
                     >
                       {item.label}
-                      <ChevronDownIcon className="size-4 -rotate-90" />
+                      <ChevronDownIcon className="size-5 -rotate-90" />
                     </button>
                   </li>
                 )

@@ -21,7 +21,8 @@ function moveFocus(event: KeyboardEvent<HTMLDivElement>) {
 }
 
 /**
- * The panel under a top-level item. Links with a column heading render as headed columns, each
+ * The panel under a top-level item. A flat panel is offset -left-8 (its 40px padding less the trigger's 8px
+ * inset) so its text lines up with the trigger's label, as in Figma. Links with a column heading render as headed columns, each
  * with a left rule; a menu with no headings renders as one flat list. Items whose link cannot
  * be resolved are dropped.
  */
@@ -53,23 +54,23 @@ export default function NavDropdown({
       onClick={(event) => {
         if ((event.target as HTMLElement).closest('a')) onNavigate?.()
       }}
-      className={`absolute top-full z-40 bg-background px-gap-md py-gap-md shadow-layer ${
-        grouped ? 'left-0 right-0' : 'left-0 min-w-56'
+      className={`absolute top-full z-40 rounded-b bg-background p-10 shadow-[0_20px_80px_rgba(47,42,34,0.16)] ${
+        grouped ? 'left-0 right-0' : '-left-8 w-max min-w-64'
       }`}
     >
       <div className={grouped ? 'grid grid-cols-3 gap-x-gap-lg' : ''}>
         {columns.map((column, index) => (
-          <div key={`${column.heading ?? 'none'}-${index}`} className="flex flex-col gap-gap-sm">
+          <div key={`${column.heading ?? 'none'}-${index}`} className="flex flex-col">
             {column.heading && <h3 className={LABEL_CLASS}>{column.heading}</h3>}
-            <ul className={`flex flex-col gap-gap-sm ${column.heading ? 'border-l border-border-light pl-gap-md' : ''}`}>
+            <ul className={`flex flex-col ${column.heading ? 'border-l border-border-light pl-gap-md' : ''}`}>
               {column.links.map((item) => (
                 <li key={item._key}>
                   <ResolvedLink
                     link={item.link}
-                    className="group inline-flex items-center gap-gap-sm border-b border-transparent font-secondary text-body-small hover:border-border-alt"
+                    className="group flex h-14 w-fit items-center gap-gap-sm border-b border-transparent font-secondary text-body-base text-on-primary hover:border-border-alt focus-visible:border-border-alt"
                   >
                     {item.label}
-                    <ArrowRightIcon className="size-4 group-hover:text-secondary" />
+                    <ArrowRightIcon className="hidden size-6 text-secondary group-hover:block group-focus-visible:block" />
                   </ResolvedLink>
                 </li>
               ))}

@@ -11,6 +11,13 @@ import NavDropdown from './NavDropdown'
 import NavSearch, {NAV_SEARCH_KEY} from './NavSearch'
 import {resolveItemHref} from './resolveItemHref'
 
+// Shared by plain links and submenu triggers so the two read as one set. Items fill the bar's height so an open
+// submenu's rule (border-b) sits on the bar's bottom edge, as in Figma; hover only darkens the text.
+const ITEM_CLASS =
+  'inline-flex items-center gap-gap-mini self-stretch border-b px-2 font-secondary text-body-base whitespace-nowrap'
+const ITEM_IDLE = 'border-transparent text-on-background-subtle hover:text-accent-primary'
+const ITEM_OPEN = 'border-border-dark text-accent-primary'
+
 /**
  * The desktop bar. Owns which dropdown (or the search panel) is open: one at a time, closed by Escape (focus returns
  * to its trigger), by a click outside, or by opening another. While one is open the root carries
@@ -31,8 +38,8 @@ export default function DesktopNav({menu}: {menu: HeaderMenuData}) {
 
   useEffect(() => {
     if (!openKey) return
-    // Below lg this bar is display:none; a dropdown left open would keep data-header-lock on a hidden element.
-    const desktop = window.matchMedia('(min-width: 64rem)')
+    // Below xl this bar is display:none; a dropdown left open would keep data-header-lock on a hidden element.
+    const desktop = window.matchMedia('(min-width: 80rem)')
     const onChange = (event: MediaQueryListEvent) => {
       if (!event.matches) setOpenKey(null)
     }
@@ -64,20 +71,17 @@ export default function DesktopNav({menu}: {menu: HeaderMenuData}) {
         if (event.relatedTarget && !rootRef.current?.contains(event.relatedTarget as Node)) setOpenKey(null)
       }}
       // Stretches to the full bar height so each <li> (and a flat panel's top-full) reaches the bar's bottom edge.
-      className="flex items-stretch self-stretch gap-gap-md max-lg:hidden"
+      className="flex items-stretch self-stretch gap-8 max-xl:hidden"
     >
       <nav aria-label="Primary" className="flex">
-        <ul className="flex items-stretch gap-gap-md">
+        <ul className="flex items-stretch gap-6">
           {(menu.items ?? []).map((item) => {
             if (!item) return null
             if (item._type === 'menuLink') {
               if (!resolveItemHref(item.link)) return null
               return (
-                <li key={item._key} className="flex items-center">
-                  <ResolvedLink
-                    link={item.link}
-                    className="font-secondary text-body-small whitespace-nowrap hover:underline"
-                  >
+                <li key={item._key} className="flex items-stretch">
+                  <ResolvedLink link={item.link} className={`${ITEM_CLASS} ${ITEM_IDLE}`}>
                     {item.label}
                   </ResolvedLink>
                 </li>
@@ -94,7 +98,7 @@ export default function DesktopNav({menu}: {menu: HeaderMenuData}) {
             const grouped = live.some((child) => child.group?.trim())
 
             return (
-              <li key={item._key} className={`flex items-center ${grouped ? 'static' : 'relative'}`}>
+              <li key={item._key} className={`flex items-stretch ${grouped ? 'static' : 'relative'}`}>
                 <button
                   id={triggerId}
                   type="button"
@@ -102,12 +106,10 @@ export default function DesktopNav({menu}: {menu: HeaderMenuData}) {
                   aria-expanded={open}
                   aria-controls={panelId}
                   onClick={() => setOpenKey(open ? null : item._key)}
-                  className={`inline-flex items-center gap-gap-mini border-b font-secondary text-body-small whitespace-nowrap ${
-                    open ? 'border-border-dark text-on-background' : 'border-transparent text-on-background-subtle'
-                  }`}
+                  className={`${ITEM_CLASS} ${open ? ITEM_OPEN : ITEM_IDLE}`}
                 >
                   {item.label}
-                  {open ? <ChevronUpIcon className="size-4" /> : <ChevronDownIcon className="size-4" />}
+                  {open ? <ChevronUpIcon className="size-5" /> : <ChevronDownIcon className="size-5" />}
                 </button>
                 {open && (
                   <NavDropdown
