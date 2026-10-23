@@ -3,6 +3,7 @@
 @import './blocks.css';
 @import './ui.css';
 @import './form.css';
+@import './motion.css';
 
 @plugin "@tailwindcss/typography";
 

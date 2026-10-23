@@ -28,11 +28,33 @@ export default function HeroVideo({block}: HeroVideoProps) {
     const video = videoRef.current
     if (!video) return
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (wantsAutoplay && !reducedMotion) {
-      // Browsers may still refuse; the poster stays visible and the button starts it.
-      video.play().catch(() => setPlaying(false))
-    } else {
+    if (!wantsAutoplay || reducedMotion) {
       video.pause()
+      return
+    }
+    // The poster is the LCP element, and the video starts downloading the moment it plays. Wait
+    // until the page has loaded (and the browser is idle) so the two don't compete for bandwidth,
+    // which matters most on a phone. Browsers may still refuse to play; the poster stays visible
+    // and the button starts it.
+    const start = () => {
+      video.play().catch(() => setPlaying(false))
+    }
+    let idle: number | undefined
+    let timer: number | undefined
+    const whenLoaded = () => {
+      // Safari has no requestIdleCallback: a short timer is its fallback.
+      if (typeof window.requestIdleCallback === 'function') {
+        idle = window.requestIdleCallback(start, {timeout: 2000})
+      } else {
+        timer = window.setTimeout(start, 500)
+      }
+    }
+    if (document.readyState === 'complete') whenLoaded()
+    else window.addEventListener('load', whenLoaded, {once: true})
+    return () => {
+      window.removeEventListener('load', whenLoaded)
+      if (idle !== undefined) window.cancelIdleCallback(idle)
+      if (timer !== undefined) window.clearTimeout(timer)
     }
   }, [wantsAutoplay])
 
@@ -57,6 +79,9 @@ export default function HeroVideo({block}: HeroVideoProps) {
           crop={poster.crop}
           mode="cover"
           sizes="100vw"
+          // The poster is the largest paint on the home page: never lazy, fetched first.
+          loading="eager"
+          fetchPriority="high"
           className="absolute inset-0 size-full object-cover"
         />
       )}
@@ -67,7 +92,7 @@ export default function HeroVideo({block}: HeroVideoProps) {
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="none"
         aria-label={block.alt || undefined}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
