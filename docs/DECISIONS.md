@@ -576,6 +576,14 @@ want it.
   `draftMode()`, which would make every page dynamic. A hero description uses
   `variant="body"` (a quicker, never-blurred sweep, capped at 48 words). Word splitting is in
   `frontend/sanity/lib/cascade.ts`, checked by `frontend/scripts/verifyCascade.mts`.
+- **The rest of the page enters through `data-enter`, in CSS only.** `BlockRenderer` tags the
+  first two blocks `load` (on a timer) and the rest `scroll` (CSS scroll-driven animations, inside
+  `@supports (animation-timeline: view())`, so Firefox and Safari before 26 see them static).
+  Detail pages tag their sections with `<Enter>`. Inside a tagged block the outermost heading,
+  paragraph, image, list item, `.button` or `[data-part]` animates; a card that is not a list item
+  needs `data-part`; a morph target's hero wrapper needs `data-morph`. The shared parts selector is
+  pinned by `verifyMotionCss.mts`, and `enterAttrs` by `verifyEnter.mts`. Studio Presentation turns
+  it off via `data-draft` on `<html>`, set by `DraftModeToast`.
 - **`<PageTransition>` belongs in each `page.tsx`, never a layout.** `<ViewTransition>` enter and
   exit do not fire in a layout, because layouts persist across navigations. A new route gets no
   transition until its `page.tsx` wraps its content.

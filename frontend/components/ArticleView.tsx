@@ -1,6 +1,7 @@
 import type {PortableTextBlock} from 'next-sanity'
 
 import Cascade from '@/components/Cascade'
+import Enter from '@/components/Enter'
 import CustomPortableText from '@/components/PortableText'
 import ShareLinks from '@/components/ShareLinks'
 import Tag from '@/components/ui/Tag'
@@ -57,14 +58,18 @@ export default function ArticleView({
           </div>
           <hr className="w-full border-0 border-t border-dusty-heath-700" />
           {article.body && article.body.length > 0 && (
-            <CustomPortableText
-              variant="article"
-              className="w-full"
-              value={article.body as PortableTextBlock[]}
-            />
+            <Enter className="w-full">
+              <CustomPortableText
+                variant="article"
+                className="w-full"
+                value={article.body as PortableTextBlock[]}
+              />
+            </Enter>
           )}
         </div>
-        <ShareLinks label={shareLabel} />
+        <Enter>
+          <ShareLinks label={shareLabel} />
+        </Enter>
       </div>
     </article>
   )

@@ -20,12 +20,13 @@ Chosen by comparing live motion demos (a throwaway companion, not committed):
 |---|---|
 | Text load-in | **Word cascade**: headline words rise ~0.4em and sharpen from a 6px blur, ~30ms apart, 450ms each (the first 45ms / 800ms felt slow on a phone, even after the easing was softened and then 600ms), `cubic-bezier(.33,1,.68,1)` (ease-out cubic; the original expo-out `.22,1,.36,1` did 95% of the movement in the first third, so the animation looked like it ended early on a phone). Eyebrow, body and buttons plain-fade in after the headline. The blur is only on devices with a fine pointer and hover: on iPhone Safari, animating `filter` on every word was choppy and snapped at the end (WebKit paints filtered text on the CPU), so touch devices get opacity + rise only. |
 | Page transition | **Shared-element morph** for card → detail, with the **soft handoff** as the fallback everywhere else. |
-| Scope | **First screen on load and navigation only.** Nothing animates on scroll. |
+| Scope | **The whole page.** The first screen animates on load and navigation. Every section below it animates as it scrolls into view, with CSS scroll-driven animations (no JS). Originally first screen only; widened after the headline and description were done (see "Whole-page enter"). |
 | Mechanism | **Server-rendered `<Cascade>` + CSS, and React `<ViewTransition>`.** No animation library, no client JS. |
 
 ## Non-goals
 
-- Scroll-in or reveal-on-scroll of any kind (deferred, see below).
+- A word-by-word cascade below the fold: sections below the first screen enter as whole parts (see "Whole-page enter"), not word by word.
+- Scroll-in in browsers without CSS scroll-driven animations (Firefox, Safari before 26): those just see the sections static.
 - Per-block or per-page motion settings in Sanity.
 - Directional (forward/back) slides, the curtain wipe, or the soft-focus text style.
 - An animation library (Motion, GSAP).
@@ -162,11 +163,48 @@ No test framework exists, so verification is in a real browser:
   `generateStaticParams`; news has no morph.
 - The dev server started for verification is stopped afterwards.
 
+## Whole-page enter
+
+The headline cascade and the hero description cover only text. Everything else on screen, and every
+section below it, also enters, so the page doesn't stop animating partway down. Two layers, both CSS
+only (no client JS), all inside the guarded block of `motion.css`:
+
+- **Tagging.** `BlockRenderer` already knows each block's index, so its wrapper gets `data-enter`:
+  `load` for the first two blocks (`data-enter-order` 0 and 1), `scroll` for the rest. The pure rule
+  is `enterAttrs(index)` in `frontend/sanity/lib/enter.ts`. Detail pages (property, project, news,
+  event) tag their own sections the same way through a small `<Enter>` wrapper.
+- **What animates: parts.** Inside a tagged block, a *part* is a heading, `p`, image, figure,
+  blockquote, a `ul > li` / `ol > li`, a `.button`, or anything marked `data-part` (cards that are
+  not list items). Only the outermost part animates, so a card (its image and text inside it) moves
+  as one unit and nothing compounds. Excluded: text that already cascades (`.cascade-word`), the
+  eyebrow (`.load-in`) and `aria-hidden` decoration.
+- **Load layer (blocks 0 and 1).** Parts fade and rise ~14px on a timer, staggered by their position
+  among their siblings (70ms apart, capped at the 7th), after the headline: block 0 starts at 120ms,
+  block 1 at 360ms. Images and figures fade only, with no movement: they are usually the LCP element
+  and large transforms are costly.
+- **Scroll layer (later blocks).** The same fade and rise, driven by the part's own entry into the
+  viewport (`animation-timeline: view()`), inside `@supports (animation-timeline: view())`. Siblings
+  in the same row are offset along the entry range, so a grid staggers. The motion follows the
+  scroll and reverses if you scroll back. The end of the range is reachable for any part inside the
+  last viewport (parts end by 91% of their own entry), so nothing is stranded part-transparent near
+  the bottom of the page. Browsers without scroll-driven animations (Firefox, Safari before 26) show
+  the sections static, which is the current behaviour.
+- **The morph target is excluded.** The hero wrapper of a property or project page is marked
+  `data-morph`, and nothing inside it is a part: a fade-in on the shared image would start the
+  morph's "new" side transparent and make it flicker.
+- **Never hidden when it matters.** Reduced motion and print: static (the whole block is in the
+  guarded `no-preference` block). Studio Presentation: `DraftModeToast` (client, draft mode only)
+  sets `data-draft` on `<html>` and a CSS rule turns the part animations off.
+- **Guard.** `verifyMotionCss.mts` pins the shared parts selector (it appears in each mode and in
+  the draft rule, and must stay identical), the `@supports` condition, the tokens, and that the
+  scroll layer uses the longhands (`animation-timeline` / `animation-range`), not the shorthand.
+  `verifyEnter.mts` covers `enterAttrs`.
+
 ## Deferred
 
 Per the repo rule each gets a GitHub issue, linked here when filed.
 
-- **Scroll-in cascade** for headings below the first screen (the earlier "B" option): [#86](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/86).
+- **Scroll-in cascade** for headings below the first screen (the earlier "B" option): [#86](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/86). Superseded for parts by "Whole-page enter" (scroll-driven, no JS); a word-by-word cascade below the fold remains undone.
 - **News article hero morph**, blocked on `ArticleView` rendering no hero image: [#87](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/87).
 - **Browser back/forward start no view transition:** [#88](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/88).
 - **Header hidden by scroll snaps back in** at the start of a transition: [#89](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/89).

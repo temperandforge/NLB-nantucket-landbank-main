@@ -123,7 +123,42 @@ check(
   'the body cascade uses the plain cascade-in keyframes and its own offset and step',
 )
 
+// Whole-page enter. The first two page blocks animate their parts on a timer (data-enter="load");
+// every later block animates them as they scroll into view (data-enter="scroll", CSS scroll-driven
+// animations, no JS). A *part* is the outermost heading / paragraph / image / list item / button;
+// the selector below is long and must stay IDENTICAL in each mode and in the draft-mode rule, so
+// this pins it.
+const flat = inside.replace(/\s+/g, ' ')
+const PARTS = ':is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part])'
+const SEL = `${PARTS}:not(${PARTS} ${PARTS}):not(:has(.cascade-word)):not(.load-in):not([aria-hidden="true"]):not([aria-hidden="true"] *):not([data-morph] *)`
+check(flat.split(SEL).length - 1 === 3, `the parts selector appears exactly 3 times, identically (load, scroll, draft) (found ${flat.split(SEL).length - 1})`)
+check(flat.includes(`[data-enter="load"] ${SEL} {`), 'a load rule animates the parts of data-enter="load" blocks')
+const supportsOpen = /@supports\s*\(\s*animation-timeline\s*:\s*view\(\)\s*\)\s*\{/g
+const {blocks: supports} = split(inside, supportsOpen)
+check(supports.length === 1, `exactly one @supports (animation-timeline: view()) block inside the guard (found ${supports.length})`)
+const scrollRule = supports.join('\n').replace(/\s+/g, ' ')
+check(scrollRule.includes(`[data-enter="scroll"] ${SEL} {`), 'the scroll rule lives inside @supports and targets data-enter="scroll"')
+const scrollBody = /\[data-enter="scroll"\][^{]*\{([^}]*)\}/.exec(scrollRule)?.[1] ?? ''
+check(
+  /animation-timeline\s*:\s*view\(\)/.test(scrollBody) && /animation-range\s*:/.test(scrollBody) && !/\banimation\s*:/.test(scrollBody),
+  'the scroll layer uses the longhands (animation-timeline: view(), animation-range), never the animation shorthand',
+)
+check(
+  new RegExp(`:root\\[data-draft\\] \\[data-enter\\] ${SEL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\{[^}]*animation\\s*:\\s*none`).test(flat),
+  'Studio Presentation (html[data-draft]) turns the part animations off',
+)
+check(/:is\(img,\s*picture,\s*figure\)\s*\{[^}]*--part-anim\s*:\s*part-fade/.test(inside), 'images, pictures and figures fade only (no movement)')
+check(
+  /\[data-enter\]\s+:nth-child\(2\)\s*\{[^}]*--n\s*:\s*1/.test(inside) && /\[data-enter\]\s+:nth-child\(n\s*\+\s*7\)\s*\{[^}]*--n\s*:\s*6/.test(inside),
+  'sibling stagger index --n is set by :nth-child and capped at 6',
+)
+
 const tokens: Record<string, string> = {
+  '--enter-rise': '14px',
+  '--enter-step': '70ms',
+  '--enter-base-0': '120ms',
+  '--enter-base-1': '360ms',
+  '--enter-scroll-step': '6%',
   '--cascade-step-body': '10ms',
   '--cascade-body-offset': '240ms',
   '--motion-duration': '450ms',

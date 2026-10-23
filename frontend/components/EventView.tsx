@@ -1,6 +1,7 @@
 import type {PortableTextBlock} from 'next-sanity'
 
 import Cascade from '@/components/Cascade'
+import Enter from '@/components/Enter'
 import {CalendarIcon, ClockIcon, MapPinIcon} from '@/components/icons'
 import CustomPortableText from '@/components/PortableText'
 import {eventDateLabel, eventParts} from '@/sanity/lib/dates'
@@ -49,9 +50,9 @@ export default function EventView({event}: {event: NonNullable<EventQueryResult>
           )}
         </div>
         {body.length > 0 && (
-          <div className="flex w-full flex-col lg:w-[640px] lg:shrink-0">
+          <Enter className="flex w-full flex-col lg:w-[640px] lg:shrink-0">
             <CustomPortableText variant="project" className="w-full" value={body as PortableTextBlock[]} />
-          </div>
+          </Enter>
         )}
       </div>
     </article>

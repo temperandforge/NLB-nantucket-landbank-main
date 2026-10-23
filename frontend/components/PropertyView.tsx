@@ -37,7 +37,7 @@ export function PropertyIntro({property}: {property: NonNullable<PropertyQueryRe
         <div className="w-full bg-background tf-px py-5 md:py-10">
           {/* The archive card's image morphs into this (CardProperty `morph`). */}
           <ViewTransition name={`property-${property.slug}`} share="morph" default="none">
-            <div className="relative h-[523px] w-full overflow-clip rounded bg-dusty-heath-800 md:h-[600px]">
+            <div data-morph className="relative h-[523px] w-full overflow-clip rounded bg-dusty-heath-800 md:h-[600px]">
               <BlockImage
                 image={hero}
                 width={2400}

@@ -19,6 +19,12 @@
   --cascade-blur: 6px;
   --page-out-duration: 180ms;
   --page-in-duration: 280ms;
+  /* Whole-page enter: the parts of a block (headings, paragraphs, images, list items, buttons). */
+  --enter-rise: 14px;
+  --enter-step: 70ms;
+  --enter-base-0: 120ms;
+  --enter-base-1: 360ms;
+  --enter-scroll-step: 6%;
 }
 
 /* Not animations, so they sit outside the guard. */
@@ -136,6 +142,100 @@
   }
 
   ::view-transition-new(site-header) {
+    animation: none;
+  }
+
+  /*
+   * Whole-page enter. BlockRenderer (and <Enter>) tag a block data-enter="load" (the first two,
+   * data-enter-order 0 and 1) or "scroll" (the rest). Inside one, the *parts* animate: the
+   * outermost heading, paragraph, image, list item or button (or anything marked data-part). A card
+   * is one part, so its image and text move as a unit and nothing compounds. Text that already
+   * cascades, the eyebrow and aria-hidden decoration are left alone. The long selector below is
+   * written out identically in three places; scripts/verifyMotionCss.mts pins that.
+   */
+  @keyframes part-in {
+    from {
+      opacity: 0;
+      transform: translateY(var(--enter-rise));
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes part-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Images are usually the LCP element and large transforms are costly: they fade, no movement. */
+  :is(img, picture, figure) {
+    --part-anim: part-fade;
+  }
+
+  /* Sibling stagger index, 0 for the first child up to 6 (a grid or a stack staggers by position). */
+  [data-enter] * {
+    --n: 0;
+  }
+  [data-enter] :nth-child(2) {
+    --n: 1;
+  }
+  [data-enter] :nth-child(3) {
+    --n: 2;
+  }
+  [data-enter] :nth-child(4) {
+    --n: 3;
+  }
+  [data-enter] :nth-child(5) {
+    --n: 4;
+  }
+  [data-enter] :nth-child(6) {
+    --n: 5;
+  }
+  [data-enter] :nth-child(n + 7) {
+    --n: 6;
+  }
+
+  [data-enter-order="0"] {
+    --enter-base: var(--enter-base-0);
+  }
+  [data-enter-order="1"] {
+    --enter-base: var(--enter-base-1);
+  }
+
+  /* Above the fold: on a timer, after the headline. */
+  [data-enter="load"] :is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part]):not(:is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part]) :is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part])):not(:has(.cascade-word)):not(.load-in):not([aria-hidden="true"]):not([aria-hidden="true"] *):not([data-morph] *) {
+    animation-name: var(--part-anim, part-in);
+    animation-duration: var(--motion-duration);
+    animation-timing-function: var(--motion-ease);
+    animation-fill-mode: both;
+    animation-delay: calc(var(--enter-base, 0ms) + var(--n, 0) * var(--enter-step));
+  }
+
+  /*
+   * Below the fold: driven by the part's own entry into the viewport, no JS. Only where the browser
+   * supports it (Chrome, Edge, Safari 26+); elsewhere the sections are simply static. Siblings in a
+   * row are offset along the range so a grid staggers. The range ends by 91% of the entry, so a part
+   * in the last viewport still reaches full opacity.
+   */
+  @supports (animation-timeline: view()) {
+    [data-enter="scroll"] :is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part]):not(:is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part]) :is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part])):not(:has(.cascade-word)):not(.load-in):not([aria-hidden="true"]):not([aria-hidden="true"] *):not([data-morph] *) {
+      animation-name: var(--part-anim, part-in);
+      animation-duration: auto;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--n, 0) * var(--enter-scroll-step)) entry calc(55% + var(--n, 0) * var(--enter-scroll-step));
+    }
+  }
+
+  /* Studio Presentation (DraftModeToast sets data-draft): editors always see the content. */
+  :root[data-draft] [data-enter] :is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part]):not(:is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part]) :is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part])):not(:has(.cascade-word)):not(.load-in):not([aria-hidden="true"]):not([aria-hidden="true"] *):not([data-morph] *) {
     animation: none;
   }
 }

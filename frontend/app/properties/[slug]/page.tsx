@@ -3,6 +3,7 @@ import {notFound} from 'next/navigation'
 import {toPlainText, type PortableTextBlock} from 'next-sanity'
 
 import MapPreviewView from '@/components/blocks/MapPreviewView'
+import Enter from '@/components/Enter'
 import PropertiesPreviewView from '@/components/blocks/PropertiesPreviewView'
 import {PropertyFaqs, PropertyGallery, PropertyIntro} from '@/components/PropertyView'
 import PageTransition from '@/components/PageTransition'
@@ -74,26 +75,36 @@ export default async function PropertyPage(props: PageProps<'/properties/[slug]'
 
   return (
     <PageTransition>
-      <PropertyIntro property={property} />
-      <PropertyGallery property={property} />
+      <Enter index={0}>
+        <PropertyIntro property={property} />
+      </Enter>
+      <Enter>
+        <PropertyGallery property={property} />
+      </Enter>
       {showMap && (
-        <MapPreviewView
-          heading={property.mapHeading || `${property.name} Trails and Properties`}
-          body={property.mapBody}
-          properties={map.properties}
-          settings={map.settings}
-          focusSlug={property.slug}
-          showPopupLink={false}
-        />
+        <Enter>
+          <MapPreviewView
+            heading={property.mapHeading || `${property.name} Trails and Properties`}
+            body={property.mapBody}
+            properties={map.properties}
+            settings={map.settings}
+            focusSlug={property.slug}
+            showPopupLink={false}
+          />
+        </Enter>
       )}
-      <PropertyFaqs property={property} settings={settings} />
+      <Enter>
+        <PropertyFaqs property={property} settings={settings} />
+      </Enter>
       {showMore && (
-        <PropertiesPreviewView
-          heading={more?.heading}
-          button={buttonLabel && buttonHref ? {label: buttonLabel, href: buttonHref} : null}
-          properties={related}
-          defaultImage={property.defaultImage}
-        />
+        <Enter>
+          <PropertiesPreviewView
+            heading={more?.heading}
+            button={buttonLabel && buttonHref ? {label: buttonLabel, href: buttonHref} : null}
+            properties={related}
+            defaultImage={property.defaultImage}
+          />
+        </Enter>
       )}
     </PageTransition>
   )
