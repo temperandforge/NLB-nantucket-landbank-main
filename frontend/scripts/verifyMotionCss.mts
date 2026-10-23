@@ -75,6 +75,8 @@ const tokens: Record<string, string> = {
   '--cascade-rise': '.4em',
   '--cascade-blur': '6px',
   '--nav-delay': '150ms',
+  '--page-out-duration': '180ms',
+  '--page-in-duration': '280ms',
 }
 for (const [name, value] of Object.entries(tokens)) {
   const found = new RegExp(`${name}\\s*:\\s*([^;]+);`).exec(css)?.[1].replace(/\s+/g, '')

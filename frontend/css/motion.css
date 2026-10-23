@@ -14,6 +14,8 @@
   --cascade-rise: .4em;
   --cascade-blur: 6px;
   --nav-delay: 150ms;
+  --page-out-duration: 180ms;
+  --page-in-duration: 280ms;
 }
 
 /* Not animations, so they sit outside the guard. */
@@ -92,11 +94,11 @@
 
   /* Soft handoff between pages: the old page fades and drops, the new one fades in after it. */
   ::view-transition-old(.page-out) {
-    animation: page-out 180ms ease-out both;
+    animation: page-out var(--page-out-duration) ease-out both;
   }
 
   ::view-transition-new(.page-in) {
-    animation: page-in var(--motion-duration) var(--motion-ease) 180ms both;
+    animation: page-in var(--page-in-duration) var(--motion-ease) var(--page-out-duration) both;
   }
 
   /* The header stays put across navigations (viewTransitionName: 'site-header'). */
