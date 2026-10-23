@@ -8,7 +8,7 @@ import BlockImage from './BlockImage'
 // Collapsed and expanded sizes from the Figma carousel (368 x 460, and 416 x 520 on hover). The slide
 // reserves the expanded height and widens with the card, so the gap holds and the page never shifts.
 const CARD =
-  'group/card relative flex h-[325px] w-full flex-none snap-start items-end justify-center overflow-clip rounded bg-dusty-heath-800 p-6 transition-[height] duration-300 ease-out md:h-[460px] hover:h-[364px] focus-visible:h-[364px] group-data-[active]/slide:h-[364px] md:hover:h-[520px] md:focus-visible:h-[520px] md:group-data-[active]/slide:h-[520px]'
+  'group/card relative flex h-[325px] w-full flex-none snap-start items-end justify-center overflow-clip rounded bg-dusty-heath-800 p-6 transition-[height] duration-300 ease-out md:h-[460px] hover:h-[364px] focus-visible:h-[364px] group-data-[current]/slide:h-[364px] md:hover:h-[520px] md:focus-visible:h-[520px] md:group-data-[current]/slide:h-[520px]'
 
 /**
  * One Image Carousel slide: an image that widens on hover and, when it has a label, shows it over a
@@ -36,10 +36,10 @@ export default function ImageCarouselSlide({
       {label && (
         <>
           <span
-            className="pointer-events-none absolute inset-0 bg-hover-green opacity-0 transition-opacity duration-300 group-hover/card:opacity-85 group-focus-visible/card:opacity-85 group-data-[active]/slide:opacity-85"
+            className="pointer-events-none absolute inset-0 bg-hover-green opacity-0 transition-opacity duration-300 group-hover/card:opacity-85 group-focus-visible/card:opacity-85 group-data-[current]/slide:opacity-85"
             aria-hidden="true"
           />
-          <span className="relative flex w-full items-center gap-4 text-on-accent-secondary opacity-0 transition-opacity duration-300 group-hover/card:opacity-100 group-focus-visible/card:opacity-100 group-data-[active]/slide:opacity-100">
+          <span className="relative flex w-full items-center gap-4 text-on-accent-secondary opacity-0 transition-opacity duration-300 group-hover/card:opacity-100 group-focus-visible/card:opacity-100 group-data-[current]/slide:opacity-100">
             <span className="flex-1 font-mono text-body-small leading-[1.6] tracking-wide uppercase">
               {label}
             </span>

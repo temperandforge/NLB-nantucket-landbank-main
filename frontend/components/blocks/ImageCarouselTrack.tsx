@@ -1,6 +1,6 @@
 'use client'
 
-import {type ReactNode, useEffect, useRef, useState} from 'react'
+import {type ReactNode, type SyntheticEvent, useEffect, useRef, useState} from 'react'
 
 const SPEED_PX_PER_SECOND = 40
 const GAP = 24
@@ -9,9 +9,12 @@ const SLACK = 400
 
 // Auto-scrolls its slides left in a loop. The slides are repeated until they overflow the track,
 // then once more as an inert clone so the wrap-around is seamless. While it runs, the slide nearest
-// the centre gets `data-active` (the expanded state hover also gives), on every repeat of that
-// slide so all copies keep equal widths and the loop period stays exact. Pauses while the pointer
-// or focus is inside or the user scrolls by hand, and doesn't run for reduced-motion users.
+// the centre is the active one: every copy of it gets `data-active` (widened, so all copies keep
+// equal widths and the loop period stays exact), but only the copy nearest the centre gets
+// `data-current` (the tall card with the label, so one slide reads as active). Pauses while the
+// pointer or focus is inside or the user scrolls by hand, and doesn't run for reduced-motion
+// users. While paused the active slide is kept, unless the pointer or focus is on a slide, which
+// then takes over through hover and focus.
 export default function ImageCarouselTrack({
   children,
   label,
@@ -23,6 +26,8 @@ export default function ImageCarouselTrack({
   const first = useRef<HTMLDivElement>(null)
   const clone = useRef<HTMLDivElement>(null)
   const paused = useRef(false)
+  // Whether the pointer, a touch or focus is on a slide, so hover/focus styling already marks one.
+  const onSlide = useRef(false)
   const [looping, setLooping] = useState(false)
   const [repeats, setRepeats] = useState(1)
 
@@ -53,37 +58,33 @@ export default function ImageCarouselTrack({
 
     const slidesOf = (group: HTMLElement | null) =>
       Array.from(group?.querySelectorAll<HTMLElement>('[data-slide]') ?? [])
-    const originals = slidesOf(first.current)
-    const clones = slidesOf(clone.current)
-    const perSet = originals.length / repeats
-    let active = -1
+    const all = [...slidesOf(first.current), ...slidesOf(clone.current)]
+    // The clone repeats the first group, so a slide's position within a set is its index modulo this.
+    const perSet = all.length / 2 / repeats
+    let current = -1
     const setActive = (index: number) => {
-      if (index === active) return
-      active = index
-      const mark = (slide: HTMLElement, i: number) =>
-        slide.toggleAttribute('data-active', index >= 0 && i % perSet === index)
-      originals.forEach(mark)
-      clones.forEach(mark)
+      if (index === current) return
+      current = index
+      const logical = index >= 0 ? index % perSet : -1
+      all.forEach((slide, i) => {
+        slide.toggleAttribute('data-active', logical >= 0 && i % perSet === logical)
+        slide.toggleAttribute('data-current', i === index)
+      })
     }
-    // Index within a set of the slide nearest the centre (offsetLeft is track-relative: the track is `relative`), with hysteresis so widening one slide
-    // doesn't flip it straight back.
+    // The slide (of any copy) nearest the centre (offsetLeft is track-relative: the track is
+    // `relative`), with hysteresis so widening one slide doesn't flip it straight back.
     const nearest = () => {
       const center = el.scrollLeft + el.clientWidth / 2
       const distance = (slide: HTMLElement) =>
         Math.abs(slide.offsetLeft + slide.offsetWidth / 2 - center)
       let best = 0
-      originals.forEach((slide, i) => {
-        if (distance(slide) < distance(originals[best])) best = i
+      all.forEach((slide, i) => {
+        if (distance(slide) < distance(all[best])) best = i
       })
-      const current = originals.find((_, i) => i % perSet === active)
-      if (
-        current &&
-        best % perSet !== active &&
-        distance(current) - distance(originals[best]) < 48
-      ) {
-        return active
+      if (current >= 0 && best !== current && distance(all[current]) - distance(all[best]) < 48) {
+        return current
       }
-      return best % perSet
+      return best
     }
 
     let frame = 0
@@ -93,7 +94,8 @@ export default function ImageCarouselTrack({
       const dt = now - last
       last = now
       if (paused.current) {
-        setActive(-1)
+        // Off the slides (in a gap, say), fall back to the centre slide so one is always active.
+        setActive(onSlide.current ? -1 : current >= 0 ? current : nearest())
       } else {
         // Hand-scrolling moves scrollLeft under us; resync rather than fight it.
         if (Math.abs(el.scrollLeft - position) > 2) position = el.scrollLeft
@@ -114,11 +116,17 @@ export default function ImageCarouselTrack({
     }
   }, [looping, repeats])
 
-  const pause = () => {
+  const pause = (event: SyntheticEvent) => {
     paused.current = true
+    onSlide.current = event.target instanceof Element && event.target.closest('[data-slide]') !== null
   }
   const resume = () => {
     paused.current = false
+    onSlide.current = false
+  }
+  // The pointer moving between a slide and the gaps around it.
+  const trackPointer = (event: SyntheticEvent) => {
+    if (paused.current) pause(event)
   }
 
   // Every set after the first, and the whole clone, is presentational: hidden from assistive tech
@@ -138,6 +146,7 @@ export default function ImageCarouselTrack({
       aria-label={label}
       tabIndex={0}
       onMouseEnter={pause}
+      onMouseMove={trackPointer}
       onMouseLeave={resume}
       onFocus={pause}
       onBlur={resume}
