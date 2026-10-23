@@ -32,6 +32,11 @@ function Tile({
   )
 }
 
+// Literal class names so Tailwind sees them. The CTA tile takes whatever columns the last row of
+// articles leaves free (2 columns from md, 3 from lg), so the grid never ends in an empty cell.
+const MD_CTA_SPAN = ['md:col-span-2', 'md:col-span-1'] as const
+const LG_CTA_SPAN = ['lg:col-span-3', 'lg:col-span-2', 'lg:col-span-1'] as const
+
 export default function NewsPreviewView({
   heading,
   articles,
@@ -98,7 +103,7 @@ export default function NewsPreviewView({
           {showCta && cta && (
             <Tile
               href={cta.href}
-              className="relative flex w-full min-w-0 flex-col items-start justify-between gap-8 overflow-clip border-r border-b border-border-light bg-accent-secondary p-10 md:col-span-2 lg:col-span-1"
+              className={`relative flex w-full min-w-0 flex-col items-start justify-between gap-8 overflow-clip border-r border-b border-border-light bg-accent-secondary p-10 ${MD_CTA_SPAN[articles.length % 2]} ${LG_CTA_SPAN[articles.length % 3]}`}
             >
               <Image
                 src="/images/blocks/decorative-line-news.svg"
