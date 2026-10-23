@@ -347,6 +347,21 @@ export type MapPreview = {
   disabled?: boolean
 }
 
+export type Seo = {
+  _type: 'seo'
+  title?: string
+  description?: string
+  image?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  noIndex?: boolean
+}
+
 export type MapExplorer = {
   _type: 'mapExplorer'
   disabled?: boolean
@@ -894,6 +909,7 @@ export type Event = {
         _key: string
       }
   >
+  seo?: Seo
 }
 
 export type Article = {
@@ -920,6 +936,7 @@ export type Article = {
     } & NewsCategoryReference
   >
   externalUrl?: string
+  seo?: Seo
 }
 
 export type Project = {
@@ -980,6 +997,7 @@ export type Project = {
       } & FaqAccordion)
   >
   property?: PropertyReference
+  seo?: Seo
 }
 
 export type PropertyTypeReference = {
@@ -1085,6 +1103,7 @@ export type Property = {
   boundaryIds?: Array<string>
   location?: Geopoint
   disablePopup?: boolean
+  seo?: Seo
 }
 
 export type Geopoint = {
@@ -1315,6 +1334,28 @@ export type Settings = {
     alt?: string
     _type: 'image'
   }
+  siteUrl?: string
+  seo?: Seo
+  organization?: {
+    legalName?: string
+    logo?: {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      alt?: string
+      _type: 'image'
+    }
+    email?: string
+    telephone?: string
+    address?: {
+      streetAddress?: string
+      addressLocality?: string
+      addressRegion?: string
+      postalCode?: string
+    }
+    sameAs?: Array<string>
+  }
   ogImage?: {
     asset?: SanityImageAssetReference
     media?: unknown
@@ -1425,6 +1466,7 @@ export type Page = {
         _key: string
       } & Timeline)
   >
+  seo?: Seo
 }
 
 export type SanityAssistInstructionTask = {
@@ -1719,6 +1761,7 @@ export type AllSanitySchemaTypes =
   | ContactForm
   | MapTeaser
   | MapPreview
+  | Seo
   | MapExplorer
   | Growers
   | DownloadBlock
@@ -1837,6 +1880,28 @@ export type SettingsQueryResult = {
     crop?: SanityImageCrop
     alt?: string
     _type: 'image'
+  }
+  siteUrl?: string
+  seo?: Seo
+  organization?: {
+    legalName?: string
+    logo?: {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      alt?: string
+      _type: 'image'
+    }
+    email?: string
+    telephone?: string
+    address?: {
+      streetAddress?: string
+      addressLocality?: string
+      addressRegion?: string
+      postalCode?: string
+    }
+    sameAs?: Array<string>
   }
   ogImage?: {
     asset?: SanityImageAssetReference
