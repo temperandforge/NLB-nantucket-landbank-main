@@ -1,6 +1,6 @@
 # Load-in text animation and page transitions
 
-Status: proposed. Nothing built.
+Status: implemented on branch `worktree-load-animations` (not yet merged): Cascade and `motion.css`, first-screen cascade wiring, route `<PageTransition>` with header anchor, property and project card-to-hero morph, internal links through `<Link>`. Decision record: DECISIONS 4.11. Verification (type-check, lint, production build, real-Chrome pass, LCP/CLS) is recorded in the task report and the PR, not here; Safari, Firefox, reduced-motion emulation and Presentation were not observed.
 
 ## Goal
 
@@ -149,18 +149,17 @@ No test framework exists, so verification is in a real browser:
   renders unsplit.
 - LCP and CLS before and after, by the same method as #56.
 - Morph pairing, measured on a production build (`next build && next start`). `next dev` does not
-  prefetch, so a dev-server result would understate pairing. Check news and projects as well as
-  properties, since only properties is known to use `generateStaticParams`.
+  prefetch, so a dev-server result would understate pairing. Projects and properties both use
+  `generateStaticParams`; news has no morph.
 - The dev server started for verification is stopped afterwards.
 
 ## Deferred
 
 Per the repo rule each gets a GitHub issue, linked here when filed.
 
-- **Scroll-in cascade** for headings below the first screen (the earlier "B" option). To be filed.
-- **Reliable morph pairing**, only if verification shows pairing is unreliable. The candidate fix is
-  intent-based prefetching (e.g. ForesightJS) on the affected routes; it is not adopted up front
-  because Next's own `<Link>` prefetch should cover pre-built pages, it adds a dependency, and it
-  does nothing on touch devices. To be filed if needed.
-- Related existing issues, to link rather than duplicate: #53 (route-to-route transitions, which this
-  spec supersedes and should close), #52 (per-block motion setting), #54 (scroll-scrubbed motion).
+- **Scroll-in cascade** for headings below the first screen (the earlier "B" option): [#86](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/86).
+- **News article hero morph**, blocked on `ArticleView` rendering no hero image: [#87](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/87).
+- **Browser back/forward start no view transition:** [#88](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/88).
+- **Header hidden by scroll snaps back in** at the start of a transition: [#89](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/89).
+- **Reliable morph pairing** was not needed: pairing worked on the production build for archive to `head-of-the-plains`. Intent-based prefetching (e.g. ForesightJS) stays unadopted.
+- Related existing issues: #53 (route-to-route transitions, superseded by this work; commented, left open for the maintainer to close), #52 (per-block motion setting), #54 (scroll-scrubbed motion).

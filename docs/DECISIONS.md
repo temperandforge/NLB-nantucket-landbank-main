@@ -553,6 +553,48 @@ and makes a results address shareable. One query keeps ranking in one place.
 - What is not searchable, and why, is tracked in
   [#50](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/50).
 
+### 4.11 Load-in motion: CSS tokens, opt-in `<Cascade>`, `<PageTransition>` per page
+
+**Status:** Implemented
+
+The first screen cascades in word by word, and navigation is a short animated handoff, with archive
+card images morphing into their detail hero. No animation library and no client JS: server-rendered
+`<Cascade>` plus CSS, and React `<ViewTransition>`. Design:
+[load-in animations spec](superpowers/specs/2026-10-23-load-in-animations-design.md).
+
+**Why:** An earlier attempt (PR #56) used auto-detection and scroll reveal and had the wrong feel.
+Explicit opt-in per headline keeps the motion predictable and keeps it off every page that doesn't
+want it.
+
+**Implication:**
+- **Motion tokens live in `frontend/css/motion.css`** (duration, easing, cascade step, nav delay,
+  page in/out durations). Every animation rule sits in one guarded block, so reduced-motion and print
+  users never get a hidden start state; `frontend/scripts/verifyMotionCss.mts` checks it. Tune the
+  feel there, not in components.
+- **`<Cascade>` is opt-in, one line per headline.** It renders text that carries Sanity stega
+  characters unsplit (splitting would break the visual-editing markers) and must never call
+  `draftMode()`, which would make every page dynamic. Word splitting is in
+  `frontend/sanity/lib/cascade.ts`, checked by `frontend/scripts/verifyCascade.mts`.
+- **`<PageTransition>` belongs in each `page.tsx`, never a layout.** `<ViewTransition>` enter and
+  exit do not fire in a layout, because layouts persist across navigations. A new route gets no
+  transition until its `page.tsx` wraps its content.
+- **Internal links go through `<Link>`** (via `AnchorLink`), never a plain `<a>`: an `<a>` is a full
+  page load with no prefetch and no transition. External links stay `<a>`.
+  `frontend/scripts/verifyLinks.mts` checks the audit.
+- **The morph is wired only for archive cards whose destination renders a hero** (properties and
+  projects). The card takes an opt-in `morph` prop that only the archive grids pass; "More
+  properties" and similar grids leave it off, or the card would get an old-only snapshot. A property
+  with no hero image gets the soft handoff. News has no morph (no hero on `ArticleView`), nor do
+  people and staff cards.
+- The header is anchored with its own `view-transition-name` so it never moves. Build with
+  `NODE_ENV=production`; view transitions cannot be verified in the in-app browser pane, only real
+  Chrome.
+- Not done, each tracked: scroll-in cascade
+  ([#86](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/86)), news morph
+  ([#87](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/87)), back/forward
+  transitions ([#88](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/88)),
+  header snap-back ([#89](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/89)).
+
 ---
 
 ## 5. Sanity conventions
