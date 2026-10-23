@@ -103,6 +103,18 @@ check(/::view-transition-group\(site-header\)/.test(inside), 'site-header anchor
 check(/::view-transition\s*\{[^}]*pointer-events:\s*none/.test(outside), '::view-transition passes pointer events through')
 check(/\.cascade-word\s*\{[^}]*display:\s*inline-block/.test(outside), '.cascade-word is inline-block')
 
+// WebKit (iPhone Safari) paints filtered text on the CPU: animating `filter: blur()` on the words
+// is choppy and snaps when the filter is removed at the end. The default cascade is opacity + rise
+// only; the blur is an enhancement for devices with a fine pointer and hover.
+const FINE_POINTER = /@media\s+\(\s*hover\s*:\s*hover\s*\)\s+and\s+\(\s*pointer\s*:\s*fine\s*\)\s*\{/g
+const {blocks: finePointers, rest: insideDefault} = split(inside, FINE_POINTER)
+check(!/\bfilter\s*:/.test(insideDefault), 'no `filter` animation outside a (hover: hover) and (pointer: fine) block')
+check(finePointers.length === 1, `exactly one (hover: hover) and (pointer: fine) block inside the guard (found ${finePointers.length})`)
+check(
+  /@keyframes\s+cascade-in-blur/.test(finePointers.join('\n')) && /\bfilter\s*:\s*blur\(/.test(finePointers.join('\n')),
+  'the blur keyframes live in the fine-pointer block',
+)
+
 const tokens: Record<string, string> = {
   '--motion-duration': '800ms',
   '--motion-ease': 'cubic-bezier(.22,1,.36,1)',

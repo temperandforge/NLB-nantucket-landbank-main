@@ -32,12 +32,10 @@
     from {
       opacity: 0;
       transform: translateY(var(--cascade-rise));
-      filter: blur(var(--cascade-blur));
     }
     to {
       opacity: 1;
       transform: none;
-      filter: none;
     }
   }
 
@@ -73,6 +71,30 @@
   .cascade-word {
     animation: cascade-in var(--motion-duration) var(--motion-ease) both;
     animation-delay: calc(var(--i, 0) * var(--cascade-step));
+  }
+
+  /*
+   * The blur is only for devices with a fine pointer and hover. WebKit (iPhone Safari) paints
+   * filtered text on the CPU, so animating `filter` on every word is choppy there, and the words snap
+   * when the filter is removed at the end. Touch devices get the opacity + rise cascade above.
+   */
+  @media (hover: hover) and (pointer: fine) {
+    @keyframes cascade-in-blur {
+      from {
+        opacity: 0;
+        transform: translateY(var(--cascade-rise));
+        filter: blur(var(--cascade-blur));
+      }
+      to {
+        opacity: 1;
+        transform: none;
+        filter: none;
+      }
+    }
+
+    .cascade-word {
+      animation-name: cascade-in-blur;
+    }
   }
 
   /* Lands after the headline; --load-in-step staggers siblings. */
