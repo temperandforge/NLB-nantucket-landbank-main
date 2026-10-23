@@ -180,8 +180,10 @@ only (no client JS), all inside the guarded block of `motion.css`:
   eyebrow (`.load-in`) and `aria-hidden` decoration.
 - **Load layer (blocks 0 and 1).** Parts fade and rise ~14px on a timer, staggered by their position
   among their siblings (70ms apart, capped at the 7th), after the headline: block 0 starts at 120ms,
-  block 1 at 360ms. Images and figures fade only, with no movement: they are usually the LCP element
-  and large transforms are costly.
+  block 1 at 360ms. Images and figures do not animate on the load layer at all: they are usually the LCP
+  element, and starting one at opacity 0 delayed the paint the browser measures (seen on the home
+  hero; fixed after a Lighthouse mobile score of 58). Below the fold they fade only, with no
+  movement, as they scroll in.
 - **Scroll layer (later blocks).** The same fade and rise, driven by the part's own entry into the
   viewport (`animation-timeline: view()`), inside `@supports (animation-timeline: view())`. Siblings
   in the same row are offset along the entry range, so a grid staggers. The motion follows the

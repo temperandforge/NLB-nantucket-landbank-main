@@ -148,6 +148,12 @@ check(
   'Studio Presentation (html[data-draft]) turns the part animations off',
 )
 check(/:is\(img,\s*picture,\s*figure\)\s*\{[^}]*--part-anim\s*:\s*part-fade/.test(inside), 'images, pictures and figures fade only (no movement)')
+// Above the fold, an image is usually the LCP element. Starting it at opacity 0 delays the paint the
+// browser measures, so images on the load layer do not animate at all (below the fold they fade).
+check(
+  /\[data-enter="load"\]\s+:is\(img,\s*picture,\s*figure\)\s*\{[^}]*--part-anim\s*:\s*none/.test(inside),
+  'images on the load layer do not animate (they are the LCP element)',
+)
 check(
   /\[data-enter\]\s+:nth-child\(2\)\s*\{[^}]*--n\s*:\s*1/.test(inside) && /\[data-enter\]\s+:nth-child\(n\s*\+\s*7\)\s*\{[^}]*--n\s*:\s*6/.test(inside),
   'sibling stagger index --n is set by :nth-child and capped at 6',

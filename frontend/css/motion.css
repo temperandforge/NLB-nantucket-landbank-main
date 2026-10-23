@@ -178,6 +178,15 @@
     --part-anim: part-fade;
   }
 
+  /*
+   * Above the fold an image is usually the LCP element, and starting it at opacity 0 delays the
+   * paint the browser measures (measured on the home page hero). So on the load layer images do not
+   * animate at all; below the fold they fade as they scroll in.
+   */
+  [data-enter="load"] :is(img, picture, figure) {
+    --part-anim: none;
+  }
+
   /* Sibling stagger index, 0 for the first child up to 6 (a grid or a stack staggers by position). */
   [data-enter] * {
     --n: 0;
