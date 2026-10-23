@@ -961,3 +961,27 @@ export const searchQuery = defineQuery(`
     "blocks": pageBuilder[!coalesce(disabled, false)].body
   }
 `)
+
+/**
+ * Every usable redirect rule, for the proxy. `destination` is the resolved site path or URL, and
+ * null when there is nothing to redirect to: a 410, or a page destination that is unpublished
+ * (the published perspective dereferences it to null) or pathOnly (no route of its own). The
+ * matcher skips a null destination on a non-410 rule, so the old path 404s instead of redirecting
+ * to a dead page. The defaults mirror the Studio's initial values.
+ */
+export const redirectsQuery = defineQuery(`
+  *[_type == "redirect" && defined(source) && coalesce(enabled, true)]{
+    source,
+    "statusCode": coalesce(statusCode, 301),
+    "passQuery": coalesce(passQuery, true),
+    "destination": select(
+      coalesce(statusCode, 301) == 410 => null,
+      destination.linkType == "page" => select(
+        defined(destination.page->slug.current) && !coalesce(destination.page->pathOnly, false) =>
+          "/" + destination.page->{"path": ${pagePath}}.path,
+        null
+      ),
+      destination.href
+    )
+  }
+`)
