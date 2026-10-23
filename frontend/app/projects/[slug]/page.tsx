@@ -4,6 +4,7 @@ import {toPlainText, type PortableTextBlock} from 'next-sanity'
 
 import ProjectPreviewView from '@/components/blocks/ProjectPreviewView'
 import ProjectView from '@/components/ProjectView'
+import PageTransition from '@/components/PageTransition'
 import {sanityFetch} from '@/sanity/lib/live'
 import {
   moreProjectsQuery,
@@ -70,7 +71,7 @@ export default async function ProjectPage(props: PageProps<'/projects/[slug]'>) 
   const buttonLabel = more?.button?.buttonText ?? ''
 
   return (
-    <>
+    <PageTransition>
       <ProjectView project={project} settings={settings} archiveHref={archiveHref} />
       {showMore && (
         <ProjectPreviewView
@@ -80,6 +81,6 @@ export default async function ProjectPage(props: PageProps<'/projects/[slug]'>) 
           projects={related}
         />
       )}
-    </>
+    </PageTransition>
   )
 }

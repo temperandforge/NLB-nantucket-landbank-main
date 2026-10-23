@@ -5,6 +5,7 @@ import {toPlainText, type PortableTextBlock} from 'next-sanity'
 import MapPreviewView from '@/components/blocks/MapPreviewView'
 import PropertiesPreviewView from '@/components/blocks/PropertiesPreviewView'
 import {PropertyFaqs, PropertyGallery, PropertyIntro} from '@/components/PropertyView'
+import PageTransition from '@/components/PageTransition'
 import {sanityFetch} from '@/sanity/lib/live'
 import {
   morePropertiesQuery,
@@ -72,7 +73,7 @@ export default async function PropertyPage(props: PageProps<'/properties/[slug]'
   const showMap = !settings?.hideMap
 
   return (
-    <>
+    <PageTransition>
       <PropertyIntro property={property} />
       <PropertyGallery property={property} />
       {showMap && (
@@ -94,6 +95,6 @@ export default async function PropertyPage(props: PageProps<'/properties/[slug]'
           defaultImage={property.defaultImage}
         />
       )}
-    </>
+    </PageTransition>
   )
 }

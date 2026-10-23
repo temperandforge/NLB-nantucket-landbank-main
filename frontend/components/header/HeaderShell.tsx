@@ -75,6 +75,9 @@ export default function HeaderShell({banner, children}: {banner?: React.ReactNod
   return (
     <header
       ref={ref}
+      // Its own view-transition group, held still by css/motion.css, so the bar never moves or
+      // fades with the page handoff.
+      style={{viewTransitionName: 'site-header'}}
       className={`sticky top-0 z-50 shadow-[inset_0_-1px_0_var(--color-border-light)] bg-background transition-transform duration-200 ease-out motion-reduce:transition-none ${
         hidden ? '-translate-y-full' : 'translate-y-0'
       }`}
