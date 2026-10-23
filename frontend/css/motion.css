@@ -1,0 +1,115 @@
+/*
+ * Load-in motion. See docs/superpowers/specs/2026-10-23-load-in-animations-design.md.
+ *
+ * Every animation, keyframe and view-transition animation rule lives in the single guarded block
+ * below. Outside it the text is fully visible: reduced-motion and print users never get a hidden
+ * start state. `scripts/verifyMotionCss.mts` asserts this. Start states (opacity 0 etc.) come from
+ * the keyframes via `animation-fill-mode: both`, never from base styles.
+ */
+
+:root {
+  --motion-duration: 800ms;
+  --motion-ease: cubic-bezier(.22,1,.36,1);
+  --cascade-step: 45ms;
+  --cascade-rise: .4em;
+  --cascade-blur: 6px;
+  --nav-delay: 150ms;
+}
+
+/* Not animations, so they sit outside the guard. */
+.cascade-word {
+  display: inline-block;
+}
+
+::view-transition {
+  pointer-events: none;
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  @keyframes cascade-in {
+    from {
+      opacity: 0;
+      transform: translateY(var(--cascade-rise));
+      filter: blur(var(--cascade-blur));
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+
+  @keyframes load-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes page-out {
+    from {
+      opacity: 1;
+      transform: none;
+    }
+    to {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  @keyframes page-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .cascade-word {
+    animation: cascade-in var(--motion-duration) var(--motion-ease) both;
+    animation-delay: calc(var(--i, 0) * var(--cascade-step));
+  }
+
+  /* Lands after the headline; --load-in-step staggers siblings. */
+  .load-in {
+    animation: load-in var(--motion-duration) var(--motion-ease) both;
+    animation-delay: calc(var(--cascade-step) * 8 + var(--load-in-step, 0) * 120ms);
+  }
+
+  /* Chrome 125+. Kept as its own rule so an engine that rejects the selector drops only this. */
+  :root:active-view-transition .cascade-word {
+    animation-delay: calc(var(--i, 0) * var(--cascade-step) + var(--nav-delay));
+  }
+
+  :root:active-view-transition .load-in {
+    animation-delay: calc(
+      var(--cascade-step) * 8 + var(--load-in-step, 0) * 120ms + var(--nav-delay)
+    );
+  }
+
+  /* Soft handoff between pages: the old page fades and drops, the new one fades in after it. */
+  ::view-transition-old(.page-out) {
+    animation: page-out 180ms ease-out both;
+  }
+
+  ::view-transition-new(.page-in) {
+    animation: page-in var(--motion-duration) var(--motion-ease) 180ms both;
+  }
+
+  /* The header stays put across navigations (viewTransitionName: 'site-header'). */
+  ::view-transition-group(site-header) {
+    animation: none;
+    z-index: 100;
+  }
+
+  ::view-transition-old(site-header) {
+    display: none;
+  }
+
+  ::view-transition-new(site-header) {
+    animation: none;
+  }
+}
