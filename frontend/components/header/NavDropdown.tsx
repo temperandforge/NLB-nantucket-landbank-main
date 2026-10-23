@@ -21,7 +21,8 @@ function moveFocus(event: KeyboardEvent<HTMLDivElement>) {
 }
 
 /**
- * The panel under a top-level item. A flat panel is offset -left-8 (its 40px padding less the trigger's 8px
+ * The panel under a top-level item. A headed panel spans the viewport (the same full-bleed trick as
+ * the mobile panel) with its columns on the page gutter, in line with the logo, as in Figma. A flat panel is offset -left-8 (its 40px padding less the trigger's 8px
  * inset) so its text lines up with the trigger's label, as in Figma. Links with a column heading render as headed columns, each
  * with a left rule; a menu with no headings renders as one flat list. Items whose link cannot
  * be resolved are dropped.
@@ -54,8 +55,10 @@ export default function NavDropdown({
       onClick={(event) => {
         if ((event.target as HTMLElement).closest('a')) onNavigate?.()
       }}
-      className={`absolute top-full z-40 rounded-b bg-background p-10 shadow-[0_20px_80px_rgba(47,42,34,0.16)] ${
-        grouped ? 'left-0 right-0' : '-left-8 w-max min-w-64'
+      className={`absolute top-full z-40 bg-background shadow-[0_20px_80px_rgba(47,42,34,0.16)] ${
+        grouped
+          ? 'left-1/2 w-screen -translate-x-1/2 tf-px py-10'
+          : '-left-8 w-max min-w-64 rounded-b p-10'
       }`}
     >
       <div className={grouped ? 'grid grid-cols-3 gap-x-gap-lg' : ''}>
