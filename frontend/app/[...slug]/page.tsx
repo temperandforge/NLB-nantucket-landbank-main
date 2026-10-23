@@ -78,7 +78,8 @@ export async function generateMetadata(props: PageProps<'/[...slug]'>): Promise<
     seo: page.seo,
     title: page.name,
     image: resolveSeoImage(page.seo),
-    path: `/${page.path}`,
+    // The landing page's canonical is /, not the path it is also reachable at.
+    path: page.isLanding ? '/' : `/${page.path}`,
     defaults: await getSeoDefaults(),
   })
 }
@@ -105,7 +106,7 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
   }
 
   const defaults = await getSeoDefaults()
-  const path = `/${page.path}`
+  const path = page.isLanding ? '/' : `/${page.path}`
   // A grouping (pathOnly) ancestor has a name in the trail but no page to link to.
   const crumbs = [
     {name: defaults.siteName, path: '/'},

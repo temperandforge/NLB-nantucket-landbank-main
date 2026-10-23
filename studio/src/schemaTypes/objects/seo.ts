@@ -16,7 +16,10 @@ export const seo = defineType({
       name: 'title',
       title: 'Search title',
       type: 'string',
-      description: 'Overrides the page name in search results and social cards. Aim for 60 characters or fewer.',
+      description:
+        'Replaces the page name, with no site name added, in search results and social cards. Aim for 60 characters or fewer.',
+      // Settings holds site-wide defaults; a default title and a site-wide noindex are not used.
+      hidden: ({document}) => document?._type === 'settings',
       validation: (rule) => rule.max(60).warning('Search engines usually cut titles off past 60 characters'),
     }),
     defineField({
@@ -41,6 +44,7 @@ export const seo = defineType({
       type: 'boolean',
       initialValue: false,
       description: 'Asks search engines not to list this page, and leaves it out of the sitemap.',
+      hidden: ({document}) => document?._type === 'settings',
     }),
   ],
 })

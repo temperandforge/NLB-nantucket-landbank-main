@@ -1532,3 +1532,15 @@ control of search and social appearance. The `seo` object goes on `page`, `artic
   hreflang, custom JSON-LD and Search Console [#80](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/80),
   GovernmentOrganization [#81](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/81).
   The records archive, #41, is built.
+
+### 24.7 Fixes from the whole-branch review
+
+- **The landing page has one canonical, `/`.** It is served at `/` and at its own path; the
+  catch-all now sets canonical and JSON-LD `url` to `/` (`isLanding` on `pageFields`), and
+  `sitemapData` leaves it out (the sitemap lists `/` itself).
+- **Settings shows only the default description and image.** The search title and "Hide from search
+  engines" are hidden on `settings`, since neither is read there; a site-wide noindex is not a thing
+  this work offers.
+- **A typed search title is absolute** (`title: {absolute}`), so the layout's "| Site" suffix is not
+  added after a name the editor typed on purpose.
+- **WebSite JSON-LD falls back to the plain-text site description**, matching the metadata default.

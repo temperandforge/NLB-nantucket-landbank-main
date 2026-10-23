@@ -12,6 +12,7 @@ export const siteStructuredDataQuery = defineQuery(`
     title,
     siteUrl,
     "description": coalesce(seo.description, null),
+    "siteDescription": description,
     organization{
       legalName,
       email,
@@ -621,6 +622,8 @@ const pageFields = /* groq */ `
   slug,
   "path": ${pagePath},
   seo{title, description, noIndex, image},
+  // The landing page is served at / and also at its own path; the path is not its canonical URL.
+  "isLanding": _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref,
   // Parent chain, farthest first, for the breadcrumb trail. Each path comes from the shared
   // pagePath, evaluated on the ancestor itself; a pathOnly ancestor has a name but no page.
   "ancestors": [
@@ -666,6 +669,8 @@ export const sitemapData = defineQuery(`
   *[
     _type == "page" && defined(slug.current) && !coalesce(pathOnly, false)
     && !coalesce(seo.noIndex, false)
+    // The landing page is listed once, as /, by the sitemap itself.
+    && _id != *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref
   ] {
     _type,
     _updatedAt,

@@ -1,3 +1,5 @@
+import {toPlainText} from 'next-sanity'
+
 import JsonLd from '@/components/JsonLd'
 import {sanityFetch} from '@/sanity/lib/live'
 import {siteStructuredDataQuery} from '@/sanity/lib/queries'
@@ -19,7 +21,13 @@ export default async function SiteJsonLd() {
           {name: settings.title, organization: settings.organization, logoUrl: settings.organization?.logoUrl},
           origin,
         ),
-        websiteLd({name: settings.title, description: settings.description}, origin),
+        websiteLd(
+          {
+            name: settings.title,
+            description: settings.description || (settings.siteDescription ? toPlainText(settings.siteDescription) : null),
+          },
+          origin,
+        ),
       ]
     }
   } catch {

@@ -52,7 +52,7 @@ check('buildMetadata with no origin has no canonical', () => {
 })
 check('seo override beats the derived title and description', () => {
   const m = buildMetadata({seo: {title: 'S', description: 'D'}, title: 'T', description: 'x', path: '/a'})
-  assert.equal(m.title, 'S')
+  assert.deepEqual(m.title, {absolute: 'S'})
   assert.equal(m.description, 'D')
 })
 check('noIndex emits robots noindex', () => {

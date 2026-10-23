@@ -21,6 +21,7 @@ import {
   getPageQuery,
   projectQuery,
   propertyQuery,
+  sitemapData,
   siteStructuredDataQuery,
 } from '../../frontend/sanity/lib/queries'
 import {
@@ -87,6 +88,17 @@ async function main() {
   console.log('site')
   verify('organization', organizationLd({name: site?.title, organization: site?.organization, logoUrl: site?.organization?.logoUrl}, ORIGIN), 'Organization')
   verify('website', websiteLd({name: site?.title, description: site?.description}, ORIGIN), 'WebSite')
+
+  // The landing page is reachable at / and at its own path; only / may be canonical and listed.
+  const landingId = await client.fetch<string | null>(
+    `*[_type == "settings" && _id == "siteSettings"][0].landingPage._ref`,
+  )
+  if (landingId) {
+    console.log('landing page')
+    const landing = await client.fetch<{slug: string | null}[]>(sitemapData)
+    const landingSlug = await client.fetch<string | null>(`*[_id == $id][0].slug.current`, {id: landingId})
+    check(!landing.some((entry) => entry.slug === landingSlug), 'the landing page is not listed in the sitemap at its own path')
+  }
 
   const articleSlug = await firstSlug('article')
   if (articleSlug) {

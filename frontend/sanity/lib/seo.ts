@@ -58,7 +58,10 @@ export function buildMetadata({
   const siteName = clean(defaults?.siteName)
 
   const metadata: Metadata = {}
-  if (resolvedTitle) metadata.title = resolvedTitle
+  // A search title typed by an editor is the whole title: the layout's "| Site" suffix would
+  // otherwise double a site name they included on purpose.
+  if (clean(seo?.title)) metadata.title = {absolute: clean(seo?.title) as string}
+  else if (resolvedTitle) metadata.title = resolvedTitle
   if (resolvedDescription) metadata.description = resolvedDescription
   if (canonical) metadata.alternates = {canonical}
   if (seo?.noIndex) metadata.robots = {index: false, follow: true}
