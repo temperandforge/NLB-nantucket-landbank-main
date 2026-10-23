@@ -27,7 +27,7 @@ A new `redirect` document type (`studio/src/schemaTypes/documents/redirect.ts`).
 
 | Field | Type | Notes |
 |---|---|---|
-| `source` | string | Site-relative path. Must start with `/`. May carry a query string (see Matching). No `*`, no `#`. Stored normalised: lowercase path, no trailing slash. |
+| `source` | string | Site-relative path. Must start with `/`. May carry a query string (see Matching). No `*`, no `#`, and not a bare `/` (that would redirect the homepage; `/?p=123` is fine). Kept as the editor typed it; every comparison goes through `normaliseSource` (lowercase path, no trailing slash). Only the function writes sources already normalised. |
 | `destination` | `link` | A page reference or a URL. Required unless `statusCode` is 410. Not `#`, `mailto:` or `tel:`. |
 | `statusCode` | number (radio) | 301 (default), 302, 303, 307, 308, or 410 Gone. 410 has no destination. |
 | `passQuery` | boolean | Default true. Append the incoming query string to the destination. |
@@ -44,7 +44,7 @@ redirects that both resolve to its current URL, so there are no chains to flatte
 
 - duplicates another redirect's `source`,
 - equals the destination's own resolved path (a self-loop),
-- is currently a live page path (the page would win anyway, so the rule would be dead),
+- is currently a live page path (the proxy runs before routing, so the redirect would hide the page),
 - starts with a reserved prefix: `/_next`, `/api`, `/studio`.
 
 The list view shows `source` → destination, the status code, and an "auto" badge.
@@ -70,11 +70,16 @@ so the verify script exercises it directly.
 `node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/proxy.md` before writing it).
 
 - Fetches the enabled redirects through a single GROQ query, resolving page destinations with the
-  shared `pagePath` constant. The fetch is cached (60 s revalidate, tag `redirect`).
-- GET and HEAD only. The matcher excludes `/_next`, `/api` and static files.
+  shared `pagePath` constant. Next does not cache `fetch` in Proxy (`next.revalidate` and
+  `next.tags` have no effect there), so the rules are held in an in-memory cache per server instance
+  (`frontend/sanity/lib/redirectRules.ts`): a 60 s TTL, one shared refresh, a 1.5 s timeout, and the
+  last good rules served on error (with a 10 s backoff before retrying). An edit to a redirect takes up
+  to 60 s per instance to apply.
+- GET and HEAD only. The matcher excludes `/_next/...`, `/api` and `/api/...` (with segment boundaries,
+  so `/apiary` is still matched) and static files.
 - 301/302/303/307/308 return `NextResponse.redirect` with that status. 410 returns a 410 response with
   a minimal body.
-- **Fails open:** if the fetch throws, the request passes through unchanged. A broken redirect fetch
+- **Fails open:** if the fetch throws or times out with no rules cached, the request passes through unchanged. A broken redirect fetch
   must never take the site down.
 - Runs before routes are rendered, so a redirect for a path that is also a live page would shadow it.
   Studio validation prevents authoring one, and the generator disables one when a page takes its path.
@@ -126,7 +131,7 @@ The `redirect` documents it writes don't match the trigger filter, so there is n
 
 **Nothing has been deployed or tested live.** Everything below is built and checked locally only
 (`verifyRedirectSource.ts`, `verifyRedirectDiff.ts`, `verifyAutoRedirect.ts` against an in-memory
-dataset, `verifyRedirectMatch.mts`, `verifyRedirects.ts` against the real dataset, which holds no
+dataset, `verifyRedirectMatch.mts`, `verifyRedirectRules.mts`, `verifyRedirects.ts` against the real dataset, which holds no
 redirects yet). Unverified:
 
 - **Free-plan availability of Functions.** The original step zero (a throwaway `blueprints init` and
@@ -171,11 +176,17 @@ drift when the landing page changes.
 
 No test framework exists (AGENTS.md). Added:
 
-- Three scripts, following the repo's split between pure checks and dataset checks. Each imports the
+- Six scripts, following the repo's split between pure checks and dataset checks. Each imports the
   module under test rather than restating it.
   - `frontend/scripts/verifyRedirectMatch.mts` (`cd frontend && node scripts/verifyRedirectMatch.mts`):
     exact, case, trailing-slash and encoded-path matching, query-string matching and precedence,
     `passQuery` merging, 410, a disabled rule.
+  - `frontend/scripts/verifyRedirectRules.mts` (`cd frontend && node scripts/verifyRedirectRules.mts`):
+    the proxy's rule cache with a fake clock: a fresh cache does not reload, concurrent callers share
+    one refresh, a failure serves stale rules and backs off, no cache plus failure is null, and a hung
+    load is cut off by the timeout.
+  - `studio/scripts/verifyRedirectSource.ts` (`npx sanity exec scripts/verifyRedirectSource.ts`, no
+    dataset): source normalisation and shape rules, including the bare `/` rejection.
   - `studio/scripts/verifyRedirectDiff.ts` (`npx sanity exec scripts/verifyRedirectDiff.ts`, no dataset):
     rename of a leaf, rename of an ancestor with descendants at depths 2 and 3, re-parent, `pathOnly`
     rename, no-op change, first publish, rename-and-rename-back, existing-source skip.

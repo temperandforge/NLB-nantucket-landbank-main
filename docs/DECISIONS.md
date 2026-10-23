@@ -339,8 +339,12 @@ through the same path, because the page query excludes it rather than the route 
 A `redirect` is a document (`source`, `destination` as the shared `link`, `statusCode`, `passQuery`,
 `enabled`, `origin`, `note`), so editors manage them in Studio with no deploy. `frontend/proxy.ts`
 applies them before routing: GET and HEAD only, exact path (case-insensitive, trailing slash ignored),
-an optional query string on the source (every listed param must match), one hop, cached 60 s under the
-`redirect` tag, and it fails open on any error. Status 301, 302, 303, 307 and 308 redirect; **410 Gone**
+an optional query string on the source (every listed param must match), one hop, and it fails open on
+any error. Next does not cache `fetch` in Proxy, so the rules sit in an in-memory cache per server
+instance (`frontend/sanity/lib/redirectRules.ts`): 60 s TTL, a 1.5 s timeout, stale rules served on
+error. An edit to a redirect takes up to 60 s per instance to apply. A bare `/` source is rejected (it
+would replace the homepage); a redirect to the landing page goes straight to `/`, and the sitemap omits
+the landing page's own path. Status 301, 302, 303, 307 and 308 redirect; **410 Gone**
 is allowed and takes no destination. The matcher is `frontend/sanity/lib/redirectMatch.ts`; the source
 rules are `studio/src/lib/redirectSource.ts`, shared by schema validation and the function and
 mirrored (not imported, since the packages cannot share code) in the frontend matcher, so a change to

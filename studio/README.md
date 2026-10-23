@@ -68,3 +68,7 @@ The function runs once per publish. If a run fails or is skipped (a timeout, an 
 parent was unpublished at the time, the function not deployed to that dataset), the redirect is not
 created and **nothing flags it**: the old URL simply 404s. Check the logs after a rename of a page
 with inbound links, and add the redirect by hand in Studio if one is missing.
+
+Renaming a parent and its child in the same publish (a release or a bulk publish) loses the child's
+original URL: both runs read the ancestors as they are now, so neither sees the child's old full path.
+Publishing the two changes separately is fine.
