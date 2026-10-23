@@ -1,6 +1,6 @@
 # SEO fields and structured data (JSON-LD) design
 
-Status: **draft, awaiting review.** Branch `worktree-structured-data`. No implementation yet.
+Status: **implemented** on branch `worktree-structured-data` (plan: [../plans/2026-10-23-seo-and-structured-data.md](../plans/2026-10-23-seo-and-structured-data.md)). Setting **Site URL** in Studio Settings is required before any canonical link, sitemap entry or JSON-LD is published.
 Decisions and the plugin analysis are recorded in [DECISIONS.md](../../DECISIONS.md) section 24.
 
 ## Intent
@@ -144,20 +144,19 @@ Props come from the generated query result types. There is no test framework, so
   `seo.image` and `ogImage.metadataBase` to `siteUrl` once; it states in its header exactly what it
   overwrites (only those two empty fields, never existing values).
 
-## Deferred (each needs a GitHub issue before this work is finished)
+## Deferred (each has a GitHub issue)
 
-- Per-document **hreflang / alternates**: the site is single-language.
-- **Hand-authored JSON-LD** for edge cases (a free-form block). Derivation covers the types in use;
-  revisit if a page needs something custom.
-- **Rich Studio SEO preview** (Google/social preview panes) and SEO audit dashboard. The plugin
-  analysis in DECISIONS 24.1 says what would be needed; it is a convenience, not a dependency.
-- **Search Console / analytics** integration.
+- Per-document **hreflang / alternates**, **hand-authored JSON-LD** for edge cases and **Search
+  Console** integration: [#80](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/80).
+- **Rich Studio SEO preview** (Google/social preview panes) and SEO audit dashboard, possibly the
+  plugin for its UI only (DECISIONS 24.1): [#79](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/79).
 - **`FAQPage` structured data** for the FAQ accordion. Google restricts FAQ rich results to
-  government and health sites, which this site is, so it may be eligible; confirm before building.
+  government and health sites, which this site is, so it may be eligible; confirm before building:
+  [#77](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/77).
 - **`JobPosting`** for job listings: needs fields the `job` document does not hold (employment type,
-  valid-through, location structure).
+  valid-through, location structure): [#78](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/78).
 - **`GovernmentOrganization` precision** (department hierarchy, `areaServed`): start with
-  `Organization`.
+  `Organization`: [#81](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/81).
 
 ## Open questions for review
 

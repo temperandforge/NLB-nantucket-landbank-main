@@ -1439,7 +1439,7 @@ department) shows a subsequence of the one order.
 
 ## 24. SEO fields and structured data
 
-Status: **designed, not implemented.** Spec:
+Status: **implemented.** Spec:
 [2026-10-23-seo-and-structured-data-design.md](superpowers/specs/2026-10-23-seo-and-structured-data-design.md).
 
 ### 24.1 We build a small `seo` object ourselves; we do not adopt `sanity-plugin-seofields`
@@ -1497,3 +1497,38 @@ and `size`.
 Chosen over "derive only" and "derive plus Organization fields" because the client wants per-page
 control of search and social appearance. The `seo` object goes on `page`, `article`, `event`,
 `property`, `project` and `settings` (site default). Organization details live on `settings`.
+
+### 24.6 As built: rulings made during implementation
+
+- **`buildMetadata` takes images already resolved**, not Sanity image sources. Callers pass
+  `resolveSeoImage(seo, documentImage)` (`frontend/sanity/lib/seoDefaults.ts`). That keeps
+  `seo.ts`, `siteUrl.ts` and `structuredData.ts` pure and runnable without Sanity env, so
+  `frontend/scripts/checkStructuredData.ts` can assert them with `npx tsx`.
+- **`ogImage.metadataBase` was retired outright**, not migrated. The dataset held no `ogImage` or
+  `metadataBase`, so `studio/scripts/migrateSeoDefaults.ts` found nothing to copy. The script stays
+  for any other environment that does; the schema field and the frontend's fallback to it are gone.
+  `settings.ogImage` is still the social image fallback until `settings.seo.image` is set.
+- **No origin means no sitemap, no canonical and no JSON-LD.** `sitemap.ts` returns an empty list
+  rather than protocol-less URLs (it used the `host` header with no scheme before). Setting **Site
+  URL** in Studio Settings is therefore required for the work to take effect; `NEXT_PUBLIC_SITE_URL`
+  is the fallback.
+- **Breadcrumb ancestors reuse `pagePath`** by evaluating it on each parent
+  (`parent->{..., "path": ${pagePath}}`), so the depth is still defined in the two places AGENTS.md
+  names and no new recursion was added. Checked against live data by
+  `studio/scripts/verifyStructuredData.ts`.
+- **A project's `WebPage` points at its property by `@id`**
+  (`<origin>/properties/<slug>#place`), which is defined on the property's own page.
+- **The `seo` field is a tab on `page` and `property`** (they already use tabs) and a collapsed
+  section on `article`, `event` and `project` (adding a tab there would hide their existing
+  fields).
+- **Verification here is two scripts, not a test framework:** pure builders by
+  `frontend/scripts/checkStructuredData.ts` (fixtures), real queries by
+  `studio/scripts/verifyStructuredData.ts --with-user-token` (live data).
+- **Not yet validated against Google's Rich Results Test or the Schema.org validator**: both need a
+  public URL, so that check is for a deployed preview once Site URL is set.
+- **Deferred, with issues:** FAQPage [#77](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/77),
+  JobPosting [#78](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/78),
+  Studio SEO preview [#79](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/79),
+  hreflang, custom JSON-LD and Search Console [#80](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/80),
+  GovernmentOrganization [#81](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/81).
+  The records archive, #41, is built.

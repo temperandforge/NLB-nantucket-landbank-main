@@ -54,6 +54,22 @@ Design docs live in [docs/superpowers/specs/](docs/superpowers/specs/).
   `setFeatureState`; deriving the id from a separate index over only properties that have geometry
   makes hovering highlight the wrong polygon as soon as one property has no boundary.
 
+## SEO and structured data
+
+- **JSON-LD is derived from document data at render, never authored.** One pure builder per
+  type in `frontend/sanity/lib/structuredData.ts`; it returns `null` when required data is missing
+  and omits a property rather than emitting it empty.
+- **One origin: `settings.siteUrl`** (fallback `NEXT_PUBLIC_SITE_URL`), via `getSiteUrl`. Without
+  it there is no canonical, sitemap or JSON-LD. Never build an absolute URL any other way.
+- **Every route's `generateMetadata` goes through `buildMetadata`.** A page that sets `openGraph`
+  replaces the layout's wholesale, so don't hand-roll metadata. Canonical is derived from the
+  page's address and is not an editable field.
+- **`seo` is the shared override object** (title, description, image, `noIndex`). `noIndex` also
+  removes the page from the sitemap.
+- **Run `frontend/scripts/checkStructuredData.ts` and
+  `studio/scripts/verifyStructuredData.ts`** after changing a builder or its query. Reasoning:
+  DECISIONS 24.
+
 ## Page URLs
 
 - **`page.slug` is a single segment.** The full path is derived from the `parent` chain, never
