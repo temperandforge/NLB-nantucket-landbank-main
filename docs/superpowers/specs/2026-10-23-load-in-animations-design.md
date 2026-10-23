@@ -71,10 +71,13 @@ Guardrails:
 - **The header is anchored** with its own `view-transition-name` and CSS that suppresses its
   animation (per the docs), so the bar never moves. The footer is not handled specially.
 - **Morph.** A card's image and the detail-page hero share `view-transition-name`s of the form
-  `property-<slug>`, `project-<slug>`, `news-<slug>`, with `share="morph" default="none"`. Wired for
-  properties, projects and news. People and staff cards have no detail page and get nothing.
+  `property-<slug>` and `project-<slug>`, with `share="morph" default="none"`. Wired for properties
+  and projects only, and only on the archive grids (an opt-in `morph` prop on the card). News has no
+  morph: `ArticleView` renders no hero image to pair with. People and staff cards have no detail page
+  and get nothing.
 - `::view-transition { pointer-events: none }`, so clicks during a transition reach the page.
-- `prefers-reduced-motion` sets all transition durations to 0.
+- `prefers-reduced-motion: reduce` sets all view-transition durations and delays to 0 (one
+  `@media (prefers-reduced-motion: reduce)` block in `motion.css`), so pages swap instantly.
 
 ### Known risks
 
@@ -115,9 +118,11 @@ Guardrails:
   `/_global-error`. Build with `NODE_ENV=production`.
 - **The in-app browser pane cannot verify view transitions**: it produces no render frames, so even an
   empty transition never becomes ready. Verify in a real Chrome.
-- **Browser back/forward** carry no transition type. The soft handoff still plays; the morph reverses
-  only when both pages carry matching names. The reverse morph was NOT probed on a real build. Only
-  forward archive → detail clicks were verified.
+- **Browser back/forward start no view transition** (observed on a production build in Chrome,
+  `history.back()` from a property page to the archive): the page swaps instantly, with neither the
+  soft handoff nor a reverse morph.
+- **A header hidden by scroll snaps back in** at the start of a transition instead of sliding down:
+  its old snapshot is hidden and its group does not animate (observed, not fixed).
 - **Safari and Firefox** are unverified (only one browser can be driven here). Without View
   Transitions support the site works and simply doesn't animate.
 - **Presentation navigation** behaviour is reasoned, not observed, until checked in Studio.
@@ -139,7 +144,7 @@ No test framework exists, so verification is in a real browser:
 
 - `npm run type-check` and `npm run lint` in `frontend`.
 - First-paint cascade on a hero page; the soft handoff between two pages; a property card morphing to
-  its detail page and back.
+  its detail page (browser back swaps instantly, with no transition).
 - Reduced motion (emulated): static text, instant swaps. Presentation text with stega characters
   renders unsplit.
 - LCP and CLS before and after, by the same method as #56.

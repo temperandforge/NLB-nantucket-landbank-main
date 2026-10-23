@@ -4,7 +4,8 @@
  * Every animation, keyframe and view-transition animation rule lives in the single guarded block
  * below. Outside it the text is fully visible: reduced-motion and print users never get a hidden
  * start state. `scripts/verifyMotionCss.mts` asserts this. Start states (opacity 0 etc.) come from
- * the keyframes via `animation-fill-mode: both`, never from base styles.
+ * the keyframes via `animation-fill-mode: both`, never from base styles. The reduced-motion block at
+ * the end is the one exception: it only zeroes view-transition durations and delays.
  */
 
 :root {
@@ -113,5 +114,19 @@
 
   ::view-transition-new(site-header) {
     animation: none;
+  }
+}
+
+/*
+ * Reduced motion: React still starts a view transition on every navigation, and outside the guard
+ * above the browser's own defaults would run (root crossfade, the header and morph groups). Zero
+ * them so the page swaps instantly. Durations and delays only; nothing here animates.
+ */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
   }
 }

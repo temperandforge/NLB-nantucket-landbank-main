@@ -7,7 +7,9 @@
  *
  * The contract: every animation, keyframe and view-transition animation rule sits inside ONE
  * `@media screen and (prefers-reduced-motion: no-preference)` block, so reduced-motion and print
- * users never get a hidden start state. Outside it the text is simply visible.
+ * users never get a hidden start state. Outside it the text is simply visible. The one exception is
+ * a single `@media (prefers-reduced-motion: reduce)` block that only zeroes view-transition
+ * durations and delays, so the browser's default transition animations don't run either.
  */
 import {readFileSync} from 'node:fs'
 
@@ -30,25 +32,33 @@ try {
 css = css.replace(/\/\*[\s\S]*?\*\//g, '')
 
 const GUARD = /@media\s+screen\s+and\s+\(\s*prefers-reduced-motion\s*:\s*no-preference\s*\)\s*\{/g
+const REDUCE = /@media\s+\(\s*prefers-reduced-motion\s*:\s*reduce\s*\)\s*\{/g
 
-// Split the file into the guarded block(s) and everything else, by brace matching.
-const guards: string[] = []
-let outside = ''
-let cursor = 0
-for (const match of css.matchAll(GUARD)) {
-  const open = match.index + match[0].length
-  let depth = 1
-  let i = open
-  while (i < css.length && depth > 0) {
-    if (css[i] === '{') depth++
-    else if (css[i] === '}') depth--
-    i++
+/** Splits `source` into the bodies of the blocks `opener` starts and everything else, by brace matching. */
+function split(source: string, opener: RegExp): {blocks: string[]; rest: string} {
+  const blocks: string[] = []
+  let rest = ''
+  let cursor = 0
+  for (const match of source.matchAll(opener)) {
+    const open = match.index + match[0].length
+    let depth = 1
+    let i = open
+    while (i < source.length && depth > 0) {
+      if (source[i] === '{') depth++
+      else if (source[i] === '}') depth--
+      i++
+    }
+    rest += source.slice(cursor, match.index)
+    blocks.push(source.slice(open, i - 1))
+    cursor = i
   }
-  outside += css.slice(cursor, match.index)
-  guards.push(css.slice(open, i - 1))
-  cursor = i
+  return {blocks, rest: rest + source.slice(cursor)}
 }
-outside += css.slice(cursor)
+
+const {blocks: guards, rest: unguarded} = split(css, GUARD)
+// The one exception outside the guard: a reduced-motion block that only zeroes view-transition
+// durations and delays (checked below), so the browser's default transition animations don't run.
+const {blocks: reduces, rest: outside} = split(unguarded, REDUCE)
 
 check(guards.length === 1, `exactly one @media screen and (prefers-reduced-motion: no-preference) block (found ${guards.length})`)
 check(!/@media[^{]*print/.test(css), 'no separate print rule (screen qualification excludes print)')
@@ -57,6 +67,32 @@ check(!/@keyframes/.test(outside), 'no @keyframes outside the guarded block')
 check(
   !/::view-transition-(old|new|group|image-pair)/.test(outside),
   'no ::view-transition-old/new/group rule outside the guarded block',
+)
+check(reduces.length === 1, `exactly one @media (prefers-reduced-motion: reduce) block (found ${reduces.length})`)
+const reduce = reduces.join('\n')
+check(
+  ['group', 'old', 'new'].every((part) => reduce.includes(`::view-transition-${part}(*)`)),
+  'the reduced-motion block covers ::view-transition-group/old/new(*)',
+)
+const reduceRules = [...reduce.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+check(
+  reduceRules.length > 0 &&
+    reduce.replace(/([^{}]+)\{([^{}]*)\}/g, '').trim() === '' &&
+    reduceRules.every(
+      ([, selectors, body]) =>
+        selectors.split(',').every((sel) => /^::view-transition-(group|old|new)\(\*\)$/.test(sel.trim())) &&
+        body
+          .split(';')
+          .map((decl) => decl.trim())
+          .filter(Boolean)
+          .every((decl) => /^animation-(duration|delay)\s*:\s*0s\s*!important$/.test(decl)),
+    ) &&
+    /animation-duration\s*:\s*0s/.test(reduce),
+  'the reduced-motion block only sets animation-duration / animation-delay to 0s on view-transition pseudos',
+)
+check(
+  !/\banimation(-name)?\s*:/.test(reduce) && !/@keyframes/.test(reduce),
+  'the reduced-motion block has no animation / animation-name / @keyframes',
 )
 const inside = guards.join('\n')
 check(/\banimation(-name)?\s*:/.test(inside), 'the guarded block contains the animation declarations')
