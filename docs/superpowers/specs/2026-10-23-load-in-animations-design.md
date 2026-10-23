@@ -82,6 +82,23 @@ Guardrails:
   as the navigation. A page that waits on data falls back to the soft handoff. How often that happens
   with our Sanity fetches is unknown until tried; measuring it is an explicit verification step, and
   the result decides whether a deferred issue is needed.
+- **Pre-implementation spike (2026-10-23): the naive morph did not pair.** On a production build, every
+  detail route is pre-rendered (properties, projects, news, events, pages; only `/search` is dynamic),
+  and the property page's RSC payload was prefetched before the click. A `<Link>` click did start a
+  view transition and it became ready in ~24ms. Yet with matching `<ViewTransition name=…>` on the
+  card image and the detail hero (tried with and without `share`/`default`), React applied no names:
+  only `root` animated. Cause not found. The implementation must start with a short investigation
+  (e.g. whether the archive card, a lazily hydrated client list, or the detail hero's position in the
+  tree prevents pairing) before wiring the morph widely. If it cannot be made to pair, ship the soft
+  handoff alone and file the morph as deferred.
+- **Link audit.** Only `Header`, `ResolvedLink`, `CardNews`, `CardProperty` and a few others use
+  `<Link>`. `ButtonLink`, `LinkButton`, `LinkRow`, `Footer`, `SearchResults`, `ProjectPreviewView` and
+  `CardProject` use a plain `<a>`, which is a full page load with no transition or prefetch. Internal
+  hrefs through those need `<Link>` for page transitions to cover them; external ones stay `<a>`.
+- **Build environment.** This shell has `NODE_ENV=development`, which makes `next build` fail on
+  `/_global-error`. Build with `NODE_ENV=production`.
+- **The in-app browser pane cannot verify view transitions**: it produces no render frames, so even an
+  empty transition never becomes ready. Verify in a real Chrome.
 - **Browser back/forward** carry no transition type. The soft handoff still plays; the morph reverses
   only when both pages carry matching names.
 - **Safari and Firefox** are unverified (only one browser can be driven here). Without View
