@@ -165,6 +165,35 @@ check(
   ],
 )
 
+// a path a page now occupies is never a redirect source
+check(
+  'swap creates no redirect from an occupied path',
+  planRedirectWrites(
+    [
+      {pageId: 'p1', oldPath: 'a', newPath: 'b'},
+      {pageId: 'p2', oldPath: 'b', newPath: 'a'},
+    ],
+    [],
+  ),
+  {create: [], disable: []},
+)
+check(
+  'self-move a/b -> a/b/b creates no redirect from the occupied path',
+  planRedirectWrites(
+    [
+      {pageId: 'p1', oldPath: 'a/b', newPath: 'a/b/b'},
+      {pageId: 'p2', oldPath: 'a/b/b', newPath: 'a/b'},
+    ],
+    [],
+  ),
+  {create: [], disable: []},
+)
+check(
+  'case-only rename creates nothing',
+  planRedirectWrites([{pageId: 'p', oldPath: 'About', newPath: 'about'}], []),
+  {create: [], disable: []},
+)
+
 if (failed) {
   console.log(`\n${failed} check(s) failed`)
   process.exit(1)

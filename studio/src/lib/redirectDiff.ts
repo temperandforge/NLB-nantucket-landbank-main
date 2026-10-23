@@ -80,19 +80,21 @@ export function planRedirectWrites(
 ): {create: NewRedirect[]; disable: string[]} {
   const existingSources = new Set(existing.map((r) => normaliseSource(r.source)))
 
+  const livePaths = new Set(
+    changes.flatMap((c) => (c.newPath === null ? [] : [normaliseSource(`/${c.newPath}`)])),
+  )
+
   const create: NewRedirect[] = []
   const created = new Set<string>()
   for (const {pageId, oldPath, newPath} of changes) {
     if (oldPath === null || newPath === null) continue
     const source = normaliseSource(`/${oldPath}`)
-    if (existingSources.has(source) || created.has(source)) continue
+    // Never redirect from a path some page now occupies (swaps, self-moves, case-only renames).
+    if (livePaths.has(source) || existingSources.has(source) || created.has(source)) continue
     created.add(source)
     create.push({source, pageId})
   }
 
-  const livePaths = new Set(
-    changes.flatMap((c) => (c.newPath === null ? [] : [normaliseSource(`/${c.newPath}`)])),
-  )
   const disable = existing.filter((r) => livePaths.has(normaliseSource(r.source))).map((r) => r.id)
 
   return {create, disable}
