@@ -124,7 +124,8 @@ export default function ImageCarouselTrack({
 
   const pause = (event: SyntheticEvent) => {
     paused.current = true
-    onSlide.current = event.target instanceof Element && event.target.closest('[data-slide]') !== null
+    onSlide.current =
+      event.target instanceof Element && event.target.closest('[data-slide]') !== null
   }
   const resume = () => {
     paused.current = false
@@ -145,31 +146,38 @@ export default function ImageCarouselTrack({
   )
   const extraSets = looping ? Array.from({length: repeats - 1}, (_, i) => copy(i)) : null
 
+  // The page's content width, then the scroller widened by one gutter either side. The fades sit in
+  // those gutters, outside the content box, so the slides are fully visible across the same width as
+  // the rest of the page and only run off into the margins.
   return (
-    <div
-      ref={track}
-      className="tf-max-w relative flex items-center overflow-x-auto px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [mask-image:linear-gradient(to_right,transparent,black_3rem,black_calc(100%-3rem),transparent)]"
-      role="region"
-      aria-label={label}
-      tabIndex={0}
-      onMouseEnter={pause}
-      onMouseMove={trackPointer}
-      onMouseLeave={resume}
-      onFocus={pause}
-      onBlur={resume}
-      onTouchStart={pause}
-      onTouchEnd={resume}
-    >
-      <div ref={first} className="flex flex-none items-center gap-6">
-        {children}
-        {extraSets}
-      </div>
-      {looping && (
-        <div ref={clone} className="ml-6 flex flex-none items-center gap-6">
-          {copy(-1)}
-          {extraSets}
+    <div className="tf-px w-full">
+      <div className="tf-max-w">
+        <div
+          ref={track}
+          className="relative -mx-(--tf-x) flex items-center overflow-x-auto px-(--tf-x) [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [mask-image:linear-gradient(to_right,transparent,black_var(--tf-x),black_calc(100%-var(--tf-x)),transparent)]"
+          role="region"
+          aria-label={label}
+          tabIndex={0}
+          onMouseEnter={pause}
+          onMouseMove={trackPointer}
+          onMouseLeave={resume}
+          onFocus={pause}
+          onBlur={resume}
+          onTouchStart={pause}
+          onTouchEnd={resume}
+        >
+          <div ref={first} className="flex flex-none items-center gap-6">
+            {children}
+            {extraSets}
+          </div>
+          {looping && (
+            <div ref={clone} className="ml-6 flex flex-none items-center gap-6">
+              {copy(-1)}
+              {extraSets}
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   )
 }
