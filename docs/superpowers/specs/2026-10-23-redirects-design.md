@@ -217,6 +217,7 @@ Each has an issue; none is built.
 - Deleted and unpublished pages: [#75](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/75)
 - Bulk import of the old WordPress URLs: [#76](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/76)
 - Sources with a file extension never fire (proxy matcher excludes dotted paths): [#83](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/83)
+- Hardening follow-ups from the final review (normaliser divergence, destination validation, landing-page query and link hop, stale-while-revalidate loader, matcher-boundary assertion, parent-and-child renamed in one publish): [#84](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/84)
 
 Also not carried over from the WordPress Redirection plugin: conditional matching on login, referrer,
 user agent or language; random and pass-through actions; groups; CSV import and export.
