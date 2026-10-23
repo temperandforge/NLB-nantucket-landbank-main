@@ -17,7 +17,7 @@ import {
   TagIcon,
   UsersIcon,
 } from '@sanity/icons'
-import type { StructureBuilder, StructureResolver } from 'sanity/structure'
+import type {StructureBuilder, StructureResolver} from 'sanity/structure'
 import {orderableDocumentListDeskItem} from '@sanity/orderable-document-list'
 import pluralize from 'pluralize-esm'
 
@@ -141,7 +141,13 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
             .items([
               S.documentTypeListItem('article').title('Articles').icon(DocumentTextIcon),
               S.divider(),
-              S.documentTypeListItem('newsCategory').title('News Categories').icon(TagIcon),
+              orderableDocumentListDeskItem({
+                type: 'newsCategory',
+                title: 'News Categories',
+                icon: TagIcon,
+                S,
+                context,
+              }),
             ]),
         ),
       S.listItem()
@@ -151,10 +157,28 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
           S.list()
             .title('People')
             .items([
-              S.documentTypeListItem('staffMember').title('Staff').icon(UsersIcon),
-              S.documentTypeListItem('commissioner').title('Commissioners').icon(UsersIcon),
+              orderableDocumentListDeskItem({
+                type: 'staffMember',
+                title: 'Staff',
+                icon: UsersIcon,
+                S,
+                context,
+              }),
+              orderableDocumentListDeskItem({
+                type: 'commissioner',
+                title: 'Commissioners',
+                icon: UsersIcon,
+                S,
+                context,
+              }),
               S.divider(),
-              S.documentTypeListItem('department').title('Departments').icon(TagIcon),
+              orderableDocumentListDeskItem({
+                type: 'department',
+                title: 'Departments',
+                icon: TagIcon,
+                S,
+                context,
+              }),
             ]),
         ),
       // Projects: initiatives the Land Bank runs, with their own categories. Separate from
@@ -168,7 +192,13 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
             .items([
               S.documentTypeListItem('project').title('Projects').icon(ProjectsIcon),
               S.divider(),
-              S.documentTypeListItem('projectType').title('Project Types').icon(TagIcon),
+              orderableDocumentListDeskItem({
+                type: 'projectType',
+                title: 'Project Types',
+                icon: TagIcon,
+                S,
+                context,
+              }),
             ]),
         ),
       // Properties: the Land Bank's properties, their categorisation, and the settings that
@@ -189,9 +219,7 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
               S.listItem()
                 .title('Properties Settings')
                 .icon(CogIcon)
-                .child(
-                  S.document().schemaType('projectSettings').documentId('projectSettings'),
-                ),
+                .child(S.document().schemaType('projectSettings').documentId('projectSettings')),
             ]),
         ),
       S.listItem()
@@ -203,7 +231,13 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
             .items([
               S.documentTypeListItem('record').title('Records').icon(DocumentsIcon),
               S.divider(),
-              S.documentTypeListItem('recordCategory').title('Record Categories').icon(TagIcon),
+              orderableDocumentListDeskItem({
+                type: 'recordCategory',
+                title: 'Record Categories',
+                icon: TagIcon,
+                S,
+                context,
+              }),
             ]),
         ),
       S.divider(),

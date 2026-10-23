@@ -1,3 +1,4 @@
+import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
 import {TagIcon} from '@sanity/icons'
 import {defineField, defineType} from 'sanity'
 
@@ -29,7 +30,10 @@ export const projectType = defineType({
       options: {source: 'title', maxLength: 96},
       validation: (Rule) => Rule.required(),
     }),
+    // Set by dragging in the Project Types list, not edited here.
+    orderRankField({type: 'projectType'}),
   ],
+  orderings: [orderRankOrdering],
   preview: {
     select: {title: 'title', slug: 'slug.current'},
     prepare({title, slug}) {

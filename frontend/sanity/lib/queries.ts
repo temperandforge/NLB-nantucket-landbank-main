@@ -214,7 +214,7 @@ const articleCardFields = /* groq */ `
   date,
   image,
   externalUrl,
-  "categories": categories[]->{"slug": slug.current, title}
+  "categories": categories[]->{"slug": slug.current, title, orderRank}
 `
 
 /** The published form with this id, for validating a submission. Drafts never match. */
@@ -300,11 +300,11 @@ const pageBuilderFields = /* groq */ `
     },
     _type == "recordsArchive" => {
       ...,
-      "categories": *[_type == "recordCategory" && defined(slug.current)] | order(order asc, title asc) {
+      "categories": *[_type == "recordCategory" && defined(slug.current)] | order(orderRank asc, _createdAt asc) {
         _id,
         title,
         "slug": slug.current,
-        order,
+        orderRank,
         sortBy,
         filters
       },
@@ -394,7 +394,7 @@ const pageBuilderFields = /* groq */ `
         description,
         location,
         employmentType,
-        "department": department->{"slug": slug.current, title},
+        department,
         applyLink{
           ...,
           ${linkReference}
@@ -403,14 +403,14 @@ const pageBuilderFields = /* groq */ `
     },
     _type == "peopleGrid" => {
       ...,
-      "staff": *[_type == "staffMember" && ^.source == "staff"] | order(order asc, name asc) {
+      "staff": *[_type == "staffMember" && ^.source == "staff"] | order(orderRank asc, _createdAt asc) {
         _id,
         name,
         title,
         headshot,
-        "department": department->{"slug": slug.current, title, order}
+        "department": department->{"slug": slug.current, title, orderRank}
       },
-      "commissioners": *[_type == "commissioner" && ^.source == "commissioners"] | order(order asc, name asc) {
+      "commissioners": *[_type == "commissioner" && ^.source == "commissioners"] | order(orderRank asc, _createdAt asc) {
         _id,
         name,
         title,
@@ -425,7 +425,7 @@ const pageBuilderFields = /* groq */ `
         name,
         image,
         "slug": slug.current,
-        "projectTypes": projectTypes[]->{"slug": slug.current, title}
+        "projectTypes": projectTypes[]->{"slug": slug.current, title, orderRank}
       }
     },
     _type == "propertyArchive" => {
@@ -656,7 +656,7 @@ export const articleQuery = defineQuery(`
     "slug": slug.current,
     date,
     image,
-    "categories": categories[]->{"slug": slug.current, title},
+    "categories": categories[]->{"slug": slug.current, title, orderRank},
     // The article's own category documents, to find related articles.
     "categoryIds": categories[]._ref,
     body[]{

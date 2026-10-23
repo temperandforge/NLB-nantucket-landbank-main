@@ -10,8 +10,7 @@ import {BlockProps} from './types'
 type Job = NonNullable<BlockProps<'jobListings'>['block']['jobs']>[number]
 
 function JobItem({job}: {job: Job}) {
-  // A department that was unpublished dereferences to null.
-  const department = job.department?.title
+  const department = job.department
   const href = linkResolver(job.applyLink as DereferencedLink | undefined)
 
   return (

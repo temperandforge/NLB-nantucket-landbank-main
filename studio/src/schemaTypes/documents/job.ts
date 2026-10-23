@@ -2,8 +2,9 @@ import {CaseIcon} from '@sanity/icons'
 import {defineField, defineType} from 'sanity'
 
 /**
- * A job opening. The tag on its card is the department's title, the same options staff use, so
- * it is never restated here. Where to apply is the shared link, so it can be a page or a URL.
+ * A job opening. The tag on its card is its department, plain text: unrelated to the staff
+ * departments (a job can name a department nobody on staff belongs to). Where to apply is the
+ * shared link, so it can be a page or a URL.
  */
 export const job = defineType({
   name: 'job',
@@ -20,9 +21,8 @@ export const job = defineType({
     defineField({
       name: 'department',
       title: 'Department',
-      type: 'reference',
-      to: [{type: 'department'}],
-      description: 'Shown as the tag under the title.',
+      type: 'string',
+      description: 'Shown as the tag under the title. Free text, e.g. "Property Management".',
     }),
     defineField({
       name: 'description',
@@ -67,7 +67,7 @@ export const job = defineType({
     },
   ],
   preview: {
-    select: {title: 'title', subtitle: 'department.title'},
+    select: {title: 'title', subtitle: 'department'},
     prepare: ({title, subtitle}) => ({title: title || 'Untitled', subtitle}),
   },
 })

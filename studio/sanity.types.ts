@@ -660,6 +660,7 @@ export type ProjectType = {
   _rev: string
   title: string
   slug: Slug
+  orderRank?: string
 }
 
 export type PropertyType = {
@@ -680,7 +681,7 @@ export type NewsCategory = {
   _rev: string
   title: string
   slug: Slug
-  order?: number
+  orderRank?: string
 }
 
 export type RecordCategoryReference = {
@@ -714,7 +715,7 @@ export type RecordCategory = {
   _rev: string
   title: string
   slug: Slug
-  order?: number
+  orderRank?: string
   sortBy: 'dateDesc' | 'titleAsc'
   filters?: Array<string>
 }
@@ -738,13 +739,6 @@ export type FormSubmission = {
   }>
 }
 
-export type DepartmentReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'department'
-}
-
 export type Job = {
   _id: string
   _type: 'job'
@@ -752,7 +746,7 @@ export type Job = {
   _updatedAt: string
   _rev: string
   title: string
-  department?: DepartmentReference
+  department?: string
   description?: string
   location?: string
   employmentType?: string
@@ -795,7 +789,7 @@ export type Commissioner = {
     crop?: SanityImageCrop
     _type: 'image'
   }
-  order?: number
+  orderRank?: string
 }
 
 export type SanityImageCrop = {
@@ -814,6 +808,13 @@ export type SanityImageHotspot = {
   width: number
 }
 
+export type DepartmentReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'department'
+}
+
 export type StaffMember = {
   _id: string
   _type: 'staffMember'
@@ -830,7 +831,7 @@ export type StaffMember = {
     crop?: SanityImageCrop
     _type: 'image'
   }
-  order?: number
+  orderRank?: string
 }
 
 export type Department = {
@@ -841,7 +842,7 @@ export type Department = {
   _rev: string
   title: string
   slug: Slug
-  order?: number
+  orderRank?: string
 }
 
 export type Event = {
@@ -1743,13 +1744,13 @@ export type AllSanitySchemaTypes =
   | Record
   | RecordCategory
   | FormSubmission
-  | DepartmentReference
   | Job
   | FaqCategoryReference
   | Faq
   | Commissioner
   | SanityImageCrop
   | SanityImageHotspot
+  | DepartmentReference
   | StaffMember
   | Department
   | Event

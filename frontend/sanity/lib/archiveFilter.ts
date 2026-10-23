@@ -7,22 +7,42 @@
 /** One tab of an archive's filter row: the slug is the stable key, the title the label. */
 export type FilterTab = {slug: string; title: string}
 
-export type Category = {slug?: string | null; title?: string | null; order?: number | null}
+/**
+ * `orderRank` is the drag-and-drop position (a string that sorts lexically); `order` is the older
+ * number, still used by taxonomies that are not draggable (property types, resources).
+ */
+export type Category = {
+  slug?: string | null
+  title?: string | null
+  order?: number | null
+  orderRank?: string | null
+}
 
 /**
- * Tabs for a set of categories: one per distinct category, in its own order and then by title. A
+ * Tabs for a set of categories: one per distinct category, in its own order (dragged rank, or the
+ * older number) and then by title. A
  * category with no slug or title (an unpublished one dereferences to null) gets no tab.
  */
 export function categoryTabs(categories: Iterable<Category | null | undefined>): FilterTab[] {
-  const found = new Map<string, {title: string; order: number}>()
+  const found = new Map<string, {title: string; order: number; rank: string | null}>()
   for (const category of categories) {
     const slug = category?.slug?.trim()
     const title = category?.title?.trim()
     if (!slug || !title || found.has(slug)) continue
-    found.set(slug, {title, order: category?.order ?? Number.MAX_SAFE_INTEGER})
+    found.set(slug, {
+      title,
+      order: category?.order ?? Number.MAX_SAFE_INTEGER,
+      rank: category?.orderRank || null,
+    })
   }
+  // A ranked category comes before an unranked one; two ranked ones compare by rank.
+  const byRank = (a: string | null, b: string | null) =>
+    a && b ? (a < b ? -1 : a > b ? 1 : 0) : a ? -1 : b ? 1 : 0
   return [...found.entries()]
-    .sort((a, b) => a[1].order - b[1].order || a[1].title.localeCompare(b[1].title))
+    .sort(
+      (a, b) =>
+        byRank(a[1].rank, b[1].rank) || a[1].order - b[1].order || a[1].title.localeCompare(b[1].title),
+    )
     .map(([slug, {title}]) => ({slug, title}))
 }
 
@@ -115,7 +135,7 @@ export const PROPERTY_RESOURCE_PARAM = 'resource'
 export type PropertySelection = {types: string[]; resources: string[]}
 export const EMPTY_SELECTION: PropertySelection = {types: [], resources: []}
 
-type MaybeCategory = {slug?: string | null; title?: string | null; order?: number | null} | null
+type MaybeCategory = Category | null
 type Filterable = {
   propertyTypes?: ReadonlyArray<MaybeCategory> | null
   resources?: ReadonlyArray<MaybeCategory> | null

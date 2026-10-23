@@ -4005,6 +4005,13 @@
           "name": "slug"
         },
         "optional": false
+      },
+      "orderRank": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
       }
     }
   },
@@ -4110,10 +4117,10 @@
         },
         "optional": false
       },
-      "order": {
+      "orderRank": {
         "type": "objectAttribute",
         "value": {
-          "type": "number"
+          "type": "string"
         },
         "optional": true
       }
@@ -4289,10 +4296,10 @@
         },
         "optional": false
       },
-      "order": {
+      "orderRank": {
         "type": "objectAttribute",
         "value": {
-          "type": "number"
+          "type": "string"
         },
         "optional": true
       },
@@ -4453,36 +4460,6 @@
     }
   },
   {
-    "type": "type",
-    "name": "department.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "department"
-    }
-  },
-  {
     "name": "job",
     "type": "document",
     "attributes": {
@@ -4527,8 +4504,7 @@
       "department": {
         "type": "objectAttribute",
         "value": {
-          "type": "inline",
-          "name": "department.reference"
+          "type": "string"
         },
         "optional": true
       },
@@ -4770,10 +4746,10 @@
         },
         "optional": true
       },
-      "order": {
+      "orderRank": {
         "type": "objectAttribute",
         "value": {
-          "type": "number"
+          "type": "string"
         },
         "optional": true
       }
@@ -4865,6 +4841,36 @@
           "optional": false
         }
       }
+    }
+  },
+  {
+    "type": "type",
+    "name": "department.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "department"
     }
   },
   {
@@ -4971,10 +4977,10 @@
         },
         "optional": true
       },
-      "order": {
+      "orderRank": {
         "type": "objectAttribute",
         "value": {
-          "type": "number"
+          "type": "string"
         },
         "optional": true
       }
@@ -5030,10 +5036,10 @@
         },
         "optional": false
       },
-      "order": {
+      "orderRank": {
         "type": "objectAttribute",
         "value": {
-          "type": "number"
+          "type": "string"
         },
         "optional": true
       }

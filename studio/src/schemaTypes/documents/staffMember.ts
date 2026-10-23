@@ -1,3 +1,4 @@
+import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
 import {UserIcon} from '@sanity/icons'
 import {defineField, defineType} from 'sanity'
 
@@ -23,23 +24,10 @@ export const staffMember = defineType({
       options: {hotspot: true},
       description: 'Shown at roughly 4:5. The person’s name is used as its alt text.',
     }),
-    defineField({
-      name: 'order',
-      title: 'Order',
-      type: 'number',
-      description: 'Lower numbers come first. Ties fall back to the name.',
-    }),
+    // Set by dragging in the list (Studio > People), not edited here.
+    orderRankField({type: 'staffMember'}),
   ],
-  orderings: [
-    {
-      title: 'Order',
-      name: 'order',
-      by: [
-        {field: 'order', direction: 'asc'},
-        {field: 'name', direction: 'asc'},
-      ],
-    },
-  ],
+  orderings: [orderRankOrdering],
   preview: {
     select: {title: 'name', subtitle: 'title', media: 'headshot'},
     prepare: ({title, subtitle, media}) => ({title: title || 'Unnamed', subtitle, media}),

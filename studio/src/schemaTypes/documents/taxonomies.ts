@@ -8,6 +8,7 @@ export const newsCategory = defineTaxonomy({
   title: 'News Category',
   icon: TagIcon,
   description: 'Shown on news items, e.g. "Conservation".',
+  draggable: true,
 })
 
 export const department = defineTaxonomy({
@@ -15,6 +16,7 @@ export const department = defineTaxonomy({
   title: 'Department',
   icon: UsersIcon,
   description: 'Groups staff, e.g. "Property Management".',
+  draggable: true,
 })
 
 export const faqCategory = defineTaxonomy({
@@ -30,6 +32,7 @@ export const recordCategory = defineTaxonomy({
   title: 'Record Category',
   icon: DocumentsIcon,
   description: 'A tab on the Public Records page, e.g. "Meeting Minutes".',
+  draggable: true,
   fields: [
     defineField({
       name: 'sortBy',

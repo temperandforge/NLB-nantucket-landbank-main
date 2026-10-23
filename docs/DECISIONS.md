@@ -984,8 +984,8 @@ default to no call to action.
 
 **Status:** Implemented, apply links outstanding ([#16](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/16))
 
-`job` documents (Studio: Jobs) hold the title, a `department` reference (the same options staff use,
-shown as the tag), description, location, employment type, apply link (the shared `link`) and
+`job` documents (Studio: Jobs) hold the title, a `department` (plain text, shown as the tag and
+unrelated to the staff departments; it was a reference to them until `convertJobDepartmentsToText.ts`), description, location, employment type, apply link (the shared `link`) and
 `order`. The Job Listings block holds only an eyebrow and heading and shows every job, like the FAQ
 List; with no jobs it renders nothing. Location and employment type are free text, not taxonomies,
 until the client needs to filter by them. The description is clamped to two lines, as in the design.
@@ -1414,19 +1414,25 @@ client designs one.
 fetches or Sanity: it loads its own stylesheet and fonts. `/` still 404s when no landing page is set
 (section 20), so "Back to home" can land on this screen until one is.
 
-## 23. FAQ ordering and the catch-all category
+## 23. Drag-and-drop ordering, and the FAQ catch-all category
 
-FAQs and FAQ categories are ordered by dragging in Studio (the Orderable Document List plugin, which
-stores a hidden `orderRank`). The FAQs and FAQ Categories lists under FAQs are the plugin's lists,
-not the default document lists. Queries sort `orderRank asc, _createdAt asc`, so nothing sorts
-alphabetically and a document that has no rank yet falls to the end, oldest first. The old `order`
-number is gone from the schema; existing documents were ranked once by `studio/scripts/seedFaqOrder.ts`
-(old `order`, then oldest first), and the old field is left in the data, unused.
+Staff, commissioners, FAQs, and the FAQ, news, project (`projectType`), department and record
+categories are ordered by dragging in Studio (the Orderable Document List plugin, which stores a
+hidden `orderRank`). Their lists in Studio are the plugin's lists, not the default document lists.
+Queries sort `orderRank asc, _createdAt asc`, so nothing sorts alphabetically and a document with no
+rank yet falls to the end, oldest first. Filter tabs built from categories (`categoryTabs` in
+`frontend/sanity/lib/archiveFilter.ts`) sort by `orderRank`, then the older `order` number, then
+title, so non-draggable taxonomies (property types, resources) still work. The old `order` number is
+gone from the draggable schemas; existing documents were ranked once by
+`studio/scripts/seedOrderRanks.ts` (old `order`, then the name or title they used to sort by, or
+oldest first for FAQs), and the old field is left in the data, unused.
 
-FAQs with no category are folded into a catch-all category chosen in FAQ Settings (`faqSettings`, a singleton under FAQs, field `uncategorisedCategory`)
-when one is set and published; with none set they show in a separate list above the categories.
+FAQs with no category are folded into a catch-all category chosen in FAQ Settings (`faqSettings`, a
+singleton under FAQs, field `uncategorisedCategory`) when one is set and published; with none set
+they show in a separate list above the categories.
 
-**Why:** The client wants to arrange FAQs by hand, and an alphabetical tiebreak read as arbitrary.
-**Implication:** Other taxonomies still use the numeric `order` field; `defineTaxonomy` takes
-`draggable: true` to switch one over, and its list must then use `orderableDocumentListDeskItem`.
-A new FAQ lands at the bottom of its list until dragged.
+**Why:** The client wants to arrange these by hand, and alphabetical tiebreaks read as arbitrary.
+**Implication:** `defineTaxonomy` takes `draggable: true` to switch another taxonomy over, and its
+list must then use `orderableDocumentListDeskItem`. A new document lands at the bottom of its list
+until dragged. The plugin ranks across every document of a type, so a filtered view (staff by
+department) shows a subsequence of the one order.

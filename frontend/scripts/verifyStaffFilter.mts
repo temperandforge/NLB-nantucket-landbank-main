@@ -68,6 +68,20 @@ same(
   'a department with no order comes after ordered ones, then by title',
 )
 
+same(
+  departmentTabs([
+    {department: {slug: 'unranked', title: 'Unranked'}},
+    {department: {slug: 'b', title: 'B', orderRank: '0|i00007:'}},
+    {department: {slug: 'a', title: 'A', orderRank: '0|i0000f:'}},
+  ]),
+  [
+    {slug: 'b', title: 'B'},
+    {slug: 'a', title: 'A'},
+    {slug: 'unranked', title: 'Unranked'},
+  ],
+  'a dragged rank orders the tabs (not by title), and an unranked department comes last',
+)
+
 same(filterByDepartment(people, null).length, 6, 'no filter keeps everyone, including people with no department')
 same(
   filterByDepartment(people, 'administration').map((p) => p.name),
