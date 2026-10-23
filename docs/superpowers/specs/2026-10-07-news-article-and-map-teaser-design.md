@@ -66,6 +66,9 @@ it).
 - The news archive, filters, pagination ([#11](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/11)).
 - The "more news" call-to-action tile, until the archive exists.
 - Instagram in the share row.
+- News Preview cards label an article with its first category, not the category the block is filtered
+  to, so an Agriculture-filtered block can show "Recreation"
+  ([#71](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/71)).
 
 ## Verification
 
