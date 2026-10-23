@@ -2,6 +2,7 @@ import {CogIcon} from '@sanity/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import type {Link, Settings} from '../../../sanity.types'
 
+import {altTextField} from '../objects/blockFields'
 import * as demo from '../../lib/initialValues'
 
 /**
@@ -132,6 +133,57 @@ export const settings = defineType({
       ],
     }),
     defineField({
+      name: 'siteUrl',
+      title: 'Site URL',
+      type: 'url',
+      description:
+        'The public address of the website, for example https://www.nantucketlandbank.org. Used for canonical links, social cards and search-engine structured data. Without it, no structured data is published.',
+      validation: (rule) => rule.uri({scheme: ['https']}),
+    }),
+    defineField({
+      name: 'seo',
+      title: 'Default SEO',
+      type: 'seo',
+      description:
+        'Used for any page that has no search title, description or social image of its own. Replaces the Open Graph Image below once a social image is set here.',
+    }),
+    defineField({
+      name: 'organization',
+      title: 'Organization',
+      type: 'object',
+      description: 'Published to search engines as the organization behind the site. Anything left empty is left out.',
+      options: {collapsible: true, collapsed: true},
+      fields: [
+        defineField({name: 'legalName', title: 'Legal name', type: 'string'}),
+        defineField({
+          name: 'logo',
+          title: 'Logo',
+          type: 'image',
+          fields: [altTextField()],
+        }),
+        defineField({name: 'email', title: 'Email', type: 'string'}),
+        defineField({name: 'telephone', title: 'Telephone', type: 'string'}),
+        defineField({
+          name: 'address',
+          title: 'Address',
+          type: 'object',
+          fields: [
+            defineField({name: 'streetAddress', title: 'Street address', type: 'string'}),
+            defineField({name: 'addressLocality', title: 'Town or city', type: 'string'}),
+            defineField({name: 'addressRegion', title: 'State', type: 'string'}),
+            defineField({name: 'postalCode', title: 'Postal code', type: 'string'}),
+          ],
+        }),
+        defineField({
+          name: 'sameAs',
+          title: 'Profiles on other sites',
+          type: 'array',
+          description: 'Addresses of the organization’s social media or directory profiles.',
+          of: [defineArrayMember({type: 'url', validation: (rule) => rule.uri({scheme: ['http', 'https']})})],
+        }),
+      ],
+    }),
+    defineField({
       name: 'ogImage',
       title: 'Open Graph Image',
       type: 'image',
@@ -157,18 +209,6 @@ export const settings = defineType({
               return true
             })
           },
-        }),
-        defineField({
-          name: 'metadataBase',
-          type: 'url',
-          description: (
-            <a
-              href="https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase"
-              rel="noreferrer noopener"
-            >
-              More information
-            </a>
-          ),
         }),
       ],
     }),

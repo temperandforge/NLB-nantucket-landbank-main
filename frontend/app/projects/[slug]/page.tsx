@@ -2,6 +2,7 @@ import type {Metadata} from 'next'
 import {notFound} from 'next/navigation'
 import {toPlainText, type PortableTextBlock} from 'next-sanity'
 
+import JsonLd from '@/components/JsonLd'
 import ProjectPreviewView from '@/components/blocks/ProjectPreviewView'
 import ProjectView from '@/components/ProjectView'
 import {sanityFetch} from '@/sanity/lib/live'
@@ -12,8 +13,11 @@ import {
   singleProjectPageQuery,
 } from '@/sanity/lib/queries'
 import {orderRelatedProjects} from '@/sanity/lib/relatedProjects'
+import {buildMetadata} from '@/sanity/lib/seo'
+import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
+import {projectLd} from '@/sanity/lib/structuredData'
 import {DereferencedLink} from '@/sanity/lib/types'
-import {linkResolver, realHref, resolveOpenGraphImage} from '@/sanity/lib/utils'
+import {linkResolver, realHref} from '@/sanity/lib/utils'
 
 /**
  * A project page, /projects/<slug>. A static route, so it wins over the catch-all that owns CMS
@@ -39,12 +43,14 @@ export async function generateMetadata(props: PageProps<'/projects/[slug]'>): Pr
   const description =
     project.description ||
     (project.body?.length ? toPlainText(project.body as PortableTextBlock[]).slice(0, 160) : undefined)
-  const image = resolveOpenGraphImage(project.image)
-  return {
+  return buildMetadata({
+    seo: project.seo,
     title: project.name,
     description,
-    openGraph: image ? {images: [image]} : undefined,
-  } satisfies Metadata
+    image: resolveSeoImage(project.seo, project.image),
+    path: `/projects/${slug}`,
+    defaults: await getSeoDefaults(),
+  })
 }
 
 export default async function ProjectPage(props: PageProps<'/projects/[slug]'>) {
@@ -69,8 +75,25 @@ export default async function ProjectPage(props: PageProps<'/projects/[slug]'>) 
   const buttonHref = realHref(more?.button?.link ? linkResolver(more.button.link as DereferencedLink) : null)
   const buttonLabel = more?.button?.buttonText ?? ''
 
+  const defaults = await getSeoDefaults()
+  const description =
+    project.description ||
+    (project.body?.length ? toPlainText(project.body as PortableTextBlock[]).slice(0, 160) : undefined)
+
   return (
     <>
+      <JsonLd
+        data={projectLd(
+          {
+            name: project.name,
+            slug: project.slug,
+            description: project.seo?.description || description,
+            image: resolveSeoImage(project.seo, project.image),
+            propertySlug: project.propertySlug,
+          },
+          defaults.origin,
+        )}
+      />
       <ProjectView project={project} settings={settings} archiveHref={archiveHref} />
       {showMore && (
         <ProjectPreviewView

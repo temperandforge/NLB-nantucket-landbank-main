@@ -11,12 +11,14 @@ import {VisualEditing} from 'next-sanity/visual-editing'
 import {Toaster} from 'sonner'
 
 import DraftModeToast from '@/components/DraftModeToast'
+import SiteJsonLd from '@/components/SiteJsonLd'
 import Footer from '@/components/Footer'
 import Header from '@/components/header/Header'
 import * as demo from '@/sanity/lib/demo'
 import {sanityFetch, SanityLive} from '@/sanity/lib/live'
 import {settingsQuery} from '@/sanity/lib/queries'
-import {resolveOpenGraphImage} from '@/sanity/lib/utils'
+import {resolveSeoImage} from '@/sanity/lib/seoDefaults'
+import {getSiteUrl} from '@/sanity/lib/siteUrl'
 import {handleError} from '@/app/client-utils'
 
 /**
@@ -32,22 +34,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = settings?.title || demo.title
   const description = settings?.description || demo.description
 
-  const ogImage = resolveOpenGraphImage(settings?.ogImage)
-  let metadataBase: URL | undefined = undefined
-  try {
-    metadataBase = settings?.ogImage?.metadataBase
-      ? new URL(settings.ogImage.metadataBase)
-      : undefined
-  } catch {
-    // ignore
-  }
+  const ogImage = resolveSeoImage(settings?.seo, settings?.ogImage)
+  const origin = getSiteUrl(settings)
+  const metadataBase = origin ? new URL(origin) : undefined
   return {
     metadataBase,
     title: {
       template: `%s | ${title}`,
       default: title,
     },
-    description: toPlainText(description),
+    description: settings?.seo?.description || toPlainText(description),
     openGraph: {
       images: ogImage ? [ogImage] : [],
     },
@@ -112,6 +108,7 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
         </a>
         {/* The <Toaster> component is responsible for rendering toast notifications used in /app/client-utils.ts and /app/components/DraftModeToast.tsx */}
         <Toaster />
+        <SiteJsonLd />
         {isDraftMode && (
           <>
             <DraftModeToast />

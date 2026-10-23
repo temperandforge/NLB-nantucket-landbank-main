@@ -2,6 +2,7 @@ import {ProjectsIcon} from '@sanity/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
 import {jumpNavBodyMembers} from '../objects/jumpNavBody'
+import {seoField} from '../objects/seo'
 
 /**
  * A Land Bank project - an initiative the Land Bank is carrying out, shown by the Project Grid,
@@ -70,6 +71,7 @@ export const project = defineType({
       to: [{type: 'property'}],
       description: 'Optional. The Land Bank property this project takes place on.',
     }),
+    seoField(),
   ],
   preview: {
     select: {title: 'name', subtitle: 'description', media: 'image'},

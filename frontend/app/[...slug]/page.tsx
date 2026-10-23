@@ -2,10 +2,14 @@ import type {Metadata} from 'next'
 import {draftMode} from 'next/headers'
 import {notFound} from 'next/navigation'
 
+import JsonLd from '@/components/JsonLd'
 import PageView from '@/components/PageView'
 import {sanityFetch} from '@/sanity/lib/live'
 import {currentHour} from '@/sanity/lib/dates'
 import {getPageQuery, pagesSlugs} from '@/sanity/lib/queries'
+import {buildMetadata} from '@/sanity/lib/seo'
+import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
+import {breadcrumbLd, recordsArchiveLd, webPageLd} from '@/sanity/lib/structuredData'
 
 /**
  * This is a catch-all segment rather than a single [slug] because a page URL spans as many
@@ -69,9 +73,15 @@ export async function generateMetadata(props: PageProps<'/[...slug]'>): Promise<
     stega: false,
   })
 
-  return {
-    title: page?.name,
-  } satisfies Metadata
+  if (!page) return {}
+  return buildMetadata({
+    seo: page.seo,
+    title: page.name,
+    image: resolveSeoImage(page.seo),
+    // The landing page's canonical is /, not the path it is also reachable at.
+    path: page.isLanding ? '/' : `/${page.path}`,
+    defaults: await getSeoDefaults(),
+  })
 }
 
 /**
@@ -95,5 +105,30 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
     notFound()
   }
 
-  return <PageView page={page} />
+  const defaults = await getSeoDefaults()
+  const path = page.isLanding ? '/' : `/${page.path}`
+  // A grouping (pathOnly) ancestor has a name in the trail but no page to link to.
+  const crumbs = [
+    {name: defaults.siteName, path: '/'},
+    ...(page.ancestors ?? []).flatMap((ancestor) =>
+      ancestor ? [{name: ancestor.name, path: ancestor.pathOnly ? null : `/${ancestor.path}`}] : [],
+    ),
+    {name: page.name, path},
+  ]
+  const archives = (page.pageBuilder ?? []).flatMap((block) => (block._type === 'recordsArchive' ? [block] : []))
+
+  return (
+    <>
+      <JsonLd
+        data={[
+          webPageLd({name: page.name, description: page.seo?.description || defaults.description, path}, defaults.origin),
+          breadcrumbLd(crumbs, defaults.origin),
+          ...archives.map((archive) =>
+            recordsArchiveLd({name: page.name, path, records: archive.records ?? []}, defaults.origin),
+          ),
+        ]}
+      />
+      <PageView page={page} />
+    </>
+  )
 }

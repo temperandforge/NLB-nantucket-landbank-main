@@ -3,6 +3,7 @@ import {defineField, defineType} from 'sanity'
 
 import {imageWithAltField} from '../objects/blockFields'
 import {jumpNavBodyMembers} from '../objects/jumpNavBody'
+import {seoField} from '../objects/seo'
 
 /**
  * An event, with a page of its own at /events/<slug> (its address is derived from the slug).
@@ -65,6 +66,7 @@ export const event = defineType({
       description:
         'The event page. Use Section heading (H2) for sections such as “Activities” or “Rain Date”, and add images between them.',
     }),
+    seoField(),
   ],
   orderings: [{title: 'Start, soonest first', name: 'startAsc', by: [{field: 'start', direction: 'asc'}]}],
   preview: {

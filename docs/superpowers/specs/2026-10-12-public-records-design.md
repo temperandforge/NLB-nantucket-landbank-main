@@ -128,3 +128,5 @@ without a deploy.
 tabs): sort order with undated records, year options, a stale param ignored, tab change clearing
 filters. In the browser against both Figma sizes: a category with a filter and one without, an empty
 category, a deep-linked `?category=&year=`, an unknown category. Stop any dev server I start.
+
+Structured data for the records archive (issue #41) is now covered by [the SEO and structured data design](2026-10-23-seo-and-structured-data-design.md), section 4.

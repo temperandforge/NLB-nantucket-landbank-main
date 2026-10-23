@@ -2,6 +2,7 @@ import type {Metadata} from 'next'
 import {notFound} from 'next/navigation'
 import {toPlainText, type PortableTextBlock} from 'next-sanity'
 
+import JsonLd from '@/components/JsonLd'
 import MapPreviewView from '@/components/blocks/MapPreviewView'
 import PropertiesPreviewView from '@/components/blocks/PropertiesPreviewView'
 import {PropertyFaqs, PropertyGallery, PropertyIntro} from '@/components/PropertyView'
@@ -14,8 +15,11 @@ import {
   singlePropertyPageQuery,
 } from '@/sanity/lib/queries'
 import {orderRelatedProperties} from '@/sanity/lib/relatedProperties'
+import {buildMetadata} from '@/sanity/lib/seo'
+import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
+import {placeLd} from '@/sanity/lib/structuredData'
 import {DereferencedLink} from '@/sanity/lib/types'
-import {linkResolver, realHref, resolveOpenGraphImage} from '@/sanity/lib/utils'
+import {linkResolver, realHref} from '@/sanity/lib/utils'
 
 /**
  * A property page, /properties/<slug>. A static route, so it wins over the catch-all that owns CMS
@@ -41,12 +45,14 @@ export async function generateMetadata(props: PageProps<'/properties/[slug]'>): 
   const description =
     property.description ||
     (property.about?.length ? toPlainText(property.about as PortableTextBlock[]).slice(0, 160) : undefined)
-  const image = resolveOpenGraphImage(property.image)
-  return {
+  return buildMetadata({
+    seo: property.seo,
     title: property.name,
     description,
-    openGraph: image ? {images: [image]} : undefined,
-  } satisfies Metadata
+    image: resolveSeoImage(property.seo, property.image),
+    path: `/properties/${slug}`,
+    defaults: await getSeoDefaults(),
+  })
 }
 
 export default async function PropertyPage(props: PageProps<'/properties/[slug]'>) {
@@ -71,8 +77,25 @@ export default async function PropertyPage(props: PageProps<'/properties/[slug]'
   const buttonLabel = more?.button?.buttonText ?? ''
   const showMap = !settings?.hideMap
 
+  const defaults = await getSeoDefaults()
+  const description =
+    property.description ||
+    (property.about?.length ? toPlainText(property.about as PortableTextBlock[]).slice(0, 160) : undefined)
+
   return (
     <>
+      <JsonLd
+        data={placeLd(
+          {
+            name: property.name,
+            slug: property.slug,
+            description: property.seo?.description || description,
+            image: resolveSeoImage(property.seo, property.image),
+            location: property.location,
+          },
+          defaults.origin,
+        )}
+      />
       <PropertyIntro property={property} />
       <PropertyGallery property={property} />
       {showMap && (
