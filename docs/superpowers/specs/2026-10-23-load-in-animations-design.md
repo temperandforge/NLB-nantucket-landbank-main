@@ -107,7 +107,9 @@ No test framework exists, so verification is in a real browser:
 - Reduced motion (emulated): static text, instant swaps. Presentation text with stega characters
   renders unsplit.
 - LCP and CLS before and after, by the same method as #56.
-- Morph pairing on a non-prefetched page.
+- Morph pairing, measured on a production build (`next build && next start`). `next dev` does not
+  prefetch, so a dev-server result would understate pairing. Check news and projects as well as
+  properties, since only properties is known to use `generateStaticParams`.
 - The dev server started for verification is stopped afterwards.
 
 ## Deferred
@@ -115,6 +117,9 @@ No test framework exists, so verification is in a real browser:
 Per the repo rule each gets a GitHub issue, linked here when filed.
 
 - **Scroll-in cascade** for headings below the first screen (the earlier "B" option). To be filed.
-- **Reliable morph pairing**, only if verification shows pairing is unreliable. To be filed if needed.
+- **Reliable morph pairing**, only if verification shows pairing is unreliable. The candidate fix is
+  intent-based prefetching (e.g. ForesightJS) on the affected routes; it is not adopted up front
+  because Next's own `<Link>` prefetch should cover pre-built pages, it adds a dependency, and it
+  does nothing on touch devices. To be filed if needed.
 - Related existing issues, to link rather than duplicate: #53 (route-to-route transitions, which this
   spec supersedes and should close), #52 (per-block motion setting), #54 (scroll-scrubbed motion).
