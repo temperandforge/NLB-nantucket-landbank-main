@@ -13,6 +13,13 @@ export type PreviewProject = {
   image?: ComponentProps<typeof BlockImage>['image']
 }
 
+// Columns follow the project count from md up, so fewer than three cards widen to fill the row
+// instead of leaving empty columns. A lone card would be very tall at the portrait ratio, so it
+// uses a landscape one and a pair a square one. The image box is also capped in height (it crops,
+// never stretches) so wide screens don't make the row towering. Literal class names so Tailwind sees them.
+const COLUMNS = ['md:grid-cols-3', 'md:grid-cols-1', 'md:grid-cols-2', 'md:grid-cols-3'] as const
+const IMAGE_RATIO = ['aspect-[346/467]', 'aspect-[3/2]', 'aspect-square', 'aspect-[346/467]'] as const
+
 /**
  * The Project Preview markup (Figma: Project Preview): an intro panel with text and a button, then
  * each project as a numbered column. Used by the Project Preview block and by the project page's
@@ -53,7 +60,7 @@ export default function ProjectPreviewView({
           // Three equal columns on one grid, so every card is the same width (and so the same image
           // size) and the two rows, header and image, line up across the cards however many lines a
           // name wraps to. The divider is drawn in the gap, not inside a column, for the same reason.
-          <ol className="m-0 grid min-w-0 flex-1 list-none grid-cols-1 gap-10 p-0 md:grid-cols-3 md:gap-x-6 md:gap-y-6">
+          <ol className={`m-0 grid min-w-0 flex-1 list-none grid-cols-1 gap-10 p-0 ${COLUMNS[Math.min(shown.length, 3)]} md:gap-x-6 md:gap-y-6`}>
             {shown.map((project, index) => {
               const href = project.slug ? projectHref(project.slug) : null
               const cardClass =
@@ -66,11 +73,11 @@ export default function ProjectPreviewView({
                     </span>
                     <p className="w-full font-mono text-body-base leading-[1.6]">{project.name}</p>
                   </div>
-                  <div className="relative aspect-[346/467] w-full overflow-clip bg-dusty-heath-800">
+                  <div className={`relative ${IMAGE_RATIO[Math.min(shown.length, 3)]} w-full max-h-[40rem] overflow-clip bg-dusty-heath-800`}>
                     <BlockImage
                       image={project.image}
                       width={692}
-                      sizes="(min-width: 1280px) 20vw, (min-width: 768px) 30vw, 100vw"
+                      sizes="(min-width: 1280px) 40vw, (min-width: 768px) 50vw, 100vw"
                       fill
                       className="size-full object-cover"
                     />
