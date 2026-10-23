@@ -9,9 +9,9 @@
  */
 
 :root {
-  --motion-duration: 600ms;
+  --motion-duration: 450ms;
   --motion-ease: cubic-bezier(.33,1,.68,1);
-  --cascade-step: 45ms;
+  --cascade-step: 30ms;
   --cascade-rise: .4em;
   --cascade-blur: 6px;
   --page-out-duration: 180ms;
