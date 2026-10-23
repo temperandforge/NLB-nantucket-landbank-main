@@ -1436,3 +1436,64 @@ they show in a separate list above the categories.
 list must then use `orderableDocumentListDeskItem`. A new document lands at the bottom of its list
 until dragged. The plugin ranks across every document of a type, so a filtered view (staff by
 department) shows a subsequence of the one order.
+
+## 24. SEO fields and structured data
+
+Status: **designed, not implemented.** Spec:
+[2026-10-23-seo-and-structured-data-design.md](superpowers/specs/2026-10-23-seo-and-structured-data-design.md).
+
+### 24.1 We build a small `seo` object ourselves; we do not adopt `sanity-plugin-seofields`
+
+Evaluated 2026-10-23 (v1.12.0, MIT, peers Sanity 3–6 and React 18/19, so it would install here).
+
+What it provides: a `seoFields` object (title, description, canonical, keywords, meta image, robots,
+Open Graph, Twitter, hreflang, custom meta tags), a live Studio preview, a health dashboard with
+CSV/JSON export, AI copy generation (needs a server-side proxy), 39 schema.org JSON-LD types with
+Next.js components (`sanity-plugin-seofields/schema/next`), and `buildSeoMeta()` returning Next
+`Metadata`. A Search Console/GA4 view is paid, in a separate package (`seofields-pro`).
+
+Why not:
+- **Its JSON-LD is typed in by editors per document.** That contradicts "compute derivable values
+  at render": an event's date or an article's headline would be entered twice and drift. Its docs
+  describe typed Studio fields, with the page URL the only generated value.
+- **No `DigitalDocument`**, which the records archive (#41) needs, so we would write those builders
+  anyway.
+- **Small and commercial-adjacent:** about 20 stars, a 2.7 MB package, a paid analytics tier and AI
+  features needing a backend. A lot of surface for four fields.
+- What we need is a meta title, description, social image and `noIndex`, which is one schema file
+  and one helper.
+
+If editors later want the live Google/social preview or an SEO audit, the plugin could be added for
+its **fields and Studio UI only**, with JSON-LD still derived from data. That is recorded as
+deferred in the spec, not rejected outright.
+
+### 24.2 JSON-LD is derived from document data, never authored
+
+One pure builder per schema.org type in `frontend/sanity/lib/structuredData.ts`, fed the document
+the page already fetched. A builder returns `null` when required data is missing, and a property is
+omitted rather than emitted empty. Output is serialised with `<` escaped as `<` (Next.js
+JSON-LD guide). **Why:** one source of truth, so structured data cannot contradict the page.
+**Implication:** a type with no matching fields (`JobPosting`, `FAQPage`) is deferred until the
+data exists, not approximated.
+
+### 24.3 One site origin, and no origin means no JSON-LD
+
+`settings.siteUrl` is the single trusted origin (fallback `NEXT_PUBLIC_SITE_URL`). It replaces
+`settings.ogImage.metadataBase` as the source of `metadataBase`, and `sitemap.ts` (which built URLs
+from the `host` header with no protocol) uses it too. Without an origin, JSON-LD is omitted rather
+than emitted with relative URLs. **Why:** structured data needs absolute URLs and a wrong host is
+worse than none. Canonical is derived from the document's address, never edited, consistent with
+"a page URL is never derivable from its slug alone".
+
+### 24.4 The records archive is one `CollectionPage`, built from data
+
+Per issue #41: `CollectionPage` + `ItemList` of `DigitalDocument`, generated from the block's full
+`records` array (the server render holds only the default category), with a filter-free canonical
+URL. `record.date` is `dateCreated`, never `datePublished`. The query must add `file.asset->mimeType`
+and `size`.
+
+### 24.5 Scope chosen: full SEO layer (option C)
+
+Chosen over "derive only" and "derive plus Organization fields" because the client wants per-page
+control of search and social appearance. The `seo` object goes on `page`, `article`, `event`,
+`property`, `project` and `settings` (site default). Organization details live on `settings`.
