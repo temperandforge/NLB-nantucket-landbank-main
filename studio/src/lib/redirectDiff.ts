@@ -21,6 +21,10 @@ export type DescendantRef = {id: string; pathOnly: boolean; belowSlugs: string[]
 
 export type PagePathChange = {pageId: string; oldPath: string | null; newPath: string | null}
 
+/**
+ * An existing redirect. The `existing` list given to `planRedirectWrites` must contain ENABLED
+ * redirects only (this type has no `enabled` flag, so a disabled one would be treated as live).
+ */
 export type ExistingRedirect = {id: string; source: string}
 export type NewRedirect = {source: string; pageId: string}
 
@@ -73,6 +77,7 @@ export function diffPagePaths(input: {
  * Turn path changes into writes. Creates a redirect from each old path to its page unless one
  * already has that source; disables any existing redirect whose source is now a live page path,
  * since that redirect would otherwise shadow the page (rename and rename back, first publish).
+ * `existing` must contain ENABLED redirects only.
  */
 export function planRedirectWrites(
   changes: PagePathChange[],
