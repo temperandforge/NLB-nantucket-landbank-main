@@ -555,7 +555,7 @@ and makes a results address shareable. One query keeps ranking in one place.
 
 ### 4.11 Load-in motion: CSS tokens, opt-in `<Cascade>`, `<PageTransition>` per page
 
-**Status:** Implemented
+**Status:** Implemented on branch `worktree-load-animations`, pending merge
 
 The first screen cascades in word by word, and navigation is a short animated handoff, with archive
 card images morphing into their detail hero. No animation library and no client JS: server-rendered
@@ -567,7 +567,7 @@ Explicit opt-in per headline keeps the motion predictable and keeps it off every
 want it.
 
 **Implication:**
-- **Motion tokens live in `frontend/css/motion.css`** (duration, easing, cascade step, nav delay,
+- **Motion tokens live in `frontend/css/motion.css`** (duration, easing, cascade step,
   page in/out durations). Every animation rule sits in one guarded block, so reduced-motion and print
   users never get a hidden start state; `frontend/scripts/verifyMotionCss.mts` checks it. Tune the
   feel there, not in components.
@@ -586,9 +586,12 @@ want it.
   properties" and similar grids leave it off, or the card would get an old-only snapshot. A property
   with no hero image gets the soft handoff. News has no morph (no hero on `ArticleView`), nor do
   people and staff cards.
-- The header is anchored with its own `view-transition-name` so it never moves. Build with
-  `NODE_ENV=production`; view transitions cannot be verified in the in-app browser pane, only real
-  Chrome.
+- The header is anchored with its own `view-transition-name` so it never moves. For verification builds, use
+  `NODE_ENV=production` (this shell exports `development`, which breaks `next build`); view
+  transitions cannot be verified in the in-app browser pane, only real Chrome.
+- The new page's cascade starts after the soft-handoff delay (the page fades in over the old one's
+  180ms exit); there is no separate navigation delay. Only `opacity`, `transform` and `filter`
+  animate: no layout shift (CLS 0 on every page measured; `/about-us/history` showed a constant 0.0000087 with and without `motion.css`). LCP on a page with a Cascade h1 (production build, real Chrome, median of 5, with vs without `motion.css`): `/about-us/history` 204 ms vs 156 ms (+48 ms, run spread 144-284 ms), `/properties/head-of-the-plains` 148 ms vs 152 ms (-4 ms). The LCP element is the hero image (IMG) on both, not the headline, and the spread across runs is larger than the difference, so no LCP effect is established; it is not proven absent either.
 - Not done, each tracked: scroll-in cascade
   ([#86](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/86)), news morph
   ([#87](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/87)), back/forward

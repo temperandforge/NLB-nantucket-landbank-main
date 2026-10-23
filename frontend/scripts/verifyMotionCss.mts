@@ -100,7 +100,6 @@ check(/@keyframes/.test(inside), 'the guarded block contains the keyframes')
 check(/::view-transition-old\(\.page-out\)/.test(inside), 'page-out exit rule exists')
 check(/::view-transition-new\(\.page-in\)/.test(inside), 'page-in enter rule exists')
 check(/::view-transition-group\(site-header\)/.test(inside), 'site-header anchor rule exists')
-check(/:root:active-view-transition/.test(inside), 'active-view-transition delay rule exists')
 check(/::view-transition\s*\{[^}]*pointer-events:\s*none/.test(outside), '::view-transition passes pointer events through')
 check(/\.cascade-word\s*\{[^}]*display:\s*inline-block/.test(outside), '.cascade-word is inline-block')
 
@@ -110,7 +109,6 @@ const tokens: Record<string, string> = {
   '--cascade-step': '45ms',
   '--cascade-rise': '.4em',
   '--cascade-blur': '6px',
-  '--nav-delay': '150ms',
   '--page-out-duration': '180ms',
   '--page-in-duration': '280ms',
 }

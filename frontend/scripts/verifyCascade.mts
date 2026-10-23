@@ -24,6 +24,8 @@ function same(actual: unknown, expected: unknown, message: string) {
 same(cascadeWords('Protecting open spaces'), ['Protecting', 'open', 'spaces'], 'splits on spaces')
 same(cascadeWords('  a   b\n c '), ['a', 'b', 'c'], 'collapses runs of whitespace and drops empty entries')
 same(cascadeWords('  a   b\n c ')!.join(' '), 'a b c', 'rejoining with single spaces is clean')
+same(cascadeWords('Land\u00a0Bank grows'), ['Land\u00a0Bank', 'grows'], 'a non-breaking space keeps its words together')
+same(cascadeWords('a\tb'), ['a', 'b'], 'tabs still split')
 same(cascadeWords(''), [], 'empty string renders nothing')
 same(cascadeWords('   '), [], 'whitespace-only renders nothing')
 same(cascadeWords(null), [], 'null renders nothing')

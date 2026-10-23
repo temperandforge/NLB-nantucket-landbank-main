@@ -11,6 +11,9 @@ export default function Cascade({as: Tag = 'h1', className, text}: CascadeProps)
   const words = cascadeWords(text)
   if (words && words.length === 0) return null
 
+  // Words are inline-block, so `break-words` / `hyphens` cannot break inside a word: a call site
+  // with an unbreakable long word must handle that itself.
+
   // Stega-encoded text (visual editing) can't be split without breaking its markers.
   if (!words) return <Tag className={className}>{text}</Tag>
 

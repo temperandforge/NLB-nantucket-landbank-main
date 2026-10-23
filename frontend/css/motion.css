@@ -14,7 +14,6 @@
   --cascade-step: 45ms;
   --cascade-rise: .4em;
   --cascade-blur: 6px;
-  --nav-delay: 150ms;
   --page-out-duration: 180ms;
   --page-in-duration: 280ms;
 }
@@ -80,17 +79,6 @@
   .load-in {
     animation: load-in var(--motion-duration) var(--motion-ease) both;
     animation-delay: calc(var(--cascade-step) * 8 + var(--load-in-step, 0) * 120ms);
-  }
-
-  /* Chrome 125+. Kept as its own rule so an engine that rejects the selector drops only this. */
-  :root:active-view-transition .cascade-word {
-    animation-delay: calc(var(--i, 0) * var(--cascade-step) + var(--nav-delay));
-  }
-
-  :root:active-view-transition .load-in {
-    animation-delay: calc(
-      var(--cascade-step) * 8 + var(--load-in-step, 0) * 120ms + var(--nav-delay)
-    );
   }
 
   /* Soft handoff between pages: the old page fades and drops, the new one fades in after it. */

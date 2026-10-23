@@ -12,5 +12,6 @@ export const CASCADE_MAX_INDEX = 14
 export function cascadeWords(text: string | null | undefined): string[] | null {
   if (!text) return []
   if (stegaClean(text) !== text) return null
-  return text.split(/\s+/).filter(Boolean)
+  // ASCII whitespace only: an authored non-breaking space (U+00A0) keeps its words together.
+  return text.split(/[ \t\r\n\f]+/).filter(Boolean)
 }

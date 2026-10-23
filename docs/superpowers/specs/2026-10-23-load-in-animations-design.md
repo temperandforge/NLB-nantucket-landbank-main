@@ -1,6 +1,6 @@
 # Load-in text animation and page transitions
 
-Status: implemented on branch `worktree-load-animations` (not yet merged): Cascade and `motion.css`, first-screen cascade wiring, route `<PageTransition>` with header anchor, property and project card-to-hero morph, internal links through `<Link>`. Decision record: DECISIONS 4.11. Verification (type-check, lint, production build, real-Chrome pass, LCP/CLS) is recorded in the task report and the PR, not here; Safari, Firefox, reduced-motion emulation and Presentation were not observed.
+Status: implemented on branch `worktree-load-animations` (not yet merged): Cascade and `motion.css`, first-screen cascade wiring, route `<PageTransition>` with header anchor, property and project card-to-hero morph, internal links through `<Link>`. Decision record: DECISIONS 4.11. Verification (type-check, lint, production build, real-Chrome pass) is recorded in the task report and the PR; the LCP/CLS figures are in the Guardrails below; Safari, Firefox, reduced-motion emulation and Presentation were not observed.
 
 ## Goal
 
@@ -34,13 +34,13 @@ Chosen by comparing live motion demos (a throwaway companion, not committed):
 
 ### Load-in primitives (`frontend/css/motion.css`, `frontend/components/Cascade.tsx`)
 
-- **`<Cascade as="h1" className=…>{text}</Cascade>`** is a server component. It splits a string into
+- **`<Cascade as="h1" className=… text={text} />`** is a server component. It splits a string into
   words, each an inline-block span with a `--i` index; real spaces stay between spans, so screen
   readers and line wrapping behave as for plain text. The delay index is capped at about 14 so a long
   heading cannot drag.
 - **`.load-in`** is a utility class for the rest of the first screen: a plain fade, delay set per
   element so it lands after the headline.
-- **Tokens** (duration, easing, per-word delay, the navigation delay) are CSS variables in
+- **Tokens** (duration, easing, per-word delay, page in/out durations) are CSS variables in
   `motion.css`, so the feel is tuned in one place. Named per the project's token rule; no Figma
   variable exists for motion, so these are project tokens, not Figma-derived ones.
 - **First paint and replay.** CSS animations start at first paint with no wait for hydration, and replay
@@ -55,7 +55,7 @@ Guardrails:
 - **Presentation / draft mode:** Sanity text there carries invisible stega characters that splitting
   would break. `<Cascade>` detects them in the string and renders the heading unsplit. It must not
   call `draftMode()`, which would make every page dynamic.
-- Only `opacity`, `transform` and `filter` animate: no layout shift, no LCP change.
+- Only `opacity`, `transform` and `filter` animate: no layout shift (CLS 0 on every page measured; `/about-us/history` showed a constant 0.0000087 with and without `motion.css`). LCP on a page with a Cascade h1 (production build, real Chrome, median of 5, with vs without `motion.css`): `/about-us/history` 204 ms vs 156 ms (+48 ms, run spread 144-284 ms), `/properties/head-of-the-plains` 148 ms vs 152 ms (-4 ms). The LCP element is the hero image (IMG) on both, not the headline, and the spread across runs is larger than the difference, so no LCP effect is established; it is not proven absent either.
 - Content is visible without JS (nothing depends on a script).
 
 ### Page transitions (`frontend/components/PageTransition.tsx`)
@@ -66,8 +66,10 @@ Guardrails:
 - **`<PageTransition>`** wraps `<ViewTransition enter exit default="none">` and gives the **soft
   handoff**: old content fades and drops ~8px in ~180ms, then the new page fades in. Used by each
   route's `page.tsx`: the `[...slug]` catch-all, news, events, projects, properties and search.
-- The new page's cascade starts after a navigation delay (a CSS variable, ~150ms) so words never
-  animate under the fading old page. On first load the delay is zero.
+- The new page is hidden for the first 180ms by the soft handoff's page-in delay, so the cascade
+  starts after the old page has faded and words never animate under it. There is no separate
+  navigation delay: an `:active-view-transition` delay would change running animations
+  retroactively when the transition ends. On first load there is no delay.
 - **The header is anchored** with its own `view-transition-name` and CSS that suppresses its
   animation (per the docs), so the bar never moves. The footer is not handled specially.
 - **Morph.** A card's image and the detail-page hero share `view-transition-name`s of the form
@@ -130,7 +132,7 @@ Guardrails:
 ### Files
 
 New: `frontend/components/Cascade.tsx`, `frontend/components/PageTransition.tsx`,
-`frontend/css/motion.css` (imported from `app/layout.tsx`).
+`frontend/css/motion.css` (`@import`ed from `css/globals.css`).
 
 Edited, a line or two each: the hero blocks and `PageHeader`, the four detail views, `CardProperty`,
 `CardProject`, `CardNews` and their detail heroes, each route's `page.tsx`, and the header. `CardProject`
