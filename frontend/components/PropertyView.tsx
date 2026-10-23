@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import type {PortableTextBlock} from 'next-sanity'
 
+import Cascade from '@/components/Cascade'
 import BlockImage from '@/components/blocks/BlockImage'
 import FaqItem from '@/components/blocks/FaqItem'
 import ImageCarouselSlide from '@/components/blocks/ImageCarouselSlide'
@@ -48,9 +49,9 @@ export function PropertyIntro({property}: {property: NonNullable<PropertyQueryRe
         <div className="basic-left-right__lines pointer-events-none absolute inset-0 z-0" aria-hidden="true" />
         <div className="relative z-10 flex w-full flex-col gap-16 tf-max-w md:flex-row md:items-start md:justify-between md:gap-20">
           <div className="flex w-full flex-col items-start gap-10 md:max-w-[553px] md:flex-1">
-            <h1 className="w-full text-headline-xl text-on-background text-balance">{property.name}</h1>
+            <Cascade as="h1" className="w-full text-headline-xl text-on-background text-balance" text={property.name} />
             {tags.length > 0 && (
-              <div className="flex flex-wrap items-start gap-2">
+              <div className="flex flex-wrap items-start gap-2 load-in">
                 {tags.map((tag) => (
                   <Tag key={tag.key} label={tag.label} />
                 ))}

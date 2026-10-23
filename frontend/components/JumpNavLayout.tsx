@@ -1,3 +1,4 @@
+import Cascade from '@/components/Cascade'
 import {ArrowRightIcon} from '@/components/icons'
 import type {JumpNavItem} from '@/sanity/lib/jumpNav'
 
@@ -23,7 +24,6 @@ export default function JumpNavLayout({
   items: JumpNavItem[]
   children: React.ReactNode
 }) {
-  const Heading = headingLevel
   const project = variant === 'project'
 
   return (
@@ -49,13 +49,13 @@ export default function JumpNavLayout({
           (eyebrow || heading) && (
             <div className="flex w-full max-w-[560px] shrink-0 flex-col gap-6">
               {eyebrow}
-              {heading && <Heading className="w-full text-headline-xl text-on-background">{heading}</Heading>}
+              {heading && <Cascade as={headingLevel} className="w-full text-headline-xl text-on-background" text={heading} />}
             </div>
           )
         ) : (
           <>
             {eyebrow}
-            {heading && <Heading className="text-headline-2xl mb-8">{heading}</Heading>}
+            {heading && <Cascade as={headingLevel} className="text-headline-2xl mb-8" text={heading} />}
           </>
         )}
         {items.length > 0 && (

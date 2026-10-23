@@ -1,5 +1,6 @@
 import Image from 'next/image'
 
+import Cascade from '@/components/Cascade'
 import BlockImage from './BlockImage'
 import Eyebrow from './Eyebrow'
 import {BlockProps} from './types'
@@ -26,12 +27,14 @@ export default function HeroImage({block, pageName}: BlockProps<'heroImage'>) {
             className="pointer-events-none absolute inset-y-[-30%] inset-x-[-60%] z-0 size-auto object-contain opacity-60"
           />
           {eyebrow && (
-            <Eyebrow className="relative z-10 text-on-background">{eyebrow}</Eyebrow>
+            <Eyebrow className="relative z-10 text-on-background load-in">{eyebrow}</Eyebrow>
           )}
           {block.heading && (
-            <h1 className="relative z-10 w-full text-headline-xl text-on-background [text-wrap:pretty]">
-              {block.heading}
-            </h1>
+            <Cascade
+              as="h1"
+              className="relative z-10 w-full text-headline-xl text-on-background [text-wrap:pretty]"
+              text={block.heading}
+            />
           )}
         </div>
       </div>

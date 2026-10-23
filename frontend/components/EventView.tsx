@@ -1,5 +1,6 @@
 import type {PortableTextBlock} from 'next-sanity'
 
+import Cascade from '@/components/Cascade'
 import {CalendarIcon, ClockIcon, MapPinIcon} from '@/components/icons'
 import CustomPortableText from '@/components/PortableText'
 import {eventDateLabel, eventParts} from '@/sanity/lib/dates'
@@ -31,13 +32,13 @@ export default function EventView({event}: {event: NonNullable<EventQueryResult>
         {/* Pinned on desktop below the header, whose offset follows its hide/show state (as on the project page). */}
         <div className="flex w-full flex-col gap-8 self-start lg:sticky lg:top-[calc(var(--header-offset,var(--header-height))+2.5rem)] lg:max-w-[414px] lg:flex-1 lg:gap-12 lg:transition-[top] lg:duration-200 lg:ease-out motion-reduce:transition-none">
           <div className="flex w-full max-w-[560px] flex-col gap-6">
-            <p className="font-mono text-body-small leading-[1.6] tracking-wide text-on-background uppercase">
+            <p className="font-mono text-body-small leading-[1.6] tracking-wide text-on-background uppercase load-in">
               Events
             </p>
-            <h1 className="w-full text-headline-xl text-on-background">{event.title}</h1>
+            <Cascade as="h1" className="w-full text-headline-xl text-on-background" text={event.title} />
           </div>
           {rows.length > 0 && (
-            <ul className="flex flex-col gap-5 lg:gap-6">
+            <ul className="flex flex-col gap-5 lg:gap-6 load-in" style={{'--load-in-step': 1} as React.CSSProperties}>
               {rows.map(({key, Icon, text}) => (
                 <li key={key} className="flex items-center gap-3">
                   <Icon className="size-[22px] shrink-0" />

@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import {stegaClean} from 'next-sanity'
 
+import Cascade from '@/components/Cascade'
 import Eyebrow from './Eyebrow'
 import {BlockProps} from './types'
 
@@ -25,11 +26,14 @@ export default function HeroTertiary({block}: BlockProps<'heroTertiary'>) {
         />
         <div className="relative flex w-full flex-col items-start gap-2.5 md:flex-row md:flex-wrap md:justify-between md:gap-x-10">
           <div className="flex max-w-[34.5rem] flex-col items-start gap-5 text-on-background md:gap-6">
-            {block.eyebrow && <Eyebrow className="whitespace-nowrap">{block.eyebrow}</Eyebrow>}
-            {block.heading && <Heading className="text-headline-2xl leading-[1.05]">{block.heading}</Heading>}
+            {block.eyebrow && <Eyebrow className="whitespace-nowrap load-in">{block.eyebrow}</Eyebrow>}
+            {block.heading && <Cascade as={Heading} className="text-headline-2xl leading-[1.05]" text={block.heading} />}
           </div>
           {block.body && (
-            <p className="max-w-[41.75rem] pt-[2.875rem] font-sans text-body-base leading-[1.6] text-on-background">
+            <p
+              className="max-w-[41.75rem] pt-[2.875rem] font-sans text-body-base leading-[1.6] text-on-background load-in"
+              style={{'--load-in-step': 1} as React.CSSProperties}
+            >
               {block.body}
             </p>
           )}

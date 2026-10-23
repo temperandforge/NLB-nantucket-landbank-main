@@ -32,9 +32,12 @@ export default function HeroSecondary({block, pageName}: BlockProps<'heroSeconda
                 aria-hidden="true"
               />
               {eyebrow && (
-                <Eyebrow className={`relative z-10 mb-3 ${TEXT[variant].eyebrow}`}>{eyebrow}</Eyebrow>
+                <Eyebrow className={`relative z-10 mb-3 load-in ${TEXT[variant].eyebrow}`}>{eyebrow}</Eyebrow>
               )}
-              {block.body && <p className={`relative z-10 ${TEXT[variant].body}`}>{block.body}</p>}
+              {block.body && <p
+                  className={`relative z-10 load-in ${TEXT[variant].body}`}
+                  style={{'--load-in-step': 1} as React.CSSProperties}
+                >{block.body}</p>}
             </div>
             <BlockImage
               image={block.image}
