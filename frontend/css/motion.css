@@ -12,6 +12,9 @@
   --motion-duration: 450ms;
   --motion-ease: cubic-bezier(.33,1,.68,1);
   --cascade-step: 30ms;
+  /* A hero description: a quicker sweep that starts as the headline lands (8 headline steps). */
+  --cascade-step-body: 10ms;
+  --cascade-body-offset: 240ms;
   --cascade-rise: .4em;
   --cascade-blur: 6px;
   --page-out-duration: 180ms;
@@ -95,6 +98,16 @@
     .cascade-word {
       animation-name: cascade-in-blur;
     }
+  }
+
+  /*
+   * A description sweeps in word by word, left to right and top to bottom (about 10ms apart, so it
+   * reads as a sweep down the lines). Never blurred, even where the headline is: that is up to ~50
+   * small words. Declared after the fine-pointer block above so it wins on desktop too.
+   */
+  .cascade-body .cascade-word {
+    animation-name: cascade-in;
+    animation-delay: calc(var(--cascade-body-offset) + var(--i, 0) * var(--cascade-step-body));
   }
 
   /* Lands after the headline; --load-in-step staggers siblings. */

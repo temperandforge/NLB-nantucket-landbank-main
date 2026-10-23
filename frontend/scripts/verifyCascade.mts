@@ -8,7 +8,7 @@
  * `@vercel/stega` (a dependency of next-sanity) resolves from frontend/.
  */
 import {vercelStegaCombine} from '@vercel/stega'
-import {CASCADE_MAX_INDEX, cascadeWords} from '../sanity/lib/cascade.ts'
+import {CASCADE_BODY_MAX_INDEX, CASCADE_MAX_INDEX, cascadeWords} from '../sanity/lib/cascade.ts'
 
 let failed = false
 function same(actual: unknown, expected: unknown, message: string) {
@@ -34,6 +34,7 @@ same(cascadeWords(undefined), [], 'undefined renders nothing')
 const forty = Array.from({length: 40}, (_, i) => `w${i}`).join(' ')
 same(cascadeWords(forty)!.length, 40, 'a 40-word string keeps all 40 words')
 same(CASCADE_MAX_INDEX, 14, 'the delay cap is on the index, at 14')
+same(CASCADE_BODY_MAX_INDEX, 48, 'the body (description) delay cap is 48 words')
 
 const stega = vercelStegaCombine('Hello world', {origin: 'sanity.io', href: '/x'})
 same(cascadeWords(stega), null, 'a stega-encoded string is not split')

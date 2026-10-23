@@ -30,12 +30,12 @@ export default function HeroTertiary({block}: BlockProps<'heroTertiary'>) {
             {block.heading && <Cascade as={Heading} className="text-headline-2xl leading-[1.05]" text={block.heading} />}
           </div>
           {block.body && (
-            <p
-              className="max-w-[41.75rem] pt-[2.875rem] font-sans text-body-base leading-[1.6] text-on-background load-in"
-              style={{'--load-in-step': 1} as React.CSSProperties}
-            >
-              {block.body}
-            </p>
+            <Cascade
+              as="p"
+              variant="body"
+              className="max-w-[41.75rem] pt-[2.875rem] font-sans text-body-base leading-[1.6] text-on-background"
+              text={block.body}
+            />
           )}
         </div>
       </div>

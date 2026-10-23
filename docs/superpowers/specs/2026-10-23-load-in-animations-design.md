@@ -38,8 +38,15 @@ Chosen by comparing live motion demos (a throwaway companion, not committed):
   words, each an inline-block span with a `--i` index; real spaces stay between spans, so screen
   readers and line wrapping behave as for plain text. The delay index is capped at about 14 so a long
   heading cannot drag.
-- **`.load-in`** is a utility class for the rest of the first screen: a plain fade, delay set per
-  element so it lands after the headline.
+- **`.load-in`** is a utility class for the rest of the first screen (the eyebrow): a plain fade,
+  delay set per element so it lands after the headline.
+- **A hero description** uses `<Cascade as="p" variant="body">`: the same word spans, but a quicker
+  sweep (10ms apart, starting 240ms in as the headline lands, index capped at 48) and never blurred,
+  because up to ~50 small blurred words is the expensive case on iPhone Safari. Words arrive in
+  reading order, so it reads as a sweep down the lines. A true per-line reveal was considered and
+  declined: the server can't know where the text wraps, so it would need a client component that
+  measures the lines after fonts load. Used by `Hero`, `HeroSecondary`, `HeroTertiary` and
+  `PageHeader`'s copy.
 - **Tokens** (duration, easing, per-word delay, page in/out durations) are CSS variables in
   `motion.css`, so the feel is tuned in one place. Named per the project's token rule; no Figma
   variable exists for motion, so these are project tokens, not Figma-derived ones.

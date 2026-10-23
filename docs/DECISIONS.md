@@ -573,7 +573,8 @@ want it.
   feel there, not in components.
 - **`<Cascade>` is opt-in, one line per headline.** It renders text that carries Sanity stega
   characters unsplit (splitting would break the visual-editing markers) and must never call
-  `draftMode()`, which would make every page dynamic. Word splitting is in
+  `draftMode()`, which would make every page dynamic. A hero description uses
+  `variant="body"` (a quicker, never-blurred sweep, capped at 48 words). Word splitting is in
   `frontend/sanity/lib/cascade.ts`, checked by `frontend/scripts/verifyCascade.mts`.
 - **`<PageTransition>` belongs in each `page.tsx`, never a layout.** `<ViewTransition>` enter and
   exit do not fire in a layout, because layouts persist across navigations. A new route gets no

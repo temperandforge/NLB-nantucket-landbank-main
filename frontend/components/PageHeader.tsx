@@ -12,7 +12,7 @@ export default function PageHeader({title = '', copy = ''}: PageHeaderProps) {
                 <Cascade as="h1" className="flex-1 text-3xl md:text-5xl xl:text-6xl leading-[1.2] font-bold" text={title} />
             }
             {copy &&
-                <p className="flex-1 text-lg load-in" style={{'--load-in-step': 1} as React.CSSProperties}>{copy}</p>
+                <Cascade as="p" variant="body" className="flex-1 text-lg" text={copy} />
             }
         </div>
     )

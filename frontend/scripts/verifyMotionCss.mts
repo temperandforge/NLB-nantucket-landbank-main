@@ -115,7 +115,17 @@ check(
   'the blur keyframes live in the fine-pointer block',
 )
 
+// A hero description cascades word by word like the headline, but quicker and without the blur
+// (up to ~50 small blurred words is the expensive case on iPhone Safari).
+check(
+  /\.cascade-body\s+\.cascade-word\s*\{[^}]*animation-name\s*:\s*cascade-in\s*;/.test(inside) &&
+    /\.cascade-body\s+\.cascade-word\s*\{[^}]*animation-delay\s*:[^;]*--cascade-body-offset[^;]*--cascade-step-body/.test(inside),
+  'the body cascade uses the plain cascade-in keyframes and its own offset and step',
+)
+
 const tokens: Record<string, string> = {
+  '--cascade-step-body': '10ms',
+  '--cascade-body-offset': '240ms',
   '--motion-duration': '450ms',
   '--motion-ease': 'cubic-bezier(.33,1,.68,1)',
   '--cascade-step': '30ms',
