@@ -117,7 +117,7 @@ check(
 
 const tokens: Record<string, string> = {
   '--motion-duration': '800ms',
-  '--motion-ease': 'cubic-bezier(.22,1,.36,1)',
+  '--motion-ease': 'cubic-bezier(.33,1,.68,1)',
   '--cascade-step': '45ms',
   '--cascade-rise': '.4em',
   '--cascade-blur': '6px',

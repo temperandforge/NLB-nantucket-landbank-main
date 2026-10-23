@@ -18,7 +18,7 @@ Chosen by comparing live motion demos (a throwaway companion, not committed):
 
 | Question | Choice |
 |---|---|
-| Text load-in | **Word cascade**: headline words rise ~0.4em and sharpen from a 6px blur, ~45ms apart, 800ms each, `cubic-bezier(.22,1,.36,1)`. Eyebrow, body and buttons plain-fade in after the headline. The blur is only on devices with a fine pointer and hover: on iPhone Safari, animating `filter` on every word was choppy and snapped at the end (WebKit paints filtered text on the CPU), so touch devices get opacity + rise only. |
+| Text load-in | **Word cascade**: headline words rise ~0.4em and sharpen from a 6px blur, ~45ms apart, 800ms each, `cubic-bezier(.33,1,.68,1)` (ease-out cubic; the original expo-out `.22,1,.36,1` did 95% of the movement in the first third, so the animation looked like it ended early on a phone). Eyebrow, body and buttons plain-fade in after the headline. The blur is only on devices with a fine pointer and hover: on iPhone Safari, animating `filter` on every word was choppy and snapped at the end (WebKit paints filtered text on the CPU), so touch devices get opacity + rise only. |
 | Page transition | **Shared-element morph** for card → detail, with the **soft handoff** as the fallback everywhere else. |
 | Scope | **First screen on load and navigation only.** Nothing animates on scroll. |
 | Mechanism | **Server-rendered `<Cascade>` + CSS, and React `<ViewTransition>`.** No animation library, no client JS. |
