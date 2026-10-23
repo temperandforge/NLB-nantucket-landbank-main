@@ -1,4 +1,5 @@
 import BlockImage from '@/components/blocks/BlockImage'
+import AnchorLink from '@/components/ui/AnchorLink'
 import Tag from '@/components/ui/Tag'
 import {projectHref} from '@/sanity/lib/utils'
 
@@ -35,9 +36,9 @@ export default function CardProject({project}: {project: ProjectItem}) {
   // which requires one) would be a plain card, never a dead anchor.
   const href = project.slug ? projectHref(project.slug) : null
   return href ? (
-    <a href={href} className="block w-full">
+    <AnchorLink href={href} className="block w-full">
       {card}
-    </a>
+    </AnchorLink>
   ) : (
     card
   )
