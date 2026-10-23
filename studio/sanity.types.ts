@@ -187,16 +187,25 @@ export type ProjectReference = {
   [internalGroqTypeReferenceTo]?: 'project'
 }
 
+export type ProjectTypeReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'projectType'
+}
+
 export type ProjectPreview = {
   _type: 'projectPreview'
   eyebrow?: string
   body?: string
   button?: Button
+  source?: 'manual' | 'category'
   projects?: Array<
     {
       _key: string
     } & ProjectReference
   >
+  category?: ProjectTypeReference
   disabled?: boolean
 }
 
@@ -378,13 +387,6 @@ export type Timeline = {
     _key: string
   }>
   disabled?: boolean
-}
-
-export type ProjectTypeReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'projectType'
 }
 
 export type ImageCarousel = {
@@ -1688,6 +1690,7 @@ export type AllSanitySchemaTypes =
   | PropertyReference
   | PropertiesPreview
   | ProjectReference
+  | ProjectTypeReference
   | ProjectPreview
   | RecordsArchive
   | PropertyArchive
@@ -1710,7 +1713,6 @@ export type AllSanitySchemaTypes =
   | Growers
   | DownloadBlock
   | Timeline
-  | ProjectTypeReference
   | ImageCarousel
   | JumpNavContent
   | BasicLeftRightText
