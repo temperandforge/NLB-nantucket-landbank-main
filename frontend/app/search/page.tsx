@@ -4,6 +4,8 @@ import SearchField from '@/components/search/SearchField'
 import SearchResults from '@/components/search/SearchResults'
 import {sanityFetch} from '@/sanity/lib/live'
 import {searchQuery} from '@/sanity/lib/queries'
+import {buildMetadata} from '@/sanity/lib/seo'
+import {getSeoDefaults} from '@/sanity/lib/seoDefaults'
 import {
   SEARCH_LIMIT,
   SEARCH_PARAM,
@@ -28,7 +30,12 @@ function queryFrom(value: string | string[] | undefined): string {
 
 export async function generateMetadata(props: SearchPageProps): Promise<Metadata> {
   const query = queryFrom((await props.searchParams)[SEARCH_PARAM])
-  return {title: query ? `Search: ${query}` : 'Search', robots: {index: false, follow: true}}
+  return buildMetadata({
+    seo: {noIndex: true},
+    title: query ? `Search: ${query}` : 'Search',
+    path: '/search',
+    defaults: await getSeoDefaults(),
+  })
 }
 
 export default async function SearchPage(props: SearchPageProps) {

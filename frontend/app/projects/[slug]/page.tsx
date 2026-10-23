@@ -12,8 +12,10 @@ import {
   singleProjectPageQuery,
 } from '@/sanity/lib/queries'
 import {orderRelatedProjects} from '@/sanity/lib/relatedProjects'
+import {buildMetadata} from '@/sanity/lib/seo'
+import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
 import {DereferencedLink} from '@/sanity/lib/types'
-import {linkResolver, realHref, resolveOpenGraphImage} from '@/sanity/lib/utils'
+import {linkResolver, realHref} from '@/sanity/lib/utils'
 
 /**
  * A project page, /projects/<slug>. A static route, so it wins over the catch-all that owns CMS
@@ -39,12 +41,14 @@ export async function generateMetadata(props: PageProps<'/projects/[slug]'>): Pr
   const description =
     project.description ||
     (project.body?.length ? toPlainText(project.body as PortableTextBlock[]).slice(0, 160) : undefined)
-  const image = resolveOpenGraphImage(project.image)
-  return {
+  return buildMetadata({
+    seo: project.seo,
     title: project.name,
     description,
-    openGraph: image ? {images: [image]} : undefined,
-  } satisfies Metadata
+    image: resolveSeoImage(project.seo, project.image),
+    path: `/projects/${slug}`,
+    defaults: await getSeoDefaults(),
+  })
 }
 
 export default async function ProjectPage(props: PageProps<'/projects/[slug]'>) {

@@ -597,6 +597,7 @@ const pageFields = /* groq */ `
   name,
   slug,
   "path": ${pagePath},
+  seo{title, description, noIndex, image},
   ${pageBuilderFields}
 `
 
@@ -635,6 +636,7 @@ export const landingPageQuery = defineQuery(`
 export const sitemapData = defineQuery(`
   *[
     _type == "page" && defined(slug.current) && !coalesce(pathOnly, false)
+    && !coalesce(seo.noIndex, false)
   ] {
     _type,
     _updatedAt,
@@ -656,6 +658,7 @@ export const articleQuery = defineQuery(`
     "slug": slug.current,
     date,
     image,
+    seo{title, description, noIndex, image},
     "categories": categories[]->{"slug": slug.current, title, orderRank},
     // The article's own category documents, to find related articles.
     "categoryIds": categories[]._ref,
@@ -707,7 +710,7 @@ export const articleSlugs = defineQuery(`
 `)
 
 export const articleSitemapData = defineQuery(`
-  *[_type == "article" && defined(slug.current)]{_updatedAt, "slug": slug.current}
+  *[_type == "article" && defined(slug.current) && !coalesce(seo.noIndex, false)]{_updatedAt, "slug": slug.current}
 `)
 
 export const projectQuery = defineQuery(`
@@ -718,6 +721,7 @@ export const projectQuery = defineQuery(`
     "slug": slug.current,
     description,
     image,
+    seo{title, description, noIndex, image},
     // This project's own types, to find related projects.
     "projectTypeIds": projectTypes[]._ref,
     body[]{
@@ -791,6 +795,7 @@ export const propertyQuery = defineQuery(`
     "slug": slug.current,
     description,
     image,
+    seo{title, description, noIndex, image},
     location,
     mapHeading,
     mapBody,
@@ -864,7 +869,7 @@ export const propertySlugs = defineQuery(`
 `)
 
 export const propertySitemapData = defineQuery(`
-  *[_type == "property" && defined(slug.current)]{_updatedAt, "slug": slug.current}
+  *[_type == "property" && defined(slug.current) && !coalesce(seo.noIndex, false)]{_updatedAt, "slug": slug.current}
 `)
 
 export const projectSlugs = defineQuery(`
@@ -872,7 +877,7 @@ export const projectSlugs = defineQuery(`
 `)
 
 export const projectSitemapData = defineQuery(`
-  *[_type == "project" && defined(slug.current)]{_updatedAt, "slug": slug.current}
+  *[_type == "project" && defined(slug.current) && !coalesce(seo.noIndex, false)]{_updatedAt, "slug": slug.current}
 `)
 
 export const eventQuery = defineQuery(`
@@ -885,6 +890,8 @@ export const eventQuery = defineQuery(`
     end,
     location,
     description,
+    image,
+    seo{title, description, noIndex, image},
     body[]{
       ...,
       ${markDefsFields}
@@ -913,7 +920,7 @@ export const eventSlugs = defineQuery(`
 `)
 
 export const eventSitemapData = defineQuery(`
-  *[_type == "event" && defined(slug.current)]{_updatedAt, "slug": slug.current}
+  *[_type == "event" && defined(slug.current) && !coalesce(seo.noIndex, false)]{_updatedAt, "slug": slug.current}
 `)
 
 /**

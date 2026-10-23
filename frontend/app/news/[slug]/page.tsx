@@ -11,8 +11,10 @@ import {
   moreNewsQuery,
   singleNewsPageQuery,
 } from '@/sanity/lib/queries'
+import {buildMetadata} from '@/sanity/lib/seo'
+import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
 import {DereferencedLink} from '@/sanity/lib/types'
-import {linkResolver, realHref, resolveOpenGraphImage} from '@/sanity/lib/utils'
+import {linkResolver, realHref} from '@/sanity/lib/utils'
 
 /**
  * A news article page, /news/<slug>. A static route, so it wins over the catch-all that owns CMS
@@ -38,12 +40,15 @@ export async function generateMetadata(props: PageProps<'/news/[slug]'>): Promis
   const description = article.body?.length
     ? toPlainText(article.body as PortableTextBlock[]).slice(0, 160)
     : undefined
-  const image = resolveOpenGraphImage(article.image)
-  return {
+  return buildMetadata({
+    seo: article.seo,
     title: article.title,
     description,
-    openGraph: image ? {images: [image]} : undefined,
-  } satisfies Metadata
+    image: resolveSeoImage(article.seo, article.image),
+    path: `/news/${slug}`,
+    type: 'article',
+    defaults: await getSeoDefaults(),
+  })
 }
 
 export default async function NewsArticlePage(props: PageProps<'/news/[slug]'>) {

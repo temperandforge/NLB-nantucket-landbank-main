@@ -6,6 +6,8 @@ import EventView from '@/components/EventView'
 import {currentHour} from '@/sanity/lib/dates'
 import {sanityFetch} from '@/sanity/lib/live'
 import {eventQuery, eventSlugs, moreEventsQuery} from '@/sanity/lib/queries'
+import {buildMetadata} from '@/sanity/lib/seo'
+import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
 
 /**
  * An event page, /events/<slug>. A static route, so it wins over the catch-all that owns CMS
@@ -28,7 +30,14 @@ export async function generateMetadata(props: PageProps<'/events/[slug]'>): Prom
   const {slug} = await props.params
   const {data: event} = await sanityFetch({query: eventQuery, params: {slug}, stega: false})
   if (!event) return {}
-  return {title: event.title, description: event.description || undefined} satisfies Metadata
+  return buildMetadata({
+    seo: event.seo,
+    title: event.title,
+    description: event.description,
+    image: resolveSeoImage(event.seo, event.image),
+    path: `/events/${slug}`,
+    defaults: await getSeoDefaults(),
+  })
 }
 
 export default async function EventPage(props: PageProps<'/events/[slug]'>) {

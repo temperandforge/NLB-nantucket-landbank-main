@@ -6,6 +6,8 @@ import PageView from '@/components/PageView'
 import {sanityFetch} from '@/sanity/lib/live'
 import {currentHour} from '@/sanity/lib/dates'
 import {getPageQuery, pagesSlugs} from '@/sanity/lib/queries'
+import {buildMetadata} from '@/sanity/lib/seo'
+import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
 
 /**
  * This is a catch-all segment rather than a single [slug] because a page URL spans as many
@@ -69,9 +71,14 @@ export async function generateMetadata(props: PageProps<'/[...slug]'>): Promise<
     stega: false,
   })
 
-  return {
-    title: page?.name,
-  } satisfies Metadata
+  if (!page) return {}
+  return buildMetadata({
+    seo: page.seo,
+    title: page.name,
+    image: resolveSeoImage(page.seo),
+    path: `/${page.path}`,
+    defaults: await getSeoDefaults(),
+  })
 }
 
 /**

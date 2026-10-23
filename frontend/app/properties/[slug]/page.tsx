@@ -14,8 +14,10 @@ import {
   singlePropertyPageQuery,
 } from '@/sanity/lib/queries'
 import {orderRelatedProperties} from '@/sanity/lib/relatedProperties'
+import {buildMetadata} from '@/sanity/lib/seo'
+import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
 import {DereferencedLink} from '@/sanity/lib/types'
-import {linkResolver, realHref, resolveOpenGraphImage} from '@/sanity/lib/utils'
+import {linkResolver, realHref} from '@/sanity/lib/utils'
 
 /**
  * A property page, /properties/<slug>. A static route, so it wins over the catch-all that owns CMS
@@ -41,12 +43,14 @@ export async function generateMetadata(props: PageProps<'/properties/[slug]'>): 
   const description =
     property.description ||
     (property.about?.length ? toPlainText(property.about as PortableTextBlock[]).slice(0, 160) : undefined)
-  const image = resolveOpenGraphImage(property.image)
-  return {
+  return buildMetadata({
+    seo: property.seo,
     title: property.name,
     description,
-    openGraph: image ? {images: [image]} : undefined,
-  } satisfies Metadata
+    image: resolveSeoImage(property.seo, property.image),
+    path: `/properties/${slug}`,
+    defaults: await getSeoDefaults(),
+  })
 }
 
 export default async function PropertyPage(props: PageProps<'/properties/[slug]'>) {

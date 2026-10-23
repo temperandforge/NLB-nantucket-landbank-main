@@ -6,6 +6,8 @@ import PageView from '@/components/PageView'
 import {sanityFetch} from '@/sanity/lib/live'
 import {currentHour} from '@/sanity/lib/dates'
 import {landingPageQuery} from '@/sanity/lib/queries'
+import {buildMetadata} from '@/sanity/lib/seo'
+import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
 
 /**
  * The site's landing page is whichever page is chosen in Site Settings. With none chosen, or the
@@ -17,7 +19,14 @@ export async function generateMetadata(): Promise<Metadata> {
     params: {includeHidden: false, now: currentHour()},
     stega: false,
   })
-  return {title: page?.name} satisfies Metadata
+  if (!page) return {}
+  return buildMetadata({
+    seo: page.seo,
+    title: page.name,
+    image: resolveSeoImage(page.seo),
+    path: '/',
+    defaults: await getSeoDefaults(),
+  })
 }
 
 /**
