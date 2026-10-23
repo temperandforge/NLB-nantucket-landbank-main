@@ -24,6 +24,7 @@ export default function JumpNavLayout({
   items: JumpNavItem[]
   children: React.ReactNode
 }) {
+  const Heading = headingLevel
   const project = variant === 'project'
 
   return (
@@ -55,7 +56,7 @@ export default function JumpNavLayout({
         ) : (
           <>
             {eyebrow}
-            {heading && <Cascade as={headingLevel} className="text-headline-2xl mb-8" text={heading} />}
+            {heading && <Heading className="text-headline-2xl mb-8">{heading}</Heading>}
           </>
         )}
         {items.length > 0 && (
