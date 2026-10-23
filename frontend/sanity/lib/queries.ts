@@ -455,12 +455,23 @@ const pageBuilderFields = /* groq */ `
         ...,
         ${linkFields}
       },
-      "projects": projects[]->{
-        _id,
-        name,
-        image,
-        "slug": slug.current
-      }
+      "projects": select(
+        source == "category" => *[
+          _type == "project" && defined(slug.current)
+          && ^.category._ref in projectTypes[]._ref
+        ] | order(_createdAt desc) [0...3] {
+          _id,
+          name,
+          image,
+          "slug": slug.current
+        },
+        projects[0...3]->{
+          _id,
+          name,
+          image,
+          "slug": slug.current
+        }
+      )
     },
     _type == "growers" => {
       ...,
