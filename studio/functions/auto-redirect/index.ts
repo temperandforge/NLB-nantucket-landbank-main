@@ -2,11 +2,13 @@ import {documentEventHandler} from '@sanity/functions'
 import {createClient, type SanityClient} from '@sanity/client'
 
 import {MAX_PAGE_DEPTH} from '../../src/lib/pageHierarchy'
+import {normaliseSource} from '../../src/lib/redirectSource'
 import {
   diffPagePaths,
   planRedirectWrites,
   type DescendantRef,
   type ExistingRedirect,
+  type NewRedirect,
   type PageState,
 } from '../../src/lib/redirectDiff'
 
@@ -85,6 +87,18 @@ const fetchExistingRedirects = (client: RedirectClient) =>
     `*[_type == "redirect" && coalesce(enabled, true) == true]{"id": _id, source}`,
   )
 
+type DisabledRedirect = {id: string; source: string; origin: string | null}
+
+/**
+ * DISABLED redirects. Not given to planRedirectWrites; used afterwards so a planned source that
+ * already has a (disabled) document is reused rather than duplicated, which the schema's source
+ * validator would reject on both documents.
+ */
+const fetchDisabledRedirects = (client: RedirectClient) =>
+  client.fetch<DisabledRedirect[]>(
+    `*[_type == "redirect" && coalesce(enabled, true) == false]{"id": _id, source, origin}`,
+  )
+
 async function toState(client: RedirectClient, snapshot: PageSnapshot): Promise<PageState | null> {
   if (!snapshot.slug) return null
   const ancestors = await fetchAncestors(client, snapshot.parentId)
@@ -99,8 +113,8 @@ export async function applyAutoRedirects(
   event: AutoRedirectEvent,
   client: RedirectClient,
   log: (...args: unknown[]) => void = console.log,
-): Promise<{created: number; disabled: number}> {
-  const none = {created: 0, disabled: 0}
+): Promise<{created: number; disabled: number; reenabled: number}> {
+  const none = {created: 0, disabled: 0, reenabled: 0}
   const after = await toState(client, event.after)
   const before = event.before ? await toState(client, event.before) : null
   if (!after || (event.before && !before)) {
@@ -111,14 +125,39 @@ export async function applyAutoRedirects(
   const descendants = await fetchDescendants(client, event.id)
   const changes = diffPagePaths({pageId: event.id, before, after, descendants})
   const existing = await fetchExistingRedirects(client)
-  const {create, disable} = planRedirectWrites(changes, existing)
-  log('auto-redirect: plan', JSON.stringify({page: event.id, changes, create, disable}))
+  const planned = planRedirectWrites(changes, existing)
+  const {disable} = planned
+  log('auto-redirect: plan', JSON.stringify({page: event.id, changes, ...planned}))
 
-  if (create.length === 0 && disable.length === 0) {
+  // A planned source that already has a disabled redirect: re-enable an auto one in place; leave
+  // a manually disabled one alone (an editor's deliberate disable outranks an automatic re-enable).
+  const disabledBySource = new Map<string, DisabledRedirect>()
+  for (const r of await fetchDisabledRedirects(client)) {
+    disabledBySource.set(normaliseSource(r.source), r)
+  }
+  const create: NewRedirect[] = []
+  const reenable: {id: string; pageId: string}[] = []
+  for (const item of planned.create) {
+    const dormant = disabledBySource.get(normaliseSource(item.source))
+    if (!dormant) create.push(item)
+    else if (dormant.origin === 'auto') reenable.push({id: dormant.id, pageId: item.pageId})
+    else {
+      log(
+        `auto-redirect: a manually disabled redirect for ${item.source} was left untouched (${dormant.id})`,
+      )
+    }
+  }
+
+  if (create.length === 0 && disable.length === 0 && reenable.length === 0) {
     log(`auto-redirect: nothing to write for ${event.id}`)
     return none
   }
 
+  const link = (pageId: string) => ({
+    _type: 'link',
+    linkType: 'page',
+    page: {_type: 'reference', _ref: pageId},
+  })
   const tx = client.transaction()
   for (const {source, pageId} of create) {
     tx.create({
@@ -128,14 +167,27 @@ export async function applyAutoRedirects(
       statusCode: 301,
       passQuery: true,
       enabled: true,
-      destination: {_type: 'link', linkType: 'page', page: {_type: 'reference', _ref: pageId}},
+      destination: link(pageId),
+    })
+  }
+  for (const {id, pageId} of reenable) {
+    tx.patch(id, {
+      set: {
+        enabled: true,
+        destination: link(pageId),
+        origin: 'auto',
+        statusCode: 301,
+        passQuery: true,
+      },
     })
   }
   for (const id of disable) tx.patch(id, {set: {enabled: false}})
   await tx.commit()
 
-  log(`auto-redirect: created ${create.length}, disabled ${disable.length} for ${event.id}`)
-  return {created: create.length, disabled: disable.length}
+  log(
+    `auto-redirect: created ${create.length}, re-enabled ${reenable.length}, disabled ${disable.length} for ${event.id}`,
+  )
+  return {created: create.length, disabled: disable.length, reenabled: reenable.length}
 }
 
 export const handler = documentEventHandler<AutoRedirectEvent>(async ({context, event}) => {

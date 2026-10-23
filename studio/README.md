@@ -55,6 +55,13 @@ npx sanity functions logs auto-redirect
 
 Each run logs its plan (`auto-redirect: plan ...`) and what it wrote.
 
+### Disabled redirects are reused, not duplicated
+
+If an old path already has a disabled redirect, the function does not create a second one (the
+`source` validator would then reject both). A disabled redirect it created itself (`origin: auto`) is
+re-enabled and pointed at the page. One an editor disabled by hand is left untouched and logged, so
+that old path stays without a redirect until the editor turns it back on.
+
 ### A missed run leaves a gap
 
 The function runs once per publish. If a run fails or is skipped (a timeout, an outage, a page whose
