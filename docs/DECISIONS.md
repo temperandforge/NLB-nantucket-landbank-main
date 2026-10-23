@@ -268,8 +268,9 @@ computed by walking ancestors.
 
 **Why:** A hand-typed path duplicates information already in the hierarchy and drifts from it.
 
-**Implication:** Renaming an ancestor's slug moves all descendant URLs automatically. Add
-redirects if the old URLs were public.
+**Implication:** Renaming an ancestor's slug moves all descendant URLs automatically. Renaming or
+moving a page creates redirects from the old URLs automatically (2.8); redirects for any other old
+URL are authored by hand.
 
 ### 2.4 The path is computed, not denormalized
 
@@ -328,6 +329,50 @@ The catch-all route calls `notFound()`. It previously returned 200 with the Sani
 
 **Implication:** `PageOnboarding` is no longer used by the page route. A `pathOnly` page 404s
 through the same path, because the page query excludes it rather than the route special-casing it.
+
+### 2.8 Redirects are documents; renaming or moving a page writes them
+
+**Status:** Built, not yet deployed or live-verified. Design:
+[the redirects spec](superpowers/specs/2026-10-23-redirects-design.md). Umbrella issue
+[#9](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/9).
+
+A `redirect` is a document (`source`, `destination` as the shared `link`, `statusCode`, `passQuery`,
+`enabled`, `origin`, `note`), so editors manage them in Studio with no deploy. `frontend/proxy.ts`
+applies them before routing: GET and HEAD only, exact path (case-insensitive, trailing slash ignored),
+an optional query string on the source (every listed param must match), one hop, cached 60 s under the
+`redirect` tag, and it fails open on any error. Status 301, 302, 303, 307 and 308 redirect; **410 Gone**
+is allowed and takes no destination. The matcher is `frontend/sanity/lib/redirectMatch.ts`; the source
+rules are `studio/src/lib/redirectSource.ts`, shared by schema validation, matcher and function.
+
+Renaming or moving a published page runs a Sanity Function (`studio/functions/auto-redirect/`, declared
+in `studio/sanity.blueprint.ts`) that creates `origin: auto` redirects from the old URL and every
+descendant's old URL. An auto redirect's destination is a **reference to the page**, not a path string,
+so a page renamed twice leaves two redirects that both reach its current URL and there are no chains. A
+redirect whose source a page now occupies is disabled, not deleted; a planned source that already has a
+disabled auto redirect re-enables that document rather than duplicating it, and a disabled manual one is
+left alone. The landing page's own path redirects to `/` in `app/[...slug]/page.tsx` as a **308**
+(`permanentRedirect`) without the query string, and not in draft mode.
+
+**Why:** Redirects as documents follow the rule that categorisation the client may extend is data, not
+code. Page references keep the generated redirects correct through later renames. 410 is there because
+some old URLs should say "gone", not "moved". Computing the landing-page redirect from the same query
+that renders the page means it cannot drift when the landing page changes.
+
+**Implication:**
+- The function is deployed **separately and per dataset** (`cd studio && npx sanity blueprints deploy`,
+  see `studio/README.md`), and redeployed when `redirectDiff.ts`, `pageHierarchy.ts`, `redirectSource.ts`
+  or the function changes. A missed run leaves a missing redirect and nothing flags it.
+- Free-plan availability of Functions, the runtime token's write access and the deployed projection are
+  unverified; so is positive 301/410 evidence from a running site. If Functions are unavailable, the
+  fallback is the same handler as a Studio publish action.
+- Pattern and regex rules are deferred ([#72](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/72));
+  so are the rename warning (#73), hit logging (#74), deleted pages (#75) and the WordPress bulk import
+  (#76). `/map` is out of scope (see 20).
+- **Known limitation:** the proxy matcher excludes any path containing a dot, so a source like
+  `/old-page.html` or `/x.php` can never fire, and Studio currently accepts one. Tracked in
+  [#83](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/83).
+- `studio/scripts/verifyRedirects.ts` checks the dataset (no enabled redirect shadows a live page, every
+  destination resolves, no duplicate sources); run it after bulk edits.
 
 ---
 
@@ -916,7 +961,7 @@ Design: [the archives spec](superpowers/specs/2026-10-07-staff-commissioner-faq-
 Staff, Commissioners and FAQs are CMS pages (a header block plus the People Grid or FAQ List), seeded
 as drafts under About Us by `studio/scripts/seedArchivePages.ts`. Each one's address is its own slug
 and parent, so it can be changed per archive at any time in Studio. Links that point at a page by
-reference follow the move; old bookmarked addresses do not, which needs redirects
+reference follow the move; old bookmarked addresses are covered by the automatic redirects in 2.8
 ([#9](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/9)). No Site Settings
 entry per archive: nothing in code needs to find an archive page.
 
@@ -1106,8 +1151,8 @@ Carried from [the footer spec](superpowers/specs/2026-07-29-footer-globals-desig
   `properties.ts`, purely so the map keeps working until the client's real export arrives. It lives
   at `studio/scripts/data/boundaries.geojson` and uses the project slug as each feature's `id`.
 - `project` has no page of its own and no body content. Explore → Properties is still `#`.
-- Renaming an ancestor's slug silently changes every descendant URL (2.3). There is no redirect
-  mechanism for the old paths (tracked in [#9](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/9)).
+- Renaming an ancestor's slug silently changes every descendant URL (2.3). A Sanity Function
+  now writes redirects for the old paths (2.8), but it is not deployed or live-verified yet.
 - Mobile footer breakpoints are assumptions awaiting designer confirmation.
 - Site search covers only content with a destination; people, FAQs and properties without a `link`
   are not searchable ([#50](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/50)).
