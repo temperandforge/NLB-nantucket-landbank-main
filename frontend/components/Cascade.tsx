@@ -8,8 +8,8 @@ type CascadeProps = {
 }
 
 export default function Cascade({as: Tag = 'h1', className, text}: CascadeProps) {
-  if (!text) return null
   const words = cascadeWords(text)
+  if (words && words.length === 0) return null
 
   // Stega-encoded text (visual editing) can't be split without breaking its markers.
   if (!words) return <Tag className={className}>{text}</Tag>
