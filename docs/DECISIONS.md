@@ -342,7 +342,9 @@ applies them before routing: GET and HEAD only, exact path (case-insensitive, tr
 an optional query string on the source (every listed param must match), one hop, cached 60 s under the
 `redirect` tag, and it fails open on any error. Status 301, 302, 303, 307 and 308 redirect; **410 Gone**
 is allowed and takes no destination. The matcher is `frontend/sanity/lib/redirectMatch.ts`; the source
-rules are `studio/src/lib/redirectSource.ts`, shared by schema validation, matcher and function.
+rules are `studio/src/lib/redirectSource.ts`, shared by schema validation and the function and
+mirrored (not imported, since the packages cannot share code) in the frontend matcher, so a change to
+one must be made in both.
 
 Renaming or moving a published page runs a Sanity Function (`studio/functions/auto-redirect/`, declared
 in `studio/sanity.blueprint.ts`) that creates `origin: auto` redirects from the old URL and every
