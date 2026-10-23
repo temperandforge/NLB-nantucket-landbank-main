@@ -1413,3 +1413,20 @@ client designs one.
 (section 2), and an invented one would 404 too. `global-error.tsx` has no site chrome, content
 fetches or Sanity: it loads its own stylesheet and fonts. `/` still 404s when no landing page is set
 (section 20), so "Back to home" can land on this screen until one is.
+
+## 23. FAQ ordering and the catch-all category
+
+FAQs and FAQ categories are ordered by dragging in Studio (the Orderable Document List plugin, which
+stores a hidden `orderRank`). The FAQs and FAQ Categories lists under FAQs are the plugin's lists,
+not the default document lists. Queries sort `orderRank asc, _createdAt asc`, so nothing sorts
+alphabetically and a document that has no rank yet falls to the end, oldest first. The old `order`
+number is gone from the schema; existing documents were ranked once by `studio/scripts/seedFaqOrder.ts`
+(old `order`, then oldest first), and the old field is left in the data, unused.
+
+FAQs with no category are folded into a catch-all category chosen in FAQ Settings (`faqSettings`, a singleton under FAQs, field `uncategorisedCategory`)
+when one is set and published; with none set they show in a separate list above the categories.
+
+**Why:** The client wants to arrange FAQs by hand, and an alphabetical tiebreak read as arbitrary.
+**Implication:** Other taxonomies still use the numeric `order` field; `defineTaxonomy` takes
+`draggable: true` to switch one over, and its list must then use `orderableDocumentListDeskItem`.
+A new FAQ lands at the bottom of its list until dragged.

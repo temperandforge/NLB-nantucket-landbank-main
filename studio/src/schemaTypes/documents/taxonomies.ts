@@ -22,6 +22,7 @@ export const faqCategory = defineTaxonomy({
   title: 'FAQ Category',
   icon: HelpCircleIcon,
   description: 'Groups FAQs under a heading, e.g. "Form Filing".',
+  draggable: true,
 })
 
 export const recordCategory = defineTaxonomy({

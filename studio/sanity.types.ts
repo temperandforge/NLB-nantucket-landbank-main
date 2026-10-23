@@ -776,18 +776,7 @@ export type Faq = {
   question: string
   answer: BlockContent
   category?: FaqCategoryReference
-  order?: number
-}
-
-export type FaqCategory = {
-  _id: string
-  _type: 'faqCategory'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  title: string
-  slug: Slug
-  order?: number
+  orderRank?: string
 }
 
 export type Commissioner = {
@@ -1131,6 +1120,26 @@ export type SingleNewsPage = {
   publishedLabel?: string
   shareLabel?: string
   moreNews?: NewsPreview
+}
+
+export type FaqSettings = {
+  _id: string
+  _type: 'faqSettings'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  uncategorisedCategory?: FaqCategoryReference
+}
+
+export type FaqCategory = {
+  _id: string
+  _type: 'faqCategory'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  orderRank?: string
 }
 
 export type ProjectSettings = {
@@ -1738,7 +1747,6 @@ export type AllSanitySchemaTypes =
   | Job
   | FaqCategoryReference
   | Faq
-  | FaqCategory
   | Commissioner
   | SanityImageCrop
   | SanityImageHotspot
@@ -1754,6 +1762,8 @@ export type AllSanitySchemaTypes =
   | Geopoint
   | SingleProjectPage
   | SingleNewsPage
+  | FaqSettings
+  | FaqCategory
   | ProjectSettings
   | SiteBanner
   | MenuReference

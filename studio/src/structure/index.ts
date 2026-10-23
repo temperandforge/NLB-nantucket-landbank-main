@@ -18,6 +18,7 @@ import {
   UsersIcon,
 } from '@sanity/icons'
 import type { StructureBuilder, StructureResolver } from 'sanity/structure'
+import {orderableDocumentListDeskItem} from '@sanity/orderable-document-list'
 import pluralize from 'pluralize-esm'
 
 /**
@@ -51,6 +52,7 @@ const DISABLED_TYPES = [
   'propertyType',
   'resource',
   'projectSettings',
+  'faqSettings',
   // Handled explicitly under Projects below.
   'project',
   'projectType',
@@ -73,7 +75,7 @@ const DISABLED_TYPES = [
   'media.tag',
 ]
 
-export const structure: StructureResolver = (S: StructureBuilder) =>
+export const structure: StructureResolver = (S: StructureBuilder, context) =>
   S.list()
     .title('Website Content')
     .items([
@@ -90,9 +92,27 @@ export const structure: StructureResolver = (S: StructureBuilder) =>
           S.list()
             .title('FAQs')
             .items([
-              S.documentTypeListItem('faq').title('FAQs').icon(HelpCircleIcon),
+              // Drag to reorder; the order is what visitors see.
+              orderableDocumentListDeskItem({
+                type: 'faq',
+                title: 'FAQs',
+                icon: HelpCircleIcon,
+                S,
+                context,
+              }),
               S.divider(),
-              S.documentTypeListItem('faqCategory').title('FAQ Categories').icon(TagIcon),
+              orderableDocumentListDeskItem({
+                type: 'faqCategory',
+                title: 'FAQ Categories',
+                icon: TagIcon,
+                S,
+                context,
+              }),
+              S.divider(),
+              S.listItem()
+                .title('FAQ Settings')
+                .icon(CogIcon)
+                .child(S.document().schemaType('faqSettings').documentId('faqSettings')),
             ]),
         ),
       // Forms: the forms editors build, and what visitors sent. Submissions hold personal data, so

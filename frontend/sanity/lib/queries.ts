@@ -352,18 +352,31 @@ const pageBuilderFields = /* groq */ `
     },
     _type == "faqList" => {
       ...,
-      "ungrouped": *[_type == "faq" && !defined(category->_id)] | order(order asc, question asc) {
-        _id,
-        question,
-        answer[]{
-          ...,
-          ${markDefsFields}
+      // With a catch-all category chosen in FAQ Settings (and published), uncategorised FAQs fold into
+      // it and this list is empty. Nothing sorts alphabetically: the order dragged in Studio (orderRank), then oldest first.
+      "ungrouped": select(
+        defined(*[_type == "faqSettings" && _id == "faqSettings"][0].uncategorisedCategory->_id) => [],
+        *[_type == "faq" && !defined(category->_id)] | order(orderRank asc, _createdAt asc) {
+          _id,
+          question,
+          answer[]{
+            ...,
+            ${markDefsFields}
+          }
         }
-      },
-      "groups": *[_type == "faqCategory"] | order(order asc, title asc) {
+      ),
+      "groups": *[_type == "faqCategory"] | order(orderRank asc, _createdAt asc) {
         _id,
         title,
-        "faqs": *[_type == "faq" && category._ref == ^._id] | order(order asc, question asc) {
+        "faqs": *[
+          _type == "faq" && (
+            category._ref == ^._id
+            || (
+              !defined(category->_id)
+              && ^._id == *[_type == "faqSettings" && _id == "faqSettings"][0].uncategorisedCategory->_id
+            )
+          )
+        ] | order(orderRank asc, _createdAt asc) {
           _id,
           question,
           answer[]{
