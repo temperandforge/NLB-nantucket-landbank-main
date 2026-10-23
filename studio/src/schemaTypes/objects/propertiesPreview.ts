@@ -31,7 +31,7 @@ export const propertiesPreview = defineBlock({
       name: 'properties',
       title: 'Properties',
       type: 'array',
-      description: 'Shown in order, three across. Up to three.',
+      description: 'Shown in order, three across. Up to three. Leave empty to show the latest properties.',
       of: [defineArrayMember({type: 'reference', to: [{type: 'property'}]})],
       validation: (rule) => rule.max(3),
     }),
@@ -40,7 +40,7 @@ export const propertiesPreview = defineBlock({
     select: {title: 'heading', properties: 'properties'},
     prepare: ({title, properties}) => ({
       title: title || 'Untitled',
-      subtitle: `Properties Preview · ${properties?.length ?? 0} properties`,
+      subtitle: properties?.length ? `Properties Preview · ${properties.length} properties` : 'Properties Preview · latest',
     }),
   },
 })

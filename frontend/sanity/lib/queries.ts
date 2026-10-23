@@ -455,17 +455,18 @@ const pageBuilderFields = /* groq */ `
         ...,
         ${linkFields}
       },
+      // Hand-picked projects win; a chosen category narrows the latest; with neither, the latest overall.
       "projects": select(
-        source == "category" => *[
-          _type == "project" && defined(slug.current)
-          && ^.category._ref in projectTypes[]._ref
-        ] | order(_createdAt desc) [0...3] {
+        source != "category" && count(projects) > 0 => projects[0...3]->{
           _id,
           name,
           image,
           "slug": slug.current
         },
-        projects[0...3]->{
+        *[
+          _type == "project" && defined(slug.current)
+          && (source != "category" || !defined(^.category) || ^.category._ref in projectTypes[]._ref)
+        ] | order(_createdAt desc) [0...3] {
           _id,
           name,
           image,
@@ -488,7 +489,9 @@ const pageBuilderFields = /* groq */ `
         ...,
         ${linkFields}
       },
-      "properties": properties[]->{
+      // Hand-picked properties win; with none chosen, the latest three.
+      "properties": select(
+        count(properties) > 0 => properties[0...3]->{
         _id,
         name,
         "slug": slug.current,
@@ -496,7 +499,17 @@ const pageBuilderFields = /* groq */ `
         image,
         "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
         "resources": resources[]->{"slug": slug.current, title, order}
-      },
+        },
+        *[_type == "property" && defined(slug.current)] | order(_createdAt desc) [0...3] {
+        _id,
+        name,
+        "slug": slug.current,
+        description,
+        image,
+        "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
+        "resources": resources[]->{"slug": slug.current, title, order}
+        }
+      ),
       "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage
     },
     _type == "mapPreview" => {

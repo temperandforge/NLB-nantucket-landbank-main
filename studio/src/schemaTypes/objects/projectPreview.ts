@@ -40,7 +40,8 @@ export const projectPreview = defineBlock({
       name: 'projects',
       title: 'Projects',
       type: 'array',
-      description: 'Shown in order, numbered 01, 02, 03. Up to three.',
+      description:
+        'Shown in order, numbered 01, 02, 03. Up to three. Leave empty to show the latest projects.',
       of: [defineArrayMember({type: 'reference', to: [{type: 'project'}]})],
       hidden: ({parent}) => parent?.source === 'category',
       validation: (rule) => rule.max(3),
@@ -51,14 +52,8 @@ export const projectPreview = defineBlock({
       type: 'reference',
       to: [{type: 'projectType'}],
       description:
-        'The three most recently created projects in this category are shown, newest first. New projects added to it appear automatically.',
+        'The three most recently created projects in this category are shown, newest first. Leave empty for the latest projects of any category.',
       hidden: ({parent}) => parent?.source !== 'category',
-      validation: (rule) =>
-        rule.custom((value, context) =>
-          (context.parent as {source?: string} | undefined)?.source === 'category' && !value
-            ? 'Choose a category'
-            : true,
-        ),
     }),
   ],
   preview: {
@@ -67,8 +62,8 @@ export const projectPreview = defineBlock({
       title: title || 'Untitled',
       subtitle:
         source === 'category'
-          ? `Project Preview · ${category ?? 'no category'}`
-          : `Project Preview · ${projects?.length ?? 0} projects`,
+          ? `Project Preview · ${category ?? 'latest'}`
+          : projects?.length ? `Project Preview · ${projects.length} projects` : 'Project Preview · latest',
     }),
   },
 })
