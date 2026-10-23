@@ -13,8 +13,7 @@ export default async function SiteJsonLd() {
   try {
     const {data: settings} = await sanityFetch({query: siteStructuredDataQuery, stega: false})
     if (settings) {
-      // `legacyOrigin` is where the origin lived before `siteUrl`; see the layout.
-      const origin = getSiteUrl({siteUrl: settings.siteUrl ?? settings.legacyOrigin})
+      const origin = getSiteUrl(settings)
       graphs = [
         organizationLd(
           {name: settings.title, organization: settings.organization, logoUrl: settings.organization?.logoUrl},

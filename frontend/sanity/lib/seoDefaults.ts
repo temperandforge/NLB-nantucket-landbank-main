@@ -23,8 +23,7 @@ export async function getSeoDefaults(): Promise<SeoDefaults> {
   try {
     const {data: settings} = await sanityFetch({query: settingsQuery, stega: false})
     return {
-      // `ogImage.metadataBase` is where the origin lived before `siteUrl`; see the layout.
-      origin: getSiteUrl({siteUrl: settings?.siteUrl ?? settings?.ogImage?.metadataBase}),
+      origin: getSiteUrl(settings),
       siteName: settings?.title,
       description: settings?.seo?.description || (settings?.description ? toPlainText(settings.description) : null),
       image: resolveOpenGraphImage(settings?.seo?.image?.asset ? settings.seo.image : settings?.ogImage) ?? null,

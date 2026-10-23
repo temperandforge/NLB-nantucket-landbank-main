@@ -1362,7 +1362,6 @@ export type Settings = {
     hotspot?: SanityImageHotspot
     crop?: SanityImageCrop
     alt?: string
-    metadataBase?: string
     _type: 'image'
   }
 }
@@ -1909,19 +1908,17 @@ export type SettingsQueryResult = {
     hotspot?: SanityImageHotspot
     crop?: SanityImageCrop
     alt?: string
-    metadataBase?: string
     _type: 'image'
   }
 } | null
 
 // Source: sanity/lib/queries.ts
 // Variable: siteStructuredDataQuery
-// Query: *[_type == "settings" && _id == "siteSettings"][0]{    title,    siteUrl,    "description": coalesce(seo.description, null),    "legacyOrigin": ogImage.metadataBase,    organization{      legalName,      email,      telephone,      address,      sameAs,      "logoUrl": logo.asset->url    }  }
+// Query: *[_type == "settings" && _id == "siteSettings"][0]{    title,    siteUrl,    "description": coalesce(seo.description, null),    organization{      legalName,      email,      telephone,      address,      sameAs,      "logoUrl": logo.asset->url    }  }
 export type SiteStructuredDataQueryResult = {
   title: string
   siteUrl: string | null
   description: string | null
-  legacyOrigin: string | null
   organization: {
     legalName: string | null
     email: string | null
@@ -5185,7 +5182,7 @@ import '@sanity/client'
 declare module '@sanity/client' {
   interface SanityQueries {
     '*[_type == "settings"][0]': SettingsQueryResult
-    '\n  *[_type == "settings" && _id == "siteSettings"][0]{\n    title,\n    siteUrl,\n    "description": coalesce(seo.description, null),\n    "legacyOrigin": ogImage.metadataBase,\n    organization{\n      legalName,\n      email,\n      telephone,\n      address,\n      sameAs,\n      "logoUrl": logo.asset->url\n    }\n  }\n': SiteStructuredDataQueryResult
+    '\n  *[_type == "settings" && _id == "siteSettings"][0]{\n    title,\n    siteUrl,\n    "description": coalesce(seo.description, null),\n    organization{\n      legalName,\n      email,\n      telephone,\n      address,\n      sameAs,\n      "logoUrl": logo.asset->url\n    }\n  }\n': SiteStructuredDataQueryResult
     '\n  *[_type == "footer" && _id == "footer"][0]{\n    newsletterHeading,\n    "newsletterForm": newsletterForm->{\n  _id,\n  title,\n  submitLabel,\n  successMessage,\n  sections[]{\n    _key,\n    heading,\n    columns,\n    fields[]{\n      _key,\n      "name": name.current,\n      label,\n      prompt,\n      helperText,\n      placeholder,\n      fieldType,\n      required,\n      width,\n      maxLength,\n      options,\n      showIf{field, equals}\n    }\n  }\n},\n    organizationName,\n    infoColumns[]{\n      _key,\n      heading,\n      lines[]{\n        _key,\n        text,\n        href\n      }\n    },\n    socialLinks[]{\n      _key,\n      platform,\n      url\n    },\n    "footerMenu": footerMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      group,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n    "legalMenu": legalMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      group,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    },\n  }\n': FooterQueryResult
     '\n  *[_type == "header" && _id == "header"][0]{\n    "mainMenu": mainMenu->{\n      \n  _id,\n  title,\n  items[]{\n    \n  _key,\n  _type,\n  label,\n  _type == "menuLink" => {\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  },\n  _type == "menuGroup" => {\n    children[]{\n      _key,\n      label,\n      group,\n      \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n    }\n  }\n\n  }\n\n    }\n  }\n': HeaderQueryResult
     '\n  *[_type == "siteBanner" && _id == "siteBanner" && enabled == true][0]{\n    message,\n    \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n  }\n': SiteBannerQueryResult

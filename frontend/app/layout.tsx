@@ -35,9 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const description = settings?.description || demo.description
 
   const ogImage = resolveSeoImage(settings?.seo, settings?.ogImage)
-  // `settings.ogImage.metadataBase` is the pre-`siteUrl` home of the origin; kept as a fallback
-  // until the site defaults migration has copied it.
-  const origin = getSiteUrl({siteUrl: settings?.siteUrl ?? settings?.ogImage?.metadataBase})
+  const origin = getSiteUrl(settings)
   const metadataBase = origin ? new URL(origin) : undefined
   return {
     metadataBase,

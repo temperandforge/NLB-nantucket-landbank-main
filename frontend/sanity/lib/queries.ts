@@ -12,7 +12,6 @@ export const siteStructuredDataQuery = defineQuery(`
     title,
     siteUrl,
     "description": coalesce(seo.description, null),
-    "legacyOrigin": ogImage.metadataBase,
     organization{
       legalName,
       email,

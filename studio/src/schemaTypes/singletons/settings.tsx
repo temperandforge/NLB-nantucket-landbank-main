@@ -210,18 +210,6 @@ export const settings = defineType({
             })
           },
         }),
-        defineField({
-          name: 'metadataBase',
-          type: 'url',
-          description: (
-            <a
-              href="https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase"
-              rel="noreferrer noopener"
-            >
-              More information
-            </a>
-          ),
-        }),
       ],
     }),
   ],
