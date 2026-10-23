@@ -1,8 +1,9 @@
 /**
- * Rules for a redirect's `source`, shared by the schema's validation and (later) the frontend
- * matcher and the auto-redirect function, so they cannot drift. Pure: no Sanity imports.
+ * Rules for a redirect's `source`, shared by the schema's validation and the auto-redirect function.
+ * Pure: no Sanity imports.
  *
- * The frontend matcher mirrors this normalisation (`frontend/sanity/lib/redirectMatch.ts`); change both together.
+ * The frontend matcher (`frontend/sanity/lib/redirectMatch.ts`) cannot import across packages, so it
+ * mirrors this normalisation rather than sharing it; change both together.
  */
 
 /** Paths the site owns outright; a redirect from one of these could never fire or would break it. */
@@ -32,7 +33,10 @@ export function validateSourceShape(source: string | undefined): true | string {
     return 'The source cannot contain a #. Browsers never send the part after it to the server.'
   }
   if (source.includes('*')) return 'Wildcards are not supported. Add one redirect per path.'
-  const path = normaliseSource(source).split('?')[0]
+  const [path, query = ''] = normaliseSource(source).split('?')
+  if (path === '/' && !query) {
+    return 'A source of / would redirect the homepage. Add a query string (like /?p=123) or use another path.'
+  }
   const reserved = RESERVED_PREFIXES.find((prefix) => path === prefix || path.startsWith(`${prefix}/`))
   if (reserved) return `${reserved} is reserved for the site itself and cannot be redirected.`
   return true

@@ -42,7 +42,7 @@ check('lowercases the path and keeps the query as written', () => {
 
 console.log('validateSourceShape:')
 
-for (const bad of ['old', '/a#b', '/a/*', '/api/x', '/_next/x', '/studio', '', undefined]) {
+for (const bad of ['old', '/a#b', '/a/*', '/api/x', '/_next/x', '/studio', '/', '//', '/?', '', undefined]) {
   check(`rejects ${JSON.stringify(bad)}`, () => {
     const got = validateSourceShape(bad)
     assert(typeof got === 'string', `expected a message, got ${JSON.stringify(got)}`)

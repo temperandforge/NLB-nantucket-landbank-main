@@ -65,7 +65,7 @@ export const redirect = defineType({
             return 'Another redirect already uses this old path.'
           }
 
-          // 2. A live page at this path would never be reached: the page wins.
+          // 2. A live page at this path: the proxy runs before routing, so the redirect would hide it.
           const path = sourcePath(value)
           const lastSegment = path.split('/').filter(Boolean).pop()
           if (lastSegment) {
@@ -74,7 +74,7 @@ export const redirect = defineType({
               {slug: lastSegment},
             )
             if (pages.some((row) => !row.pathOnly && pagePath(row) === path)) {
-              return 'A live page already exists at this path, so the redirect would never run. Delete or move the page first.'
+              return 'A live page already exists at this path. Redirects run before pages, so this one would hide the page. Delete or move the page first.'
             }
           }
 
@@ -183,13 +183,16 @@ export const redirect = defineType({
       statusCode: 'statusCode',
       linkType: 'destination.linkType',
       href: 'destination.href',
+      // Preview paths, not GROQ: dereference with dots.
       pageSlug: 'destination.page.slug.current',
+      parentSlug: 'destination.page.parent.slug.current',
+      grandparentSlug: 'destination.page.parent.parent.slug.current',
       origin: 'origin',
       enabled: 'enabled',
     },
-    prepare({source, statusCode, linkType, href, pageSlug, origin, enabled}) {
-      const target =
-        statusCode === 410 ? 'gone' : linkType === 'page' ? (pageSlug ? `/${pageSlug}` : 'a page') : href
+    prepare({source, statusCode, linkType, href, pageSlug, parentSlug, grandparentSlug, origin, enabled}) {
+      const pageTarget = pageSlug ? `/${buildPagePath([grandparentSlug, parentSlug, pageSlug])}` : 'a page'
+      const target = statusCode === 410 ? 'gone' : linkType === 'page' ? pageTarget : href
       const parts = [`${statusCode ?? 301}`, target ? `→ ${target}` : undefined]
       if (origin === 'auto') parts.push('(auto)')
       if (enabled === false) parts.push('(off)')
