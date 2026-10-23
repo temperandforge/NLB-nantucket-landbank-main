@@ -1,3 +1,5 @@
+import {stegaClean} from 'next-sanity'
+
 import type {JsonLdGraph} from '@/sanity/lib/structuredData'
 
 /**
@@ -5,7 +7,8 @@ import type {JsonLdGraph} from '@/sanity/lib/structuredData'
  * JSON-LD guide asks for exactly this. JSON.stringify does not sanitise on its own.
  */
 export function serializeJsonLd(graph: JsonLdGraph): string {
-  return JSON.stringify(graph).replace(/</g, '\\u003c')
+  // In Presentation, strings carry invisible stega characters that must never reach a crawler.
+  return JSON.stringify(stegaClean(graph)).replace(/</g, '\\u003c')
 }
 
 /** Renders each non-null graph as its own script tag, and nothing at all when there are none. */

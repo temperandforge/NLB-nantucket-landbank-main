@@ -1,6 +1,7 @@
 import type {Metadata} from 'next'
 import {notFound} from 'next/navigation'
 
+import JsonLd from '@/components/JsonLd'
 import EventsPreviewView from '@/components/blocks/EventsPreviewView'
 import EventView from '@/components/EventView'
 import {currentHour} from '@/sanity/lib/dates'
@@ -8,6 +9,7 @@ import {sanityFetch} from '@/sanity/lib/live'
 import {eventQuery, eventSlugs, moreEventsQuery} from '@/sanity/lib/queries'
 import {buildMetadata} from '@/sanity/lib/seo'
 import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
+import {eventLd} from '@/sanity/lib/structuredData'
 
 /**
  * An event page, /events/<slug>. A static route, so it wins over the catch-all that owns CMS
@@ -50,8 +52,16 @@ export default async function EventPage(props: PageProps<'/events/[slug]'>) {
   // No event at this slug: a real 404, never a 200 placeholder.
   if (!event?._id) notFound()
 
+  const defaults = await getSeoDefaults()
+
   return (
     <>
+      <JsonLd
+        data={eventLd(
+          {...event, description: event.seo?.description || event.description, image: resolveSeoImage(event.seo, event.image)},
+          defaults.origin,
+        )}
+      />
       <EventView event={event} />
       {others.length > 0 && <EventsPreviewView eyebrow="Events - Upcoming" events={others.slice(0, 2)} />}
     </>

@@ -2,6 +2,7 @@ import type {Metadata} from 'next'
 import {notFound} from 'next/navigation'
 import {toPlainText, type PortableTextBlock} from 'next-sanity'
 
+import JsonLd from '@/components/JsonLd'
 import ArticleView from '@/components/ArticleView'
 import NewsPreviewView from '@/components/blocks/NewsPreviewView'
 import {sanityFetch} from '@/sanity/lib/live'
@@ -13,6 +14,7 @@ import {
 } from '@/sanity/lib/queries'
 import {buildMetadata} from '@/sanity/lib/seo'
 import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
+import {newsArticleLd} from '@/sanity/lib/structuredData'
 import {DereferencedLink} from '@/sanity/lib/types'
 import {linkResolver, realHref} from '@/sanity/lib/utils'
 
@@ -75,8 +77,25 @@ export default async function NewsArticlePage(props: PageProps<'/news/[slug]'>) 
     moreSettings?.ctaLink ? linkResolver(moreSettings.ctaLink as DereferencedLink) : null,
   )
 
+  const defaults = await getSeoDefaults()
+  const description = article.body?.length
+    ? toPlainText(article.body as PortableTextBlock[]).slice(0, 160)
+    : undefined
+
   return (
     <>
+      <JsonLd
+        data={newsArticleLd(
+          {
+            title: article.title,
+            slug: article.slug,
+            date: article.date,
+            description: article.seo?.description || description,
+            image: resolveSeoImage(article.seo, article.image),
+          },
+          defaults.origin,
+        )}
+      />
       <ArticleView
         article={article}
         eyebrow={settings?.eyebrow || undefined}

@@ -3,6 +3,28 @@ import {defineQuery} from 'next-sanity'
 export const settingsQuery = defineQuery(`*[_type == "settings"][0]`)
 
 /**
+ * What the site-wide structured data (Organization, WebSite) is built from. Matched on _type and
+ * the fixed singleton id. The logo comes back as a plain asset URL, since JSON-LD wants a URL
+ * rather than an image reference.
+ */
+export const siteStructuredDataQuery = defineQuery(`
+  *[_type == "settings" && _id == "siteSettings"][0]{
+    title,
+    siteUrl,
+    "description": coalesce(seo.description, null),
+    "legacyOrigin": ogImage.metadataBase,
+    organization{
+      legalName,
+      email,
+      telephone,
+      address,
+      sameAs,
+      "logoUrl": logo.asset->url
+    }
+  }
+`)
+
+/**
  * Assembles a page's URL path from its parent chain.
  *
  * The single source of truth for how a page URL is built - reused by the page lookup,
@@ -316,6 +338,8 @@ const pageBuilderFields = /* groq */ `
         date,
         "fileUrl": file.asset->url,
         "fileName": file.asset->originalFilename,
+        "mimeType": file.asset->mimeType,
+        "size": file.asset->size,
         "categorySlug": category->slug.current
       }
     },
@@ -598,6 +622,12 @@ const pageFields = /* groq */ `
   slug,
   "path": ${pagePath},
   seo{title, description, noIndex, image},
+  // Parent chain, farthest first, for the breadcrumb trail. Each path comes from the shared
+  // pagePath, evaluated on the ancestor itself; a pathOnly ancestor has a name but no page.
+  "ancestors": [
+    parent->parent->{name, pathOnly, "path": ${pagePath}},
+    parent->{name, pathOnly, "path": ${pagePath}}
+  ][defined(@)],
   ${pageBuilderFields}
 `
 
@@ -722,6 +752,7 @@ export const projectQuery = defineQuery(`
     description,
     image,
     seo{title, description, noIndex, image},
+    "propertySlug": property->slug.current,
     // This project's own types, to find related projects.
     "projectTypeIds": projectTypes[]._ref,
     body[]{

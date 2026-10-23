@@ -11,6 +11,7 @@ import {VisualEditing} from 'next-sanity/visual-editing'
 import {Toaster} from 'sonner'
 
 import DraftModeToast from '@/components/DraftModeToast'
+import SiteJsonLd from '@/components/SiteJsonLd'
 import Footer from '@/components/Footer'
 import Header from '@/components/header/Header'
 import * as demo from '@/sanity/lib/demo'
@@ -109,6 +110,7 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
         </a>
         {/* The <Toaster> component is responsible for rendering toast notifications used in /app/client-utils.ts and /app/components/DraftModeToast.tsx */}
         <Toaster />
+        <SiteJsonLd />
         {isDraftMode && (
           <>
             <DraftModeToast />
