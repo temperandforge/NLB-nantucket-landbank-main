@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import {ViewTransition} from 'react'
 import type {PortableTextBlock} from 'next-sanity'
 
 import Cascade from '@/components/Cascade'
@@ -34,15 +35,18 @@ export function PropertyIntro({property}: {property: NonNullable<PropertyQueryRe
     <>
       {hero && (
         <div className="w-full bg-background tf-px py-5 md:py-10">
-          <div className="relative h-[523px] w-full overflow-clip rounded bg-dusty-heath-800 md:h-[600px]">
-            <BlockImage
-              image={hero}
-              width={2400}
-              sizes="100vw"
-              fill
-              className="absolute inset-0 size-full object-cover"
-            />
-          </div>
+          {/* The archive card's image morphs into this (CardProperty `morph`). */}
+          <ViewTransition name={`property-${property.slug}`} share="morph" default="none">
+            <div className="relative h-[523px] w-full overflow-clip rounded bg-dusty-heath-800 md:h-[600px]">
+              <BlockImage
+                image={hero}
+                width={2400}
+                sizes="100vw"
+                fill
+                className="absolute inset-0 size-full object-cover"
+              />
+            </div>
+          </ViewTransition>
         </div>
       )}
       <article className="relative w-full overflow-clip bg-background tf-px py-s6">

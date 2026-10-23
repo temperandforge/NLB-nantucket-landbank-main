@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import {ViewTransition} from 'react'
 import type {PortableTextBlock} from 'next-sanity'
 
 import BlockImage from '@/components/blocks/BlockImage'
@@ -54,15 +55,18 @@ export default function ProjectView({
       >
         <div className="flex w-full flex-col gap-12 md:gap-16">
           {project.image?.asset?._ref && (
-            <div className="relative h-[375px] w-full overflow-clip rounded bg-dusty-heath-800">
-              <BlockImage
-                image={project.image}
-                width={1280}
-                sizes="(min-width: 768px) 640px, 100vw"
-                fill
-                className="absolute inset-0 size-full object-cover"
-              />
-            </div>
+            // The archive card's image morphs into this (CardProject `morph`).
+            <ViewTransition name={`project-${project.slug}`} share="morph" default="none">
+              <div className="relative h-[375px] w-full overflow-clip rounded bg-dusty-heath-800">
+                <BlockImage
+                  image={project.image}
+                  width={1280}
+                  sizes="(min-width: 768px) 640px, 100vw"
+                  fill
+                  className="absolute inset-0 size-full object-cover"
+                />
+              </div>
+            </ViewTransition>
           )}
           {body.length > 0 && (
             <CustomPortableText
