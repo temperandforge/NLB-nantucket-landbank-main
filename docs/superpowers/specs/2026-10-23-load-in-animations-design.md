@@ -94,8 +94,10 @@ New: `frontend/components/Cascade.tsx`, `frontend/components/PageTransition.tsx`
 `frontend/css/motion.css` (imported from `app/layout.tsx`).
 
 Edited, a line or two each: the hero blocks and `PageHeader`, the four detail views, `CardProperty`,
-`CardProject`, `CardNews` and their detail heroes, each route's `page.tsx`, and the header. No schema,
-Studio, dependency or generated-type changes.
+`CardProject`, `CardNews` and their detail heroes, each route's `page.tsx`, and the header. `CardProject`
+also changes its plain `<a>` to `next/link`'s `<Link>`: an `<a>` is a full page load, so it can neither
+prefetch nor run a view transition. Other `<a>` card links get the same check. No schema, Studio,
+dependency or generated-type changes.
 
 ## Verification
 
