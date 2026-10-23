@@ -116,6 +116,12 @@ export default function ImageCarouselTrack({
     }
   }, [looping, repeats])
 
+  useEffect(() => {
+    track.current
+      ?.querySelectorAll<HTMLElement>('[data-copy] a, [data-copy] [tabindex]')
+      .forEach((el) => el.setAttribute('tabindex', '-1'))
+  }, [looping, repeats])
+
   const pause = (event: SyntheticEvent) => {
     paused.current = true
     onSlide.current = event.target instanceof Element && event.target.closest('[data-slide]') !== null
@@ -130,9 +136,10 @@ export default function ImageCarouselTrack({
   }
 
   // Every set after the first, and the whole clone, is presentational: hidden from assistive tech
-  // and unfocusable.
+  // and out of the tab order. Not `inert`, which would also stop hover and clicks, and on a wide
+  // screen most of the visible slides are copies.
   const copy = (key: number) => (
-    <div key={key} className="contents" aria-hidden="true" {...{inert: true}}>
+    <div key={key} className="contents" aria-hidden="true" data-copy="">
       {children}
     </div>
   )
