@@ -15,7 +15,7 @@
 - Read the relevant doc in `node_modules/next/dist/docs/` before Next work (`01-app/02-guides/view-transitions.md` for this plan).
 - Frontend only. No schema, Studio, dependency or generated-type changes. No animation library.
 - Only `opacity`, `transform` and `filter` animate. Text must be visible with no JS.
-- Word cascade values: 800ms, `cubic-bezier(.33,1,.68,1)` (softened from `.22,1,.36,1` after phone feedback), 45ms per word, rise `.4em`, blur `6px`, delay index capped at 14. Soft handoff: old content fades and drops 8px in 180ms.
+- Word cascade values: 600ms (was 800ms), `cubic-bezier(.33,1,.68,1)` (softened from `.22,1,.36,1` after phone feedback), 45ms per word, rise `.4em`, blur `6px`, delay index capped at 14. Soft handoff: old content fades and drops 8px in 180ms.
 - Tokens are CSS variables in `frontend/css/motion.css`, imported from `css/globals.css`. Don't restate values elsewhere.
 - Builds need `NODE_ENV=production` (this shell exports `development`, which breaks `next build` on `/_global-error`). Test view transitions in real Chrome (the in-app browser pane never completes a transition) against `NODE_ENV=production npx next start -p 3107`.
 - Verification (repo rule): `npm run sanity:typegen`, `npm run type-check`, `npm run lint` in `frontend` before claiming done. Stop any dev/prod server you started.
@@ -93,7 +93,7 @@ Why first: the pre-implementation spike showed React applying no names to a matc
 
 **Interfaces:**
 - Consumes: class `cascade-word` and its `--i` variable from Task 2.
-- Produces: classes `.cascade-word`, `.load-in` (plain fade; optional `--load-in-step` variable, default 0, adds `step × 120ms` to its delay), and the transition classes `.page-out`, `.page-in` used by Task 4; tokens `--motion-duration: 800ms`, `--motion-ease: cubic-bezier(.33,1,.68,1)`, `--cascade-step: 45ms`, `--cascade-rise: .4em`, `--cascade-blur: 6px`.
+- Produces: classes `.cascade-word`, `.load-in` (plain fade; optional `--load-in-step` variable, default 0, adds `step × 120ms` to its delay), and the transition classes `.page-out`, `.page-in` used by Task 4; tokens `--motion-duration: 600ms`, `--motion-ease: cubic-bezier(.33,1,.68,1)`, `--cascade-step: 45ms`, `--cascade-rise: .4em`, `--cascade-blur: 6px`.
 
 - [ ] **Step 1: Write `scripts/verifyMotionCss.mts`.** Reads `css/motion.css` as text and asserts: every `animation` / `animation-name` declaration and every `::view-transition-*` animation rule sits inside an `@media (prefers-reduced-motion: no-preference)` block, and the file contains a `@media print` rule or the no-preference block is `screen`-qualified, so reduced-motion and print users never get a hidden start state (Review Focus 5). Also asserts the tokens above exist with the spec's values.
 - [ ] **Step 2: Run, expect FAIL** (file missing).
