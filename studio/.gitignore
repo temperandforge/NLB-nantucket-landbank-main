@@ -27,3 +27,6 @@
 
 # Dotenv and similar local-only files
 *.local
+
+# Build output of Sanity Functions (written by the CLI when testing or deploying)
+/functions/*/.build

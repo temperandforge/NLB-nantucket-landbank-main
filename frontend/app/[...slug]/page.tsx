@@ -1,11 +1,11 @@
 import type {Metadata} from 'next'
 import {draftMode} from 'next/headers'
-import {notFound} from 'next/navigation'
+import {notFound, permanentRedirect} from 'next/navigation'
 
 import PageView from '@/components/PageView'
 import {sanityFetch} from '@/sanity/lib/live'
 import {currentHour} from '@/sanity/lib/dates'
-import {getPageQuery, pagesSlugs} from '@/sanity/lib/queries'
+import {getPageQuery, landingPageQuery, pagesSlugs} from '@/sanity/lib/queries'
 
 /**
  * This is a catch-all segment rather than a single [slug] because a page URL spans as many
@@ -84,8 +84,9 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
   const {slug} = await props.params
   // Hidden blocks are shown (with a badge) only while an editor is previewing in Presentation.
   const {isEnabled: includeHidden} = await draftMode()
-  const [{data: page}] = await Promise.all([
+  const [{data: page}, {data: landingPage}] = await Promise.all([
     sanityFetch({query: getPageQuery, params: toQueryParams(slug, includeHidden)}),
+    sanityFetch({query: landingPageQuery, params: {includeHidden, now: currentHour()}}),
   ])
 
   // No page at this path - including a pathOnly grouping segment like /about-us, which the query
@@ -93,6 +94,14 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
   // was returning 200 for every unmatched URL.
   if (!page?._id) {
     notFound()
+  }
+
+  // The landing page is served at "/", so its own path is a duplicate URL. Not in draft mode:
+  // Presentation opens the page at its own path and must keep rendering it. (This is a 308, the
+  // permanent redirect Next.js emits; the query string is not carried, since reading searchParams
+  // here would make the route dynamic.)
+  if (!includeHidden && landingPage?._id === page._id) {
+    permanentRedirect('/')
   }
 
   return <PageView page={page} />

@@ -14,6 +14,7 @@ import {
   MenuIcon,
   PinIcon,
   ProjectsIcon,
+  ResetIcon,
   TagIcon,
   UsersIcon,
 } from '@sanity/icons'
@@ -41,6 +42,7 @@ const DISABLED_TYPES = [
   'singleNewsPage',
   'singleProjectPage',
   'page',
+  'redirect',
   'assist.instruction.context',
   // Handled explicitly under Globals below.
   'footer',
@@ -83,6 +85,7 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
         .title('Pages')
         .icon(DocumentsIcon)
         .child(S.documentTypeList('page').title('Pages')),
+      S.documentTypeListItem('redirect').title('Redirects').icon(ResetIcon),
       S.divider(),
       S.documentTypeListItem('event').title('Events').icon(CalendarIcon),
       S.listItem()
