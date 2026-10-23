@@ -1,6 +1,8 @@
 /**
  * Rules for a redirect's `source`, shared by the schema's validation and (later) the frontend
  * matcher and the auto-redirect function, so they cannot drift. Pure: no Sanity imports.
+ *
+ * The frontend matcher mirrors this normalisation (`frontend/sanity/lib/redirectMatch.ts`); change both together.
  */
 
 /** Paths the site owns outright; a redirect from one of these could never fire or would break it. */
