@@ -142,7 +142,7 @@ export const redirect = defineType({
       name: 'passQuery',
       title: 'Keep the query string',
       type: 'boolean',
-      initialValue: false,
+      initialValue: true,
       description: 'Append the visitor’s query string (?utm_source=...) to the destination.',
       hidden: ({document}) => document?.statusCode === 410,
     }),
