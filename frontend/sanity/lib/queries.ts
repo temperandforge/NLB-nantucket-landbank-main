@@ -630,11 +630,13 @@ export const landingPageQuery = defineQuery(`
 /**
  * Sitemap entries.
  *
- * pathOnly pages are excluded because they 404.
+ * pathOnly pages are excluded because they 404. The landing page is excluded because its own path
+ * redirects to `/`, which app/sitemap.ts lists separately.
  */
 export const sitemapData = defineQuery(`
   *[
     _type == "page" && defined(slug.current) && !coalesce(pathOnly, false)
+    && _id != *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref
   ] {
     _type,
     _updatedAt,
@@ -967,7 +969,8 @@ export const searchQuery = defineQuery(`
  * null when there is nothing to redirect to: a 410, or a page destination that is unpublished
  * (the published perspective dereferences it to null) or pathOnly (no route of its own). The
  * matcher skips a null destination on a non-410 rule, so the old path 404s instead of redirecting
- * to a dead page. The defaults mirror the Studio's initial values.
+ * to a dead page. A destination that is the landing page resolves to `/`, since its own path only
+ * redirects to `/` again. The defaults mirror the Studio's initial values.
  */
 export const redirectsQuery = defineQuery(`
   *[_type == "redirect" && defined(source) && coalesce(enabled, true)]{
@@ -977,6 +980,8 @@ export const redirectsQuery = defineQuery(`
     "destination": select(
       coalesce(statusCode, 301) == 410 => null,
       destination.linkType == "page" => select(
+        defined(destination.page->_id) && !coalesce(destination.page->pathOnly, false)
+          && destination.page._ref == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref => "/",
         defined(destination.page->slug.current) && !coalesce(destination.page->pathOnly, false) =>
           "/" + destination.page->{"path": ${pagePath}}.path,
         null
