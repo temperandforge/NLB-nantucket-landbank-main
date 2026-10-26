@@ -18,6 +18,9 @@
   },
   "dependencies": {
     "@sanity/assist": "^6.0.7",
+    "@sanity/blueprints": "^0.20.2",
+    "@sanity/client": "^7.27.0",
+    "@sanity/functions": "^1.10.1",
     "@sanity/icons": "^3.7.4",
     "@sanity/orderable-document-list": "^2.0.28",
     "@sanity/vision": "^5.31.1",

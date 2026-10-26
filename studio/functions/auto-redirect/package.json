@@ -1,0 +1,10 @@
+{
+  "name": "auto-redirect",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@sanity/client": "^7.27.0",
+    "@sanity/functions": "^1.10.1"
+  }
+}

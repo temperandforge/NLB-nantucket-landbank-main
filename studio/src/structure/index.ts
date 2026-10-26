@@ -14,6 +14,7 @@ import {
   MenuIcon,
   PinIcon,
   ProjectsIcon,
+  ResetIcon,
   TagIcon,
   UsersIcon,
 } from '@sanity/icons'
@@ -29,9 +30,9 @@ import pluralize from 'pluralize-esm'
  * Pages are the page-builder 'page' type - the client freely composes and reorders sections,
  * e.g. Home, About Us. Site Settings sits outside it - global config with no page of its own.
  *
- * Globals holds content that appears on every page rather than on a page of its own: the
- * Footer singleton and the reusable Menus it references. The Header and Site Banner singletons
- * sit beside it.
+ * Globals holds content that appears on every page rather than on a page of its own: the Site
+ * Banner, Header and Footer singletons and the reusable Menus they reference. Page-template
+ * settings (what every article or project page shares) live in their own section, not here.
  */
 
 // Types removed from the automatic top-level list, either because they are handled
@@ -41,6 +42,7 @@ const DISABLED_TYPES = [
   'singleNewsPage',
   'singleProjectPage',
   'page',
+  'redirect',
   'assist.instruction.context',
   // Handled explicitly under Globals below.
   'footer',
@@ -83,6 +85,7 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
         .title('Pages')
         .icon(DocumentsIcon)
         .child(S.documentTypeList('page').title('Pages')),
+      S.documentTypeListItem('redirect').title('Redirects').icon(ResetIcon),
       S.divider(),
       S.documentTypeListItem('event').title('Events').icon(CalendarIcon),
       S.listItem()
@@ -148,6 +151,12 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
                 S,
                 context,
               }),
+              S.divider(),
+              // The content every news article page shares (wording and the "more news" section).
+              S.listItem()
+                .title('Article Page Settings')
+                .icon(CogIcon)
+                .child(S.document().schemaType('singleNewsPage').documentId('singleNewsPage')),
             ]),
         ),
       S.listItem()
@@ -199,6 +208,14 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
                 S,
                 context,
               }),
+              S.divider(),
+              // The content every project page shares (wording, FAQ heading, "more projects").
+              S.listItem()
+                .title('Project Page Settings')
+                .icon(CogIcon)
+                .child(
+                  S.document().schemaType('singleProjectPage').documentId('singleProjectPage'),
+                ),
             ]),
         ),
       // Properties: the Land Bank's properties, their categorisation, and the settings that
@@ -251,13 +268,13 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
             .title('Globals')
             .items([
               S.listItem()
-                .title('Header')
-                .icon(FolderIcon)
-                .child(S.document().schemaType('header').documentId('header')),
-              S.listItem()
                 .title('Site Banner')
                 .icon(BellIcon)
                 .child(S.document().schemaType('siteBanner').documentId('siteBanner')),
+              S.listItem()
+                .title('Header')
+                .icon(FolderIcon)
+                .child(S.document().schemaType('header').documentId('header')),
               S.listItem()
                 .title('Footer')
                 .icon(FolderIcon)
@@ -266,18 +283,6 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
                 .title('Menus')
                 .icon(MenuIcon)
                 .child(S.documentTypeList('menu').title('Menus')),
-              // The content every news article page shares (wording and the "more news" section).
-              S.listItem()
-                .title('Single News Page')
-                .icon(DocumentTextIcon)
-                .child(S.document().schemaType('singleNewsPage').documentId('singleNewsPage')),
-              // The content every project page shares (wording, FAQ heading, "more projects").
-              S.listItem()
-                .title('Single Project Page')
-                .icon(ProjectsIcon)
-                .child(
-                  S.document().schemaType('singleProjectPage').documentId('singleProjectPage'),
-                ),
             ]),
         ),
       // Site Settings: global config with no page/route of its own.

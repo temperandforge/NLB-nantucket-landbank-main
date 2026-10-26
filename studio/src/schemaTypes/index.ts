@@ -1,5 +1,6 @@
 import {menu} from './documents/menu'
 import {page} from './documents/page'
+import {redirect} from './documents/redirect'
 import {project} from './documents/project'
 import {projectType} from './documents/projectType'
 import {property} from './documents/property'
@@ -81,6 +82,7 @@ export const schemaTypes = [
   singleProjectPage,
   // Documents
   page,
+  redirect,
   menu,
   property,
   project,

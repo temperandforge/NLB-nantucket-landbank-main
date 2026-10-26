@@ -73,6 +73,8 @@ Design docs live in [docs/superpowers/specs/](docs/superpowers/specs/).
   returns a page href; it will be wrong for every nested page.
 - **Slugs are unique per-sibling**, not globally. Two parents may each have a `history` child.
 - **Unmatched paths call `notFound()`.** Never return 200 with a placeholder screen.
+- **Renaming or moving a page creates redirects automatically**, through a Sanity Function that is
+  deployed separately (`cd studio && npx sanity blueprints deploy`). See DECISIONS 2.8.
 
 ## Routing
 
