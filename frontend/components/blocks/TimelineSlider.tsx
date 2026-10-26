@@ -320,7 +320,10 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
   }, [events]);
 
   return (
-    <div ref={rootRef} className={`history-slider flex w-full flex-col items-end gap-16 bg-background py-24 ${className ?? ""}`}>
+    // `data-part`: the slider is ONE unit for the page-enter animation (see motion.css). Splide shows
+    // and hides slides as you move, and a CSS animation restarts whenever its element goes from
+    // hidden to shown, so animating the slides themselves replayed the fade-and-rise on every change.
+    <div ref={rootRef} data-part="" className={`history-slider flex w-full flex-col items-end gap-16 bg-background py-24 ${className ?? ""}`}>
       {/* Full-bleed wave: unpadded, direct child of root so it spans the true viewport edges. */}
       <div ref={waveRef} className="relative h-[135px] w-full overflow-hidden">
         <svg viewBox={WAVE_VIEWBOX} preserveAspectRatio="none" className="block h-full w-full overflow-visible">

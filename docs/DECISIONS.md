@@ -582,7 +582,10 @@ want it.
   Detail pages tag their sections with `<Enter>`. Inside a tagged block the outermost heading,
   paragraph, image, list item, `.button` or `[data-part]` animates; a card that is not a list item
   needs `data-part`; a morph target's hero wrapper needs `data-morph`. Images on the load layer do
-  not animate (they are usually the LCP element); below the fold they fade. The shared parts selector is
+  not animate (they are usually the LCP element); below the fold they fade. A widget that shows and
+  hides its own children (a slider) must be marked `data-part` on its root so it animates as one
+  unit: a CSS animation restarts whenever its element goes from hidden to shown, so animating the
+  slides replayed the fade on every change (the history timeline did). The shared parts selector is
   pinned by `verifyMotionCss.mts`, and `enterAttrs` by `verifyEnter.mts`. Studio Presentation turns
   it off via `data-draft` on `<html>`, set by `DraftModeToast`.
 - **`<PageTransition>` belongs in each `page.tsx`, never a layout.** `<ViewTransition>` enter and
