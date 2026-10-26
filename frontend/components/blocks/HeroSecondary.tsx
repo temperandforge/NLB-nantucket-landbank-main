@@ -44,6 +44,7 @@ export default function HeroSecondary({block, pageName}: BlockProps<'heroSeconda
               width={960}
               sizes="(min-width: 768px) 50vw, 100vw"
               fill
+              priority
               className="w-full h-full object-cover"
             />
           </div>

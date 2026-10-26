@@ -15,6 +15,7 @@ export default function HeroImage({block, pageName}: BlockProps<'heroImage'>) {
         width={1920}
         sizes="100vw"
         fill
+        priority
         className="pointer-events-none absolute inset-0 size-full object-cover"
       />
       <div className="relative z-10 tf-max-w">

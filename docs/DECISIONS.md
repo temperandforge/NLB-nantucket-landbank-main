@@ -651,6 +651,22 @@ is unchanged.
   interaction both got a token and sent the request; a blocked script showed the error, sent
   nothing, and a retry worked. Not tested: a real submission end to end against Sanity.
 
+### 4.14 A page's leading hero image is eager and high priority
+
+**Status:** Implemented on branch `worktree-load-animations`, pending merge.
+
+Images lazy-load by default (`sanity-image`), but a hero image is almost always the Largest
+Contentful Paint, and Lighthouse flags a lazy, low-priority LCP image under "LCP request discovery".
+`BlockImage` takes a `priority` prop (`loading="eager"`, `fetchpriority="high"`); `Hero`,
+`HeroImage` and `HeroSecondary` pass it for their hero image, and `HeroVideo` does the same for its
+poster. Use it for the one image a page leads with, not for images further down.
+
+- Measured on `/about-us/history` (local production build, 2 baseline runs and 1 after): the three
+  LCP discovery checks went from failing to passing, and the delay before the image request starts
+  went from 33-36 ms to 5 ms. The Lighthouse score did not change (79 and 82 before, 82 after:
+  run-to-run spread is about 3 points), because it treats these insights as unscored and its phone
+  simulation already assumes an ideal fetch. The benefit is in real browsers on slower devices.
+
 ---
 
 ## 5. Sanity conventions

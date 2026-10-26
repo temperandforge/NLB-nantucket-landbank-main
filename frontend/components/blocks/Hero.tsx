@@ -14,6 +14,7 @@ export default function Hero({block}: BlockProps<'hero'>) {
           image={block.image}
           width={1360}
           sizes="(min-width: 1360px) 1360px, 100vw"
+          priority
           className="w-full rounded mt-10"
         />
       </div>
