@@ -611,6 +611,24 @@ want it.
   transitions ([#88](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/88)),
   header snap-back ([#89](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/89)).
 
+### 4.12 The map loads `mapbox-gl` lazily, near the viewport
+
+**Status:** Implemented on branch `worktree-load-animations`, pending merge.
+
+`mapbox-gl` is about 500 KB of JavaScript over the wire (1.8 MB parsed), and the home page loaded it
+without rendering a map. Every use goes through `LazyMapboxMap`, which holds the map's space
+(`h-full w-full`, as the map's own root does, so nothing shifts), watches it with an
+`IntersectionObserver` (600px margin) and only then fetches `MapboxMap` through `next/dynamic`
+(`ssr: false`). Never import `MapboxMap` directly from a page or a block: that puts the chunk back
+on every page that renders it, or that merely links to one that does. Without
+`IntersectionObserver` the map loads at once.
+
+- Measured on a production build: the home page's initial JavaScript went from about 973 KB to
+  465 KB (biggest script 508 KB to 184 KB). A map near the fold (the property page on desktop, the
+  map explorer) still loads immediately; a map far down loads as you approach it.
+- When testing, bust the browser cache (`?fresh=`): static pages and their chunks are cached, and a
+  stale tab will happily show the previous build's numbers.
+
 ---
 
 ## 5. Sanity conventions
