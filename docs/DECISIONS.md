@@ -629,6 +629,28 @@ on every page that renders it, or that merely links to one that does. Without
 - When testing, bust the browser cache (`?fresh=`): static pages and their chunks are cached, and a
   stale tab will happily show the previous build's numbers.
 
+### 4.13 reCAPTCHA loads on demand, not on every page
+
+**Status:** Implemented on branch `worktree-load-animations`, pending merge.
+
+The newsletter form sits in the footer of every page, so reCAPTCHA v3 (about 350 KB plus an iframe)
+was loaded on every page whether or not anyone used a form. `Recaptcha` now renders nothing but a
+marker, and loads Google's script the first time someone focuses, touches or types in the form it
+sits in (the header search form is not one, so it does not trigger it). `getRecaptchaToken` loads the
+script itself if it is not there yet, so a submit with no earlier interaction (autofill, then Enter)
+still works; the early load only saves time. The server (`/api/forms/[formId]`, `verifyRecaptcha`)
+is unchanged.
+
+- A failed load (blocked by an extension or the network) rejects and clears itself: the form shows
+  its existing "could not verify that you are human" message, sends nothing, and the next submit
+  tries the load again.
+- Google's badge (bottom right) now appears after someone first uses a form, not on page load.
+- Verified in real Chrome on a production build, with the call to `/api/forms/*` intercepted so no
+  `formSubmission` was stored: nothing loads at page load; the search form does not trigger it;
+  focusing the newsletter form loads one script; a submit after focus and a submit with no
+  interaction both got a token and sent the request; a blocked script showed the error, sent
+  nothing, and a retry worked. Not tested: a real submission end to end against Sanity.
+
 ---
 
 ## 5. Sanity conventions
