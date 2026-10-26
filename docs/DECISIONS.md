@@ -560,7 +560,10 @@ and makes a results address shareable. One query keeps ranking in one place.
 The first screen cascades in word by word, and navigation is a short animated handoff, with archive
 card images morphing into their detail hero. No animation library and no client JS: server-rendered
 `<Cascade>` plus CSS, and React `<ViewTransition>`. Design:
-[load-in animations spec](superpowers/specs/2026-10-23-load-in-animations-design.md).
+[load-in animations spec](superpowers/specs/2026-10-23-load-in-animations-design.md). How to work
+on it (tokens, rules for new components, the guard scripts, how to test): [motion.md](motion.md).
+What it and the other speed work measured, what was tried and rejected, and what is still open:
+[performance.md](performance.md).
 
 **Why:** An earlier attempt (PR #56) used auto-detection and scroll reveal and had the wrong feel.
 Explicit opt-in per headline keeps the motion predictable and keeps it off every page that doesn't
