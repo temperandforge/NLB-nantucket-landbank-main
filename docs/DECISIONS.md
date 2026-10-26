@@ -1009,7 +1009,7 @@ page is the Staff page's header and a three-column grid of the existing commissi
 
 **Status:** Implemented
 
-`singleNewsPage` (Studio: Globals > Single News Page, fixed id) holds what all news article pages
+`singleNewsPage` (Studio: News > Article Page Settings, fixed id) holds what all news article pages
 share, as opposed to one article's own content: the label above the title, the "Published:" and
 "Share" labels, and the "more news" section (the News Preview block's own fields, including its
 "Hide this block" setting). Other single templates (events, projects) get their own settings

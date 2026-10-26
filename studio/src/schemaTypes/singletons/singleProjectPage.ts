@@ -4,13 +4,13 @@ import {defineField, defineType} from 'sanity'
 /**
  * Single Project Page (singleton, fixed id `singleProjectPage`): what every project page shares,
  * as opposed to one project's own content: the eyebrow and where it links, and the "more
- * projects" section under the page. Mirrors Single News Page.
+ * projects" section under the page. Mirrors Article Page Settings.
  *
  * Every field is optional: the page falls back to the wording in the design.
  */
 export const singleProjectPage = defineType({
   name: 'singleProjectPage',
-  title: 'Single Project Page',
+  title: 'Project Page Settings',
   type: 'document',
   icon: CogIcon,
   fields: [
@@ -64,5 +64,5 @@ export const singleProjectPage = defineType({
       initialValue: {disabled: false, eyebrow: 'Projects', count: 3},
     }),
   ],
-  preview: {prepare: () => ({title: 'Single Project Page'})},
+  preview: {prepare: () => ({title: 'Project Page Settings'})},
 })

@@ -11,7 +11,7 @@ import {defineField, defineType} from 'sanity'
  */
 export const singleNewsPage = defineType({
   name: 'singleNewsPage',
-  title: 'Single News Page',
+  title: 'Article Page Settings',
   type: 'document',
   icon: CogIcon,
   fields: [
@@ -48,5 +48,5 @@ export const singleNewsPage = defineType({
       },
     }),
   ],
-  preview: {prepare: () => ({title: 'Single News Page'})},
+  preview: {prepare: () => ({title: 'Article Page Settings'})},
 })
