@@ -1,5 +1,6 @@
 import type {Metadata} from 'next'
 
+import PageTransition from '@/components/PageTransition'
 import SearchField from '@/components/search/SearchField'
 import SearchResults from '@/components/search/SearchResults'
 import {sanityFetch} from '@/sanity/lib/live'
@@ -57,36 +58,38 @@ export default async function SearchPage(props: SearchPageProps) {
   const empty = searched && !failed && results.length === 0
 
   return (
-    <section className="flex flex-col gap-12 bg-background py-s6 md:gap-16">
-      <div className="tf-px">
-        <div className="tf-max-w flex flex-col gap-12 md:gap-16">
-          <div className="flex flex-col gap-10 md:gap-12">
-            <h1 className="max-w-[24ch] break-words text-headline-xl leading-[1.1] tracking-tight text-on-background">
-              {searched ? <>Results for &ldquo;{query}&rdquo;</> : 'Search'}
-            </h1>
-            {/* Keyed on the query so a new search resets the field to it, error state included. */}
-            <SearchField
-              key={query}
-              defaultValue={query}
-              error={failed ? 'Search is unavailable right now. Please try again.' : empty ? 'No search results' : undefined}
-              className="max-w-3xl"
-            />
-          </div>
+    <PageTransition>
+      <section className="flex flex-col gap-12 bg-background py-s6 md:gap-16">
+        <div className="tf-px">
+          <div className="tf-max-w flex flex-col gap-12 md:gap-16">
+            <div className="flex flex-col gap-10 md:gap-12">
+              <h1 className="max-w-[24ch] break-words text-headline-xl leading-[1.1] tracking-tight text-on-background">
+                {searched ? <>Results for &ldquo;{query}&rdquo;</> : 'Search'}
+              </h1>
+              {/* Keyed on the query so a new search resets the field to it, error state included. */}
+              <SearchField
+                key={query}
+                defaultValue={query}
+                error={failed ? 'Search is unavailable right now. Please try again.' : empty ? 'No search results' : undefined}
+                className="max-w-3xl"
+              />
+            </div>
 
-          {!searched && (
-            <p className="max-w-[60ch] font-secondary text-body-large leading-[1.6] text-on-background-subtle">
-              Search pages, news, projects, events, properties and public records.
-            </p>
-          )}
-          {empty && (
-            <p className="max-w-[60ch] font-secondary text-body-large leading-[1.6] text-on-background-subtle">
-              Nothing matched every word. Check the spelling, or try fewer or more general words.
-            </p>
-          )}
+            {!searched && (
+              <p className="max-w-[60ch] font-secondary text-body-large leading-[1.6] text-on-background-subtle">
+                Search pages, news, projects, events, properties and public records.
+              </p>
+            )}
+            {empty && (
+              <p className="max-w-[60ch] font-secondary text-body-large leading-[1.6] text-on-background-subtle">
+                Nothing matched every word. Check the spelling, or try fewer or more general words.
+              </p>
+            )}
+          </div>
         </div>
-      </div>
-      {/* Outside the padded block: the filter tabs carry their own page padding, as in the archives. */}
-      {results.length > 0 && <SearchResults results={results} capped={capped} />}
-    </section>
+        {/* Outside the padded block: the filter tabs carry their own page padding, as in the archives. */}
+        {results.length > 0 && <SearchResults results={results} capped={capped} />}
+      </section>
+    </PageTransition>
   )
 }

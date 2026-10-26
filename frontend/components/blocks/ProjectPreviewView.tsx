@@ -1,5 +1,6 @@
 import type {ComponentProps} from 'react'
 
+import AnchorLink from '@/components/ui/AnchorLink'
 import ButtonLink from '@/components/ui/ButtonLink'
 import {projectHref} from '@/sanity/lib/utils'
 
@@ -94,9 +95,9 @@ export default function ProjectPreviewView({
                   }`}
                 >
                   {href ? (
-                    <a href={href} className={cardClass}>
+                    <AnchorLink href={href} className={cardClass}>
                       {card}
-                    </a>
+                    </AnchorLink>
                   ) : (
                     <div className={cardClass}>{card}</div>
                   )}

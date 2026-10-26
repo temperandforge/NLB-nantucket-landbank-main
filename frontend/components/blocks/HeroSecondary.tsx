@@ -1,5 +1,6 @@
 import {stegaClean} from 'next-sanity'
 
+import Cascade from '@/components/Cascade'
 import BlockImage from './BlockImage'
 import Eyebrow from './Eyebrow'
 import {BlockProps} from './types'
@@ -32,15 +33,18 @@ export default function HeroSecondary({block, pageName}: BlockProps<'heroSeconda
                 aria-hidden="true"
               />
               {eyebrow && (
-                <Eyebrow className={`relative z-10 mb-3 ${TEXT[variant].eyebrow}`}>{eyebrow}</Eyebrow>
+                <Eyebrow className={`relative z-10 mb-3 load-in ${TEXT[variant].eyebrow}`}>{eyebrow}</Eyebrow>
               )}
-              {block.body && <p className={`relative z-10 ${TEXT[variant].body}`}>{block.body}</p>}
+              {block.body && (
+                <Cascade as="p" variant="body" className={`relative z-10 ${TEXT[variant].body}`} text={block.body} />
+              )}
             </div>
             <BlockImage
               image={block.image}
               width={960}
               sizes="(min-width: 768px) 50vw, 100vw"
               fill
+              priority
               className="w-full h-full object-cover"
             />
           </div>

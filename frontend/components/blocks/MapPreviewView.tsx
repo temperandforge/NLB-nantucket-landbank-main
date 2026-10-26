@@ -1,4 +1,4 @@
-import {MapboxMap} from '@/components/map/MapboxMap'
+import {LazyMapboxMap} from '@/components/map/LazyMapboxMap'
 import type {MapSettings, Property} from '@/components/map/types'
 
 /**
@@ -36,7 +36,7 @@ export default function MapPreviewView({
           )}
         </div>
         <div className="relative h-[420px] w-full overflow-clip rounded-[4px] md:h-[738px]">
-          <MapboxMap
+          <LazyMapboxMap
             projects={properties}
             settings={settings}
             scrollZoom={false}

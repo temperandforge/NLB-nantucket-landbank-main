@@ -1,4 +1,5 @@
 import {ArrowLeftIcon, ArrowRightIcon} from '@/components/icons'
+import AnchorLink from '@/components/ui/AnchorLink'
 
 type LinkButtonProps = {
   label: string
@@ -16,10 +17,10 @@ export default function LinkButton({
   className,
 }: LinkButtonProps) {
   return (
-    <a href={href} className={`link-button ${className ?? ''}`}>
+    <AnchorLink href={href} className={`link-button ${className ?? ''}`}>
       {iconLeft && <ArrowLeftIcon className="link-button-icon" />}
       <span>{label}</span>
       {iconRight && <ArrowRightIcon className="link-button-icon" />}
-    </a>
+    </AnchorLink>
   )
 }

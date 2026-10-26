@@ -23,12 +23,15 @@ function Tile({
   className: string
   children: React.ReactNode
 }) {
+  // `data-part`: a tile is one unit for the page-enter animation (see motion.css), not its pieces.
   return href ? (
-    <Link href={href} className={className}>
+    <Link href={href} className={className} data-part="">
       {children}
     </Link>
   ) : (
-    <div className={className}>{children}</div>
+    <div className={className} data-part="">
+      {children}
+    </div>
   )
 }
 

@@ -3,7 +3,7 @@
 import {useMemo} from 'react'
 import {usePathname, useRouter, useSearchParams} from 'next/navigation'
 
-import {MapboxMap} from './MapboxMap'
+import {LazyMapboxMap} from './LazyMapboxMap'
 import {MultiSelectDropdown} from './MultiSelectDropdown'
 import {
   projectSlugs,
@@ -175,7 +175,7 @@ export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
       </div>
       {/* close .container--inner */}
       <div className="relative flex-1">
-        <MapboxMap projects={filteredProjects} settings={settings} />
+        <LazyMapboxMap projects={filteredProjects} settings={settings} />
       </div>
     </div>
   )
