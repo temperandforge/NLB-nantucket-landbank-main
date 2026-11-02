@@ -116,7 +116,7 @@ export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
               <button
                 type="button"
                 onClick={clearAll}
-                className="cursor-pointer text-sm font-medium text-error hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500 sm:ml-auto"
+                className="cursor-pointer text-sm font-medium text-error hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500 sm:ml-2"
               >
                 Clear all
               </button>

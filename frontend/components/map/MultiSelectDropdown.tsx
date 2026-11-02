@@ -70,11 +70,15 @@ export function MultiSelectDropdown({
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen(!open)}
-        className={`flex w-full cursor-pointer items-center justify-between rounded border bg-input px-5 py-4 font-mono text-body-base text-on-input focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500 ${
+        className={`flex w-full cursor-pointer items-center justify-between gap-2 rounded border bg-input px-5 py-4 font-mono text-body-base text-on-input focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500 ${
           open || selected.length > 0 ? "border-border-light" : "border-transparent"
         }`}
       >
-        <span>{selected.length > 0 ? `${label} (${selected.length})` : label}</span>
+        {/* One line: the label gives way with an ellipsis, the count and the chevron never do. */}
+        <span className="flex min-w-0 whitespace-nowrap">
+          <span className="truncate">{label}</span>
+          {selected.length > 0 && <span className="shrink-0">&nbsp;({selected.length})</span>}
+        </span>
         <Chevron className="size-6 shrink-0" />
       </button>
       {open && (
