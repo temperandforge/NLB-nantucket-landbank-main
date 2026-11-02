@@ -44,7 +44,7 @@ export default function PeopleGrid({block}: BlockProps<'peopleGrid'>) {
             </div>
           ))}
         {commissioners.length > 0 && (
-          <ul className="tf-px grid tf-max-w w-full list-none grid-cols-1 gap-x-3 gap-y-3 p-0 sm:grid-cols-2 sm:gap-y-16 lg:grid-cols-3">
+          <ul className="tf-px grid tf-max-w w-full list-none grid-cols-1 gap-x-3 gap-y-12 p-0 sm:grid-cols-2 sm:gap-y-16 lg:grid-cols-3">
             {commissioners.map((person) => (
               <RevealItem key={person._id}>
                 <CardCommissioner person={person} />
