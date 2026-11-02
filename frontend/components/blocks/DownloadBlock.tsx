@@ -3,8 +3,8 @@ import {BlockProps} from './types'
 export default function DownloadBlock({block}: BlockProps<'downloadBlock'>) {
   const downloads = block.downloads?.filter((item) => item.fileUrl) ?? []
   return (
-    <section className="w-full tf-px">
-      <div className="tf-max-w py-8">
+    <section className="w-full">
+      <div className="tf-max-w tf-px py-8">
         {downloads.length > 0 && (
           <ul className="list-none m-0 p-0">
             {downloads.map((item) => (
