@@ -35,7 +35,13 @@ export default function JumpNavLayout({
           {(eyebrow || heading) && (
             <div className="flex w-full max-w-[560px] shrink-0 flex-col gap-6">
               {eyebrow}
-              {heading && <Cascade as={headingLevel} className="w-full text-headline-xl text-on-background" text={heading} />}
+              {heading && (
+                <Cascade
+                  as={headingLevel}
+                  className="w-full text-headline-xl text-on-background"
+                  text={heading}
+                />
+              )}
             </div>
           )}
           {items.length > 0 && (
@@ -46,11 +52,13 @@ export default function JumpNavLayout({
               {items.map((item) => (
                 <a
                   key={item.id}
-                  className="flex items-center justify-between gap-4 border-t border-border-light py-3 font-mono text-body-base leading-[1.6] text-on-background no-underline"
+                  // Figma (anchor links): the arrow is faint at rest; on hover or focus the row indents
+                  // 12px and takes the darker surface, and the label and arrow darken.
+                  className="group flex items-center justify-between gap-4 border-t border-border-light bg-background py-3 font-mono text-body-base leading-[1.6] text-on-background no-underline transition-[padding,background-color,color] hover:bg-surface-dark hover:px-3 hover:text-on-surface-dark focus-visible:bg-surface-dark focus-visible:px-3 focus-visible:text-on-surface-dark focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-moody-moor-500"
                   href={`#${item.id}`}
                 >
                   <span>{item.text}</span>
-                  <ArrowRightIcon className="size-6 shrink-0" />
+                  <ArrowRightIcon className="size-6 shrink-0 text-moody-moor-900 transition-colors group-hover:text-on-surface-dark group-focus-visible:text-on-surface-dark" />
                 </a>
               ))}
             </nav>
