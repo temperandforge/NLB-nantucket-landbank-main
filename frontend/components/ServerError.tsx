@@ -28,7 +28,8 @@ export default function ServerError({
       eyebrow="500"
       body="That one is on us. The page ran into a problem while loading. Try again, and if it keeps happening, come back a little later."
     >
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-col items-start gap-4">
+        <ButtonLink variant="ghost" label="Back to home" href="/" leftIcon />
         <button
           type="button"
           onClick={retry}
@@ -36,7 +37,6 @@ export default function ServerError({
         >
           Try again
         </button>
-        <ButtonLink variant="ghost" label="Back to home" href="/" leftIcon />
       </div>
       {error.digest && (
         <p className="font-mono text-body-small tracking-wide text-on-background-subtle">
