@@ -19,7 +19,7 @@ export default function HeroImage({block, pageName}: BlockProps<'heroImage'>) {
         className="pointer-events-none absolute inset-0 size-full object-cover"
       />
       <div className="relative z-10 tf-max-w">
-        <div className="relative flex h-[380px] w-full flex-col items-start justify-between overflow-clip rounded bg-background p-5 sm:w-[680px] sm:p-10">
+        <div className="relative flex h-[380px] w-full flex-col items-start justify-between overflow-clip rounded bg-background p-5 sm:max-w-[680px] sm:p-10">
           <Image
             src="/images/blocks/decorative-line-hero.svg"
             alt=""
