@@ -63,7 +63,8 @@ export default function NavDropdown({
     >
       <div className={grouped ? 'grid grid-cols-3 gap-x-gap-lg tf-max-w' : ''}>
         {columns.map((column, index) => (
-          <div key={`${column.heading ?? 'none'}-${index}`} className="flex flex-col">
+          // gap-md between the column label and its list, as in Figma.
+          <div key={`${column.heading ?? 'none'}-${index}`} className="flex flex-col gap-gap-md">
             {column.heading && <h3 className={LABEL_CLASS}>{column.heading}</h3>}
             <ul className={`flex flex-col ${column.heading ? 'border-l border-border-light pl-gap-md' : ''}`}>
               {column.links.map((item) => (
