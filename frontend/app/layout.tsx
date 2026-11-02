@@ -127,10 +127,6 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
         </main>
         <Footer />
         <SpeedInsights />
-        {/* <Script
-          src="https://www.bugherd.com/sidebarv2.js?apikey=vuefxgttt1s6fiowcnigea"
-          strategy="lazyOnload"
-        /> */}
       </body>
     </html>
   )

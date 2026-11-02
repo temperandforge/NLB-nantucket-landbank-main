@@ -45,7 +45,7 @@ export default function ProjectPreviewView({
     <section className="w-full bg-background tf-px py-s5">
       {/* Below 1280px the numbered cards drop to their own row under the panel; below 768px they
           stack in one column. */}
-      <div className="flex w-full flex-col gap-6 tf-max-w xl:flex-row">
+      <div className="flex w-full flex-col gap-16 tf-max-w xl:flex-row xl:gap-6">
         {hasPanel && (
           // Figma's 644px is just what the row measures at 1440. The cards grow and shrink with the
           // width, so the panel takes the row's height (a flex row stretches its children) and always
