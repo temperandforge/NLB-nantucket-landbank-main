@@ -23,6 +23,10 @@ type TimelineSliderProps = {
 // of how the SVG is scaled on screen (getScreenCTM handles the conversion).
 const WAVE_PATH_D =
   "M0,70 C100,20 200,20 300,70 C400,120 500,120 600,60 C700,10 800,10 900,55 C1000,100 1100,100 1200,50";
+// Mobile shows the curve at its natural proportions, where the full-amplitude wave reads as a sine
+// wave, so it uses the same course with roughly half the swing.
+const WAVE_PATH_MOBILE_D =
+  "M0,70 C100,45 200,45 300,70 C400,95 500,95 600,65 C700,40 800,40 900,62 C1000,85 1100,85 1200,60";
 const WAVE_VIEWBOX = "0 0 1200 120";
 const WAVE_VIEWBOX_WIDTH = 1200;
 
@@ -134,6 +138,7 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
     let mobileTargetX = { min: 0, max: 0 };
 
     function updateBounds() {
+      path!.setAttribute("d", isMobileLayout.matches ? WAVE_PATH_MOBILE_D : WAVE_PATH_D);
       const totalLength = path!.getTotalLength();
       const wrapperRect = wave!.getBoundingClientRect();
       if (wrapperRect.width === 0 || wrapperRect.height === 0) return;
@@ -320,7 +325,7 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
   }, [events]);
 
   return (
-    <div ref={rootRef} className={`history-slider flex w-full flex-col items-end gap-16 bg-background py-24 ${className ?? ""}`}>
+    <div ref={rootRef} className={`history-slider flex w-full flex-col items-end gap-10 bg-background py-16 [--line-scale:0.5] md:gap-16 md:py-24 md:[--line-scale:1] ${className ?? ""}`}>
       {/* Full-bleed wave: unpadded, direct child of root so it spans the true viewport edges. */}
       <div ref={waveRef} className="relative h-[135px] w-full overflow-hidden">
         <svg viewBox={WAVE_VIEWBOX} preserveAspectRatio="none" className="block h-full w-full overflow-visible">
@@ -355,8 +360,8 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
               <li key={`${event.year}-${event.title}`} className="splide__slide">
                 <div className="flex w-full flex-col items-start gap-3">
                   <p className="w-full font-mono text-body-base leading-[1.6] text-on-background">{event.title}</p>
-                  <div className="flex w-full items-end gap-6" style={{ height: `${event.lineLength + 130}px` }}>
-                    <div className="h-full w-px shrink-0 bg-dusty-heath-700" style={{ height: `${event.lineLength}px` }} />
+                  <div className="flex w-full items-start gap-6" style={{ height: `calc(${event.lineLength}px * var(--line-scale) + 130px)` }}>
+                    <div className="h-full w-px shrink-0 bg-dusty-heath-700" style={{ height: `calc(${event.lineLength}px * var(--line-scale))` }} />
                     <div className="flex h-full flex-1 flex-col items-start justify-between">
                       <p className="w-full font-serif text-headline-2xl font-normal leading-[1.05] text-on-background">
                         {event.year}
