@@ -73,7 +73,9 @@ export default function NavDropdown({
                     className="group flex h-14 w-fit items-center gap-gap-sm border-b border-transparent font-secondary text-body-base text-on-primary hover:border-border-alt focus-visible:border-border-alt"
                   >
                     {item.label}
-                    <ArrowRightIcon className="hidden size-6 text-secondary group-hover:block group-focus-visible:block" />
+                    {/* Always laid out, only hidden until hover or focus: if it took space only then,
+                        hovering the longest item would widen the whole panel. shrink-0 keeps it 24px. */}
+                    <ArrowRightIcon className="invisible size-6 shrink-0 text-secondary group-hover:visible group-focus-visible:visible" />
                   </ResolvedLink>
                 </li>
               ))}
