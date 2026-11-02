@@ -68,7 +68,7 @@ export default function PropertyArchiveView({
         <ul className="grid w-full list-none grid-cols-1 gap-x-3 gap-y-12 p-0 sm:grid-cols-2 lg:grid-cols-3 lg:gap-y-16">
           {shown.map((property) => (
             <li key={property._id}>
-              <CardProperty property={property} defaultImage={defaultImage} />
+              <CardProperty property={property} defaultImage={defaultImage} morph />
             </li>
           ))}
         </ul>

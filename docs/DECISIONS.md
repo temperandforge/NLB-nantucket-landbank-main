@@ -553,6 +553,123 @@ and makes a results address shareable. One query keeps ranking in one place.
 - What is not searchable, and why, is tracked in
   [#50](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/50).
 
+### 4.11 Load-in motion: CSS tokens, opt-in `<Cascade>`, `<PageTransition>` per page
+
+**Status:** Implemented on branch `worktree-load-animations`, pending merge
+
+The first screen cascades in word by word, and navigation is a short animated handoff, with archive
+card images morphing into their detail hero. No animation library and no client JS: server-rendered
+`<Cascade>` plus CSS, and React `<ViewTransition>`. Design:
+[load-in animations spec](superpowers/specs/2026-10-23-load-in-animations-design.md). How to work
+on it (tokens, rules for new components, the guard scripts, how to test): [motion.md](motion.md).
+What it and the other speed work measured, what was tried and rejected, and what is still open:
+[performance.md](performance.md).
+
+**Why:** An earlier attempt (PR #56) used auto-detection and scroll reveal and had the wrong feel.
+Explicit opt-in per headline keeps the motion predictable and keeps it off every page that doesn't
+want it.
+
+**Implication:**
+- **Motion tokens live in `frontend/css/motion.css`** (duration, easing, cascade step,
+  page in/out durations). Every animation rule sits in one guarded block, so reduced-motion and print
+  users never get a hidden start state; `frontend/scripts/verifyMotionCss.mts` checks it. Tune the
+  feel there, not in components.
+- **`<Cascade>` is opt-in, one line per headline.** It renders text that carries Sanity stega
+  characters unsplit (splitting would break the visual-editing markers) and must never call
+  `draftMode()`, which would make every page dynamic. A hero description uses
+  `variant="body"` (a quicker, never-blurred sweep, capped at 48 words). Word splitting is in
+  `frontend/sanity/lib/cascade.ts`, checked by `frontend/scripts/verifyCascade.mts`.
+- **The rest of the page enters through `data-enter`, in CSS only.** `BlockRenderer` tags the
+  first two blocks `load` (on a timer) and the rest `scroll` (CSS scroll-driven animations, inside
+  `@supports (animation-timeline: view())`, so Firefox and Safari before 26 see them static).
+  Detail pages tag their sections with `<Enter>`. Inside a tagged block the outermost heading,
+  paragraph, image, list item, `.button` or `[data-part]` animates; a card that is not a list item
+  needs `data-part`; a morph target's hero wrapper needs `data-morph`. Images on the load layer do
+  not animate (they are usually the LCP element); below the fold they fade. A widget that shows and
+  hides its own children (a slider) must be marked `data-part` on its root so it animates as one
+  unit: a CSS animation restarts whenever its element goes from hidden to shown, so animating the
+  slides replayed the fade on every change (the history timeline did). The shared parts selector is
+  pinned by `verifyMotionCss.mts`, and `enterAttrs` by `verifyEnter.mts`. Studio Presentation turns
+  it off via `data-draft` on `<html>`, set by `DraftModeToast`.
+- **`<PageTransition>` belongs in each `page.tsx`, never a layout.** `<ViewTransition>` enter and
+  exit do not fire in a layout, because layouts persist across navigations. A new route gets no
+  transition until its `page.tsx` wraps its content.
+- **Internal links go through `<Link>`** (via `AnchorLink`), never a plain `<a>`: an `<a>` is a full
+  page load with no prefetch and no transition. External links stay `<a>`.
+  `frontend/scripts/verifyLinks.mts` checks the audit.
+- **The morph is wired only for archive cards whose destination renders a hero** (properties and
+  projects). The card takes an opt-in `morph` prop that only the archive grids pass; "More
+  properties" and similar grids leave it off, or the card would get an old-only snapshot. A property
+  with no hero image gets the soft handoff. News has no morph (no hero on `ArticleView`), nor do
+  people and staff cards.
+- The header is anchored with its own `view-transition-name` so it never moves. For verification builds, use
+  `NODE_ENV=production` (this shell exports `development`, which breaks `next build`); view
+  transitions cannot be verified in the in-app browser pane, only real Chrome.
+- The new page's cascade starts after the soft-handoff delay (the page fades in over the old one's
+  180ms exit); there is no separate navigation delay. Only `opacity`, `transform` and `filter`
+  animate: no layout shift (CLS 0 on every page measured; `/about-us/history` showed a constant 0.0000087 with and without `motion.css`). LCP on a page with a Cascade h1 (production build, real Chrome, median of 5, with vs without `motion.css`): `/about-us/history` 204 ms vs 156 ms (+48 ms, run spread 144-284 ms), `/properties/head-of-the-plains` 148 ms vs 152 ms (-4 ms). The LCP element is the hero image (IMG) on both, not the headline, and the spread across runs is larger than the difference, so no LCP effect is established; it is not proven absent either.
+- Not done, each tracked: scroll-in cascade
+  ([#86](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/86)), news morph
+  ([#87](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/87)), back/forward
+  transitions ([#88](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/88)),
+  header snap-back ([#89](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/89)).
+
+### 4.12 The map loads `mapbox-gl` lazily, near the viewport
+
+**Status:** Implemented on branch `worktree-load-animations`, pending merge.
+
+`mapbox-gl` is about 500 KB of JavaScript over the wire (1.8 MB parsed), and the home page loaded it
+without rendering a map. Every use goes through `LazyMapboxMap`, which holds the map's space
+(`h-full w-full`, as the map's own root does, so nothing shifts), watches it with an
+`IntersectionObserver` (600px margin) and only then fetches `MapboxMap` through `next/dynamic`
+(`ssr: false`). Never import `MapboxMap` directly from a page or a block: that puts the chunk back
+on every page that renders it, or that merely links to one that does. Without
+`IntersectionObserver` the map loads at once.
+
+- Measured on a production build: the home page's initial JavaScript went from about 973 KB to
+  465 KB (biggest script 508 KB to 184 KB). A map near the fold (the property page on desktop, the
+  map explorer) still loads immediately; a map far down loads as you approach it.
+- When testing, bust the browser cache (`?fresh=`): static pages and their chunks are cached, and a
+  stale tab will happily show the previous build's numbers.
+
+### 4.13 reCAPTCHA loads on demand, not on every page
+
+**Status:** Implemented on branch `worktree-load-animations`, pending merge.
+
+The newsletter form sits in the footer of every page, so reCAPTCHA v3 (about 350 KB plus an iframe)
+was loaded on every page whether or not anyone used a form. `Recaptcha` now renders nothing but a
+marker, and loads Google's script the first time someone focuses, touches or types in the form it
+sits in (the header search form is not one, so it does not trigger it). `getRecaptchaToken` loads the
+script itself if it is not there yet, so a submit with no earlier interaction (autofill, then Enter)
+still works; the early load only saves time. The server (`/api/forms/[formId]`, `verifyRecaptcha`)
+is unchanged.
+
+- A failed load (blocked by an extension or the network) rejects and clears itself: the form shows
+  its existing "could not verify that you are human" message, sends nothing, and the next submit
+  tries the load again.
+- Google's badge (bottom right) now appears after someone first uses a form, not on page load.
+- Verified in real Chrome on a production build, with the call to `/api/forms/*` intercepted so no
+  `formSubmission` was stored: nothing loads at page load; the search form does not trigger it;
+  focusing the newsletter form loads one script; a submit after focus and a submit with no
+  interaction both got a token and sent the request; a blocked script showed the error, sent
+  nothing, and a retry worked. Not tested: a real submission end to end against Sanity.
+
+### 4.14 A page's leading hero image is eager and high priority
+
+**Status:** Implemented on branch `worktree-load-animations`, pending merge.
+
+Images lazy-load by default (`sanity-image`), but a hero image is almost always the Largest
+Contentful Paint, and Lighthouse flags a lazy, low-priority LCP image under "LCP request discovery".
+`BlockImage` takes a `priority` prop (`loading="eager"`, `fetchpriority="high"`); `Hero`,
+`HeroImage` and `HeroSecondary` pass it for their hero image, and `HeroVideo` does the same for its
+poster. Use it for the one image a page leads with, not for images further down.
+
+- Measured on `/about-us/history` (local production build, 2 baseline runs and 1 after): the three
+  LCP discovery checks went from failing to passing, and the delay before the image request starts
+  went from 33-36 ms to 5 ms. The Lighthouse score did not change (79 and 82 before, 82 after:
+  run-to-run spread is about 3 points), because it treats these insights as unscored and its phone
+  simulation already assumes an ideal fetch. The benefit is in real browsers on slower devices.
+
 ---
 
 ## 5. Sanity conventions

@@ -1,4 +1,5 @@
 import {ArrowRightIcon, DownloadIcon} from '@/components/icons'
+import AnchorLink from '@/components/ui/AnchorLink'
 
 type LinkRowProps = {
   label: string
@@ -11,7 +12,7 @@ type LinkRowProps = {
 
 export default function LinkRow({label, href, icon, newTab = false, className}: LinkRowProps) {
   return (
-    <a
+    <AnchorLink
       href={href}
       download={icon === 'download' ? '' : undefined}
       target={newTab ? '_blank' : undefined}
@@ -20,6 +21,6 @@ export default function LinkRow({label, href, icon, newTab = false, className}: 
     >
       <span>{label}</span>
       {icon === 'download' ? <DownloadIcon /> : <ArrowRightIcon />}
-    </a>
+    </AnchorLink>
   )
 }

@@ -29,6 +29,7 @@ import HeroImage from '@/components/blocks/HeroImage'
 import HeroSecondary from '@/components/blocks/HeroSecondary'
 import HeroTertiary from '@/components/blocks/HeroTertiary'
 import HeroVideo from '@/components/HeroVideo'
+import {enterAttrs} from '@/sanity/lib/enter'
 import {dataAttr} from '@/sanity/lib/utils'
 import {PageBuilderSection} from '@/sanity/lib/types'
 
@@ -88,6 +89,7 @@ export default function BlockRenderer({block, index, pageId, pageType, pageName}
       <div
         key={block._key}
         className={hidden ? 'relative' : undefined}
+        {...enterAttrs(index)}
         data-sanity={dataAttr({
           id: pageId,
           type: pageType,
