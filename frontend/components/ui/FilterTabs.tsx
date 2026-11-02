@@ -67,7 +67,7 @@ export default function FilterTabs({
           ref={groupRef}
           role="group"
           aria-label={label}
-          className={`${padInside ? '' : '-mx-(--tf-x) '}flex items-center gap-10 overflow-x-auto px-(--tf-x) py-2 scroll-pl-(--tf-x) [mask-image:linear-gradient(to_right,transparent,black_var(--tf-x),black_calc(100%-var(--tf-x)),transparent)]`}
+          className={`${padInside ? '' : '-mx-(--tf-x) '}flex items-center gap-10 overflow-x-auto scroll-x-visible px-(--tf-x) py-2 scroll-pl-(--tf-x) [mask-image:linear-gradient(to_right,transparent,black_var(--tf-x),black_calc(100%-var(--tf-x)),transparent)]`}
         >
           {showAll && (
             <button

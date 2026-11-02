@@ -28,6 +28,35 @@
 }
 
 /**
+ * A horizontal scroller whose scrollbar is always visible and takes its own space under the
+ * content. iOS Safari and macOS hide an overlay scrollbar until you scroll, and when it does show
+ * it is drawn over the bottom of the content. Styling ::-webkit-scrollbar switches those browsers
+ * to a persistent bar that sits below the content. Firefox has no such pseudo-element, so it gets
+ * the standard properties (Chrome would ignore the pseudo-element rules if it saw them, hence the
+ * @supports gate).
+ */
+@utility scroll-x-visible {
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-dusty-heath-300) var(--color-dusty-heath-800);
+  }
+
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--color-dusty-heath-800);
+    border-radius: 9999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-dusty-heath-300);
+    border-radius: 9999px;
+  }
+}
+
+/**
  * Hero - Secondary. The panel colour and the line-art stroke are tuned per variant in the theme
  * (cream stroke at ~70% on green, brown stroke at ~40% on brown), so the art is two SVGs.
  * #5F8154 is the theme's own value for the Lowlands panel; the nearest token, lowlands-800, is
