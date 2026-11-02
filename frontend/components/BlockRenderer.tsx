@@ -89,7 +89,7 @@ export default function BlockRenderer({block, index, pageId, pageType, pageName}
       <div
         key={block._key}
         className={hidden ? 'relative' : undefined}
-        {...enterAttrs(index)}
+        {...enterAttrs(index, block._type)}
         data-sanity={dataAttr({
           id: pageId,
           type: pageType,
