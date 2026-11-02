@@ -26,7 +26,7 @@ export default function HeroSecondary({block, pageName}: BlockProps<'heroSeconda
         <div className="tf-max-w">
           <div className="grid grid-cols-1 md:grid-cols-2">
             <div
-              className={`hero-secondary__panel--${variant} relative flex flex-col justify-between p-5 gap-y-10 _min-h-[524px] md:p-10 md:min-h-[560px]`}
+              className={`hero-secondary__panel--${variant} relative flex flex-col justify-between p-5 gap-y-10 min-h-[420px] md:p-10 md:min-h-[560px]`}
             >
               <div
                 className={`hero-secondary__lines hero-secondary__lines--${variant} absolute inset-0 pointer-events-none`}
