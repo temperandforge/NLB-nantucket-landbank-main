@@ -51,3 +51,5 @@ studio/scripts/data/migrations/
 
 # Brainstorming visual companion scratch
 .superpowers/
+# Pastel CLI downloads
+.pastel/
