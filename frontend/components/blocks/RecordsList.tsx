@@ -32,15 +32,19 @@ export default function RecordsList({
       />
       <div className="tf-px w-full">
         <div className="tf-max-w flex flex-col items-start gap-12">
-          {filters.map((filter) => (
-            <RecordFilterMenu
-              key={filter.key}
-              label={filter.label}
-              options={filter.options}
-              value={filter.value}
-              onChange={onChooseFilter ? (value) => onChooseFilter(filter.param, value) : undefined}
-            />
-          ))}
+          <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center">
+            {filters.map((filter) => (
+              <RecordFilterMenu
+                key={filter.key}
+                label={filter.label}
+                options={filter.options}
+                value={filter.value}
+                onChange={
+                  onChooseFilter ? (value) => onChooseFilter(filter.param, value) : undefined
+                }
+              />
+            ))}
+          </div>
           <div className="flex w-full flex-col">
             <div className="flex w-full items-start justify-between py-6 font-mono text-body-small uppercase leading-[1.6] tracking-wide text-on-background">
               <span>File Name</span>
