@@ -61,7 +61,9 @@ export default function JobListings({block}: BlockProps<'jobListings'>) {
     <section className="flex w-full bg-background tf-px py-s8">
       <div className="tf-max-w flex flex-col items-start gap-20 lg:flex-row lg:justify-between lg:gap-10">
         {(block.eyebrow || block.heading) && (
-          <div className="flex w-full flex-col items-start gap-3 text-on-background lg:w-[436px] lg:shrink-0">
+          // Pinned on desktop below the header, whose offset follows its hide/show state, so the
+          // heading stays in view while a long list of jobs scrolls past (as on the event page).
+          <div className="flex w-full flex-col items-start gap-3 text-on-background lg:sticky lg:top-[calc(var(--header-offset,var(--header-height))+2.5rem)] lg:w-[436px] lg:shrink-0 lg:self-start lg:transition-[top] lg:duration-200 lg:ease-out motion-reduce:transition-none">
             {block.eyebrow && <Eyebrow>{block.eyebrow}</Eyebrow>}
             {block.heading && <h2 className="text-headline-lg leading-[1.1]">{block.heading}</h2>}
           </div>
