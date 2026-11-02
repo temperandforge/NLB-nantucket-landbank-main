@@ -55,7 +55,9 @@ export default function NavDropdown({
       onClick={(event) => {
         if ((event.target as HTMLElement).closest('a')) onNavigate?.()
       }}
-      className={`absolute top-full z-40 bg-background shadow-[0_20px_80px_rgba(47,42,34,0.16)] ${
+      // The shadow's blur reaches 60px above the panel, over the header bar it sits inside, so the
+      // panel is clipped at its top edge and left open on the sides and below, where it should fall.
+      className={`absolute top-full z-40 bg-background shadow-[0_20px_80px_rgba(47,42,34,0.16)] [clip-path:inset(0_-100px_-120px_-100px)] ${
         grouped
           ? 'left-1/2 w-screen -translate-x-1/2 tf-px py-10'
           : '-left-8 w-max min-w-64 rounded-b p-10'
