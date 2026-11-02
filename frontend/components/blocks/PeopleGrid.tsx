@@ -20,7 +20,11 @@ export default function PeopleGrid({block}: BlockProps<'peopleGrid'>) {
   return (
     <section className="bg-background py-s6">
       <div className="flex w-full flex-col items-start gap-10 _tf-max-w">
-        {block.heading && <h2 className="tf-max-w tf-px text-headline-xl text-on-background">{block.heading}</h2>}
+        {block.heading && (
+          <div className="tf-px w-full">
+            <h2 className="tf-max-w text-headline-xl text-on-background">{block.heading}</h2>
+          </div>
+        )}
         {staff.length > 0 &&
           (showTabs ? (
             // useSearchParams needs a Suspense boundary on a statically rendered page. The fallback
@@ -29,8 +33,8 @@ export default function PeopleGrid({block}: BlockProps<'peopleGrid'>) {
             <Suspense
               fallback={
                 <div className="flex w-full flex-col items-start gap-16">
-                  <FilterTabs tabs={tabs} active={null} label={DEPARTMENT_FILTER_LABEL} padInside />
-                  <div className="tf-max-w tf-px">
+                  <FilterTabs tabs={tabs} active={null} label={DEPARTMENT_FILTER_LABEL} />
+                  <div className="tf-px w-full">
                     <StaffGrid people={staff} />
                   </div>
                 </div>
@@ -39,18 +43,20 @@ export default function PeopleGrid({block}: BlockProps<'peopleGrid'>) {
               <StaffFilter people={staff} />
             </Suspense>
           ) : (
-            <div className="tf-max-w tf-px">
+            <div className="tf-px w-full">
               <StaffGrid people={staff} />
             </div>
           ))}
         {commissioners.length > 0 && (
-          <ul className="tf-px grid tf-max-w w-full list-none grid-cols-1 gap-x-3 gap-y-10 p-0 sm:grid-cols-2 sm:gap-y-16 lg:grid-cols-3">
-            {commissioners.map((person) => (
-              <RevealItem key={person._id}>
-                <CardCommissioner person={person} />
-              </RevealItem>
-            ))}
-          </ul>
+          <div className="tf-px w-full">
+            <ul className="grid tf-max-w w-full list-none grid-cols-1 gap-x-3 gap-y-10 p-0 sm:grid-cols-2 sm:gap-y-16 lg:grid-cols-3">
+              {commissioners.map((person) => (
+                <RevealItem key={person._id}>
+                  <CardCommissioner person={person} />
+                </RevealItem>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
     </section>

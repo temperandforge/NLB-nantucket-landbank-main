@@ -32,9 +32,8 @@ export default function StaffFilter({people}: {people: StaffItem[]}) {
           setChosen(true)
           choose(tab)
         }}
-        padInside
       />
-      <div className="tf-max-w tf-px" style={chosen ? ({'--enter-base': '0ms'} as CSSProperties) : undefined}>
+      <div className="tf-px w-full" style={chosen ? ({'--enter-base': '0ms'} as CSSProperties) : undefined}>
         {/* Keyed by the category so the cards remount and play their entrance again. */}
         <StaffGrid key={active ?? 'all'} people={filterByDepartment(people, active)} />
       </div>

@@ -72,10 +72,11 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
     const gutterProbe = document.createElement("div");
     gutterProbe.style.cssText = "position:absolute;visibility:hidden;padding-left:var(--tf-x)";
     rootRef.current!.appendChild(gutterProbe);
-    // Distance from each viewport edge to the page content (the same on both sides).
+    // Distance from each viewport edge to the page content (the same on both sides): the content
+    // is `tf-max-w` (85rem) centred inside the `tf-px` gutters.
     function getContentInset() {
       const gutter = parseFloat(getComputedStyle(gutterProbe).paddingLeft) || 0;
-      const maxWidth = 90 * (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
+      const maxWidth = 85 * (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
       return Math.max(gutter, (splideRoot!.clientWidth - maxWidth) / 2);
     }
 

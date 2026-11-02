@@ -23,9 +23,16 @@
   padding-inline: var(--tf-x);
 }
 
+/**
+ * The content box inside a parent that carries tf-px: 85rem (1360px), which with the 40px gutter
+ * on each side is 90rem (1440px) at a 1440px viewport. Past that the box stays 1360px and centred
+ * while the gutters grow. Always put tf-px on the parent, not on this element.
+ */
 @utility tf-max-w {
-  @apply w-full max-w-[90rem] mx-auto;
+  @apply w-full mx-auto;
+  max-width: 85rem; /* 1360px at 16px root font size */
 }
+
 
 /**
  * A horizontal scroller whose scrollbar only shows while it is being scrolled, and never over the
