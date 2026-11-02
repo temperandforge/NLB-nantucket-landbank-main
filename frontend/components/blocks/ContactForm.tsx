@@ -14,7 +14,10 @@ export default function ContactForm({block}: BlockProps<'contactForm'>) {
   return (
     <section className="relative w-full overflow-clip bg-background tf-px py-s6">
       <div className="relative z-10 flex w-full flex-col gap-16 tf-max-w md:flex-row md:justify-between md:gap-20">
-        <div className="flex w-full flex-col items-start gap-8 md:w-[322px] md:shrink-0">
+        {/* Pinned below the header from md, where the columns sit side by side, so the heading and
+            contact details stay in view while the form scrolls. `self-start` stops the row from
+            stretching the column to the form's height, which would leave sticky nothing to move in. */}
+        <div className="flex w-full flex-col items-start gap-8 md:sticky md:top-[calc(var(--header-offset,var(--header-height))+2.5rem)] md:w-[322px] md:shrink-0 md:self-start md:transition-[top] md:duration-200 md:ease-out motion-reduce:transition-none">
           {block.heading && (
             <Heading className="w-full text-headline-xl text-on-background text-balance">
               {block.heading}
