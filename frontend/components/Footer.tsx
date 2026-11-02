@@ -1,6 +1,7 @@
 import FooterMenu, {FooterInlineMenu} from '@/components/FooterMenu'
 import NewsletterSignup from '@/components/NewsletterSignup'
 import SocialLinks from '@/components/SocialLinks'
+import AnchorLink from '@/components/ui/AnchorLink'
 import {sanityFetch} from '@/sanity/lib/live'
 import {footerQuery} from '@/sanity/lib/queries'
 import type {FooterInfoColumnData} from '@/sanity/lib/types'
@@ -31,12 +32,12 @@ function InfoColumn({column}: {column: FooterInfoColumnData}) {
             {/* href is optional per line, so an email or phone number can be actionable
                 while an address line stays plain text. */}
             {line.href ? (
-              <a
+              <AnchorLink
                 href={line.href}
                 className="transition-opacity hover:opacity-75 focus-visible:opacity-75"
               >
                 {line.text}
-              </a>
+              </AnchorLink>
             ) : (
               line.text
             )}

@@ -13,8 +13,8 @@ export default function ContactForm({block}: BlockProps<'contactForm'>) {
   const Heading = stegaClean(block.headingLevel) === 'h1' ? 'h1' : 'h2'
   return (
     <section className="relative w-full overflow-clip bg-background tf-px py-s6">
-      <div className="relative z-10 flex w-full flex-col gap-12 tf-max-w md:flex-row md:justify-between md:gap-20">
-        <div className="flex w-full flex-col items-start gap-16 md:w-[322px] md:shrink-0">
+      <div className="relative z-10 flex w-full flex-col gap-16 tf-max-w md:flex-row md:justify-between md:gap-20">
+        <div className="flex w-full flex-col items-start gap-8 md:w-[322px] md:shrink-0">
           {block.heading && (
             <Heading className="w-full text-headline-xl text-on-background text-balance">
               {block.heading}
