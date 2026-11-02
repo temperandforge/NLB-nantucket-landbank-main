@@ -3,7 +3,6 @@
 import {useEffect} from 'react'
 
 import ErrorPage from '@/components/ErrorPage'
-import Button from '@/components/ui/Button'
 import ButtonLink from '@/components/ui/ButtonLink'
 
 /**
@@ -30,9 +29,13 @@ export default function ServerError({
       body="That one is on us. The page ran into a problem while loading. Try again, and if it keeps happening, come back a little later."
     >
       <div className="flex flex-wrap items-center gap-4">
-        <Button variant="secondary" leftIcon={false} rightIcon={false} onClick={retry}>
+        <button
+          type="button"
+          onClick={retry}
+          className="cursor-pointer font-sans text-body-base text-on-background underline decoration-border-alt decoration-2 underline-offset-4 hover:decoration-on-background focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-moody-moor-500"
+        >
           Try again
-        </Button>
+        </button>
         <ButtonLink variant="ghost" label="Back to home" href="/" leftIcon />
       </div>
       {error.digest && (
