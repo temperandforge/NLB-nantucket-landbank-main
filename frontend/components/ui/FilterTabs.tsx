@@ -55,7 +55,9 @@ export default function FilterTabs({
   const cls = (pressed: boolean) =>
     `${TAB} ${pressed ? 'text-on-background' : 'text-on-background-subtle'}`
   return (
-    <div className={padInside ? 'w-full' : 'tf-px w-full'}>
+    // `data-part`: the tab row enters with the rest of its block (motion.css). It is not remounted
+    // when a tab is chosen, so changing the category does not replay it.
+    <div data-part="" className={padInside ? 'w-full' : 'tf-px w-full'}>
       {/* The mask sits on the element that clips (the scroller), so the fade lands on tab text. It
           bleeds exactly into the page padding on each side (-mx-(--tf-x), so it can't overflow the viewport) and pads back in, which
           keeps the tabs aligned with the grid and lets "All" rest outside the fade. With
