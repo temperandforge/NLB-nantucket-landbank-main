@@ -13,6 +13,8 @@
  */
 import {readFileSync} from 'node:fs'
 
+import {PART_SELECTOR} from '../sanity/lib/enter.ts'
+
 let failed = false
 function check(ok: boolean, message: string) {
   if (ok) {
@@ -124,25 +126,24 @@ check(
 )
 
 // Whole-page enter. The first two page blocks animate their parts on a timer (data-enter="load");
-// every later block animates them as they scroll into view (data-enter="scroll", CSS scroll-driven
-// animations, no JS). A *part* is the outermost heading / paragraph / image / list item / button;
-// the selector below is long and must stay IDENTICAL in each mode and in the draft-mode rule, so
-// this pins it.
+// everything below the first screen is held back by ScrollReveal and plays once as it enters view
+// (data-reveal, set by JS, never by CSS scroll-driven animation: those scrub with scroll position).
+// A *part* is the outermost heading / paragraph / image / list item / button; the selector below is
+// long and must stay IDENTICAL in the load rule and the draft-mode rule, and in the copy ScrollReveal
+// uses (PART_SELECTOR in sanity/lib/enter.ts), so this pins all three.
 const flat = inside.replace(/\s+/g, ' ')
 const PARTS = ':is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part])'
 const SEL = `${PARTS}:not(${PARTS} ${PARTS}):not(:has(.cascade-word)):not(.load-in):not([aria-hidden="true"]):not([aria-hidden="true"] *):not([data-morph] *)`
-check(flat.split(SEL).length - 1 === 3, `the parts selector appears exactly 3 times, identically (load, scroll, draft) (found ${flat.split(SEL).length - 1})`)
+check(flat.split(SEL).length - 1 === 2, `the parts selector appears exactly 2 times, identically (load, draft) (found ${flat.split(SEL).length - 1})`)
+check(PART_SELECTOR === SEL, 'PART_SELECTOR (sanity/lib/enter.ts, used by ScrollReveal) is identical to the CSS parts selector')
 check(flat.includes(`[data-enter="load"] ${SEL} {`), 'a load rule animates the parts of data-enter="load" blocks')
-const supportsOpen = /@supports\s*\(\s*animation-timeline\s*:\s*view\(\)\s*\)\s*\{/g
-const {blocks: supports} = split(inside, supportsOpen)
-check(supports.length === 1, `exactly one @supports (animation-timeline: view()) block inside the guard (found ${supports.length})`)
-const scrollRule = supports.join('\n').replace(/\s+/g, ' ')
-check(scrollRule.includes(`[data-enter="scroll"] ${SEL} {`), 'the scroll rule lives inside @supports and targets data-enter="scroll"')
-const scrollBody = /\[data-enter="scroll"\][^{]*\{([^}]*)\}/.exec(scrollRule)?.[1] ?? ''
+check(!/animation-timeline/.test(css) && !/@supports\s*\(\s*animation-timeline/.test(css), 'no scroll-driven animation (nothing scrubs with scroll position)')
 check(
-  /animation-timeline\s*:\s*view\(\)/.test(scrollBody) && /animation-range\s*:/.test(scrollBody) && !/\banimation\s*:/.test(scrollBody),
-  'the scroll layer uses the longhands (animation-timeline: view(), animation-range), never the animation shorthand',
+  /\[data-reveal="hidden"\]\s*\{[^}]*opacity:\s*0\s*!important[^}]*animation:\s*none\s*!important/.test(inside) &&
+    /\[data-reveal="shown"\]\s*\{[^}]*animation:\s*part-in[^;]*--reveal-delay[^;]*both\s*!important/.test(inside),
+  'held-back parts are hidden and then play part-in once, with a stagger delay (both inside the guard)',
 )
+check(/:root\[data-draft\] \[data-reveal\]\s*\{[^}]*opacity:\s*1\s*!important/.test(inside), 'Studio Presentation shows held-back parts')
 check(
   new RegExp(`:root\\[data-draft\\] \\[data-enter\\] ${SEL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\{[^}]*animation\\s*:\\s*none`).test(flat),
   'Studio Presentation (html[data-draft]) turns the part animations off',
@@ -164,7 +165,6 @@ const tokens: Record<string, string> = {
   '--enter-step': '70ms',
   '--enter-base-0': '120ms',
   '--enter-base-1': '360ms',
-  '--enter-scroll-step': '6%',
   '--cascade-step-body': '10ms',
   '--cascade-body-offset': '240ms',
   '--motion-duration': '450ms',

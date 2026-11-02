@@ -2,7 +2,6 @@ import {Suspense} from 'react'
 
 import CardCommissioner from '@/components/cards/CardCommissioner'
 import FilterTabs from '@/components/ui/FilterTabs'
-import RevealItem from '@/components/ui/RevealItem'
 
 import {DEPARTMENT_FILTER_LABEL, departmentTabs} from '@/sanity/lib/archiveFilter'
 
@@ -51,9 +50,9 @@ export default function PeopleGrid({block}: BlockProps<'peopleGrid'>) {
           <div className="tf-px w-full">
             <ul className="grid tf-max-w w-full list-none grid-cols-1 gap-x-3 gap-y-10 p-0 sm:grid-cols-2 sm:gap-y-16 lg:grid-cols-3">
               {commissioners.map((person) => (
-                <RevealItem key={person._id}>
+                <li key={person._id}>
                   <CardCommissioner person={person} />
-                </RevealItem>
+                </li>
               ))}
             </ul>
           </div>
