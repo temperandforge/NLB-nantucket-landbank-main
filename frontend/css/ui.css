@@ -285,8 +285,28 @@
   line-height: 1.6;
 }
 
-.rich-text-basic > * + * {
+/* .rich-text-basic > * + * {
   margin-top: 1.5rem;
+} */
+
+/* gap-xl */
+.rich-text-basic > * {
+  margin-block: 3rem;
+}
+
+@media ( min-width: 48rem ) {
+  .rich-text-basic > * {
+    margin-block: 4rem;
+  }
+}
+
+.rich-text-basic > p {
+  margin-top: 0;
+}
+
+/* paragraph spacing */
+.rich-text-basic > p:has( + p ) {
+  margin-bottom: 1.25rem; /* 20px */
 }
 
 .rich-text-basic > h2,
@@ -294,16 +314,31 @@
 .rich-text-basic > h4,
 .rich-text-basic > h5,
 .rich-text-basic > h6 {
-  margin-top: 4rem;
   font-family: var(--font-serif);
   font-weight: 400;
   letter-spacing: -0.05em;
   line-height: 1.1;
+  margin-top: 0;
+  margin-bottom: 2rem;
 }
 
 .rich-text-basic > h2,
 .rich-text-basic > h3 {
   font-size: var(--text-headline-lg);
+}
+
+/* .rich-text-basic > h3 {
+  margin-top: 2.5rem;
+}
+
+.rich-text-basic > h3 {
+  margin-top: 2rem;
+} */
+
+.rich-text-basic > h4,
+.rich-text-basic > h5,
+.rich-text-basic > h6 {
+  margin-bottom: 1.5rem;
 }
 
 .rich-text-basic > h4 {
@@ -318,9 +353,8 @@
 .rich-text-basic > :first-child {
   margin-top: 0;
 }
-
-.rich-text-basic > div:has(> a.link-item--inactive) {
-  margin-top: 4rem;
+.rich-text-basic > :last-child {
+  margin-bottom: 0;
 }
 
 .rich-text-basic a:not(.link-item--inactive) {
