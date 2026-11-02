@@ -23,9 +23,6 @@ same(ENTER_LOAD_BLOCKS, 2, 'the first two blocks animate on load')
 same(enterAttrs(0), {'data-enter': 'load', 'data-enter-order': '0'}, 'block 0 is load, order 0')
 same(enterAttrs(1), {'data-enter': 'load', 'data-enter-order': '1'}, 'block 1 is load, order 1')
 same(enterAttrs(2), {'data-enter': 'scroll'}, 'block 2 is scroll')
-same(enterAttrs(1, 'peopleGrid'), {'data-enter': 'scroll'}, 'a people grid under the hero is scroll, not load')
-same(enterAttrs(0, 'peopleGrid'), {'data-enter': 'load', 'data-enter-order': '0'}, 'a people grid as block 0 stays load')
-same(enterAttrs(1, 'hero'), {'data-enter': 'load', 'data-enter-order': '1'}, 'other block types keep the load layer')
 same(enterAttrs(40), {'data-enter': 'scroll'}, 'a late block is scroll')
 // A bad index must never throw or hide anything: it falls to the scroll layer, which is static
 // without scroll-driven animation support.
