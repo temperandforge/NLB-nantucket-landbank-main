@@ -58,7 +58,7 @@ export default function JobListings({block}: BlockProps<'jobListings'>) {
   if (jobs.length === 0) return null
 
   return (
-    <section className="flex w-full bg-background px-5 py-20 lg:px-10 lg:py-32">
+    <section className="flex w-full bg-background px-5 py-s8 lg:px-10">
       <div className="mx-auto flex w-full max-w-[85rem] flex-col items-start gap-20 lg:flex-row lg:justify-between lg:gap-10">
         {(block.eyebrow || block.heading) && (
           <div className="flex w-full flex-col items-start gap-3 text-on-background lg:w-[436px] lg:shrink-0">
