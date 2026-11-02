@@ -33,7 +33,6 @@ How it was measured and what it cost is in [performance.md](performance.md).
 | `--cascade-step-body` / `--cascade-body-offset` | 10ms / 240ms | A hero description sweeps in quickly, starting as the headline lands. |
 | `--enter-rise` / `--enter-step` | 14px / 70ms | Parts of the first two blocks. |
 | `--enter-base-0` / `--enter-base-1` | 120ms / 360ms | When block 0 and block 1 start. |
-| `--enter-scroll-step` | 6% | Offset between siblings along a scroll range, so a grid staggers. |
 | `--page-out-duration` / `--page-in-duration` | 180ms / 280ms | The soft handoff. |
 
 How the values got here (so nobody undoes them by accident):
@@ -81,11 +80,15 @@ alone: text that already cascades, `.load-in`, `aria-hidden` decoration, and any
 - **Load layer** (blocks 0 and 1): the parts fade and rise 14px on a timer, staggered by their
   position among their siblings, after the headline. **Images do not animate here**: a hero image
   is usually the LCP element, and starting it at opacity 0 delayed it.
-- **Scroll layer** (later blocks): the same fade and rise, driven by the part's own entry into the
-  viewport with CSS scroll-driven animations (`animation-timeline: view()`), inside
-  `@supports (animation-timeline: view())`. The motion follows the scroll and reverses if you scroll
-  back. Images fade only, with no movement. Chrome and Edge, and Safari 26 and newer, have it;
-  Firefox and older Safari see the sections static, which is the previous behaviour.
+- **Below the first screen** (later blocks, and anything in the load layer that starts off screen):
+  `components/ScrollReveal.tsx`, mounted once in the layout, holds each such part back after
+  hydration (`data-reveal="hidden"`) and plays one fade and rise the first time it enters view
+  (`data-reveal="shown"`, staggered 70ms within a row). It runs on its own clock: it does not follow
+  scroll position and never reverses. Images fade only, with no movement. The server HTML carries no
+  `data-reveal`, so without JavaScript everything is visible; reduced motion and Studio Presentation
+  skip it. Parts added later (a filter remounting a grid, a route change) are picked up by a
+  MutationObserver. This replaced CSS scroll-driven animations (`animation-timeline: view()`), which
+  scrubbed with scroll position and reversed on the way back up.
 
 ### Rules for components you add or change
 
@@ -96,8 +99,9 @@ alone: text that already cascades, `.load-in`, `aria-hidden` decoration, and any
   slides replayed the fade on every change (the history timeline did, until its root got `data-part`).
 - **A morph target's hero wrapper needs `data-morph`**, or a fade-in on the shared image makes the
   morph flicker.
-- **List items re-rendered by client state** (a filter changing a list) can replay the stagger. That
-  has not been looked at.
+- **List items re-rendered by client state** (a filter changing a list) play again if they are new
+  elements (the staff grid is keyed by category so it remounts on purpose); items that stay mounted
+  do not.
 - The long parts selector is written out in three places in `motion.css` (load, scroll, and the
   draft-mode switch-off). They must stay identical; `verifyMotionCss.mts` pins it.
 

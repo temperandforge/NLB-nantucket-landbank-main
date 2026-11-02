@@ -20,13 +20,13 @@ Chosen by comparing live motion demos (a throwaway companion, not committed):
 |---|---|
 | Text load-in | **Word cascade**: headline words rise ~0.4em and sharpen from a 6px blur, ~30ms apart, 450ms each (the first 45ms / 800ms felt slow on a phone, even after the easing was softened and then 600ms), `cubic-bezier(.33,1,.68,1)` (ease-out cubic; the original expo-out `.22,1,.36,1` did 95% of the movement in the first third, so the animation looked like it ended early on a phone). Eyebrow, body and buttons plain-fade in after the headline. The blur is only on devices with a fine pointer and hover: on iPhone Safari, animating `filter` on every word was choppy and snapped at the end (WebKit paints filtered text on the CPU), so touch devices get opacity + rise only. |
 | Page transition | **Shared-element morph** for card → detail, with the **soft handoff** as the fallback everywhere else. |
-| Scope | **The whole page.** The first screen animates on load and navigation. Every section below it animates as it scrolls into view, with CSS scroll-driven animations (no JS). Originally first screen only; widened after the headline and description were done (see "Whole-page enter"). |
-| Mechanism | **Server-rendered `<Cascade>` + CSS, and React `<ViewTransition>`.** No animation library, no client JS. |
+| Scope | **The whole page.** The first screen animates on load and navigation. Every section below it plays once as it scrolls into view, driven by a small client observer (`ScrollReveal`), not by scroll position. Originally first screen only; widened after the headline and description were done (see "Whole-page enter"). |
+| Mechanism | **Server-rendered `<Cascade>` + CSS, and React `<ViewTransition>`.** No animation library; one small client observer for the parts below the first screen. |
 
 ## Non-goals
 
 - A word-by-word cascade below the fold: sections below the first screen enter as whole parts (see "Whole-page enter"), not word by word.
-- Scroll-in in browsers without CSS scroll-driven animations (Firefox, Safari before 26): those just see the sections static.
+- Scroll-driven (scrubbed) animation below the first screen: it was built first and replaced, because the motion followed scroll position and reversed on the way back up.
 - Per-block or per-page motion settings in Sanity.
 - Directional (forward/back) slides, the curtain wipe, or the soft-focus text style.
 - An animation library (Motion, GSAP).
@@ -166,8 +166,8 @@ No test framework exists, so verification is in a real browser:
 ## Whole-page enter
 
 The headline cascade and the hero description cover only text. Everything else on screen, and every
-section below it, also enters, so the page doesn't stop animating partway down. Two layers, both CSS
-only (no client JS), all inside the guarded block of `motion.css`:
+section below it, also enters, so the page doesn't stop animating partway down. Two layers, all inside
+the guarded block of `motion.css` (the below-the-fold layer is switched on by `ScrollReveal`):
 
 - **Tagging.** `BlockRenderer` already knows each block's index, so its wrapper gets `data-enter`:
   `load` for the first two blocks (`data-enter-order` 0 and 1), `scroll` for the rest. The pure rule
@@ -184,22 +184,25 @@ only (no client JS), all inside the guarded block of `motion.css`:
   element, and starting one at opacity 0 delayed the paint the browser measures (seen on the home
   hero; fixed after a Lighthouse mobile score of 58). Below the fold they fade only, with no
   movement, as they scroll in.
-- **Scroll layer (later blocks).** The same fade and rise, driven by the part's own entry into the
-  viewport (`animation-timeline: view()`), inside `@supports (animation-timeline: view())`. Siblings
-  in the same row are offset along the entry range, so a grid staggers. The motion follows the
-  scroll and reverses if you scroll back. The end of the range is reachable for any part inside the
-  last viewport (parts end by 91% of their own entry), so nothing is stranded part-transparent near
-  the bottom of the page. Browsers without scroll-driven animations (Firefox, Safari before 26) show
-  the sections static, which is the current behaviour.
+- **Below the first screen (later blocks, and anything in the load layer that starts off screen).**
+  `ScrollReveal` (client, mounted once in the layout) finds the parts with the same selector
+  (`PART_SELECTOR` in `sanity/lib/enter.ts`), holds each one back after hydration
+  (`data-reveal="hidden"`) and plays the same fade and rise once, on its own clock, the first time it
+  enters view (`data-reveal="shown"`). Parts that enter together are offset 70ms, capped at four
+  steps. It does not follow scroll position and never reverses. Anything still held back and on
+  screen when scrolling stops is shown, so a part in the last stretch of a page is never stranded.
+  The server HTML has no `data-reveal`, so without JS everything is visible. An earlier version used
+  CSS scroll-driven animations (`animation-timeline: view()`); they scrubbed with scroll position and
+  reversed, so they were removed.
 - **The morph target is excluded.** The hero wrapper of a property or project page is marked
   `data-morph`, and nothing inside it is a part: a fade-in on the shared image would start the
   morph's "new" side transparent and make it flicker.
 - **Never hidden when it matters.** Reduced motion and print: static (the whole block is in the
   guarded `no-preference` block). Studio Presentation: `DraftModeToast` (client, draft mode only)
   sets `data-draft` on `<html>` and a CSS rule turns the part animations off.
-- **Guard.** `verifyMotionCss.mts` pins the shared parts selector (it appears in each mode and in
-  the draft rule, and must stay identical), the `@supports` condition, the tokens, and that the
-  scroll layer uses the longhands (`animation-timeline` / `animation-range`), not the shorthand.
+- **Guard.** `verifyMotionCss.mts` pins the shared parts selector (it appears in the load rule and
+  the draft rule, and `PART_SELECTOR` must match it), that nothing in the stylesheet uses a scroll
+  timeline, the `data-reveal` rules and the tokens.
   `verifyEnter.mts` covers `enterAttrs`.
 
 ## Deferred

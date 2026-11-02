@@ -558,8 +558,9 @@ and makes a results address shareable. One query keeps ranking in one place.
 **Status:** Implemented on branch `worktree-load-animations`, pending merge
 
 The first screen cascades in word by word, and navigation is a short animated handoff, with archive
-card images morphing into their detail hero. No animation library and no client JS: server-rendered
-`<Cascade>` plus CSS, and React `<ViewTransition>`. Design:
+card images morphing into their detail hero. No animation library: server-rendered `<Cascade>` plus
+CSS, and React `<ViewTransition>`, with one small client observer (`ScrollReveal`) for the parts
+below the first screen. Design:
 [load-in animations spec](superpowers/specs/2026-10-23-load-in-animations-design.md). How to work
 on it (tokens, rules for new components, the guard scripts, how to test): [motion.md](motion.md).
 What it and the other speed work measured, what was tried and rejected, and what is still open:
@@ -579,9 +580,12 @@ want it.
   `draftMode()`, which would make every page dynamic. A hero description uses
   `variant="body"` (a quicker, never-blurred sweep, capped at 48 words). Word splitting is in
   `frontend/sanity/lib/cascade.ts`, checked by `frontend/scripts/verifyCascade.mts`.
-- **The rest of the page enters through `data-enter`, in CSS only.** `BlockRenderer` tags the
-  first two blocks `load` (on a timer) and the rest `scroll` (CSS scroll-driven animations, inside
-  `@supports (animation-timeline: view())`, so Firefox and Safari before 26 see them static).
+- **The rest of the page enters through `data-enter`.** `BlockRenderer` tags the first two blocks
+  `load` (on a timer, in CSS) and the rest `scroll`. Parts that start below the screen, in either
+  layer, are held back by `components/ScrollReveal.tsx` after hydration and play once as they enter
+  view, on their own clock: not CSS scroll-driven animations, which scrubbed with scroll position
+  and reversed (replaced after the home page news preview read as scroll-scrubbed). No `data-reveal`
+  is in the server HTML, so without JS everything is visible.
   Detail pages tag their sections with `<Enter>`. Inside a tagged block the outermost heading,
   paragraph, image, list item, `.button` or `[data-part]` animates; a card that is not a list item
   needs `data-part`; a morph target's hero wrapper needs `data-morph`. Images on the load layer do

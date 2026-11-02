@@ -15,3 +15,12 @@ export function enterAttrs(index: number): EnterAttrs {
   }
   return {'data-enter': 'scroll'}
 }
+
+/**
+ * What counts as a *part* of a page block: the outermost heading, paragraph, image, list item or
+ * button (or anything marked data-part), excluding text that already cascades, the eyebrow and
+ * aria-hidden decoration. css/motion.css writes this out in full (scripts/verifyMotionCss.mts checks
+ * the two stay identical); ScrollReveal uses it to find the parts to hold back below the screen.
+ */
+const PARTS = ':is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part])'
+export const PART_SELECTOR = `${PARTS}:not(${PARTS} ${PARTS}):not(:has(.cascade-word)):not(.load-in):not([aria-hidden="true"]):not([aria-hidden="true"] *):not([data-morph] *)`

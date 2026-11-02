@@ -83,11 +83,16 @@ export default function FormRenderer({
   }, [status])
 
   function focusField(name: string) {
-    formRef.current
-      ?.querySelector<HTMLElement>(
-        `[data-field-name="${CSS.escape(name)}"] :is(input, select, textarea, button)`,
-      )
-      ?.focus()
+    const field = formRef.current?.querySelector<HTMLElement>(`[data-field-name="${CSS.escape(name)}"]`)
+    const control = field?.querySelector<HTMLElement>('input, select, textarea, button')
+    if (!field || !control) return
+    // Focusing alone scrolls differently per browser: Chrome brings the control to the middle of the
+    // screen, Safari only to the nearest edge, which puts a field above the screen under the sticky
+    // header. So centre the whole field (label, control and message) first, then focus without a
+    // second scroll.
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    field.scrollIntoView({block: 'center', behavior: reduced ? 'auto' : 'smooth'})
+    control.focus({preventScroll: true})
   }
 
   function setError(field: FormField, answer: string | string[] | undefined) {

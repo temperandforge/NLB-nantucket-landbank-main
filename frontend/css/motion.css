@@ -24,7 +24,6 @@
   --enter-step: 70ms;
   --enter-base-0: 120ms;
   --enter-base-1: 360ms;
-  --enter-scroll-step: 6%;
 }
 
 /* Not animations, so they sit outside the guard. */
@@ -226,43 +225,35 @@
     animation-delay: calc(var(--enter-base, 0ms) + var(--n, 0) * var(--enter-step));
   }
 
-  /*
-   * Below the fold: driven by the part's own entry into the viewport, no JS. Only where the browser
-   * supports it (Chrome, Edge, Safari 26+); elsewhere the sections are simply static. Siblings in a
-   * row are offset along the range so a grid staggers. The range ends by 91% of the entry, so a part
-   * in the last viewport still reaches full opacity.
-   */
-  @supports (animation-timeline: view()) {
-    [data-enter="scroll"] :is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part]):not(:is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part]) :is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part])):not(:has(.cascade-word)):not(.load-in):not([aria-hidden="true"]):not([aria-hidden="true"] *):not([data-morph] *) {
-      animation-name: var(--part-anim, part-in);
-      animation-duration: auto;
-      animation-timing-function: linear;
-      animation-fill-mode: both;
-      animation-timeline: view();
-      animation-range: entry calc(var(--n, 0) * var(--enter-scroll-step)) entry calc(55% + var(--n, 0) * var(--enter-scroll-step));
-    }
-  }
-
   /* Studio Presentation (DraftModeToast sets data-draft): editors always see the content. */
   :root[data-draft] [data-enter] :is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part]):not(:is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part]) :is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part])):not(:has(.cascade-word)):not(.load-in):not([aria-hidden="true"]):not([aria-hidden="true"] *):not([data-morph] *) {
     animation: none;
   }
 
   /*
-   * Card grids in the load layer (RevealItem). A card that starts below the screen is held back and
-   * plays one fade and rise the first time it enters view, on its own clock, with no scroll
-   * scrubbing. RevealItem sets data-reveal after hydration; the server HTML carries none, so
-   * without JS every card is simply visible. !important because the parts rule above is far more
-   * specific and these attributes are only ever set by RevealItem.
+   * Below the fold (data-enter="scroll", and anything in the load layer that starts off screen):
+   * ScrollReveal holds the part back after hydration and plays one fade and rise the first time it
+   * enters view, on its own clock. It does not follow scroll position and never reverses. The server
+   * HTML carries no data-reveal, so without JS everything is visible. !important because the parts
+   * rule above is far more specific and these attributes are only ever set by ScrollReveal.
+   * Images, pictures and figures fade without moving, as elsewhere.
    */
   [data-reveal="hidden"] {
     opacity: 0 !important;
-    transform: translateY(var(--enter-rise)) !important;
+    transform: translateY(var(--reveal-rise, var(--enter-rise))) !important;
     animation: none !important;
   }
 
   [data-reveal="shown"] {
-    animation: part-in var(--motion-duration) var(--motion-ease) both !important;
+    animation: part-in var(--motion-duration) var(--motion-ease) var(--reveal-delay, 0ms) both !important;
+  }
+
+  :is(img, picture, figure)[data-reveal] {
+    --reveal-rise: 0px;
+  }
+
+  :is(img, picture, figure)[data-reveal="shown"] {
+    animation-name: part-fade !important;
   }
 
   :root[data-draft] [data-reveal] {
