@@ -16,7 +16,7 @@ export default function RecordsList({
 }: {
   view: RecordView
   onChooseCategory?: (slug: string) => void
-  onChooseFilter?: (param: string, value: string | null) => void
+  onChooseFilter?: (param: string, value: string[]) => void
 }) {
   const {tabs, category, filters, records} = view
   if (!category) return null
@@ -38,7 +38,7 @@ export default function RecordsList({
                 key={filter.key}
                 label={filter.label}
                 options={filter.options}
-                value={filter.value}
+                selected={filter.value}
                 onChange={
                   onChooseFilter ? (value) => onChooseFilter(filter.param, value) : undefined
                 }
