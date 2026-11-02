@@ -89,7 +89,9 @@ export default function ProjectPreviewView({
                   key={project._id}
                   className={`relative min-w-0 md:row-span-2 md:grid md:grid-rows-subgrid ${
                     index > 0
-                      ? 'md:before:absolute md:before:inset-y-0 md:before:-left-3 md:before:w-px md:before:bg-border-light'
+                      ? // Stacked (below md) the divider is a horizontal rule centred in the gap above the
+                        // card; from md the cards sit in columns and it is a vertical rule beside it.
+                        'before:absolute before:inset-x-0 before:-top-5 before:h-px before:bg-border-light md:before:inset-x-auto md:before:inset-y-0 md:before:-left-3 md:before:h-auto md:before:w-px'
                       : ''
                   }`}
                 >
