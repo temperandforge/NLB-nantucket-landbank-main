@@ -29,7 +29,7 @@ export default function ServerError({
       body="That one is on us. The page ran into a problem while loading. Try again, and if it keeps happening, come back a little later."
     >
       <div className="flex flex-col items-start gap-4">
-        <ButtonLink variant="ghost" label="Back to home" href="/" leftIcon />
+        <ButtonLink variant="secondary" label="Back to home" href="/" leftIcon />
         <button
           type="button"
           onClick={retry}
