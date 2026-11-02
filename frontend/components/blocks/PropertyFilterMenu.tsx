@@ -19,8 +19,8 @@ function Row({label, checked, onToggle}: {label: string; checked: boolean; onTog
 
 /**
  * One filter dropdown, the same as the map's (components/map/MultiSelectDropdown): a button that
- * opens a white panel of options, each with the design's square on the right, and a red "Clear all"
- * at the top once something is chosen. Closed by Escape (focus returns to the button) or a press
+ * opens a white panel of options, each with the design's square on the right, "View All" first
+ * (checked while nothing is chosen; choosing it clears the group). Closed by Escape (focus returns to the button) or a press
  * outside. Renders nothing when no property offers an option. Without
  * `onChange` the checkboxes do nothing (only until the page has loaded).
  */
@@ -87,15 +87,7 @@ export default function PropertyFilterMenu({
           aria-label={label}
           className="absolute left-0 top-full z-10 mt-2 flex max-h-[min(32rem,70dvh)] w-full flex-col overflow-auto rounded bg-surface-light p-6 shadow-[0_8px_20px_rgba(0,0,0,0.04)] sm:w-[266px]"
         >
-          {selected.length > 0 && (
-            <button
-              type="button"
-              onClick={() => onChange?.([])}
-              className="mb-2 block w-full cursor-pointer text-right font-sans text-body-small text-error focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500"
-            >
-              Clear all
-            </button>
-          )}
+          <Row label="View All" checked={selected.length === 0} onToggle={() => onChange?.([])} />
           {options.map((option) => (
             <Row
               key={option.slug}

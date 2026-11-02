@@ -19,8 +19,8 @@ interface MultiSelectDropdownProps {
 /**
  * One filter of the map (Figma: a button that opens a white panel of checkboxes). The button is the
  * same as the one on the Properties page: label and chevron, with the light border while open or
- * once something is chosen. The panel lists each option with the design's square on the right, and
- * a red "Clear all" at the top once something is chosen. Closed by Escape (focus returns to the
+ * once something is chosen. The panel lists each option with the design's square on the right, "View All"
+ * first (checked while nothing is chosen; choosing it clears the filter). Closed by Escape (focus returns to the
  * button) or a press outside.
  */
 export function MultiSelectDropdown({
@@ -88,15 +88,18 @@ export function MultiSelectDropdown({
           aria-label={label}
           className="absolute left-0 top-full z-20 mt-2 flex max-h-[min(32rem,70dvh)] w-full flex-col overflow-auto rounded bg-surface-light p-6 shadow-[0_8px_20px_rgba(0,0,0,0.04)] sm:w-[266px]"
         >
-          {selected.length > 0 && (
-            <button
-              type="button"
-              onClick={() => onChange([])}
-              className="mb-2 block w-full cursor-pointer text-right font-sans text-body-small text-error focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500"
-            >
-              Clear all
-            </button>
-          )}
+          <label className="flex cursor-pointer items-center justify-between gap-4 py-2 font-sans text-body-base text-on-surface-light">
+            <span>View All</span>
+            <input
+              type="checkbox"
+              checked={selected.length === 0}
+              onChange={() => onChange([])}
+              className="peer sr-only"
+            />
+            <span className="flex shrink-0 rounded-[2px] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-moody-moor-500">
+              {selected.length === 0 ? <SquareCheckIcon className="size-6" /> : <SquareIcon className="size-6" />}
+            </span>
+          </label>
           {options.map((option) => {
             const checked = selected.includes(option.value);
             return (
