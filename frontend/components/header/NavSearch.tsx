@@ -68,7 +68,9 @@ export default function NavSearch(props: DesktopProps | MobileProps) {
           className="fixed inset-x-0 top-full z-40 bg-background py-gap-lg border-b border-border-light"
         >
           <div className="tf-px">
-            <SearchField autoFocus onSearch={onSearch} />
+            <div className="tf-max-w">
+              <SearchField autoFocus onSearch={onSearch} />
+            </div>
           </div>
         </div>
       )}

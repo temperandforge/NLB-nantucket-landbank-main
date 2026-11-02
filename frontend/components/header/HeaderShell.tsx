@@ -83,7 +83,9 @@ export default function HeaderShell({banner, children}: {banner?: React.ReactNod
       }`}
     >
       {banner}
-      <div className="tf-px">{children}</div>
+      <div className="tf-px">
+        <div className="tf-max-w">{children}</div>
+      </div>
     </header>
   )
 }

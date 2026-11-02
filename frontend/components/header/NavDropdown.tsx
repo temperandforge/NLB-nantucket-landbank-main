@@ -61,7 +61,7 @@ export default function NavDropdown({
           : '-left-8 w-max min-w-64 rounded-b p-10'
       }`}
     >
-      <div className={grouped ? 'grid grid-cols-3 gap-x-gap-lg' : ''}>
+      <div className={grouped ? 'grid grid-cols-3 gap-x-gap-lg tf-max-w' : ''}>
         {columns.map((column, index) => (
           <div key={`${column.heading ?? 'none'}-${index}`} className="flex flex-col">
             {column.heading && <h3 className={LABEL_CLASS}>{column.heading}</h3>}
