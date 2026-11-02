@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+
+import { ChevronDownIcon, ChevronUpIcon, SquareCheckIcon, SquareIcon } from "@/components/icons";
 
 interface Option {
   value: string;
@@ -14,6 +16,13 @@ interface MultiSelectDropdownProps {
   onChange: (selected: string[]) => void;
 }
 
+/**
+ * One filter of the map (Figma: a button that opens a white panel of checkboxes). The button is the
+ * same as the one on the Properties page: label and chevron, with the light border while open or
+ * once something is chosen. The panel lists each option with the design's square on the right, and
+ * a red "Clear all" at the top once something is chosen. Closed by Escape (focus returns to the
+ * button) or a press outside.
+ */
 export function MultiSelectDropdown({
   label,
   options,
@@ -21,17 +30,27 @@ export function MultiSelectDropdown({
   onChange,
 }: MultiSelectDropdownProps) {
   const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const root = useRef<HTMLDivElement>(null);
+  const button = useRef<HTMLButtonElement>(null);
+  const panelId = useId();
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    if (!open) return;
+    const onPointer = (event: PointerEvent) => {
+      if (!root.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      button.current?.focus();
+    };
+    document.addEventListener("pointerdown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   function toggleValue(value: string) {
     if (selected.includes(value)) {
@@ -41,66 +60,59 @@ export function MultiSelectDropdown({
     }
   }
 
-  const summary =
-    selected.length === 0
-      ? "All"
-      : selected.length === 1
-        ? options.find((o) => o.value === selected[0])?.label
-        : `${selected.length} selected`;
+  const Chevron = open ? ChevronUpIcon : ChevronDownIcon;
 
   return (
-    <div ref={containerRef} className="relative w-full sm:w-81.25 sm:max-w-[35%]">
+    <div ref={root} className="relative w-full sm:w-[214px]">
       <button
+        ref={button}
         type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between gap-2 border border-black p-3 text-black hover:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen(!open)}
+        className={`flex w-full cursor-pointer items-center justify-between rounded border bg-input px-5 py-4 font-mono text-body-base text-on-input focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500 ${
+          open || selected.length > 0 ? "border-border-light" : "border-transparent"
+        }`}
       >
-        <span className="dropdown-container flex gap-2 items-center truncate">
-          {selected.length ? (
-            <>
-              <span className="font-medium">{label}:</span> {summary}
-            </>
-          ) : (
-            <span className="font-medium">{label}</span>
-          )}
-        </span>
-        <svg
-          className={`ml-2 size-4 shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-            clipRule="evenodd"
-          />
-        </svg>
+        <span>{selected.length > 0 ? `${label} (${selected.length})` : label}</span>
+        <Chevron className="size-6 shrink-0" />
       </button>
       {open && (
-        <div className="absolute right-0 z-20 mt-1 max-h-64 md:w-[85%] w-full overflow-auto border border-black bg-background lg:py-3 py-1 dark:border-neutral-700 dark:bg-neutral-900 scrollbar-thin">
+        <div
+          id={panelId}
+          role="group"
+          aria-label={label}
+          className="absolute left-0 top-full z-20 mt-2 flex max-h-[min(32rem,70dvh)] w-full flex-col overflow-auto rounded bg-surface-light p-6 shadow-[0_8px_20px_rgba(0,0,0,0.04)] sm:w-[266px]"
+        >
           {selected.length > 0 && (
             <button
               type="button"
               onClick={() => onChange([])}
-              className="mb-1 w-full rounded lg:px-6 px-3 py-1 text-left text-xs text-neutral-500 hover:bg-red-500 dark:hover:bg-red-500"
+              className="mb-2 block w-full cursor-pointer text-right font-sans text-body-small text-error focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500"
             >
               Clear all
             </button>
           )}
-          {options.map((option) => (
-            <label
-              key={option.value}
-              className="flex cursor-pointer items-center gap-10 justify-between py-2 lg:px-6 px-3 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-            >
-              {option.label}
-              <input
-                type="checkbox"
-                checked={selected.includes(option.value)}
-                onChange={() => toggleValue(option.value)}
-                className="dropdown-checkbox size-3 border-black dark:border-neutral-600"
-              />
-            </label>
-          ))}
+          {options.map((option) => {
+            const checked = selected.includes(option.value);
+            return (
+              <label
+                key={option.value}
+                className="flex cursor-pointer items-center justify-between gap-4 py-2 font-sans text-body-base text-on-surface-light"
+              >
+                <span>{option.label}</span>
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggleValue(option.value)}
+                  className="peer sr-only"
+                />
+                <span className="flex shrink-0 rounded-[2px] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-moody-moor-500">
+                  {checked ? <SquareCheckIcon className="size-6" /> : <SquareIcon className="size-6" />}
+                </span>
+              </label>
+            );
+          })}
         </div>
       )}
     </div>
