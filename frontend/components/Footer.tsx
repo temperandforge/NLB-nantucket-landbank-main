@@ -66,13 +66,16 @@ export default async function Footer() {
   return (
     <footer className="siteFooter relative overflow-hidden bg-lowlands-500 text-on-accent-primary">
       {/*
-        Decorative wave. Reproduces the Figma structure exactly: a 4758x760 box centred on the
-        footer, with the artwork bleeding past its top and left edges (inset -7.29% / -1.1%),
-        which is why the SVG itself is 4810x815. Clipped by the footer's overflow-hidden.
+        Decorative wave. Two pieces of artwork, as in Figma: the desktop one is a 4758x760 box centred
+        on the footer, with the artwork bleeding past its top and left edges (inset -7.29% / -1.1%),
+        which is why the SVG itself is 4810x815. The mobile one is its own, taller artwork (4592x1526,
+        the viewBox starts at -2108,-17 so the whole drawing is in view): it hangs from 17px above the
+        footer's top edge and runs to about 1,500px down, behind the stacked contact and menu columns.
+        Both are clipped by the footer's overflow-hidden.
       */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute top-0 left-1/2 h-[760px] w-[4758px] -translate-x-1/2 select-none"
+        className="pointer-events-none absolute top-0 left-1/2 hidden h-[760px] w-[4758px] -translate-x-1/2 select-none md:block"
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- decorative, fixed-size,
             already-optimised SVG; the Image component would add no value here. */}
@@ -82,6 +85,13 @@ export default async function Footer() {
           className="absolute block size-full max-w-none"
           style={{inset: '-7.29% 0 0 -1.1%'}}
         />
+      </div>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute top-[-17px] left-[calc(50%+0.5px)] h-[1526px] w-[4592px] -translate-x-1/2 select-none md:hidden"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element -- decorative, fixed-size SVG. */}
+        <img src="/images/footer-wave-mobile.svg" alt="" className="block size-full max-w-none" />
       </div>
 
       <div className="relative tf-px pt-10 pb-12 md:py-global-margin">
