@@ -20,7 +20,7 @@ type ErrorPageProps = {
   /** The status, as the small label above the heading ("404", "500"). */
   eyebrow: string
   /** The paragraph under the heading. */
-  body: string
+  body: React.ReactNode
   /** The actions: a search field, buttons, a reference code. */
   children?: React.ReactNode
 }
