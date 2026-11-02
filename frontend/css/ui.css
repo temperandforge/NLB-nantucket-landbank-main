@@ -75,7 +75,7 @@
   align-items: center;
   justify-content: center;
   gap: calc(var(--spacing) * 2);
-  height: 3rem;
+  padding-block: calc(var(--spacing) * 2.75);
   padding-inline: calc(var(--spacing) * 5);
   overflow: clip;
   position: relative;

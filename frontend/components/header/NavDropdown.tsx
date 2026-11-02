@@ -61,7 +61,7 @@ export default function NavDropdown({
           : '-left-8 w-max min-w-64 rounded-b p-10'
       }`}
     >
-      <div className={grouped ? 'grid grid-cols-3 gap-x-gap-lg' : ''}>
+      <div className={grouped ? 'grid grid-cols-3 gap-x-gap-lg tf-max-w' : ''}>
         {columns.map((column, index) => (
           <div key={`${column.heading ?? 'none'}-${index}`} className="flex flex-col">
             {column.heading && <h3 className={LABEL_CLASS}>{column.heading}</h3>}
@@ -73,7 +73,9 @@ export default function NavDropdown({
                     className="group flex h-14 w-fit items-center gap-gap-sm border-b border-transparent font-secondary text-body-base text-on-primary hover:border-border-alt focus-visible:border-border-alt"
                   >
                     {item.label}
-                    <ArrowRightIcon className="hidden size-6 text-secondary group-hover:block group-focus-visible:block" />
+                    {/* Always laid out, only hidden until hover or focus: if it took space only then,
+                        hovering the longest item would widen the whole panel. shrink-0 keeps it 24px. */}
+                    <ArrowRightIcon className="invisible size-6 shrink-0 text-secondary group-hover:visible group-focus-visible:visible" />
                   </ResolvedLink>
                 </li>
               ))}

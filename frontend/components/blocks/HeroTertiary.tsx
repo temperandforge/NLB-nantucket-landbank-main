@@ -10,19 +10,19 @@ export default function HeroTertiary({block}: BlockProps<'heroTertiary'>) {
   const Heading = stegaClean(block.headingLevel) === 'h2' ? 'h2' : 'h1'
 
   return (
-    <section className="relative w-full overflow-clip">
+    <section className="relative w-full overflow-clip tf-px">
       {/* The frame the art is positioned against. The SVG is the Figma line with its rotation baked
           in and extended past the 1440px frame, in the frame's own pixel coordinates, so it is
           placed at fixed offsets and never scaled. The full-bleed section does the clipping. The
           mobile frame shows a different stretch of the same line, hence the second offset. */}
-      <div className="tf-max-w relative px-5 py-s3 md:px-10">
+      <div className="tf-max-w relative py-s3">
         <Image
           src="/images/blocks/decorative-line-hero-tertiary-wide.svg"
           alt=""
           aria-hidden="true"
           width={5400}
           height={1300}
-          className="pointer-events-none absolute top-[-244px] left-[-2188px] z-0 h-auto w-[5400px]! max-w-none md:top-1/2 md:left-[-1500px] md:-translate-y-[470px]"
+          className="pointer-events-none absolute top-[-244px] left-[calc(-2188px-var(--tf-x))] z-0 h-auto w-[5400px]! max-w-none md:top-1/2 md:left-[calc(-1500px-var(--tf-x))] md:-translate-y-[470px]"
         />
         <div className="relative flex w-full flex-col items-start gap-2.5 md:flex-row md:flex-wrap md:justify-between md:gap-x-10">
           <div className="flex max-w-[34.5rem] flex-col items-start gap-5 text-on-background md:gap-6">

@@ -47,7 +47,6 @@ export default function ProjectView({
         aria-hidden="true"
       />
       <JumpNavLayout
-        variant="project"
         eyebrow={eyebrow}
         heading={project.name}
         headingLevel="h1"

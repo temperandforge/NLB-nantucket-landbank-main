@@ -84,10 +84,10 @@ export default async function Footer() {
         />
       </div>
 
-      <div className="relative px-5 pt-10 pb-12 md:px-global-margin md:py-global-margin">
+      <div className="relative tf-px pt-10 pb-12 md:py-global-margin">
         {/* Four bands stacked with 80px between them: newsletter and social, contact info,
             navigation, then the legal row. */}
-        <div className="flex flex-col gap-20">
+        <div className="flex flex-col gap-20 tf-max-w">
           {/* One set of social links: under the signup form on mobile, top-right from md. */}
           <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
             {newsletterHeading ? (

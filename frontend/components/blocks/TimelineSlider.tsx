@@ -72,10 +72,11 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
     const gutterProbe = document.createElement("div");
     gutterProbe.style.cssText = "position:absolute;visibility:hidden;padding-left:var(--tf-x)";
     rootRef.current!.appendChild(gutterProbe);
-    // Distance from each viewport edge to the page content (the same on both sides).
+    // Distance from each viewport edge to the page content (the same on both sides): the content
+    // is `tf-max-w` (85rem) centred inside the `tf-px` gutters.
     function getContentInset() {
       const gutter = parseFloat(getComputedStyle(gutterProbe).paddingLeft) || 0;
-      const maxWidth = 90 * (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
+      const maxWidth = 85 * (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
       return Math.max(gutter, (splideRoot!.clientWidth - maxWidth) / 2);
     }
 
@@ -362,7 +363,7 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
                   <div className="flex w-full items-start gap-6" style={{ height: `calc(${event.lineLength}px * var(--line-scale) + 130px)` }}>
                     {/* Figma: 1px stroke, dashed 3px on / 3px off. Drawn as a gradient so the pattern is
                         exact instead of whatever the browser picks for a dashed border. */}
-                    <div className="h-full w-0 shrink-0 border-l border-on-background-subtle md:w-px md:border-l-0 md:bg-[repeating-linear-gradient(to_bottom,var(--color-on-background-subtle)_0_3px,transparent_3px_6px)]" />
+                    <div className="h-full w-px shrink-0 bg-[repeating-linear-gradient(to_bottom,var(--color-on-background-subtle)_0_3px,transparent_3px_6px)]" />
                     <div className="flex h-full flex-1 flex-col items-start justify-between">
                       <p className="w-full font-serif text-headline-2xl font-normal leading-[1.05] text-on-background">
                         {event.year}

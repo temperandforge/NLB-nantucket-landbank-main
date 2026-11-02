@@ -247,6 +247,29 @@
   :root[data-draft] [data-enter] :is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part]):not(:is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part]) :is(h1,h2,h3,h4,h5,h6,p,img,picture,figure,blockquote,ul>li,ol>li,.button,[data-part])):not(:has(.cascade-word)):not(.load-in):not([aria-hidden="true"]):not([aria-hidden="true"] *):not([data-morph] *) {
     animation: none;
   }
+
+  /*
+   * Card grids in the load layer (RevealItem). A card that starts below the screen is held back and
+   * plays one fade and rise the first time it enters view, on its own clock, with no scroll
+   * scrubbing. RevealItem sets data-reveal after hydration; the server HTML carries none, so
+   * without JS every card is simply visible. !important because the parts rule above is far more
+   * specific and these attributes are only ever set by RevealItem.
+   */
+  [data-reveal="hidden"] {
+    opacity: 0 !important;
+    transform: translateY(var(--enter-rise)) !important;
+    animation: none !important;
+  }
+
+  [data-reveal="shown"] {
+    animation: part-in var(--motion-duration) var(--motion-ease) both !important;
+  }
+
+  :root[data-draft] [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
 }
 
 /*
