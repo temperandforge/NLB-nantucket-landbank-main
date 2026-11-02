@@ -42,6 +42,16 @@ export default function FilterTabs({
 }) {
   const groupRef = useRef<HTMLDivElement>(null)
   const mounted = useRef(false)
+  // The scrollbar only shows while the row is scrolling (see `scroll-x-autohide`).
+  const idleTimer = useRef(0)
+  useEffect(() => () => window.clearTimeout(idleTimer.current), [])
+  function showScrollbar() {
+    const group = groupRef.current
+    if (!group) return
+    group.setAttribute('data-scrolling', '')
+    window.clearTimeout(idleTimer.current)
+    idleTimer.current = window.setTimeout(() => group.removeAttribute('data-scrolling'), 1000)
+  }
   useEffect(() => {
     const pressed = groupRef.current?.querySelector<HTMLElement>('[aria-pressed="true"]')
     // Smooth only after the first render, so a deep-linked filter doesn't animate in on load.
@@ -67,7 +77,8 @@ export default function FilterTabs({
           ref={groupRef}
           role="group"
           aria-label={label}
-          className={`${padInside ? '' : '-mx-(--tf-x) '}flex items-center gap-10 overflow-x-auto scroll-x-visible px-(--tf-x) py-2 scroll-pl-(--tf-x) [mask-image:linear-gradient(to_right,transparent,black_var(--tf-x),black_calc(100%-var(--tf-x)),transparent)]`}
+          onScroll={showScrollbar}
+          className={`${padInside ? '' : '-mx-(--tf-x) '}flex items-center gap-10 overflow-x-auto scroll-x-autohide px-(--tf-x) py-2 scroll-pl-(--tf-x) [mask-image:linear-gradient(to_right,transparent,black_var(--tf-x),black_calc(100%-var(--tf-x)),transparent)]`}
         >
           {showAll && (
             <button

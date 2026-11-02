@@ -28,17 +28,22 @@
 }
 
 /**
- * A horizontal scroller whose scrollbar is always visible and takes its own space under the
- * content. iOS Safari and macOS hide an overlay scrollbar until you scroll, and when it does show
- * it is drawn over the bottom of the content. Styling ::-webkit-scrollbar switches those browsers
- * to a persistent bar that sits below the content. Firefox has no such pseudo-element, so it gets
- * the standard properties (Chrome would ignore the pseudo-element rules if it saw them, hence the
- * @supports gate).
+ * A horizontal scroller whose scrollbar only shows while it is being scrolled, and never over the
+ * content. iOS Safari and macOS draw an overlay scrollbar over the bottom of the content that is
+ * faint and can't be styled. Styling ::-webkit-scrollbar gives those browsers a bar that reserves
+ * its own strip under the content; it is transparent until the scroller has `data-scrolling`
+ * (FilterTabs sets it on scroll and clears it a moment after). Firefox has no such pseudo-element,
+ * so it gets the standard properties (Chrome would ignore the pseudo-element rules if it saw them,
+ * hence the @supports gate).
  */
-@utility scroll-x-visible {
+@utility scroll-x-autohide {
   @supports not selector(::-webkit-scrollbar) {
     scrollbar-width: thin;
-    scrollbar-color: var(--color-dusty-heath-300) var(--color-dusty-heath-800);
+    scrollbar-color: transparent transparent;
+
+    &[data-scrolling] {
+      scrollbar-color: var(--color-dusty-heath-300) var(--color-dusty-heath-800);
+    }
   }
 
   &::-webkit-scrollbar {
@@ -46,13 +51,21 @@
   }
 
   &::-webkit-scrollbar-track {
-    background: var(--color-dusty-heath-800);
+    background: transparent;
     border-radius: 9999px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: var(--color-dusty-heath-300);
+    background: transparent;
     border-radius: 9999px;
+  }
+
+  &[data-scrolling]::-webkit-scrollbar-track {
+    background: var(--color-dusty-heath-800);
+  }
+
+  &[data-scrolling]::-webkit-scrollbar-thumb {
+    background: var(--color-dusty-heath-300);
   }
 }
 
