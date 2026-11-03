@@ -34,7 +34,7 @@ function Runs({runs}: {runs: TextRun[]}) {
 }
 
 /**
- * One result: what kind of thing it is (and its date), its title, an excerpt around where the
+ * One result: what kind of thing it is, its title, its date, an excerpt around where the
  * words were found, and an arrow, or the download tray for a record. The whole row is the link and
  * takes the darker surface on hover and focus, like a record row.
  */
@@ -50,12 +50,14 @@ function ResultRow({result}: {result: SearchResult}) {
       >
         <p className="col-span-2 font-mono-tracked text-body-small uppercase tracking-[1.54px] leading-[1.6] text-on-background-subtle md:col-span-1 md:pt-2">
           {result.typeLabel}
-          {result.date && <span className="block normal-case tracking-normal">{result.date}</span>}
         </p>
         <div className="flex min-w-0 flex-col gap-3">
           <h2 className="break-words text-headline-sm leading-[1.2] tracking-normal">
             <Runs runs={result.title} />
           </h2>
+          {result.date && (
+            <p className="font-secondary text-body-base leading-[1.6] text-on-background-subtle">{result.date}</p>
+          )}
           {result.snippet.length > 0 && (
             <p className="font-secondary text-body-base leading-[1.6] text-on-background-subtle">
               <Runs runs={result.snippet} />

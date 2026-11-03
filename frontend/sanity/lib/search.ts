@@ -1,4 +1,4 @@
-import {formatDate, eventDateLabel} from './dates.ts'
+import {formatShortDate} from './dates.ts'
 import type {FilterTab} from '@/sanity/lib/archiveFilter'
 import type {SearchQueryResult} from '@/sanity.types'
 
@@ -69,7 +69,7 @@ export type SearchResult = {
   type: SearchType
   typeLabel: string
   title: TextRun[]
-  /** Date text where the type has one ("08/02/2026"); empty otherwise. */
+  /** Date text where the type has one ("Jun 22, 2026"); empty otherwise. */
   date: string
   snippet: TextRun[]
   href: string
@@ -172,8 +172,8 @@ function hrefFor(row: Row): {href: string; external: boolean} | null {
 }
 
 function dateFor(row: Row): string {
-  if (row._type === 'event') return eventDateLabel(row.start)
-  if (row._type === 'article' || row._type === 'record') return formatDate(row.date)
+  if (row._type === 'event') return formatShortDate(row.start)
+  if (row._type === 'article' || row._type === 'record') return formatShortDate(row.date)
   return ''
 }
 

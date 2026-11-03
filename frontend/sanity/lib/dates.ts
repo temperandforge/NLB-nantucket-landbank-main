@@ -28,6 +28,25 @@ export function formatDate(value: string | null | undefined): string {
   return date ? `${date.month}/${date.day}/${date.year}` : ''
 }
 
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+/**
+ * "Jun 22, 2026": the one date format for lists of mixed content (search results). Takes a Sanity
+ * `date` (YYYY-MM-DD, read as written) or a `datetime` (an instant, read in the site time zone).
+ * An event shows its start date only, so a range reads the same as a single day. Empty when the
+ * value is missing or invalid.
+ */
+export function formatShortDate(value: string | null | undefined): string {
+  if (!value) return ''
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const date = parseDate(value)
+    return date ? `${MONTHS[Number(date.month) - 1]} ${Number(date.day)}, ${date.year}` : ''
+  }
+  const instant = new Date(value)
+  if (Number.isNaN(instant.getTime())) return ''
+  return part(instant, {month: 'short', day: 'numeric', year: 'numeric'})
+}
+
 function part(date: Date, options: Intl.DateTimeFormatOptions) {
   return new Intl.DateTimeFormat('en-US', {timeZone: SITE_TIME_ZONE, ...options}).format(date)
 }
