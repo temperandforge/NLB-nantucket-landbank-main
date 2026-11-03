@@ -3,6 +3,7 @@
 import {useEffect, useRef, useState} from 'react'
 
 import Image from '@/components/SanityImage'
+import {watchOnScreen} from '@/components/watchOnScreen'
 import {ExtractPageBuilderType} from '@/sanity/lib/types'
 
 type HeroVideoProps = {
@@ -17,12 +18,15 @@ type HeroVideoProps = {
  *
  * Autoplays muted and looping unless the editor turned autoplay off or the visitor prefers
  * reduced motion. A pause/play button is always present, since moving content that runs for more
- * than a few seconds has to be stoppable.
+ * than a few seconds has to be stoppable. It plays only while it is on screen in a foreground tab,
+ * and resumes afterwards unless the visitor paused it themselves.
  */
 export default function HeroVideo({block}: HeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const wantsAutoplay = block?.autoplay !== false
   const [playing, setPlaying] = useState(false)
+  // The visitor pressed pause: scrolling back into view must not override that.
+  const userPaused = useRef(false)
 
   useEffect(() => {
     const video = videoRef.current
@@ -32,12 +36,25 @@ export default function HeroVideo({block}: HeroVideoProps) {
       video.pause()
       return
     }
+    // Whether the video is on screen in a foreground tab, and whether the load-time start has
+    // happened. It plays only when both are true and the visitor hasn't paused it.
+    let onScreen = false
+    let started = false
+    const play = () => {
+      if (onScreen && started && !userPaused.current) video.play().catch(() => setPlaying(false))
+    }
+    const stopWatching = watchOnScreen(video, (active) => {
+      onScreen = active
+      if (active) play()
+      else video.pause()
+    })
     // The poster is the LCP element, and the video starts downloading the moment it plays. Wait
     // until the page has loaded (and the browser is idle) so the two don't compete for bandwidth,
     // which matters most on a phone. Browsers may still refuse to play; the poster stays visible
     // and the button starts it.
     const start = () => {
-      video.play().catch(() => setPlaying(false))
+      started = true
+      play()
     }
     let idle: number | undefined
     let timer: number | undefined
@@ -52,6 +69,7 @@ export default function HeroVideo({block}: HeroVideoProps) {
     if (document.readyState === 'complete') whenLoaded()
     else window.addEventListener('load', whenLoaded, {once: true})
     return () => {
+      stopWatching()
       window.removeEventListener('load', whenLoaded)
       if (idle !== undefined) window.cancelIdleCallback(idle)
       if (timer !== undefined) window.clearTimeout(timer)
@@ -64,6 +82,7 @@ export default function HeroVideo({block}: HeroVideoProps) {
   function toggle() {
     const video = videoRef.current
     if (!video) return
+    userPaused.current = !video.paused
     if (video.paused) void video.play()
     else video.pause()
   }
