@@ -1113,6 +1113,21 @@ export type Geopoint = {
   alt?: number
 }
 
+export type Redirect = {
+  _id: string
+  _type: 'redirect'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  source?: string
+  destination?: Link
+  statusCode: 301 | 302 | 303 | 307 | 308 | 410
+  passQuery?: boolean
+  enabled?: boolean
+  origin?: 'manual' | 'auto'
+  note?: string
+}
+
 export type SingleProjectPage = {
   _id: string
   _type: 'singleProjectPage'
@@ -1803,6 +1818,7 @@ export type AllSanitySchemaTypes =
   | FaqReference
   | Property
   | Geopoint
+  | Redirect
   | SingleProjectPage
   | SingleNewsPage
   | FaqSettings

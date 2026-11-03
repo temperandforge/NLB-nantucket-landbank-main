@@ -1113,6 +1113,21 @@ export type Geopoint = {
   alt?: number
 }
 
+export type Redirect = {
+  _id: string
+  _type: 'redirect'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  source?: string
+  destination?: Link
+  statusCode: 301 | 302 | 303 | 307 | 308 | 410
+  passQuery?: boolean
+  enabled?: boolean
+  origin?: 'manual' | 'auto'
+  note?: string
+}
+
 export type SingleProjectPage = {
   _id: string
   _type: 'singleProjectPage'
@@ -1803,6 +1818,7 @@ export type AllSanitySchemaTypes =
   | FaqReference
   | Property
   | Geopoint
+  | Redirect
   | SingleProjectPage
   | SingleNewsPage
   | FaqSettings
@@ -5200,6 +5216,16 @@ export type SearchQueryResult = Array<
     }
 >
 
+// Source: sanity/lib/queries.ts
+// Variable: redirectsQuery
+// Query: *[_type == "redirect" && defined(source) && coalesce(enabled, true)]{    source,    "statusCode": coalesce(statusCode, 301),    "passQuery": coalesce(passQuery, true),    "destination": select(      coalesce(statusCode, 301) == 410 => null,      destination.linkType == "page" => select(        defined(destination.page->_id) && !coalesce(destination.page->pathOnly, false)          && destination.page._ref == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref => "/",        defined(destination.page->slug.current) && !coalesce(destination.page->pathOnly, false) =>          "/" + destination.page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path,        null      ),      destination.href    )  }
+export type RedirectsQueryResult = Array<{
+  source: string | null
+  statusCode: 301 | 302 | 303 | 307 | 308 | 410
+  passQuery: boolean | true
+  destination: null | string | '/'
+}>
+
 // Query TypeMap
 import '@sanity/client'
 declare module '@sanity/client' {
@@ -5235,5 +5261,6 @@ declare module '@sanity/client' {
     '\n  *[_type == "event" && defined(slug.current)]{"slug": slug.current}\n': EventSlugsResult
     '\n  *[_type == "event" && defined(slug.current) && !coalesce(seo.noIndex, false)]{_updatedAt, "slug": slug.current}\n': EventSitemapDataResult
     '\n  *[\n    (\n      (_type == "page" && !coalesce(pathOnly, false) && defined(slug.current))\n      || (_type in ["article", "project", "event", "property"] && defined(slug.current))\n      || (_type == "record" && defined(file.asset))\n    )\n    && [\n      title, name, description, pt::text(body),\n      pageBuilder[!coalesce(disabled, false)].heading,\n      pageBuilder[!coalesce(disabled, false)].body\n    ] match $terms\n  ] | score(\n    boost(title match $terms, 8),\n    boost(name match $terms, 8),\n    description match $terms,\n    pt::text(body) match $terms\n  ) | order(_score desc, _updatedAt desc) [0...$limit] {\n    _id,\n    _type,\n    "title": coalesce(title, name),\n    "slug": slug.current,\n    "path": select(_type == "page" => select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)),\n    date,\n    start,\n    externalUrl,\n    "fileUrl": file.asset->url,\n    description,\n    "body": pt::text(body),\n    "blocks": pageBuilder[!coalesce(disabled, false)].body\n  }\n': SearchQueryResult
+    '\n  *[_type == "redirect" && defined(source) && coalesce(enabled, true)]{\n    source,\n    "statusCode": coalesce(statusCode, 301),\n    "passQuery": coalesce(passQuery, true),\n    "destination": select(\n      coalesce(statusCode, 301) == 410 => null,\n      destination.linkType == "page" => select(\n        defined(destination.page->_id) && !coalesce(destination.page->pathOnly, false)\n          && destination.page._ref == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref => "/",\n        defined(destination.page->slug.current) && !coalesce(destination.page->pathOnly, false) =>\n          "/" + destination.page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path,\n        null\n      ),\n      destination.href\n    )\n  }\n': RedirectsQueryResult
   }
 }

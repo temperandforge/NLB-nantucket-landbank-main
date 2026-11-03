@@ -1,4 +1,10 @@
-import {FooterQueryResult, GetPageQueryResult, HeaderQueryResult, SiteBannerQueryResult} from '@/sanity.types'
+import {
+  FooterQueryResult,
+  GetPageQueryResult,
+  HeaderQueryResult,
+  RedirectsQueryResult,
+  SiteBannerQueryResult,
+} from '@/sanity.types'
 
 export type PageBuilderSection = NonNullable<NonNullable<GetPageQueryResult>['pageBuilder']>[number]
 export type ExtractPageBuilderType<T extends PageBuilderSection['_type']> = Extract<
@@ -45,3 +51,9 @@ export type HeaderMenuLeaf = Extract<HeaderMenuItem, {_type: 'menuLink'}>
 export type HeaderMenuGroup = Extract<HeaderMenuItem, {_type: 'menuGroup'}>
 export type HeaderMenuChild = HeaderMenuGroup['children'][number]
 export type SiteBannerData = NonNullable<SiteBannerQueryResult>
+
+/**
+ * A redirect rule as the proxy receives it. `source` is typed nullable by typegen even though the
+ * query filters on defined(source); the proxy drops any such row before matching.
+ */
+export type RedirectRule = RedirectsQueryResult[number]
