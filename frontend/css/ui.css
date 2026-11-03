@@ -59,8 +59,8 @@
 
 /* ---- Tag. Letter-spacing is --tracking-wide (2px), as in nlb-design. ------------------------- */
 @utility tag-label {
-  white-space: nowrap;
   overflow-wrap: break-word;
+  text-align: center;
   font-family: var(--font-mono);
   font-size: var(--text-body-small);
   line-height: 1.6;
