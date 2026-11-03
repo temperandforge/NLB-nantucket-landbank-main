@@ -26,6 +26,15 @@ export const altTextField = () =>
       }),
   })
 
+/** The caption shown under an image. Optional; unlike alt text it is for every reader, not a description. */
+export const captionField = () =>
+  defineField({
+    name: 'caption',
+    title: 'Caption',
+    type: 'string',
+    description: 'Optional. Shown under the image, e.g. a credit or what the photo shows.',
+  })
+
 /**
  * An image with the alt text stored on the image itself, so it travels with the asset reference
  * in a query. Required where the block makes no sense without it.

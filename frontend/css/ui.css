@@ -502,6 +502,451 @@
   list-style: decimal;
 }
 
+/* Quote (the Quote paragraph style): someone else's words inside the flow. Smaller than a pull
+   quote and set apart by an inset and a hairline, so it reads as cited text, not as a feature.
+   The editor types any quotation marks themselves. */
+.rich-text-article > blockquote,
+.rich-text-project > blockquote {
+  margin-block: 2.5rem;
+  border-inline-start: 1px solid var(--color-border-light);
+  padding-inline-start: 1.5rem;
+  color: var(--color-on-background-subtle);
+  font-family: var(--font-serif);
+  font-size: var(--text-headline-sm);
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  text-wrap: pretty;
+}
+
+/* Pull quote: one line lifted from the article and set large between two rules. The quotation
+   marks come from CSS, so the editor types the line bare. The attribution uses the same mono caps
+   as the article's category label. */
+.rich-text-article > .pullquote,
+.rich-text-project > .pullquote {
+  margin-block: 3rem;
+  border-block: 1px solid var(--color-dusty-heath-700);
+  padding-block: 2.5rem;
+  text-align: center;
+}
+
+.pullquote__text {
+  quotes: '\201C' '\201D' '\2018' '\2019';
+  color: var(--color-accent-secondary);
+  font-family: var(--font-serif);
+  font-size: var(--text-headline-lg);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.pullquote__text::before {
+  content: open-quote;
+}
+
+.pullquote__text::after {
+  content: close-quote;
+}
+
+.pullquote__attribution {
+  margin-top: 1.5rem;
+  color: var(--color-on-background-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-body-small);
+  line-height: 1.6;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+/* Image caption: under a body image or a gallery image. Small sans in the muted brown, like the
+   article's date line. */
+.figure-caption {
+  margin-top: 0.75rem;
+  color: var(--color-on-background-subtle);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-small);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* Image gallery: a figure holding a grid of figures, so the gallery caption sits under the grid.
+   One column on a phone, two from 640px. An odd last image takes the full row so the grid never
+   ends on a hole. */
+.rich-text-article > .image-gallery,
+.rich-text-project > .image-gallery {
+  margin-block: 2.5rem;
+}
+
+.image-gallery__grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.image-gallery__grid > figure {
+  margin: 0;
+}
+
+.image-gallery__tile {
+  display: block;
+  width: 100%;
+  cursor: zoom-in;
+}
+
+.image-gallery__tile:focus-visible {
+  outline: 2px solid var(--color-moody-moor-500);
+  outline-offset: 2px;
+}
+
+/* Lightbox: a native dialog covering the viewport in the site background, slightly see-through and
+   blurred so the page stays a presence behind the picture. The picture is shown whole (contain),
+   with its caption beneath; controls sit at the edges and are 48px for a thumb. It fades in and
+   out; the picture rises in, and again each time it changes. All motion is off under
+   prefers-reduced-motion. */
+.lightbox {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  padding: 4.5rem 1rem 3rem;
+  background: color-mix(in srgb, var(--color-background) 80%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--color-on-background);
+  /* Hand pan gestures to the swipe handler; pinch-zoom stays with the browser. */
+  touch-action: pinch-zoom;
+}
+
+/* The browser's default backdrop is a flat 10% black that does not fade with the dialog, so it
+   would darken the page while the overlay fades out. The dialog is the whole overlay. */
+.lightbox::backdrop {
+  background: transparent;
+}
+
+.lightbox[open] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lightbox {
+    opacity: 0;
+    transition:
+      opacity 220ms cubic-bezier(0.16, 1, 0.3, 1),
+      display 220ms allow-discrete,
+      overlay 220ms allow-discrete;
+  }
+
+  .lightbox[open] {
+    opacity: 1;
+  }
+
+  @starting-style {
+    .lightbox[open] {
+      opacity: 0;
+    }
+  }
+
+  .lightbox__figure {
+    animation: lightbox-rise 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes lightbox-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.985);
+  }
+}
+
+.lightbox__figure {
+  display: flex;
+  max-width: 100%;
+  max-height: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin: 0;
+}
+
+.lightbox__image {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: calc(100dvh - 11rem);
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+.lightbox__caption {
+  max-width: 40rem;
+  font-family: var(--font-sans);
+  font-size: var(--text-body-small);
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.lightbox__count {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-body-small);
+  letter-spacing: var(--tracking-wide);
+}
+
+.lightbox__button {
+  position: absolute;
+  display: flex;
+  width: 3rem;
+  height: 3rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  color: var(--color-on-background);
+  cursor: pointer;
+  transition: background-color 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lightbox__button:hover {
+  background: color-mix(in srgb, var(--color-moody-moor-500) 10%, transparent);
+}
+
+.lightbox__button:focus-visible {
+  outline: 2px solid var(--color-moody-moor-500);
+  outline-offset: 2px;
+}
+
+.lightbox__close {
+  top: 1rem;
+  right: 1rem;
+}
+
+.lightbox__prev,
+.lightbox__next {
+  bottom: 0.75rem;
+}
+
+.lightbox__prev {
+  left: calc(50% - 3.5rem);
+}
+
+.lightbox__next {
+  left: calc(50% + 0.5rem);
+}
+
+@media (min-width: 48rem) {
+  .lightbox {
+    padding-inline: 6rem;
+  }
+
+  .lightbox__prev,
+  .lightbox__next {
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+  }
+
+  .lightbox__prev {
+    left: 1.5rem;
+  }
+
+  .lightbox__next {
+    left: auto;
+    right: 1.5rem;
+  }
+}
+
+@media (min-width: 40rem) {
+  .image-gallery__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .image-gallery__grid > figure:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* The gallery's own caption, below the grid, reads as a caption for the set. */
+.image-gallery > .figure-caption {
+  margin-top: 1.25rem;
+  text-align: center;
+}
+
+/* Divider: a break inside the article. The full line matches the rule under the title; the short
+   one is a small centred mark. */
+.rich-text-article > .divider,
+.rich-text-project > .divider {
+  margin-block: 3rem;
+  border: 0;
+  border-top: 1px solid var(--color-dusty-heath-700);
+}
+
+.rich-text-article > .divider--short,
+.rich-text-project > .divider--short {
+  width: 4rem;
+  margin-inline: auto;
+  border-top-color: var(--color-border-light);
+}
+
+/* Callout with image: a statement set large beside a photo that keeps its own proportions. Text
+   first on a phone; from 640px two columns with the text centred against the photo. The image
+   column is capped so a portrait photo does not take half the article. */
+.rich-text-article > .callout-image,
+.rich-text-project > .callout-image {
+  display: grid;
+  gap: 1.5rem 3rem;
+  margin-block: 3rem;
+}
+
+.callout-image__text {
+  color: var(--color-accent-secondary);
+  font-family: var(--font-serif);
+  font-size: var(--text-headline-base);
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.callout-image__figure {
+  margin: 0;
+}
+
+@media (min-width: 40rem) {
+  .rich-text-article > .callout-image,
+  .rich-text-project > .callout-image {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+    align-items: center;
+  }
+
+  .callout-image--image-first {
+    grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+  }
+
+  .callout-image--image-first > .callout-image__figure {
+    order: -1;
+  }
+}
+
+/* Table: scrolls sideways inside the article column rather than widening the page. The header row
+   is the dusty-heath tag colour; rows are separated by hairlines. */
+.rich-text-article > .table-block,
+.rich-text-project > .table-block {
+  margin-block: 2.5rem;
+}
+
+.table-block__scroll {
+  overflow-x: auto;
+}
+
+.table-block__scroll:focus-visible {
+  outline: 2px solid var(--color-moody-moor-500);
+  outline-offset: 2px;
+}
+
+.table-block table {
+  width: 100%;
+  min-width: 32rem;
+  border-collapse: collapse;
+  font-size: var(--text-body-base);
+  line-height: 1.5;
+  text-align: left;
+}
+
+.table-block caption {
+  caption-side: bottom;
+  padding-top: 0.75rem;
+  color: var(--color-on-background-subtle);
+  font-size: var(--text-body-small);
+  text-align: left;
+}
+
+.table-block th {
+  background: var(--color-tag);
+  color: var(--color-on-tag);
+  font-family: var(--font-mono);
+  font-size: var(--text-body-small);
+  font-weight: 400;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.table-block th,
+.table-block td {
+  padding: 0.75rem 1rem;
+  vertical-align: top;
+}
+
+.table-block tbody tr {
+  border-bottom: 1px solid var(--color-dusty-heath-700);
+}
+
+/* Video: a 16:9 panel that is a play button until pressed, so no video host is contacted before
+   then. */
+.rich-text-article > .video-figure,
+.rich-text-project > .video-figure {
+  margin-block: 2.5rem;
+}
+
+.video-embed {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--color-surface-dark);
+}
+
+.video-embed__frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.video-embed__play {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  color: var(--color-on-background);
+  cursor: pointer;
+  transition: background-color 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.video-embed__play:hover {
+  background: var(--color-dusty-heath-800);
+}
+
+.video-embed__play:focus-visible {
+  outline: 2px solid var(--color-moody-moor-500);
+  outline-offset: -6px;
+}
+
+.video-embed__icon {
+  width: 4rem;
+  height: 4rem;
+  padding: 1rem 0.75rem 1rem 1.25rem;
+  border-radius: 9999px;
+  background: var(--color-accent-primary);
+  color: var(--color-on-accent-primary);
+}
+
+.video-embed__title {
+  max-width: 32rem;
+  font-family: var(--font-serif);
+  font-size: var(--text-headline-sm);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-align: center;
+  text-wrap: balance;
+}
+
 .article-curve {
   background: url('/images/blocks/article-curve.svg') center / 100% 100% no-repeat;
 }

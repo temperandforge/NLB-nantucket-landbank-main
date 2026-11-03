@@ -42,6 +42,12 @@ import {singleNewsPage} from './singletons/singleNewsPage'
 import {singleProjectPage} from './singletons/singleProjectPage'
 import {link} from './objects/link'
 import {anchorLinks} from './objects/anchorLinks'
+import {pullquote} from './objects/pullquote'
+import {imageGallery} from './objects/imageGallery'
+import {divider} from './objects/divider'
+import {calloutImage} from './objects/calloutImage'
+import {table} from './objects/table'
+import {videoEmbed} from './objects/videoEmbed'
 import {faqAccordion} from './objects/faqAccordion'
 import {peopleGrid} from './objects/peopleGrid'
 import {projectGrid} from './objects/projectGrid'
@@ -128,6 +134,12 @@ export const schemaTypes = [
   contactForm,
   link,
   anchorLinks,
+  pullquote,
+  imageGallery,
+  divider,
+  calloutImage,
+  table,
+  videoEmbed,
   faqAccordion,
   missionStatement,
   newsPreview,
