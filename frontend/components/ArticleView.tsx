@@ -67,7 +67,7 @@ export default function ArticleView({
             </Enter>
           )}
         </div>
-        <Enter>
+        <Enter className="max-md:w-full">
           <ShareLinks label={shareLabel} />
         </Enter>
       </div>
