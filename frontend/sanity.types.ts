@@ -295,6 +295,65 @@ export type FaqAccordion = {
   }>
 }
 
+export type VideoEmbed = {
+  _type: 'videoEmbed'
+  url: string
+  title: string
+  caption?: string
+}
+
+export type Table = {
+  _type: 'table'
+  rows: Array<{
+    cells: Array<string>
+    _type: 'tableRow'
+    _key: string
+  }>
+  firstRowHeader?: boolean
+  caption?: string
+}
+
+export type CalloutImage = {
+  _type: 'calloutImage'
+  text: string
+  image: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    caption?: string
+    _type: 'image'
+  }
+  imagePosition?: 'right' | 'left'
+}
+
+export type Divider = {
+  _type: 'divider'
+  style?: 'full' | 'short'
+}
+
+export type ImageGallery = {
+  _type: 'imageGallery'
+  images: Array<{
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    caption?: string
+    _type: 'galleryImage'
+    _key: string
+  }>
+  caption?: string
+}
+
+export type Pullquote = {
+  _type: 'pullquote'
+  quote: string
+  attribution?: string
+}
+
 export type AnchorLinks = {
   _type: 'anchorLinks'
   links?: Array<{
@@ -579,6 +638,7 @@ export type BlockContentWithForm = Array<
       hotspot?: SanityImageHotspot
       crop?: SanityImageCrop
       alt?: string
+      caption?: string
       _type: 'image'
       _key: string
     }
@@ -637,6 +697,7 @@ export type BlockContent = Array<
       hotspot?: SanityImageHotspot
       crop?: SanityImageCrop
       alt?: string
+      caption?: string
       _type: 'image'
       _key: string
     }
@@ -929,7 +990,60 @@ export type Article = {
     alt?: string
     _type: 'image'
   }
-  body?: BlockContent
+  body?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>
+          text?: string
+          _type: 'span'
+          _key: string
+        }>
+        style?: 'normal' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
+        listItem?: 'bullet' | 'number'
+        markDefs?: Array<{
+          linkType?: 'href' | 'page'
+          href?: string
+          page?: PageReference
+          openInNewTab?: boolean
+          _type: 'link'
+          _key: string
+        }>
+        level?: number
+        _type: 'block'
+        _key: string
+      }
+    | {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        caption?: string
+        _type: 'image'
+        _key: string
+      }
+    | ({
+        _key: string
+      } & AnchorLinks)
+    | ({
+        _key: string
+      } & Pullquote)
+    | ({
+        _key: string
+      } & ImageGallery)
+    | ({
+        _key: string
+      } & Divider)
+    | ({
+        _key: string
+      } & CalloutImage)
+    | ({
+        _key: string
+      } & Table)
+    | ({
+        _key: string
+      } & VideoEmbed)
+  >
   categories?: Array<
     {
       _key: string
@@ -1076,6 +1190,7 @@ export type Property = {
         hotspot?: SanityImageHotspot
         crop?: SanityImageCrop
         alt?: string
+        caption?: string
         _type: 'image'
         _key: string
       }
@@ -1769,6 +1884,12 @@ export type AllSanitySchemaTypes =
   | NewsPreview
   | MissionStatement
   | FaqAccordion
+  | VideoEmbed
+  | Table
+  | CalloutImage
+  | Divider
+  | ImageGallery
+  | Pullquote
   | AnchorLinks
   | PageReference
   | Link
@@ -2339,6 +2460,7 @@ export type GetPageQueryResult = {
               hotspot?: SanityImageHotspot
               crop?: SanityImageCrop
               alt?: string
+              caption?: string
               _type: 'image'
               _key: string
               markDefs: null
@@ -2391,6 +2513,7 @@ export type GetPageQueryResult = {
               hotspot?: SanityImageHotspot
               crop?: SanityImageCrop
               alt?: string
+              caption?: string
               _type: 'image'
               _key: string
               markDefs: null
@@ -2571,6 +2694,7 @@ export type GetPageQueryResult = {
                     hotspot?: SanityImageHotspot
                     crop?: SanityImageCrop
                     alt?: string
+                    caption?: string
                     _type: 'image'
                     _key: string
                     markDefs: null
@@ -2624,6 +2748,7 @@ export type GetPageQueryResult = {
                   hotspot?: SanityImageHotspot
                   crop?: SanityImageCrop
                   alt?: string
+                  caption?: string
                   _type: 'image'
                   _key: string
                   markDefs: null
@@ -2862,6 +2987,7 @@ export type GetPageQueryResult = {
                       hotspot?: SanityImageHotspot
                       crop?: SanityImageCrop
                       alt?: string
+                      caption?: string
                       _type: 'image'
                       _key: string
                       markDefs: null
@@ -3435,6 +3561,7 @@ export type LandingPageQueryResult = {
               hotspot?: SanityImageHotspot
               crop?: SanityImageCrop
               alt?: string
+              caption?: string
               _type: 'image'
               _key: string
               markDefs: null
@@ -3487,6 +3614,7 @@ export type LandingPageQueryResult = {
               hotspot?: SanityImageHotspot
               crop?: SanityImageCrop
               alt?: string
+              caption?: string
               _type: 'image'
               _key: string
               markDefs: null
@@ -3667,6 +3795,7 @@ export type LandingPageQueryResult = {
                     hotspot?: SanityImageHotspot
                     crop?: SanityImageCrop
                     alt?: string
+                    caption?: string
                     _type: 'image'
                     _key: string
                     markDefs: null
@@ -3720,6 +3849,7 @@ export type LandingPageQueryResult = {
                   hotspot?: SanityImageHotspot
                   crop?: SanityImageCrop
                   alt?: string
+                  caption?: string
                   _type: 'image'
                   _key: string
                   markDefs: null
@@ -3958,6 +4088,7 @@ export type LandingPageQueryResult = {
                       hotspot?: SanityImageHotspot
                       crop?: SanityImageCrop
                       alt?: string
+                      caption?: string
                       _type: 'image'
                       _key: string
                       markDefs: null
@@ -4485,13 +4616,79 @@ export type ArticleQueryResult = {
         _key: string
       }
     | {
+        _key: string
+        _type: 'calloutImage'
+        text: string
+        image: {
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          alt?: string
+          caption?: string
+          _type: 'image'
+        }
+        imagePosition?: 'left' | 'right'
+        markDefs: null
+      }
+    | {
+        _key: string
+        _type: 'divider'
+        style?: 'full' | 'short'
+        markDefs: null
+      }
+    | {
         asset?: SanityImageAssetReference
         media?: unknown
         hotspot?: SanityImageHotspot
         crop?: SanityImageCrop
         alt?: string
+        caption?: string
         _type: 'image'
         _key: string
+        markDefs: null
+      }
+    | {
+        _key: string
+        _type: 'imageGallery'
+        images: Array<{
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          alt?: string
+          caption?: string
+          _type: 'galleryImage'
+          _key: string
+        }>
+        caption?: string
+        markDefs: null
+      }
+    | {
+        _key: string
+        _type: 'pullquote'
+        quote: string
+        attribution?: string
+        markDefs: null
+      }
+    | {
+        _key: string
+        _type: 'table'
+        rows: Array<{
+          cells: Array<string>
+          _type: 'tableRow'
+          _key: string
+        }>
+        firstRowHeader?: boolean
+        caption?: string
+        markDefs: null
+      }
+    | {
+        _key: string
+        _type: 'videoEmbed'
+        url: string
+        title: string
+        caption?: string
         markDefs: null
       }
   > | null
@@ -4678,6 +4875,7 @@ export type ProjectQueryResult = {
                 hotspot?: SanityImageHotspot
                 crop?: SanityImageCrop
                 alt?: string
+                caption?: string
                 _type: 'image'
                 _key: string
                 markDefs: null
@@ -4836,6 +5034,7 @@ export type PropertyQueryResult = {
         hotspot?: SanityImageHotspot
         crop?: SanityImageCrop
         alt?: string
+        caption?: string
         _type: 'image'
         _key: string
         markDefs: null
@@ -4892,6 +5091,7 @@ export type PropertyQueryResult = {
           hotspot?: SanityImageHotspot
           crop?: SanityImageCrop
           alt?: string
+          caption?: string
           _type: 'image'
           _key: string
           markDefs: null

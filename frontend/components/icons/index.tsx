@@ -432,3 +432,12 @@ export function AlertCircleIcon({className}: IconProps) {
     </svg>
   )
 }
+
+/** Play triangle, on a video's play button. 24 x 24, solid; drawn, not exported from Figma. */
+export function PlayIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <path d="M7 4.5V19.5L19.5 12L7 4.5Z" fill="currentColor" />
+    </svg>
+  )
+}

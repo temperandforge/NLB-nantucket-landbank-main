@@ -1,6 +1,6 @@
 import {defineArrayMember, defineType, defineField} from 'sanity'
 import type {Link} from '../../../sanity.types'
-import {altTextField} from './blockFields'
+import {altTextField, captionField} from './blockFields'
 
 /**
  * This is the schema definition for the rich text fields used for
@@ -18,8 +18,26 @@ import {altTextField} from './blockFields'
  * The members of the rich text. No H1: a page's main heading belongs to the block's own heading
  * field. H3 is the top level by default; `h2` adds Heading 2 for a field that stands in for a page
  * section, such as a property's About text, where the editor writes the section heading.
+ * `pullquote` adds the Pull quote block and `gallery` the Image gallery block, `divider` a Divider, `callout` a Callout with image, `table` a Table, `video` a Video, for long-form text
+ * such as a news article.
  */
-export function blockContentMembers({h2 = false}: {h2?: boolean} = {}) {
+export function blockContentMembers({
+  h2 = false,
+  pullquote = false,
+  gallery = false,
+  divider = false,
+  callout = false,
+  table = false,
+  video = false,
+}: {
+  h2?: boolean
+  pullquote?: boolean
+  gallery?: boolean
+  divider?: boolean
+  callout?: boolean
+  table?: boolean
+  video?: boolean
+} = {}) {
   return [
     defineArrayMember({
       type: 'block',
@@ -101,9 +119,15 @@ export function blockContentMembers({h2 = false}: {h2?: boolean} = {}) {
       options: {
         hotspot: true,
       },
-      fields: [altTextField()],
+      fields: [altTextField(), captionField()],
     }),
     defineArrayMember({type: 'anchorLinks'}),
+    ...(pullquote ? [defineArrayMember({type: 'pullquote'})] : []),
+    ...(gallery ? [defineArrayMember({type: 'imageGallery'})] : []),
+    ...(divider ? [defineArrayMember({type: 'divider'})] : []),
+    ...(callout ? [defineArrayMember({type: 'calloutImage'})] : []),
+    ...(table ? [defineArrayMember({type: 'table'})] : []),
+    ...(video ? [defineArrayMember({type: 'videoEmbed'})] : []),
   ]
 }
 

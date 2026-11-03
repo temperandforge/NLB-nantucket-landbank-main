@@ -18,9 +18,12 @@ import ResolvedLink from '@/components/ResolvedLink'
 import Image from '@/components/SanityImage'
 import FormView from '@/components/ui/form/FormView'
 import FaqItem from '@/components/blocks/FaqItem'
+import GalleryGrid from '@/components/GalleryGrid'
+import VideoEmbed from '@/components/VideoEmbed'
 import LinkRow from '@/components/ui/LinkRow'
 import {ExtractPageBuilderType} from '@/sanity/lib/types'
 import {linkResolver} from '@/sanity/lib/utils'
+import {videoEmbedSrc} from '@/sanity/lib/video'
 
 /** One row of an anchor-links item, derived from the generated query result so it cannot drift. */
 type AnchorLinkRow = NonNullable<
@@ -37,6 +40,16 @@ type FaqAccordionItem = NonNullable<
     {_type: 'faqAccordion'}
   >['items']
 >[number]
+
+/** One image of an image gallery block. Typed by hand: the body's query result is a wide union. */
+type GalleryImage = {
+  _key: string
+  asset?: {_ref: string}
+  alt?: string
+  caption?: string
+  crop?: React.ComponentProps<typeof Image>['crop']
+  hotspot?: React.ComponentProps<typeof Image>['hotspot']
+}
 
 export default function CustomPortableText({
   className,
@@ -121,6 +134,118 @@ export default function CustomPortableText({
               mode="cover"
               className={isArticle ? 'h-[362px] w-full rounded object-cover' : 'rounded-sm'}
             />
+            {value.caption && <figcaption className="figure-caption">{value.caption}</figcaption>}
+          </figure>
+        )
+      },
+      imageGallery: ({value}) => {
+        // An image without an asset would be an empty tile, so it is dropped; fewer than two left is no gallery.
+        const images = ((value?.images ?? []) as GalleryImage[]).filter((image) => image?.asset?._ref)
+        if (images.length < 2) return null
+        return (
+          <figure className="image-gallery">
+            <GalleryGrid
+              images={images.map((image) => ({
+                key: image._key,
+                id: image.asset!._ref,
+                alt: image.alt || '',
+                caption: image.caption,
+                crop: image.crop,
+                hotspot: image.hotspot,
+              }))}
+            />
+            {value?.caption && <figcaption className="figure-caption">{value.caption}</figcaption>}
+          </figure>
+        )
+      },
+      calloutImage: ({value}) => {
+        // The block is the statement plus its photo; without either it is not this layout.
+        const text = typeof value?.text === 'string' ? value.text.trim() : ''
+        if (!text || !value?.image?.asset?._ref) return null
+        const imageFirst = stegaClean(value.imagePosition) === 'left'
+        return (
+          <div className={imageFirst ? 'callout-image callout-image--image-first' : 'callout-image'}>
+            <p className="callout-image__text">{text}</p>
+            <figure className="callout-image__figure">
+              <Image
+                id={value.image.asset._ref}
+                alt={value.image.alt || ''}
+                width={640}
+                sizes="(min-width: 640px) 320px, 100vw"
+                crop={value.image.crop}
+                hotspot={value.image.hotspot}
+                mode="cover"
+                className="h-auto w-full rounded"
+              />
+              {value.image.caption && (
+                <figcaption className="figure-caption">{value.image.caption}</figcaption>
+              )}
+            </figure>
+          </div>
+        )
+      },
+      table: ({value}) => {
+        const rows = ((value?.rows ?? []) as {_key: string; cells?: string[]}[]).filter(
+          (row) => row.cells && row.cells.length > 0,
+        )
+        if (rows.length === 0) return null
+        const hasHeader = Boolean(value?.firstRowHeader) && rows.length > 1
+        const head = hasHeader ? rows[0] : undefined
+        const body = hasHeader ? rows.slice(1) : rows
+        return (
+          <div className="table-block">
+            {/* Focusable so a keyboard user can scroll a wide table sideways. */}
+            <div className="table-block__scroll" role="region" aria-label={value?.caption || 'Table'} tabIndex={0}>
+              <table>
+                {value?.caption && <caption>{value.caption}</caption>}
+                {head && (
+                  <thead>
+                    <tr>
+                      {head.cells!.map((cell, index) => (
+                        <th key={index} scope="col">
+                          {cell}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                )}
+                <tbody>
+                  {body.map((row) => (
+                    <tr key={row._key}>
+                      {row.cells!.map((cell, index) => (
+                        <td key={index}>{cell}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )
+      },
+      videoEmbed: ({value}) => {
+        // An address that is not YouTube or Vimeo, or has no id, gives no player: show nothing.
+        const video = videoEmbedSrc(value?.url)
+        if (!video || !value?.title) return null
+        return (
+          <figure className="video-figure">
+            <VideoEmbed src={video.src} title={value.title} />
+            {value.caption && <figcaption className="figure-caption">{value.caption}</figcaption>}
+          </figure>
+        )
+      },
+      divider: ({value}) => (
+        <hr className={stegaClean(value?.style) === 'short' ? 'divider divider--short' : 'divider'} />
+      ),
+      pullquote: ({value}) => {
+        // A pull quote with no line has nothing to show; the attribution alone would be a stray caption.
+        const quote = typeof value?.quote === 'string' ? value.quote.trim() : ''
+        if (!quote) return null
+        const attribution = typeof value?.attribution === 'string' ? value.attribution.trim() : ''
+        return (
+          <figure className="pullquote">
+            <blockquote className="pullquote__text">{quote}</blockquote>
+            {attribution && <figcaption className="pullquote__attribution">{attribution}</figcaption>}
           </figure>
         )
       },
