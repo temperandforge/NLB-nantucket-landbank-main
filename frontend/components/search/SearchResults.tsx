@@ -1,5 +1,6 @@
 'use client'
 
+import AnchorLink from '@/components/ui/AnchorLink'
 import FilterTabs from '@/components/ui/FilterTabs'
 import {ArrowRightIcon, DownloadIcon} from '@/components/icons'
 import {
@@ -40,7 +41,7 @@ function Runs({runs}: {runs: TextRun[]}) {
 function ResultRow({result}: {result: SearchResult}) {
   return (
     <li className="border-t border-border-light last:border-b">
-      <a
+      <AnchorLink
         href={result.href}
         download={result.download ? '' : undefined}
         target={result.external && !result.download ? '_blank' : undefined}
@@ -66,7 +67,7 @@ function ResultRow({result}: {result: SearchResult}) {
         ) : (
           <ArrowRightIcon className="mt-1 size-6 shrink-0 text-border-light group-hover:text-secondary group-focus-visible:text-secondary" />
         )}
-      </a>
+      </AnchorLink>
     </li>
   )
 }

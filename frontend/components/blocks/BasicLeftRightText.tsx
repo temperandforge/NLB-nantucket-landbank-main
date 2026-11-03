@@ -26,7 +26,12 @@ export default function BasicLeftRightText({block}: BlockProps<'basicLeftRightTe
     <section className="relative w-full overflow-clip bg-background tf-px py-s6">
       <div className="basic-left-right__lines pointer-events-none absolute inset-0 z-0" aria-hidden="true" />
       <div className="relative z-10 flex w-full flex-col gap-20 tf-max-w md:flex-row md:items-start">
-        <div className="flex w-full flex-col items-start gap-8 md:max-w-[560px] md:flex-1">
+        {/* Pinned below the header from md, where the columns sit side by side, so the heading and
+            buttons stay in view while a long right column scrolls past (as on the event page). The
+            column is capped to the visible height and scrolls inside itself, so CMS text taller than
+            a short screen is never cut off. The padding balanced by the negative margin gives focus
+            rings room inside that scroll box without moving the text. */}
+        <div className="flex w-full flex-col items-start gap-8 md:sticky md:top-[calc(var(--header-offset,var(--header-height))+2.5rem)] md:-m-1 md:max-h-[calc(100dvh-var(--header-offset,var(--header-height))-5rem)] md:max-w-[560px] md:flex-1 md:overflow-y-auto md:overscroll-contain md:p-1 md:transition-[top] md:duration-200 md:ease-out motion-reduce:transition-none">
           {(block.eyebrow || block.heading || block.description) && (
             <div className="flex w-full flex-col items-start gap-6 text-on-background">
               {block.eyebrow && <Eyebrow className="text-on-background">{block.eyebrow}</Eyebrow>}

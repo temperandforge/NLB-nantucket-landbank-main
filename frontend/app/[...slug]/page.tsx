@@ -3,6 +3,7 @@ import {draftMode} from 'next/headers'
 import {notFound, permanentRedirect} from 'next/navigation'
 
 import PageView from '@/components/PageView'
+import PageTransition from '@/components/PageTransition'
 import {sanityFetch} from '@/sanity/lib/live'
 import {currentHour} from '@/sanity/lib/dates'
 import {getPageQuery, landingPageQuery, pagesSlugs} from '@/sanity/lib/queries'
@@ -104,5 +105,9 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
     permanentRedirect('/')
   }
 
-  return <PageView page={page} />
+  return (
+    <PageTransition>
+      <PageView page={page} />
+    </PageTransition>
+  )
 }

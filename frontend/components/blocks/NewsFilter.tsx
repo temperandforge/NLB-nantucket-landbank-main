@@ -19,9 +19,8 @@ export default function NewsFilter({articles}: {articles: NewsItem[]}) {
         active={active}
         label={NEWS_FILTER_LABEL}
         onChoose={choose}
-        padInside
       />
-      <div className="tf-max-w tf-px">
+      <div className="tf-px w-full">
         <NewsList articles={filterByNewsCategory(articles, active)} />
       </div>
     </div>

@@ -18,13 +18,14 @@ type TimelineSliderProps = {
   className?: string;
 };
 
-// Wave path recreated from the Figma line asset — an organic multi-hump curve.
-// viewBox width is arbitrary; getPointAtLength works in path-space regardless
-// of how the SVG is scaled on screen (getScreenCTM handles the conversion).
+// The Figma line (Vector 43, 1677.5 x 134.28), path data copied from the design: an irregular curve,
+// not a regular wave. x only ever increases along it, which findLengthForX relies on.
+// getPointAtLength works in path-space regardless of how the SVG is scaled on screen.
 const WAVE_PATH_D =
-  "M0,70 C100,20 200,20 300,70 C400,120 500,120 600,60 C700,10 800,10 900,55 C1000,100 1100,100 1200,50";
-const WAVE_VIEWBOX = "0 0 1200 120";
-const WAVE_VIEWBOX_WIDTH = 1200;
+  "M0,118.193 C57.667,106.527 180.5,86.693 210.5,100.693 C248,118.193 303,155.693 391,118.193 C479,80.694 644.5,50.694 689.5,75.694 C734.5,100.693 779.5,75.694 855,75.694 C930.5,75.694 1015.5,-17.178 1083.5,2.822 C1151.5,22.822 1197.5,58.194 1235.5,75.694 C1273.5,93.194 1309.5,125.693 1429.5,100.693 C1525.5,80.694 1634.833,92.36 1677.5,100.693";
+const WAVE_VIEWBOX_WIDTH = 1677.5;
+const WAVE_VIEWBOX_HEIGHT = 134.276;
+const WAVE_VIEWBOX = `0 0 ${WAVE_VIEWBOX_WIDTH} ${WAVE_VIEWBOX_HEIGHT}`;
 
 // The path is monotonically increasing in x, so a given x has exactly one
 // length along the curve — find it via bisection on getPointAtLength.
@@ -71,10 +72,11 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
     const gutterProbe = document.createElement("div");
     gutterProbe.style.cssText = "position:absolute;visibility:hidden;padding-left:var(--tf-x)";
     rootRef.current!.appendChild(gutterProbe);
-    // Distance from each viewport edge to the page content (the same on both sides).
+    // Distance from each viewport edge to the page content (the same on both sides): the content
+    // is `tf-max-w` (85rem) centred inside the `tf-px` gutters.
     function getContentInset() {
       const gutter = parseFloat(getComputedStyle(gutterProbe).paddingLeft) || 0;
-      const maxWidth = 90 * (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
+      const maxWidth = 85 * (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
       return Math.max(gutter, (splideRoot!.clientWidth - maxWidth) / 2);
     }
 
@@ -140,10 +142,10 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
 
       if (isMobileLayout.matches) {
         // Natural (unstretched) aspect ratio: pick a pixel width for the SVG
-        // that matches the viewBox's own 1200:120 ratio at the wrapper's
+        // that matches the viewBox's own proportions at the wrapper's
         // fixed height, so nothing gets squished — the SVG just ends up
         // wider than the wrapper, clipped by its overflow-hidden.
-        const naturalWidth = wrapperRect.height * (WAVE_VIEWBOX_WIDTH / 120);
+        const naturalWidth = wrapperRect.height * (WAVE_VIEWBOX_WIDTH / WAVE_VIEWBOX_HEIGHT);
         svgEl!.style.width = `${naturalWidth}px`;
         svgEl!.style.transform = "none"; // reset before measuring
       } else {
@@ -155,7 +157,7 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
       if (svgRect.width === 0 || svgRect.height === 0) return;
 
       pxScaleX = svgRect.width / WAVE_VIEWBOX_WIDTH;
-      pxScaleY = svgRect.height / 120;
+      pxScaleY = svgRect.height / WAVE_VIEWBOX_HEIGHT;
       pxOffsetX = svgRect.left - wrapperRect.left;
       pxOffsetY = svgRect.top - wrapperRect.top;
 
@@ -320,14 +322,17 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
   }, [events]);
 
   return (
-    <div ref={rootRef} className={`history-slider flex w-full flex-col items-end gap-16 bg-background py-24 ${className ?? ""}`}>
+    // `data-part`: the slider is ONE unit for the page-enter animation (see motion.css). Splide shows
+    // and hides slides as you move, and a CSS animation restarts whenever its element goes from
+    // hidden to shown, so animating the slides themselves replayed the fade-and-rise on every change.
+    <div ref={rootRef} data-part="" className={`history-slider flex w-full flex-col items-end gap-10 bg-background py-16 [--line-scale:0.5] md:gap-16 md:py-24 md:[--line-scale:1] ${className ?? ""}`}>
       {/* Full-bleed wave: unpadded, direct child of root so it spans the true viewport edges. */}
       <div ref={waveRef} className="relative h-[135px] w-full overflow-hidden">
         <svg viewBox={WAVE_VIEWBOX} preserveAspectRatio="none" className="block h-full w-full overflow-visible">
           <path
             d={WAVE_PATH_D}
             fill="none"
-            stroke="var(--color-dusty-heath-700)"
+            stroke="var(--color-on-background-tonal)"
             strokeWidth={1}
             vectorEffect="non-scaling-stroke"
           />
@@ -355,8 +360,10 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
               <li key={`${event.year}-${event.title}`} className="splide__slide">
                 <div className="flex w-full flex-col items-start gap-3">
                   <p className="w-full font-mono text-body-base leading-[1.6] text-on-background">{event.title}</p>
-                  <div className="flex w-full items-end gap-6" style={{ height: `${event.lineLength + 130}px` }}>
-                    <div className="h-full w-px shrink-0 bg-dusty-heath-700" style={{ height: `${event.lineLength}px` }} />
+                  <div className="flex w-full items-start gap-6" style={{ height: `calc(${event.lineLength}px * var(--line-scale) + 130px)` }}>
+                    {/* Figma: 1px stroke, dashed 3px on / 3px off. Drawn as a gradient so the pattern is
+                        exact instead of whatever the browser picks for a dashed border. */}
+                    <div className="h-full w-px shrink-0 bg-[repeating-linear-gradient(to_bottom,var(--color-on-background-subtle)_0_3px,transparent_3px_6px)]" />
                     <div className="flex h-full flex-1 flex-col items-start justify-between">
                       <p className="w-full font-serif text-headline-2xl font-normal leading-[1.05] text-on-background">
                         {event.year}

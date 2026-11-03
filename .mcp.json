@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "pastel": {
+      "type": "http",
+      "url": "https://api.usepastel.com/mcp"
+    }
+  }
+}

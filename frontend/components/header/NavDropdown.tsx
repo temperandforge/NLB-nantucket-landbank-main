@@ -55,15 +55,18 @@ export default function NavDropdown({
       onClick={(event) => {
         if ((event.target as HTMLElement).closest('a')) onNavigate?.()
       }}
-      className={`absolute top-full z-40 bg-background shadow-[0_20px_80px_rgba(47,42,34,0.16)] ${
+      // The shadow's blur reaches 60px above the panel, over the header bar it sits inside, so the
+      // panel is clipped at its top edge and left open on the sides and below, where it should fall.
+      className={`absolute top-full z-40 bg-background shadow-[0_20px_80px_rgba(47,42,34,0.16)] [clip-path:inset(0_-100px_-120px_-100px)] ${
         grouped
           ? 'left-1/2 w-screen -translate-x-1/2 tf-px py-10'
           : '-left-8 w-max min-w-64 rounded-b p-10'
       }`}
     >
-      <div className={grouped ? 'grid grid-cols-3 gap-x-gap-lg' : ''}>
+      <div className={grouped ? 'grid grid-cols-3 gap-x-gap-lg tf-max-w' : ''}>
         {columns.map((column, index) => (
-          <div key={`${column.heading ?? 'none'}-${index}`} className="flex flex-col">
+          // gap-md between the column label and its list, as in Figma.
+          <div key={`${column.heading ?? 'none'}-${index}`} className="flex flex-col gap-gap-md">
             {column.heading && <h3 className={LABEL_CLASS}>{column.heading}</h3>}
             <ul className={`flex flex-col ${column.heading ? 'border-l border-border-light pl-gap-md' : ''}`}>
               {column.links.map((item) => (
@@ -73,7 +76,9 @@ export default function NavDropdown({
                     className="group flex h-14 w-fit items-center gap-gap-sm border-b border-transparent font-secondary text-body-base text-on-primary hover:border-border-alt focus-visible:border-border-alt"
                   >
                     {item.label}
-                    <ArrowRightIcon className="hidden size-6 text-secondary group-hover:block group-focus-visible:block" />
+                    {/* Always laid out, only hidden until hover or focus: if it took space only then,
+                        hovering the longest item would widen the whole panel. shrink-0 keeps it 24px. */}
+                    <ArrowRightIcon className="invisible size-6 shrink-0 text-secondary group-hover:visible group-focus-visible:visible" />
                   </ResolvedLink>
                 </li>
               ))}

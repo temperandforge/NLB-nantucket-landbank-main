@@ -35,6 +35,11 @@ export default function DraftModeToast() {
     }
   }, [router, isPresentationTool])
 
+  // Editors must always see the content: motion.css turns the part animations off under data-draft.
+  useEffect(() => {
+    document.documentElement.setAttribute('data-draft', '')
+  }, [])
+
   useEffect(() => {
     if (pending) {
       const toastId = toast.loading('Disabling draft mode...')

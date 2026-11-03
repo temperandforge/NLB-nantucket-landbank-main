@@ -1,5 +1,6 @@
 import {stegaClean} from 'next-sanity'
 
+import Cascade from '@/components/Cascade'
 import BlockImage from './BlockImage'
 import Eyebrow from './Eyebrow'
 import {BlockProps} from './types'
@@ -25,23 +26,26 @@ export default function HeroSecondary({block, pageName}: BlockProps<'heroSeconda
         <div className="tf-max-w">
           <div className="grid grid-cols-1 md:grid-cols-2">
             <div
-              className={`hero-secondary__panel--${variant} relative flex flex-col justify-between p-10 min-h-[320px] md:min-h-[420px]`}
+              className={`hero-secondary__panel--${variant} relative flex flex-col justify-between p-5 gap-y-10 min-h-[420px] md:p-10 md:min-h-[560px]`}
             >
               <div
                 className={`hero-secondary__lines hero-secondary__lines--${variant} absolute inset-0 pointer-events-none`}
                 aria-hidden="true"
               />
               {eyebrow && (
-                <Eyebrow className={`relative z-10 mb-3 ${TEXT[variant].eyebrow}`}>{eyebrow}</Eyebrow>
+                <Eyebrow className={`relative z-10 mb-3 load-in ${TEXT[variant].eyebrow}`}>{eyebrow}</Eyebrow>
               )}
-              {block.body && <p className={`relative z-10 ${TEXT[variant].body}`}>{block.body}</p>}
+              {block.body && (
+                <Cascade as="p" variant="body" className={`relative z-10 ${TEXT[variant].body}`} text={block.body} />
+              )}
             </div>
             <BlockImage
               image={block.image}
               width={960}
               sizes="(min-width: 768px) 50vw, 100vw"
               fill
-              className="w-full h-full object-cover"
+              priority
+              className="h-[420px] w-full object-cover md:h-full"
             />
           </div>
         </div>

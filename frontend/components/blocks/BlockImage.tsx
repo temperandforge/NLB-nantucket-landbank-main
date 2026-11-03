@@ -13,6 +13,10 @@ type ImageValue = {
  * was deleted comes back without one), so a block never shows a broken image.
  *
  * `fill` crops to the container (object-cover); otherwise the image keeps its own proportions.
+ *
+ * Images lazy-load by default. `priority` is for the one image a page leads with (a hero): it is
+ * fetched first and never lazy, because that image is almost always the Largest Contentful Paint
+ * and a lazy, low-priority LCP image is what Lighthouse flags as "LCP request discovery".
  */
 export default function BlockImage({
   image,
@@ -20,12 +24,14 @@ export default function BlockImage({
   sizes,
   className,
   fill = false,
+  priority = false,
 }: {
   image?: ImageValue | null
   width: number
   sizes?: string
   className?: string
   fill?: boolean
+  priority?: boolean
 }) {
   if (!image?.asset?._ref) return null
   return (
@@ -38,6 +44,7 @@ export default function BlockImage({
       mode={fill ? 'cover' : 'contain'}
       sizes={sizes}
       className={className}
+      {...(priority ? {loading: 'eager' as const, fetchPriority: 'high' as const} : {})}
     />
   )
 }

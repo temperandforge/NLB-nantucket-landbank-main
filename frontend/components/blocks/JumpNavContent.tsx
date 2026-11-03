@@ -19,7 +19,6 @@ export default function JumpNavContent({block}: BlockProps<'jumpNavContent'>) {
         aria-hidden="true"
       />
       <JumpNavLayout
-        variant="project"
         heading={block.heading}
         headingLevel={headingLevel}
         navLabel={block.heading || 'Section navigation'}

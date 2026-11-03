@@ -23,12 +23,15 @@ function Tile({
   className: string
   children: React.ReactNode
 }) {
+  // `data-part`: a tile is one unit for the page-enter animation (see motion.css), not its pieces.
   return href ? (
-    <Link href={href} className={className}>
+    <Link href={href} className={className} data-part="">
       {children}
     </Link>
   ) : (
-    <div className={className}>{children}</div>
+    <div className={className} data-part="">
+      {children}
+    </div>
   )
 }
 
@@ -103,7 +106,7 @@ export default function NewsPreviewView({
           {showCta && cta && (
             <Tile
               href={cta.href}
-              className={`relative flex w-full min-w-0 flex-col items-start justify-between gap-8 overflow-clip border-r border-b border-border-light bg-accent-secondary p-10 ${MD_CTA_SPAN[articles.length % 2]} ${LG_CTA_SPAN[articles.length % 3]}`}
+              className={`relative flex w-full min-w-0 flex-col items-start justify-between gap-8 overflow-clip border-r border-b border-border-light bg-accent-secondary p-10 min-h-[540px] md:min-h-0 ${MD_CTA_SPAN[articles.length % 2]} ${LG_CTA_SPAN[articles.length % 3]}`}
             >
               <Image
                 src="/images/blocks/decorative-line-news.svg"

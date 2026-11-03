@@ -23,8 +23,70 @@
   padding-inline: var(--tf-x);
 }
 
+/**
+ * The content box inside a parent that carries tf-px: 85rem (1360px), which with the 40px gutter
+ * on each side is 90rem (1440px) at a 1440px viewport. Past that the box stays 1360px and centred
+ * while the gutters grow. Always put tf-px on the parent, not on this element.
+ */
 @utility tf-max-w {
-  @apply w-full max-w-[90rem] mx-auto;
+  @apply w-full mx-auto;
+  max-width: 85rem; /* 1360px at 16px root font size */
+}
+
+
+/**
+ * A horizontal scroller whose scrollbar only shows while it is being scrolled, and never over the
+ * content. iOS Safari and macOS draw an overlay scrollbar over the bottom of the content that is
+ * faint and can't be styled. Styling ::-webkit-scrollbar gives those browsers a bar that reserves
+ * its own strip under the content. The bar's colours come from --scrollbar-alpha, which is 0 until
+ * the scroller has `data-scrolling` (FilterTabs sets it on scroll and clears it a moment after).
+ * The scrollbar's own parts can't be transitioned, but a registered custom property can, so the
+ * bar fades in and out through that number (a browser that won't transition it just snaps).
+ * Firefox has no such pseudo-element, so it gets the standard properties, which don't fade (Chrome
+ * would ignore the pseudo-element rules if it saw them, hence the @supports gate).
+ */
+@property --scrollbar-alpha {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@utility scroll-x-autohide {
+  --scrollbar-thumb: var(--color-dusty-heath-300);
+  --scrollbar-track: var(--color-dusty-heath-800);
+  transition: --scrollbar-alpha 500ms ease-out;
+
+  &[data-scrolling] {
+    --scrollbar-alpha: 1;
+    transition-duration: 120ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+
+    &[data-scrolling] {
+      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    }
+  }
+
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--scrollbar-track) calc(var(--scrollbar-alpha) * 100%), transparent);
+    border-radius: 9999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--scrollbar-thumb) calc(var(--scrollbar-alpha) * 100%), transparent);
+    border-radius: 9999px;
+  }
 }
 
 /**

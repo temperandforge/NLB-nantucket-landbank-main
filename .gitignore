@@ -48,3 +48,8 @@ studio/scripts/data/wordpress/
 
 # Migration reports (generated)
 studio/scripts/data/migrations/
+
+# Brainstorming visual companion scratch
+.superpowers/
+# Pastel CLI downloads
+.pastel/

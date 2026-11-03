@@ -4,6 +4,7 @@ import {toPlainText, type PortableTextBlock} from 'next-sanity'
 
 import ArticleView from '@/components/ArticleView'
 import NewsPreviewView from '@/components/blocks/NewsPreviewView'
+import PageTransition from '@/components/PageTransition'
 import {sanityFetch} from '@/sanity/lib/live'
 import {
   articleQuery,
@@ -71,7 +72,7 @@ export default async function NewsArticlePage(props: PageProps<'/news/[slug]'>) 
   )
 
   return (
-    <>
+    <PageTransition>
       <ArticleView
         article={article}
         eyebrow={settings?.eyebrow || undefined}
@@ -86,6 +87,6 @@ export default async function NewsArticlePage(props: PageProps<'/news/[slug]'>) 
           cta={{heading: moreSettings?.ctaHeading, label: moreSettings?.ctaLabel, href: ctaHref}}
         />
       )}
-    </>
+    </PageTransition>
   )
 }
