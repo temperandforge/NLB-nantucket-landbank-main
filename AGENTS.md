@@ -122,6 +122,22 @@ Design docs live in [docs/superpowers/specs/](docs/superpowers/specs/).
 - **Ship unbuilt interactive features disabled**, and record the gap in the spec's deferred
   section. An enabled form that does nothing reads as a bug.
 
+## Performance
+
+- **Anything that runs on its own runs only while it is seen.** Video, auto-scrolling or
+  auto-advancing carousels, `requestAnimationFrame` loops, `setInterval` animations and polling
+  start when the element is on screen in a foreground tab, stop when it is not, and resume from
+  where they were. Use `watchOnScreen` (`frontend/components/watchOnScreen.ts`); don't write a
+  new `IntersectionObserver` for it. Browsers do not do this for you.
+- **A resumed loop must not replay the time it was away.** Reset the clock when it restarts, and
+  cap the per-frame step.
+- **Resuming never overrides the visitor.** A video they paused stays paused, and reduced-motion
+  and an editor's autoplay-off still win over scrolling back into view.
+- **Defer what isn't needed for the first paint** (media downloads, third-party scripts) until
+  after load or first interaction, as `HeroVideo` and the reCAPTCHA load do.
+
+Reasoning: DECISIONS 25.
+
 ## Content scripts
 
 - **Run seeds and migrations via `cd studio && npx sanity exec scripts/<name>.ts

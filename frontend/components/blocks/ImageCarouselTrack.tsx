@@ -2,6 +2,8 @@
 
 import {type ReactNode, type SyntheticEvent, useEffect, useRef, useState} from 'react'
 
+import {watchOnScreen} from '@/components/watchOnScreen'
+
 const SPEED_PX_PER_SECOND = 40
 const GAP = 24
 // Room for a slide to widen on hover without the loop running short.
@@ -13,7 +15,7 @@ const SLACK = 400
 // equal widths and the loop period stays exact), but only the copy nearest the centre gets
 // `data-current` (the tall card with the label, so one slide reads as active). Pauses while the
 // pointer or focus is inside or the user scrolls by hand, and doesn't run for reduced-motion
-// users. While paused the active slide is kept, unless the pointer or focus is on a slide, which
+// users, or while it is off screen or the tab is hidden. While paused the active slide is kept, unless the pointer or focus is on a slide, which
 // then takes over through hover and focus.
 export default function ImageCarouselTrack({
   children,
@@ -88,10 +90,11 @@ export default function ImageCarouselTrack({
     }
 
     let frame = 0
-    let last = performance.now()
+    let last = 0
     let position = el.scrollLeft
     const tick = (now: number) => {
-      const dt = now - last
+      // Capped so one long frame (a stalled main thread) can't jump the track.
+      const dt = Math.min(now - last, 100)
       last = now
       if (paused.current) {
         // Off the slides (in a gap, say), fall back to the centre slide so one is always active.
@@ -109,8 +112,17 @@ export default function ImageCarouselTrack({
       }
       frame = requestAnimationFrame(tick)
     }
-    frame = requestAnimationFrame(tick)
+    // Runs only while the track is on screen in a foreground tab; `last` restarts on resume so the
+    // time spent away is not added to the position.
+    const stopWatching = watchOnScreen(el, (active) => {
+      cancelAnimationFrame(frame)
+      if (!active) return
+      last = performance.now()
+      position = el.scrollLeft
+      frame = requestAnimationFrame(tick)
+    })
     return () => {
+      stopWatching()
       cancelAnimationFrame(frame)
       setActive(-1)
     }

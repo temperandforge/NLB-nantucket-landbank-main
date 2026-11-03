@@ -1716,3 +1716,45 @@ control of search and social appearance. The `seo` object goes on `page`, `artic
 - **A typed search title is absolute** (`title: {absolute}`), so the layout's "| Site" suffix is not
   added after a name the editor typed on purpose.
 - **WebSite JSON-LD falls back to the plain-text site description**, matching the metadata default.
+
+## 25. Things that move on their own run only while they are seen
+
+Status: **implemented** for the hero video and the image carousel; apply to anything new.
+
+### 25.1 Pause off-screen and in a hidden tab, resume where it was
+
+Found 2026-11-03 reviewing the homepage: the hero video had no off-screen handling, and the
+carousel's `requestAnimationFrame` loop ran every frame while scrolled out of view.
+
+- **Video:** it is started with a script `play()`. Browsers pause off-screen muted video on their
+  own only for the `autoplay` attribute, so this one kept playing, decoding and using bandwidth, off
+  screen and, as far as we know, in a background tab.
+- **Carousel:** `requestAnimationFrame` stops in a hidden tab by itself, but the loop added the
+  time since the last frame to its position, so returning after a long absence made the track
+  lurch by up to a loop length. Off-screen it scrolled and re-measured every frame for nothing.
+
+The fix is one helper, `watchOnScreen(el, onChange)` in `frontend/components/watchOnScreen.ts`,
+true while the element intersects the viewport and the tab is visible. The video pauses and plays
+from it; the carousel starts and cancels its loop from it, resets its clock on resume, and caps
+each frame's step at 100 ms.
+
+### 25.2 The rule
+
+**Why:** off-screen motion costs battery, bandwidth and main-thread time on the phones this site's
+visitors use, and nobody sees the result. Every new auto-playing thing would otherwise need the
+same bug found again.
+
+**Implication:**
+- Run it from `watchOnScreen`, and cancel timers and frames when it reports `false`.
+- Keep the visitor's choices above it: a manual pause (`userPaused` in `HeroVideo`), reduced
+  motion and an editor's autoplay-off are never overridden by scrolling back into view.
+- Reset time-based state on resume, and cap the step, so the gap is not replayed.
+- This is a rule for *running* work. Deferring work out of the first paint (the hero video waits
+  for load and idle; reCAPTCHA waits for the form to be touched) is the same idea at load time and
+  is kept.
+
+### 25.3 Not yet verified
+
+Checked by type-check and lint only. Needs a real browser: that the video pauses on scroll and on
+switching tabs and resumes, stays paused if the visitor paused it, and that the carousel does not
+jump after a long time in another tab.
