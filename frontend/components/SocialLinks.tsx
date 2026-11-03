@@ -51,7 +51,9 @@ export default function SocialLinks({
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex size-6 items-center justify-center transition-opacity hover:opacity-75 focus-visible:opacity-75"
+              // Footer is a dark surface, so interaction turns the icon the brand yellow (the
+              // same goldenrod as the newsletter button) and the focus ring uses it too.
+              className="flex size-6 items-center justify-center rounded-[2px] transition-[color,transform] hover:text-goldenrod-500 focus-visible:text-goldenrod-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-goldenrod-500 active:scale-90 active:text-goldenrod-400 motion-reduce:transition-none motion-reduce:active:scale-100"
             >
               <span className="sr-only">{label}</span>
               <Icon className={sizeClass} />
