@@ -5,6 +5,7 @@ import {toPlainText, type PortableTextBlock} from 'next-sanity'
 import JsonLd from '@/components/JsonLd'
 import ArticleView from '@/components/ArticleView'
 import NewsPreviewView from '@/components/blocks/NewsPreviewView'
+import PageTransition from '@/components/PageTransition'
 import {sanityFetch} from '@/sanity/lib/live'
 import {
   articleQuery,
@@ -96,20 +97,22 @@ export default async function NewsArticlePage(props: PageProps<'/news/[slug]'>) 
           defaults.origin,
         )}
       />
-      <ArticleView
-        article={article}
-        eyebrow={settings?.eyebrow || undefined}
-        publishedLabel={settings?.publishedLabel || undefined}
-        shareLabel={settings?.shareLabel || undefined}
-      />
-      {showMore && (
-        <NewsPreviewView
-          heading={moreSettings ? moreSettings.heading : 'Nantucket News'}
-          articles={more.slice(0, count)}
-          // The call to action is whatever the Single News Page settings say; with no text there is no tile.
-          cta={{heading: moreSettings?.ctaHeading, label: moreSettings?.ctaLabel, href: ctaHref}}
+      <PageTransition>
+        <ArticleView
+          article={article}
+          eyebrow={settings?.eyebrow || undefined}
+          publishedLabel={settings?.publishedLabel || undefined}
+          shareLabel={settings?.shareLabel || undefined}
         />
-      )}
+        {showMore && (
+          <NewsPreviewView
+            heading={moreSettings ? moreSettings.heading : 'Nantucket News'}
+            articles={more.slice(0, count)}
+            // The call to action is whatever the Single News Page settings say; with no text there is no tile.
+            cta={{heading: moreSettings?.ctaHeading, label: moreSettings?.ctaLabel, href: ctaHref}}
+          />
+        )}
+      </PageTransition>
     </>
   )
 }

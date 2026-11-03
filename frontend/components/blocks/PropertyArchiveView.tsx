@@ -35,7 +35,10 @@ export default function PropertyArchiveView({
   const shown = filterProperties(properties, selection)
   return (
     <div className="flex w-full flex-col items-start gap-10">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+      {/* `data-part`: the menus enter with the rest of the block (motion.css), and are not remounted
+          when a filter is chosen, so they do not replay. `relative z-10` keeps the open menu's panel
+          above the cards, which are animated parts with stacking contexts of their own. */}
+      <div data-part="" className="relative z-10 flex w-full flex-col gap-3 sm:flex-row sm:items-center">
         <PropertyFilterMenu
           label="Property Type"
           options={typeOptions}
@@ -48,6 +51,15 @@ export default function PropertyArchiveView({
           selected={selection.resources}
           onChange={onChange && ((resources) => onChange({...selection, resources}))}
         />
+        {hasSelection(selection) && onChange && (
+          <button
+            type="button"
+            onClick={() => onChange(EMPTY_SELECTION)}
+            className="cursor-pointer self-start text-sm font-medium text-error hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500 sm:ml-2 sm:self-auto"
+          >
+            Clear all
+          </button>
+        )}
       </div>
       {shown.length === 0 ? (
         <div className="flex flex-col items-start gap-4">
@@ -68,7 +80,7 @@ export default function PropertyArchiveView({
         <ul className="grid w-full list-none grid-cols-1 gap-x-3 gap-y-12 p-0 sm:grid-cols-2 lg:grid-cols-3 lg:gap-y-16">
           {shown.map((property) => (
             <li key={property._id}>
-              <CardProperty property={property} defaultImage={defaultImage} />
+              <CardProperty property={property} defaultImage={defaultImage} morph />
             </li>
           ))}
         </ul>

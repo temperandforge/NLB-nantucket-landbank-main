@@ -4,8 +4,10 @@ import {toPlainText, type PortableTextBlock} from 'next-sanity'
 
 import JsonLd from '@/components/JsonLd'
 import MapPreviewView from '@/components/blocks/MapPreviewView'
+import Enter from '@/components/Enter'
 import PropertiesPreviewView from '@/components/blocks/PropertiesPreviewView'
 import {PropertyFaqs, PropertyGallery, PropertyIntro} from '@/components/PropertyView'
+import PageTransition from '@/components/PageTransition'
 import {sanityFetch} from '@/sanity/lib/live'
 import {
   morePropertiesQuery,
@@ -96,27 +98,39 @@ export default async function PropertyPage(props: PageProps<'/properties/[slug]'
           defaults.origin,
         )}
       />
-      <PropertyIntro property={property} />
-      <PropertyGallery property={property} />
-      {showMap && (
-        <MapPreviewView
-          heading={property.mapHeading || `${property.name} Trails and Properties`}
-          body={property.mapBody}
-          properties={map.properties}
-          settings={map.settings}
-          focusSlug={property.slug}
-          showPopupLink={false}
-        />
-      )}
-      <PropertyFaqs property={property} settings={settings} />
-      {showMore && (
-        <PropertiesPreviewView
-          heading={more?.heading}
-          button={buttonLabel && buttonHref ? {label: buttonLabel, href: buttonHref} : null}
-          properties={related}
-          defaultImage={property.defaultImage}
-        />
-      )}
+      <PageTransition>
+        <Enter index={0}>
+          <PropertyIntro property={property} />
+        </Enter>
+        <Enter>
+          <PropertyGallery property={property} />
+        </Enter>
+        {showMap && (
+          <Enter>
+            <MapPreviewView
+              heading={property.mapHeading || `${property.name} Trails and Properties`}
+              body={property.mapBody}
+              properties={map.properties}
+              settings={map.settings}
+              focusSlug={property.slug}
+              showPopupLink={false}
+            />
+          </Enter>
+        )}
+        <Enter>
+          <PropertyFaqs property={property} settings={settings} />
+        </Enter>
+        {showMore && (
+          <Enter>
+            <PropertiesPreviewView
+              heading={more?.heading}
+              button={buttonLabel && buttonHref ? {label: buttonLabel, href: buttonHref} : null}
+              properties={related}
+              defaultImage={property.defaultImage}
+            />
+          </Enter>
+        )}
+      </PageTransition>
     </>
   )
 }

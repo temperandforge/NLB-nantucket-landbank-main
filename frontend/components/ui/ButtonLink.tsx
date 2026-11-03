@@ -1,4 +1,5 @@
 import {ArrowLeftIcon, ArrowRightIcon} from '@/components/icons'
+import AnchorLink from '@/components/ui/AnchorLink'
 
 type ButtonLinkProps = {
   label: string
@@ -29,7 +30,7 @@ export default function ButtonLink({
   className,
 }: ButtonLinkProps) {
   return (
-    <a
+    <AnchorLink
       href={href}
       target={newTab ? '_blank' : undefined}
       rel={newTab ? 'noopener noreferrer' : undefined}
@@ -38,6 +39,6 @@ export default function ButtonLink({
       {leftIcon && <ArrowLeftIcon className="size-6 shrink-0" />}
       {label}
       {rightIcon && <ArrowRightIcon className="size-6 shrink-0" />}
-    </a>
+    </AnchorLink>
   )
 }

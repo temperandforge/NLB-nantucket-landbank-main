@@ -12,6 +12,7 @@ import {Toaster} from 'sonner'
 
 import DraftModeToast from '@/components/DraftModeToast'
 import SiteJsonLd from '@/components/SiteJsonLd'
+import ScrollReveal from '@/components/ScrollReveal'
 import Footer from '@/components/Footer'
 import Header from '@/components/header/Header'
 import * as demo from '@/sanity/lib/demo'
@@ -118,16 +119,13 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
         )}
         {/* The <SanityLive> component is responsible for making all sanityFetch calls in your application live, so should always be rendered. */}
         <SanityLive onError={handleError} />
+        <ScrollReveal />
         <Header />
         <main className="pageMain grow" id="pageMain">
           {children}
         </main>
         <Footer />
         <SpeedInsights />
-        {/* <Script
-          src="https://www.bugherd.com/sidebarv2.js?apikey=vuefxgttt1s6fiowcnigea"
-          strategy="lazyOnload"
-        /> */}
       </body>
     </html>
   )

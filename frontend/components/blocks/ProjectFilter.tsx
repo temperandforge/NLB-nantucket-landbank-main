@@ -19,14 +19,8 @@ export default function ProjectFilter({projects}: {projects: ProjectItem[]}) {
 
   return (
     <div className="flex w-full flex-col items-start gap-16">
-      <FilterTabs
-        tabs={tabs}
-        active={active}
-        label={PROJECT_FILTER_LABEL}
-        onChoose={choose}
-        padInside
-      />
-      <div className="tf-max-w tf-px">
+      <FilterTabs tabs={tabs} active={active} label={PROJECT_FILTER_LABEL} onChoose={choose} />
+      <div className="tf-px w-full">
         <ProjectList projects={filterByProjectType(projects, active)} />
       </div>
     </div>

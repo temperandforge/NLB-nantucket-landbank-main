@@ -4,6 +4,7 @@ import {notFound} from 'next/navigation'
 import JsonLd from '@/components/JsonLd'
 import EventsPreviewView from '@/components/blocks/EventsPreviewView'
 import EventView from '@/components/EventView'
+import PageTransition from '@/components/PageTransition'
 import {currentHour} from '@/sanity/lib/dates'
 import {sanityFetch} from '@/sanity/lib/live'
 import {eventQuery, eventSlugs, moreEventsQuery} from '@/sanity/lib/queries'
@@ -62,8 +63,10 @@ export default async function EventPage(props: PageProps<'/events/[slug]'>) {
           defaults.origin,
         )}
       />
-      <EventView event={event} />
-      {others.length > 0 && <EventsPreviewView eyebrow="Events - Upcoming" events={others.slice(0, 2)} />}
+      <PageTransition>
+        <EventView event={event} />
+        {others.length > 0 && <EventsPreviewView eyebrow="Events - Upcoming" events={others.slice(0, 2)} />}
+      </PageTransition>
     </>
   )
 }

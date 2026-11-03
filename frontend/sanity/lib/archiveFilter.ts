@@ -300,7 +300,8 @@ export type RecordFilterView = {
   param: string
   label: string
   options: FilterTab[]
-  value: string | null
+  /** The chosen option slugs, in option order; empty when the filter is not applied. */
+  value: string[]
 }
 
 export type RecordView = {
@@ -314,7 +315,8 @@ export type RecordView = {
  * Everything the Records block shows for an address: the tabs, the active category (the first one
  * when the address names none, or an unknown one), the filters that category offers with their
  * choices, and its records, narrowed by the chosen filters and sorted as the category says.
- * A filter value the category does not offer is ignored.
+ * A filter takes several values, written ?year=2025,2024. A value the category does not offer is
+ * ignored.
  */
 export function recordView(
   search: string,
@@ -331,13 +333,16 @@ export function recordView(
   const filters = keys.map((key): RecordFilterView => {
     const definition = RECORD_FILTERS[key]
     const options = definition.options(inCategory)
-    return {key, param: definition.param, label: definition.label, options, value: parseFilter(search, definition.param, options)}
+    return {key, param: definition.param, label: definition.label, options, value: read(new URLSearchParams(search), definition.param, options)}
   })
 
   let visible = inCategory
   for (const filter of filters) {
-    const value = filter.value
-    if (value) visible = visible.filter((record) => RECORD_FILTERS[filter.key].matches(record, value))
+    const values = filter.value
+    // Several choices of one filter widen the list (any of them); different filters narrow it.
+    if (values.length > 0) {
+      visible = visible.filter((record) => values.some((value) => RECORD_FILTERS[filter.key].matches(record, value)))
+    }
   }
   return {tabs, category, filters, records: sortRecords(visible, category.sortBy)}
 }

@@ -4,6 +4,7 @@ import {notFound} from 'next/navigation'
 
 import JsonLd from '@/components/JsonLd'
 import PageView from '@/components/PageView'
+import PageTransition from '@/components/PageTransition'
 import {sanityFetch} from '@/sanity/lib/live'
 import {currentHour} from '@/sanity/lib/dates'
 import {landingPageQuery} from '@/sanity/lib/queries'
@@ -51,7 +52,9 @@ export default async function Page() {
           defaults.origin,
         )}
       />
-      <PageView page={page} />
+      <PageTransition>
+        <PageView page={page} />
+      </PageTransition>
     </>
   )
 }

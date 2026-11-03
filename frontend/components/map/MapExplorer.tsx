@@ -3,12 +3,11 @@
 import {useMemo} from 'react'
 import {usePathname, useRouter, useSearchParams} from 'next/navigation'
 
-import {MapboxMap} from './MapboxMap'
+import {LazyMapboxMap} from './LazyMapboxMap'
 import {MultiSelectDropdown} from './MultiSelectDropdown'
 import {
   projectSlugs,
   toFilterOptions,
-  type FilterOption,
   type MapFilters,
   type MapSettings,
   type Property,
@@ -87,95 +86,47 @@ export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
     })
   }, [projects, selectedPropertyTypes, selectedResources])
 
-  // Labels are looked up from the options rather than a parallel map, so a filter left in the URL
-  // for a category that has since been deleted still shows something meaningful.
-  function labelFor(options: FilterOption[], value: string): string {
-    return options.find((option) => option.value === value)?.label ?? value
-  }
-
-  const activeFilters = [
-    ...selectedPropertyTypes.map((value) => ({
-      group: 'propertyType' as const,
-      value,
-      label: labelFor(propertyTypeOptions, value),
-    })),
-    ...selectedResources.map((value) => ({
-      group: 'resource' as const,
-      value,
-      label: labelFor(resourceOptions, value),
-    })),
-  ]
-
-  function removeFilter(group: 'propertyType' | 'resource', value: string) {
-    if (group === 'propertyType') {
-      updateParams({propertyType: selectedPropertyTypes.filter((v) => v !== value)})
-    } else {
-      updateParams({resources: selectedResources.filter((v) => v !== value)})
-    }
-  }
+  const hasFilters = selectedPropertyTypes.length > 0 || selectedResources.length > 0
 
   function clearAll() {
     updateParams({propertyType: [], resources: []})
   }
 
   return (
-    // tf-max-w with tf-px on the same element, like the heroes and the commissioners grid, so the
-    // filters and map sit under the hero heading at every width. The starter's `container` class
-    // used a different max width and padding, which left them left of the heading.
-    <div id="mapWrap" className="tf-max-w tf-px flex flex-col gap-10 py-10">
-      <div className="container--inner flex flex-col gap-2">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <MultiSelectDropdown
-            label="Property Type"
-            options={propertyTypeOptions}
-            selected={selectedPropertyTypes}
-            onChange={(values) => updateParams({propertyType: values})}
-          />
-          <MultiSelectDropdown
-            label="Resources"
-            options={resourceOptions}
-            selected={selectedResources}
-            onChange={(values) => updateParams({resources: values})}
-          />
-          <span className="flex items-center text-sm text-neutral-500">
-            {filteredProjects.length} of {projects.length} properties
-          </span>
-          {activeFilters.length > 0 && (
-            <button
-              type="button"
-              onClick={clearAll}
-              className="text-sm font-medium text-blue-600 hover:underline sm:ml-auto dark:text-blue-400"
-            >
-              Clear all
-            </button>
-          )}
-        </div>
-        {activeFilters.length > 0 && (
-          <div className="flex flex-wrap gap-2 py-3 dark:bg-neutral-950">
-            {activeFilters.map((filter) => (
-              <span
-                key={`${filter.group}-${filter.value}`}
-                className="flex items-center gap-2 bg-neutral-100 py-2 pl-4 pr-3 text-black dark:bg-neutral-800 dark:text-neutral-200"
+    // tf-px on the parent and tf-max-w inside, like the other blocks, so the filters and map sit
+    // under the hero heading at every width. The starter's `container` class used a different max
+    // width and padding, which left them left of the heading.
+    <div className="tf-px w-full">
+      <div id="mapWrap" className="tf-max-w flex flex-col gap-10 py-10">
+        <div className="container--inner flex flex-col gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <MultiSelectDropdown
+              label="Property Type"
+              options={propertyTypeOptions}
+              selected={selectedPropertyTypes}
+              onChange={(values) => updateParams({propertyType: values})}
+            />
+            <MultiSelectDropdown
+              label="Resources"
+              options={resourceOptions}
+              selected={selectedResources}
+              onChange={(values) => updateParams({resources: values})}
+            />
+            {hasFilters && (
+              <button
+                type="button"
+                onClick={clearAll}
+                className="cursor-pointer text-sm font-medium text-error hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500 sm:ml-2"
               >
-                {filter.label}
-                <button
-                  type="button"
-                  onClick={() => removeFilter(filter.group, filter.value)}
-                  aria-label={`Remove ${filter.label} filter`}
-                  className="flex size-4 items-center justify-center rounded-full text-black hover:bg-neutral-300 hover:text-neutral-900 dark:hover:bg-neutral-700 dark:hover:text-neutral-50"
-                >
-                  <svg viewBox="0 0 20 20" fill="currentColor" className="size-4">
-                    <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-                  </svg>
-                </button>
-              </span>
-            ))}
+                Clear all
+              </button>
+            )}
           </div>
-        )}
-      </div>
-      {/* close .container--inner */}
-      <div className="relative flex-1">
-        <MapboxMap projects={filteredProjects} settings={settings} />
+        </div>
+        {/* close .container--inner */}
+        <div className="relative flex-1">
+          <LazyMapboxMap projects={filteredProjects} settings={settings} />
+        </div>
       </div>
     </div>
   )

@@ -64,9 +64,11 @@ same(
 same(first.filters.map((filter) => filter.key), ['year'], 'a category with the year filter offers it')
 same(first.filters[0].options.map((option) => option.slug), ['2025', '2024'], 'years are those present in the category, newest first')
 same(ids(recordView('?year=2024', categories, records)), ['m2'], 'the year narrows the list')
-same(recordView('?year=2024', categories, records).filters[0].value, '2024', 'the active year is reported')
+same(recordView('?year=2024', categories, records).filters[0].value, ['2024'], 'the active year is reported')
 same(ids(recordView('?year=1999', categories, records)), ['m3', 'm1', 'm2', 'm4'], 'a year with no records is ignored')
-same(recordView('?year=1999', categories, records).filters[0].value, null, 'an ignored year reports no value')
+same(recordView('?year=1999', categories, records).filters[0].value, [], 'an ignored year reports no value')
+same(ids(recordView('?year=2025,2024', categories, records)), ['m3', 'm1', 'm2'], 'several years show the records of any of them')
+same(recordView('?year=2024,2025,1999,2024', categories, records).filters[0].value, ['2025', '2024'], 'values are in option order, once each, unknown ones dropped')
 same(
   ids(recordView('?category=policies&year=2024', categories, records)),
   ['p2', 'p3', 'p1'],

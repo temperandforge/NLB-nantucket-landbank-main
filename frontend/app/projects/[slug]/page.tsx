@@ -4,7 +4,9 @@ import {toPlainText, type PortableTextBlock} from 'next-sanity'
 
 import JsonLd from '@/components/JsonLd'
 import ProjectPreviewView from '@/components/blocks/ProjectPreviewView'
+import Enter from '@/components/Enter'
 import ProjectView from '@/components/ProjectView'
+import PageTransition from '@/components/PageTransition'
 import {sanityFetch} from '@/sanity/lib/live'
 import {
   moreProjectsQuery,
@@ -94,15 +96,19 @@ export default async function ProjectPage(props: PageProps<'/projects/[slug]'>) 
           defaults.origin,
         )}
       />
-      <ProjectView project={project} settings={settings} archiveHref={archiveHref} />
-      {showMore && (
-        <ProjectPreviewView
-          eyebrow={more?.eyebrow}
-          body={more?.body}
-          button={buttonLabel && buttonHref ? {label: buttonLabel, href: buttonHref} : null}
-          projects={related}
-        />
-      )}
+      <PageTransition>
+        <ProjectView project={project} settings={settings} archiveHref={archiveHref} />
+        {showMore && (
+          <Enter>
+            <ProjectPreviewView
+              eyebrow={more?.eyebrow}
+              body={more?.body}
+              button={buttonLabel && buttonHref ? {label: buttonLabel, href: buttonHref} : null}
+              projects={related}
+            />
+          </Enter>
+        )}
+      </PageTransition>
     </>
   )
 }

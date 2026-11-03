@@ -45,17 +45,22 @@
   .form-control::placeholder {
     color: var(--color-on-input-placeholder);
   }
-  .form-control:hover:not(:disabled) {
-    background-color: var(--color-background);
+  /*
+   * Hover, focus and error lighten the field instead of replacing its fill: the design layers the
+   * hover-lighter colour at 70% over the input colour (the same overlay the buttons use). The page
+   * background itself is not the field colour, so a field on the page never turns into it.
+   */
+  .form-control:hover:not(:disabled),
+  .form-control:focus-visible,
+  .form-control[aria-invalid='true'] {
+    background-image: linear-gradient(var(--ui-hover-lighter), var(--ui-hover-lighter));
   }
   .form-control:focus-visible {
-    background-color: var(--color-background);
     border-color: var(--color-border-light);
     outline: 2px solid var(--color-border-dark);
     outline-offset: 2px;
   }
   .form-control[aria-invalid='true'] {
-    background-color: var(--color-background);
     border-color: var(--color-error);
   }
   /* An unfilled select reads as a placeholder. */
