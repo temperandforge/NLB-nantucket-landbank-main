@@ -3,6 +3,28 @@ import {defineQuery} from 'next-sanity'
 export const settingsQuery = defineQuery(`*[_type == "settings"][0]`)
 
 /**
+ * What the site-wide structured data (Organization, WebSite) is built from. Matched on _type and
+ * the fixed singleton id. The logo comes back as a plain asset URL, since JSON-LD wants a URL
+ * rather than an image reference.
+ */
+export const siteStructuredDataQuery = defineQuery(`
+  *[_type == "settings" && _id == "siteSettings"][0]{
+    title,
+    siteUrl,
+    "description": coalesce(seo.description, null),
+    "siteDescription": description,
+    organization{
+      legalName,
+      email,
+      telephone,
+      address,
+      sameAs,
+      "logoUrl": logo.asset->url
+    }
+  }
+`)
+
+/**
  * Assembles a page's URL path from its parent chain.
  *
  * The single source of truth for how a page URL is built - reused by the page lookup,
@@ -316,6 +338,8 @@ const pageBuilderFields = /* groq */ `
         date,
         "fileUrl": file.asset->url,
         "fileName": file.asset->originalFilename,
+        "mimeType": file.asset->mimeType,
+        "size": file.asset->size,
         "categorySlug": category->slug.current
       }
     },
@@ -597,6 +621,15 @@ const pageFields = /* groq */ `
   name,
   slug,
   "path": ${pagePath},
+  seo{title, description, noIndex, image},
+  // The landing page is served at / and also at its own path; the path is not its canonical URL.
+  "isLanding": _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref,
+  // Parent chain, farthest first, for the breadcrumb trail. Each path comes from the shared
+  // pagePath, evaluated on the ancestor itself; a pathOnly ancestor has a name but no page.
+  "ancestors": [
+    parent->parent->{name, pathOnly, "path": ${pagePath}},
+    parent->{name, pathOnly, "path": ${pagePath}}
+  ][defined(@)],
   ${pageBuilderFields}
 `
 
@@ -635,6 +668,9 @@ export const landingPageQuery = defineQuery(`
 export const sitemapData = defineQuery(`
   *[
     _type == "page" && defined(slug.current) && !coalesce(pathOnly, false)
+    && !coalesce(seo.noIndex, false)
+    // The landing page is listed once, as /, by the sitemap itself.
+    && _id != *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref
   ] {
     _type,
     _updatedAt,
@@ -656,6 +692,7 @@ export const articleQuery = defineQuery(`
     "slug": slug.current,
     date,
     image,
+    seo{title, description, noIndex, image},
     "categories": categories[]->{"slug": slug.current, title, orderRank},
     // The article's own category documents, to find related articles.
     "categoryIds": categories[]._ref,
@@ -707,7 +744,7 @@ export const articleSlugs = defineQuery(`
 `)
 
 export const articleSitemapData = defineQuery(`
-  *[_type == "article" && defined(slug.current)]{_updatedAt, "slug": slug.current}
+  *[_type == "article" && defined(slug.current) && !coalesce(seo.noIndex, false)]{_updatedAt, "slug": slug.current}
 `)
 
 export const projectQuery = defineQuery(`
@@ -718,6 +755,8 @@ export const projectQuery = defineQuery(`
     "slug": slug.current,
     description,
     image,
+    seo{title, description, noIndex, image},
+    "propertySlug": property->slug.current,
     // This project's own types, to find related projects.
     "projectTypeIds": projectTypes[]._ref,
     body[]{
@@ -791,6 +830,7 @@ export const propertyQuery = defineQuery(`
     "slug": slug.current,
     description,
     image,
+    seo{title, description, noIndex, image},
     location,
     mapHeading,
     mapBody,
@@ -864,7 +904,7 @@ export const propertySlugs = defineQuery(`
 `)
 
 export const propertySitemapData = defineQuery(`
-  *[_type == "property" && defined(slug.current)]{_updatedAt, "slug": slug.current}
+  *[_type == "property" && defined(slug.current) && !coalesce(seo.noIndex, false)]{_updatedAt, "slug": slug.current}
 `)
 
 export const projectSlugs = defineQuery(`
@@ -872,7 +912,7 @@ export const projectSlugs = defineQuery(`
 `)
 
 export const projectSitemapData = defineQuery(`
-  *[_type == "project" && defined(slug.current)]{_updatedAt, "slug": slug.current}
+  *[_type == "project" && defined(slug.current) && !coalesce(seo.noIndex, false)]{_updatedAt, "slug": slug.current}
 `)
 
 export const eventQuery = defineQuery(`
@@ -885,6 +925,8 @@ export const eventQuery = defineQuery(`
     end,
     location,
     description,
+    image,
+    seo{title, description, noIndex, image},
     body[]{
       ...,
       ${markDefsFields}
@@ -913,7 +955,7 @@ export const eventSlugs = defineQuery(`
 `)
 
 export const eventSitemapData = defineQuery(`
-  *[_type == "event" && defined(slug.current)]{_updatedAt, "slug": slug.current}
+  *[_type == "event" && defined(slug.current) && !coalesce(seo.noIndex, false)]{_updatedAt, "slug": slug.current}
 `)
 
 /**

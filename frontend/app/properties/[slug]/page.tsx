@@ -2,6 +2,7 @@ import type {Metadata} from 'next'
 import {notFound} from 'next/navigation'
 import {toPlainText, type PortableTextBlock} from 'next-sanity'
 
+import JsonLd from '@/components/JsonLd'
 import MapPreviewView from '@/components/blocks/MapPreviewView'
 import Enter from '@/components/Enter'
 import PropertiesPreviewView from '@/components/blocks/PropertiesPreviewView'
@@ -16,8 +17,11 @@ import {
   singlePropertyPageQuery,
 } from '@/sanity/lib/queries'
 import {orderRelatedProperties} from '@/sanity/lib/relatedProperties'
+import {buildMetadata} from '@/sanity/lib/seo'
+import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
+import {placeLd} from '@/sanity/lib/structuredData'
 import {DereferencedLink} from '@/sanity/lib/types'
-import {linkResolver, realHref, resolveOpenGraphImage} from '@/sanity/lib/utils'
+import {linkResolver, realHref} from '@/sanity/lib/utils'
 
 /**
  * A property page, /properties/<slug>. A static route, so it wins over the catch-all that owns CMS
@@ -43,12 +47,14 @@ export async function generateMetadata(props: PageProps<'/properties/[slug]'>): 
   const description =
     property.description ||
     (property.about?.length ? toPlainText(property.about as PortableTextBlock[]).slice(0, 160) : undefined)
-  const image = resolveOpenGraphImage(property.image)
-  return {
+  return buildMetadata({
+    seo: property.seo,
     title: property.name,
     description,
-    openGraph: image ? {images: [image]} : undefined,
-  } satisfies Metadata
+    image: resolveSeoImage(property.seo, property.image),
+    path: `/properties/${slug}`,
+    defaults: await getSeoDefaults(),
+  })
 }
 
 export default async function PropertyPage(props: PageProps<'/properties/[slug]'>) {
@@ -73,39 +79,58 @@ export default async function PropertyPage(props: PageProps<'/properties/[slug]'
   const buttonLabel = more?.button?.buttonText ?? ''
   const showMap = !settings?.hideMap
 
+  const defaults = await getSeoDefaults()
+  const description =
+    property.description ||
+    (property.about?.length ? toPlainText(property.about as PortableTextBlock[]).slice(0, 160) : undefined)
+
   return (
-    <PageTransition>
-      <Enter index={0}>
-        <PropertyIntro property={property} />
-      </Enter>
-      <Enter>
-        <PropertyGallery property={property} />
-      </Enter>
-      {showMap && (
-        <Enter>
-          <MapPreviewView
-            heading={property.mapHeading || `${property.name} Trails and Properties`}
-            body={property.mapBody}
-            properties={map.properties}
-            settings={map.settings}
-            focusSlug={property.slug}
-            showPopupLink={false}
-          />
+    <>
+      <JsonLd
+        data={placeLd(
+          {
+            name: property.name,
+            slug: property.slug,
+            description: property.seo?.description || description,
+            image: resolveSeoImage(property.seo, property.image),
+            location: property.location,
+          },
+          defaults.origin,
+        )}
+      />
+      <PageTransition>
+        <Enter index={0}>
+          <PropertyIntro property={property} />
         </Enter>
-      )}
-      <Enter>
-        <PropertyFaqs property={property} settings={settings} />
-      </Enter>
-      {showMore && (
         <Enter>
-          <PropertiesPreviewView
-            heading={more?.heading}
-            button={buttonLabel && buttonHref ? {label: buttonLabel, href: buttonHref} : null}
-            properties={related}
-            defaultImage={property.defaultImage}
-          />
+          <PropertyGallery property={property} />
         </Enter>
-      )}
-    </PageTransition>
+        {showMap && (
+          <Enter>
+            <MapPreviewView
+              heading={property.mapHeading || `${property.name} Trails and Properties`}
+              body={property.mapBody}
+              properties={map.properties}
+              settings={map.settings}
+              focusSlug={property.slug}
+              showPopupLink={false}
+            />
+          </Enter>
+        )}
+        <Enter>
+          <PropertyFaqs property={property} settings={settings} />
+        </Enter>
+        {showMore && (
+          <Enter>
+            <PropertiesPreviewView
+              heading={more?.heading}
+              button={buttonLabel && buttonHref ? {label: buttonLabel, href: buttonHref} : null}
+              properties={related}
+              defaultImage={property.defaultImage}
+            />
+          </Enter>
+        )}
+      </PageTransition>
+    </>
   )
 }

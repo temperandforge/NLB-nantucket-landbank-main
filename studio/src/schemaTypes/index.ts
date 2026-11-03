@@ -30,6 +30,7 @@ import {mapTeaser} from './objects/mapTeaser'
 import {contactForm} from './objects/contactForm'
 import {imageCarousel} from './objects/imageCarousel'
 import {timeline} from './objects/timeline'
+import {seo} from './objects/seo'
 import {settings} from './singletons/settings'
 import {footer} from './singletons/footer'
 import {header} from './singletons/header'
@@ -119,6 +120,7 @@ export const schemaTypes = [
   downloadBlock,
   growers,
   mapExplorer,
+  seo,
   mapPreview,
   mapTeaser,
   contactForm,

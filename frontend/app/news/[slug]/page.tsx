@@ -2,6 +2,7 @@ import type {Metadata} from 'next'
 import {notFound} from 'next/navigation'
 import {toPlainText, type PortableTextBlock} from 'next-sanity'
 
+import JsonLd from '@/components/JsonLd'
 import ArticleView from '@/components/ArticleView'
 import NewsPreviewView from '@/components/blocks/NewsPreviewView'
 import PageTransition from '@/components/PageTransition'
@@ -12,8 +13,11 @@ import {
   moreNewsQuery,
   singleNewsPageQuery,
 } from '@/sanity/lib/queries'
+import {buildMetadata} from '@/sanity/lib/seo'
+import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
+import {newsArticleLd} from '@/sanity/lib/structuredData'
 import {DereferencedLink} from '@/sanity/lib/types'
-import {linkResolver, realHref, resolveOpenGraphImage} from '@/sanity/lib/utils'
+import {linkResolver, realHref} from '@/sanity/lib/utils'
 
 /**
  * A news article page, /news/<slug>. A static route, so it wins over the catch-all that owns CMS
@@ -39,12 +43,15 @@ export async function generateMetadata(props: PageProps<'/news/[slug]'>): Promis
   const description = article.body?.length
     ? toPlainText(article.body as PortableTextBlock[]).slice(0, 160)
     : undefined
-  const image = resolveOpenGraphImage(article.image)
-  return {
+  return buildMetadata({
+    seo: article.seo,
     title: article.title,
     description,
-    openGraph: image ? {images: [image]} : undefined,
-  } satisfies Metadata
+    image: resolveSeoImage(article.seo, article.image),
+    path: `/news/${slug}`,
+    type: 'article',
+    defaults: await getSeoDefaults(),
+  })
 }
 
 export default async function NewsArticlePage(props: PageProps<'/news/[slug]'>) {
@@ -71,22 +78,41 @@ export default async function NewsArticlePage(props: PageProps<'/news/[slug]'>) 
     moreSettings?.ctaLink ? linkResolver(moreSettings.ctaLink as DereferencedLink) : null,
   )
 
+  const defaults = await getSeoDefaults()
+  const description = article.body?.length
+    ? toPlainText(article.body as PortableTextBlock[]).slice(0, 160)
+    : undefined
+
   return (
-    <PageTransition>
-      <ArticleView
-        article={article}
-        eyebrow={settings?.eyebrow || undefined}
-        publishedLabel={settings?.publishedLabel || undefined}
-        shareLabel={settings?.shareLabel || undefined}
+    <>
+      <JsonLd
+        data={newsArticleLd(
+          {
+            title: article.title,
+            slug: article.slug,
+            date: article.date,
+            description: article.seo?.description || description,
+            image: resolveSeoImage(article.seo, article.image),
+          },
+          defaults.origin,
+        )}
       />
-      {showMore && (
-        <NewsPreviewView
-          heading={moreSettings ? moreSettings.heading : 'Nantucket News'}
-          articles={more.slice(0, count)}
-          // The call to action is whatever the Single News Page settings say; with no text there is no tile.
-          cta={{heading: moreSettings?.ctaHeading, label: moreSettings?.ctaLabel, href: ctaHref}}
+      <PageTransition>
+        <ArticleView
+          article={article}
+          eyebrow={settings?.eyebrow || undefined}
+          publishedLabel={settings?.publishedLabel || undefined}
+          shareLabel={settings?.shareLabel || undefined}
         />
-      )}
-    </PageTransition>
+        {showMore && (
+          <NewsPreviewView
+            heading={moreSettings ? moreSettings.heading : 'Nantucket News'}
+            articles={more.slice(0, count)}
+            // The call to action is whatever the Single News Page settings say; with no text there is no tile.
+            cta={{heading: moreSettings?.ctaHeading, label: moreSettings?.ctaLabel, href: ctaHref}}
+          />
+        )}
+      </PageTransition>
+    </>
   )
 }
