@@ -1517,6 +1517,12 @@ browser.
   only there. Choice inputs are named by their field (`name` is the field name).
 - **Checkbox groups** carry the `*` in the legend and their error through `aria-describedby`.
 - **The multi-select trigger** is `role="combobox"`; focus moves into a listbox while it is open.
+- **While the list is open the focus ring is drawn on the trigger, not the panel.** Focus is in the
+  listbox, but the Figma menu has no outline; `aria-expanded` gives the trigger the focus treatment
+  (border plus 2px `border-dark` outline), which keeps the 3:1 indicator on screen. The active row
+  keeps a `--color-input` highlight (not in the node, needed to show the active option).
+- **Single selects use the same square rows** as the multi-select: Figma's Contact Us menu draws
+  squares for its one-answer topic list.
 - **No native `maxLength`.** Validation and the counter report overflow instead of silently
   truncating typed text.
 - **Icons.** Time fields use the Figma clock-2 icon (`Clock2Icon`). The design system has no radio

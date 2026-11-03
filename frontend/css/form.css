@@ -52,10 +52,12 @@
    */
   .form-control:hover:not(:disabled),
   .form-control:focus-visible,
+  .form-control[aria-expanded='true'],
   .form-control[aria-invalid='true'] {
     background-image: linear-gradient(var(--ui-hover-lighter), var(--ui-hover-lighter));
   }
-  .form-control:focus-visible {
+  .form-control:focus-visible,
+  .form-control[aria-expanded='true'] {
     border-color: var(--color-border-light);
     outline: 2px solid var(--color-border-dark);
     outline-offset: 2px;
@@ -113,12 +115,12 @@
   .form-menu {
     position: absolute;
     z-index: 20;
-    top: calc(100% + 0.25rem);
+    top: calc(100% + 0.5rem);
     left: 0;
     width: 100%;
     max-height: 18rem;
     overflow: auto;
-    padding: 1rem 1.5rem;
+    padding: 1.5rem;
     border-radius: 4px;
     background-color: var(--color-surface-light);
     color: var(--color-on-surface-light);
@@ -126,16 +128,18 @@
     list-style: none;
     margin: 0;
   }
-  .form-menu:focus-visible {
-    outline: 2px solid var(--color-border-dark);
-    outline-offset: 2px;
+  /* Focus lives in the list while it is open, but the ring stays on the trigger (aria-expanded
+     above): the design's panel has no outline, and the trigger still shows where the control is. */
+  .form-menu:focus {
+    outline: none;
   }
   .form-option {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-    min-height: 2.75rem;
+    padding-block: 0.5rem;
+    line-height: 1.6;
     /* The highlight reaches past the text by 0.75rem each side, and the negative margin keeps the
        text where it was. */
     margin-inline: -0.75rem;

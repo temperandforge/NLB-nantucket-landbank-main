@@ -2,7 +2,7 @@
 
 import {useEffect, useId, useRef, useState, type KeyboardEvent} from 'react'
 
-import {CheckIcon, ChevronDownIcon, SquareCheckIcon, SquareIcon} from '@/components/icons'
+import {ChevronDownIcon, SquareCheckIcon, SquareIcon} from '@/components/icons'
 import {moveActive, typeaheadMatch} from '@/sanity/lib/listbox'
 
 import Field from './Field'
@@ -30,7 +30,7 @@ export default function ListSelect({field, id, value, error, onChange, onBlur}: 
   const options = field.options ?? []
   const chosen = Array.isArray(value) ? value : typeof value === 'string' && value ? [value] : []
   const summary =
-    chosen.length > 0 ? chosen.join(', ') : field.placeholder || (multi ? 'Select all that apply' : 'Select one')
+    chosen.length > 0 ? options.filter((option) => chosen.includes(option)).join(', ') : field.placeholder || (multi ? 'Select all that apply' : 'Select one')
   const optionId = (index: number) => `${listId}-${index}`
 
   // Focus moves into the list while it is open; the wrapper's blur check treats that as staying inside.
@@ -183,15 +183,8 @@ export default function ListSelect({field, id, value, error, onChange, onBlur}: 
                   className="form-option"
                 >
                   <span>{option}</span>
-                  {multi ? (
-                    selected ? (
-                      <SquareCheckIcon className="size-6" />
-                    ) : (
-                      <SquareIcon className="size-6" />
-                    )
-                  ) : (
-                    selected && <CheckIcon className="size-6" />
-                  )}
+                  {/* The design's menu uses the square for both kinds, including Contact Us's single topic. */}
+                  {selected ? <SquareCheckIcon className="size-6 shrink-0" /> : <SquareIcon className="size-6 shrink-0" />}
                 </li>
               )
             })}
