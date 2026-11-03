@@ -52,12 +52,15 @@ function ResultRow({result}: {result: SearchResult}) {
           {result.typeLabel}
         </p>
         <div className="flex min-w-0 flex-col gap-3">
-          <h2 className="break-words text-headline-sm leading-[1.2] tracking-normal">
-            <Runs runs={result.title} />
-          </h2>
-          {result.date && (
-            <p className="font-secondary text-body-base leading-[1.6] text-on-background-subtle">{result.date}</p>
-          )}
+          {/* The date belongs to the title, so the two sit closer than the snippet below them. */}
+          <div className="flex flex-col gap-1">
+            <h2 className="break-words text-headline-sm leading-[1.2] tracking-normal">
+              <Runs runs={result.title} />
+            </h2>
+            {result.date && (
+              <p className="font-secondary text-body-base leading-[1.6] text-on-background-subtle">{result.date}</p>
+            )}
+          </div>
           {result.snippet.length > 0 && (
             <p className="font-secondary text-body-base leading-[1.6] text-on-background-subtle">
               <Runs runs={result.snippet} />
