@@ -2,6 +2,7 @@ import {DocumentTextIcon} from '@sanity/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
 import {imageWithAltField} from '../objects/blockFields'
+import {seoField} from '../objects/seo'
 
 /**
  * A news item, with a page of its own at /news/<slug>. `externalUrl` is an optional override for
@@ -54,6 +55,7 @@ export const article = defineType({
       description:
         'Optional. Only for an article that lives on another site: the news tile goes to this address instead of the article page. Leave empty to use the article page.',
     }),
+    seoField(),
   ],
   orderings: [{title: 'Date, newest first', name: 'dateDesc', by: [{field: 'date', direction: 'desc'}]}],
   preview: {

@@ -3,6 +3,7 @@ import {PinIcon} from '@sanity/icons'
 
 import {BoundaryIdsInput} from '../../components/BoundaryIdsInput'
 import {blockContentMembers} from '../objects/blockContent'
+import {seoField, seoGroup} from '../objects/seo'
 
 /**
  * A Land Bank property - the parcels, beaches, trails and ponds shown on the interactive map.
@@ -28,6 +29,7 @@ export const property = defineType({
     {name: 'details', title: 'Details', default: true},
     {name: 'page', title: 'Page Content'},
     {name: 'map', title: 'Map'},
+    seoGroup,
   ],
   fields: [
     defineField({
@@ -176,6 +178,7 @@ export const property = defineType({
       description:
         'Turn on to stop this property from opening a popup on the map — its marker or boundary still shows and (for a boundary) still highlights on hover, it just does not respond to a click.',
     }),
+    seoField('seo'),
   ],
   preview: {
     select: {

@@ -29,6 +29,7 @@ import {newsPreview} from '../objects/newsPreview'
 import {eventsGrid} from '../objects/eventsGrid'
 import {newsArchive} from '../objects/newsArchive'
 import {recordsArchive} from '../objects/recordsArchive'
+import {seoField, seoGroup} from '../objects/seo'
 import {timeline} from '../objects/timeline'
 import {buildPagePath, MAX_PAGE_DEPTH, slugifySegment} from '../../lib/pageHierarchy'
 
@@ -116,6 +117,7 @@ export const page = defineType({
   groups: [
     {name: 'content', title: 'Content', default: true},
     {name: 'settings', title: 'Settings'},
+    seoGroup,
   ],
   fields: [
     defineField({
@@ -237,6 +239,7 @@ export const page = defineType({
         },
       },
     }),
+    seoField('seo'),
   ],
   preview: {
     select: {
