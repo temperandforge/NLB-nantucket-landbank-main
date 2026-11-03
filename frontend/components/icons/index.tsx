@@ -421,3 +421,14 @@ export function CheckIcon({className}: IconProps) {
     </svg>
   )
 }
+
+/** Circled exclamation mark, flagging a form error. 24 x 24, 2px stroke; drawn, not exported from Figma. */
+export function AlertCircleIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+      <path d="M12 7V13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="12" cy="16.5" r="1.25" fill="currentColor" />
+    </svg>
+  )
+}

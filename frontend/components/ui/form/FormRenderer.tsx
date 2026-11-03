@@ -3,7 +3,7 @@
 import {useEffect, useId, useRef, useState, type FormEvent} from 'react'
 import {flushSync} from 'react-dom'
 
-import {ArrowForwardIcon, ArrowRightIcon} from '@/components/icons'
+import {AlertCircleIcon, ArrowForwardIcon, ArrowRightIcon} from '@/components/icons'
 import {
   HONEYPOT_FIELD,
   validateField,
@@ -221,7 +221,10 @@ export default function FormRenderer({
             value={typeof values[name] === 'string' ? (values[name] as string) : ''}
             onChange={(event) => change(field, event.target.value)}
             onBlur={() => setError(field, values[name])}
-            className="h-12 min-w-0 flex-1 rounded-[4px] bg-warm-neutral-50 px-gap-sm font-secondary text-body-base text-lowlands-500 placeholder:text-lowlands-500/70"
+            // The footer is dark green: red on it is only 2.0:1, so the error is an inset red line inside the
+            // field's own 1px cream edge. Red then sits on cream on both sides (3.6:1) and the field
+            // keeps its size. Red text on the green would not pass either, so the message stays light.
+            className="h-12 min-w-0 flex-1 rounded-[4px] border border-transparent bg-warm-neutral-50 px-gap-sm font-secondary text-body-base text-lowlands-500 placeholder:text-lowlands-500/70 focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-goldenrod-500 aria-[invalid=true]:shadow-[inset_0_0_0_2px_var(--color-error)]"
           />
           <button
             type="submit"
@@ -253,9 +256,10 @@ export default function FormRenderer({
           <p
             id={`${id}-message`}
             role="alert"
-            className="font-secondary text-body-small text-warm-neutral-50"
+            className="flex items-start gap-2 font-secondary text-body-small text-warm-neutral-50"
           >
-            {error || serverError}
+            <AlertCircleIcon className="mt-0.5 size-4 shrink-0" />
+            <span>{error || serverError}</span>
           </p>
         )}
       </form>
