@@ -23,10 +23,12 @@ export default function FaqItem({question, children}: {question: string; childre
         if (answerRef.current?.contains(event.target as Node)) return
         setOpen((isOpen) => !isOpen)
       }}
-      className={`flex w-full cursor-pointer flex-col items-start overflow-clip rounded p-6 text-left transition-colors duration-200 motion-reduce:transition-none ${
-        // Figma open state (2103:36336): the card takes the page background; a hairline keeps it
-        // visible on a page that is the same colour.
-        open ? 'bg-background ring-1 ring-inset ring-border-light' : 'bg-surface-dark'
+      className={`flex w-full cursor-pointer flex-col items-start overflow-clip rounded p-6 text-left transition-colors duration-300 ease-out motion-reduce:transition-none ${
+        // Figma open state (2103:36336): hover-lighter at 70% over surface-dark, no border. The
+        // token is opaque here, so the 70% is applied with color-mix (which also transitions).
+        open
+          ? 'bg-[color-mix(in_srgb,var(--color-hover-lighter)_70%,var(--color-surface-dark))]'
+          : 'bg-surface-dark'
       }`}
     >
       <h4 className="w-full">
@@ -44,18 +46,18 @@ export default function FaqItem({question, children}: {question: string; childre
           )}
         </button>
       </h4>
-      {/* Height and opacity ease together (0fr -> 1fr grid row). `hidden` can't animate, so a closed
-          answer is `inert` + `invisible` instead, keeping it out of tab order and the a11y tree. */}
+      {/* Height and opacity ease together (0fr -> 1fr grid row). `inert` + `invisible` (visibility
+          delayed on close) keep the collapsed answer out of the tab order and accessibility tree
+          without cutting the motion short. */}
       <div
         id={answerId}
         ref={answerRef}
         inert={!open}
-        className={`grid w-full cursor-auto text-on-surface-dark transition-[grid-template-rows,opacity,visibility] duration-200 ease-out motion-reduce:transition-none ${
+        className={`grid w-full cursor-auto text-on-surface-dark transition-[grid-template-rows,opacity,visibility] duration-300 ease-out motion-reduce:transition-none ${
           open ? 'visible grid-rows-[1fr] opacity-100' : 'invisible grid-rows-[0fr] opacity-0'
         }`}
       >
         <div className="min-h-0 overflow-hidden">
-          {/* The old flex gap-8 can't collapse with the row, so the spacing lives inside it. */}
           <div className="pt-8">{children}</div>
         </div>
       </div>

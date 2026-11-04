@@ -17,7 +17,9 @@ export default function LinkButton({
   className,
 }: LinkButtonProps) {
   return (
-    <AnchorLink href={href} className={`link-button ${className ?? ''}`}>
+    // `data-part`: motion.css only animates headings, text, images and `.button`s as parts of a
+    // block's entrance; a link button is none of those, so it must opt in or it never fades in.
+    <AnchorLink href={href} className={`link-button ${className ?? ''}`} data-part="">
       {iconLeft && <ArrowLeftIcon className="link-button-icon" />}
       <span>{label}</span>
       {iconRight && <ArrowRightIcon className="link-button-icon" />}
