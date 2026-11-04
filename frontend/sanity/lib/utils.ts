@@ -68,20 +68,5 @@ export function dataAttr(config: DataAttributeConfig) {
   }).combine(config)
 }
 
-/**
- * The address of a project's page. Unlike a CMS page, whose URL comes from its parent chain, a
- * project lives at a fixed route (app/projects/[slug]), so its address is derived from the slug
- * alone. Keep in step with the `/projects/:slug` Presentation route in studio/sanity.config.ts.
- */
-export function projectHref(slug: string): string {
-  return `/projects/${slug}`
-}
-
-/**
- * The address of a property's page, derived from the slug alone for the same reason as
- * projectHref. Keep in step with the `/properties/:slug` Presentation route in
- * studio/sanity.config.ts.
- */
-export function propertyHref(slug: string): string {
-  return `/properties/${slug}`
-}
+// Addresses of the document types that live at a fixed route (see routes.ts).
+export {articleHref, eventHref, projectHref, propertyHref} from '@/sanity/lib/routes'

@@ -1128,6 +1128,20 @@ export type ResourceReference = {
   [internalGroqTypeReferenceTo]?: 'resource'
 }
 
+export type ArticleReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'article'
+}
+
+export type EventReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'event'
+}
+
 export type FaqReference = {
   _ref: string
   _type: 'reference'
@@ -1197,17 +1211,26 @@ export type Property = {
     | ({
         _key: string
       } & AnchorLinks)
+    | ({
+        _key: string
+      } & ImageGallery)
   >
-  gallery?: Array<{
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    caption?: string
-    _type: 'image'
-    _key: string
-  }>
+  gallery?: Array<
+    | {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        caption?: string
+        _type: 'image'
+        _key: string
+      }
+    | ArticleReference
+    | ProjectReference
+    | PropertyReference
+    | EventReference
+  >
   mapHeading?: string
   mapBody?: string
   faqs?: Array<
@@ -1936,6 +1959,8 @@ export type AllSanitySchemaTypes =
   | Project
   | PropertyTypeReference
   | ResourceReference
+  | ArticleReference
+  | EventReference
   | FaqReference
   | Property
   | Geopoint
@@ -4951,7 +4976,7 @@ export type SingleProjectPageQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: propertyQuery
-// Query: *[_type == "property" && slug.current == $slug][0]{    _id,    _type,    name,    "slug": slug.current,    description,    image,    seo{title, description, noIndex, image},    location,    mapHeading,    mapBody,    "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},    "propertyTypeIds": propertyTypes[]._ref,    about[]{      ...,      _type == "anchorLinks" => {        links[]{          ...,            link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }        }      },        markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }    },    gallery[]{_key, asset, hotspot, crop, alt, caption},    // A reference to an unpublished FAQ dereferences to null.    "faqs": faqs[]->{      _id,      question,      answer[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },    "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage  }
+// Query: *[_type == "property" && slug.current == $slug][0]{    _id,    _type,    name,    "slug": slug.current,    description,    image,    seo{title, description, noIndex, image},    location,    mapHeading,    mapBody,    "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},    "propertyTypeIds": propertyTypes[]._ref,    about[]{      ...,      _type == "anchorLinks" => {        links[]{          ...,            link {      ...,        _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }      }        }      },        markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }    },    // An entry is an uploaded image or a reference to a related document. A document's card image is    // its own image, then its SEO image, then the first image in its body; galleryCards() drops one    // that still has none. The body fallback is its first image block, or the first picture of its first image gallery.    gallery[]{      _key,      _type,      asset,      hotspot,      crop,      alt,      caption,      "doc": select(_type in ["relatedDocument", "reference"] => @->{        "docType": _type,        "title": coalesce(title, name),        "slug": slug.current,        externalUrl,        "image": coalesce(          select(defined(image.asset) => image{asset, hotspot, crop, alt}),          select(defined(seo.image.asset) => seo.image{asset, hotspot, crop, alt}),          body[_type == "image" && defined(asset)][0]{asset, hotspot, crop, alt},          body[_type == "imageGallery"][0].images[defined(asset)][0]{asset, hotspot, crop, alt}        )      })    },    // A reference to an unpublished FAQ dereferences to null.    "faqs": faqs[]->{      _id,      question,      answer[]{        ...,          markDefs[]{    ...,      _type == "link" => {    "page": page->{"path": select(  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,  defined(parent) => parent->slug.current + "/" + slug.current,  slug.current)}.path  }  }      }    },    "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage  }
 export type PropertyQueryResult = {
   _id: string
   _type: 'property'
@@ -5039,15 +5064,119 @@ export type PropertyQueryResult = {
         _key: string
         markDefs: null
       }
+    | {
+        _key: string
+        _type: 'imageGallery'
+        images: Array<{
+          asset?: SanityImageAssetReference
+          media?: unknown
+          hotspot?: SanityImageHotspot
+          crop?: SanityImageCrop
+          alt?: string
+          caption?: string
+          _type: 'galleryImage'
+          _key: string
+        }>
+        caption?: string
+        markDefs: null
+      }
   > | null
-  gallery: Array<{
-    _key: string
-    asset: SanityImageAssetReference | null
-    hotspot: SanityImageHotspot | null
-    crop: SanityImageCrop | null
-    alt: string | null
-    caption: string | null
-  }> | null
+  gallery: Array<
+    | {
+        _key: null
+        _type: 'reference'
+        asset: null
+        hotspot: null
+        crop: null
+        alt: null
+        caption: null
+        doc: {
+          docType: 'article'
+          title: string
+          slug: string
+          externalUrl: string | null
+          image: {
+            asset: SanityImageAssetReference
+            hotspot: SanityImageHotspot | null
+            crop: SanityImageCrop | null
+            alt: string | null
+          }
+        }
+      }
+    | {
+        _key: null
+        _type: 'reference'
+        asset: null
+        hotspot: null
+        crop: null
+        alt: null
+        caption: null
+        doc: {
+          docType: 'event'
+          title: string
+          slug: string
+          externalUrl: null
+          image: {
+            asset: SanityImageAssetReference
+            hotspot: SanityImageHotspot | null
+            crop: SanityImageCrop | null
+            alt: string | null
+          }
+        }
+      }
+    | {
+        _key: null
+        _type: 'reference'
+        asset: null
+        hotspot: null
+        crop: null
+        alt: null
+        caption: null
+        doc: {
+          docType: 'project'
+          title: string
+          slug: string
+          externalUrl: null
+          image: {
+            asset: SanityImageAssetReference
+            hotspot: SanityImageHotspot | null
+            crop: SanityImageCrop | null
+            alt: string | null
+          }
+        }
+      }
+    | {
+        _key: null
+        _type: 'reference'
+        asset: null
+        hotspot: null
+        crop: null
+        alt: null
+        caption: null
+        doc: {
+          docType: 'property'
+          title: string
+          slug: string
+          externalUrl: null
+          image: {
+            asset: SanityImageAssetReference
+            hotspot: SanityImageHotspot | null
+            crop: SanityImageCrop | null
+            alt: string | null
+          }
+        }
+      }
+    | {
+        _key: string
+        _type: 'image'
+        asset: SanityImageAssetReference | null
+        hotspot: SanityImageHotspot | null
+        crop: SanityImageCrop | null
+        alt: string | null
+        caption: string | null
+        doc: null
+      }
+  > | null
   faqs: Array<{
     _id: string
     question: string
@@ -5448,7 +5577,7 @@ declare module '@sanity/client' {
     '\n  *[_type == "project" && slug.current == $slug][0]{\n    _id,\n    _type,\n    name,\n    "slug": slug.current,\n    description,\n    image,\n    seo{title, description, noIndex, image},\n    "propertySlug": property->slug.current,\n    // This project\'s own types, to find related projects.\n    "projectTypeIds": projectTypes[]._ref,\n    body[]{\n      ...,\n      _type == "anchorLinks" => {\n        links[]{\n          ...,\n          \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n        }\n      },\n      _type == "faqAccordion" => {\n        items[]{\n          ...,\n          answer[]{\n            ...,\n            \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n          }\n        }\n      },\n      \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n    }\n  }\n': ProjectQueryResult
     '\n  *[_type == "project" && defined(slug.current) && slug.current != $slug]{\n    _id,\n    _createdAt,\n    name,\n    image,\n    "slug": slug.current,\n    "projectTypeIds": projectTypes[]._ref\n  }\n': MoreProjectsQueryResult
     '\n  *[_type == "singleProjectPage" && _id == "singleProjectPage"][0]{\n    eyebrow,\n    archiveLink{\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n    },\n    moreProjects{\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    }\n  }\n': SingleProjectPageQueryResult
-    '\n  *[_type == "property" && slug.current == $slug][0]{\n    _id,\n    _type,\n    name,\n    "slug": slug.current,\n    description,\n    image,\n    seo{title, description, noIndex, image},\n    location,\n    mapHeading,\n    mapBody,\n    "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},\n    "propertyTypeIds": propertyTypes[]._ref,\n    about[]{\n      ...,\n      _type == "anchorLinks" => {\n        links[]{\n          ...,\n          \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n        }\n      },\n      \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n    },\n    gallery[]{_key, asset, hotspot, crop, alt, caption},\n    // A reference to an unpublished FAQ dereferences to null.\n    "faqs": faqs[]->{\n      _id,\n      question,\n      answer[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n    "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage\n  }\n': PropertyQueryResult
+    '\n  *[_type == "property" && slug.current == $slug][0]{\n    _id,\n    _type,\n    name,\n    "slug": slug.current,\n    description,\n    image,\n    seo{title, description, noIndex, image},\n    location,\n    mapHeading,\n    mapBody,\n    "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},\n    "propertyTypeIds": propertyTypes[]._ref,\n    about[]{\n      ...,\n      _type == "anchorLinks" => {\n        links[]{\n          ...,\n          \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n        }\n      },\n      \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n    },\n    // An entry is an uploaded image or a reference to a related document. A document\'s card image is\n    // its own image, then its SEO image, then the first image in its body; galleryCards() drops one\n    // that still has none. The body fallback is its first image block, or the first picture of its first image gallery.\n    gallery[]{\n      _key,\n      _type,\n      asset,\n      hotspot,\n      crop,\n      alt,\n      caption,\n      "doc": select(_type in ["relatedDocument", "reference"] => @->{\n        "docType": _type,\n        "title": coalesce(title, name),\n        "slug": slug.current,\n        externalUrl,\n        "image": coalesce(\n          select(defined(image.asset) => image{asset, hotspot, crop, alt}),\n          select(defined(seo.image.asset) => seo.image{asset, hotspot, crop, alt}),\n          body[_type == "image" && defined(asset)][0]{asset, hotspot, crop, alt},\n          body[_type == "imageGallery"][0].images[defined(asset)][0]{asset, hotspot, crop, alt}\n        )\n      })\n    },\n    // A reference to an unpublished FAQ dereferences to null.\n    "faqs": faqs[]->{\n      _id,\n      question,\n      answer[]{\n        ...,\n        \n  markDefs[]{\n    ...,\n    \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n  }\n\n      }\n    },\n    "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage\n  }\n': PropertyQueryResult
     '\n  *[_type == "property" && defined(slug.current) && slug.current != $slug]{\n    _createdAt,\n    \n  _id,\n  name,\n  "slug": slug.current,\n  description,\n  image,\n  "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},\n  "resources": resources[]->{"slug": slug.current, title, order}\n,\n    "propertyTypeIds": propertyTypes[]._ref\n  }\n': MorePropertiesQueryResult
     '\n  {\n    "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {\n      \n  _id,\n  name,\n  "slug": slug.current,\n  boundaryIds,\n  location,\n  disablePopup,\n  description,\n  "image": image{"url": asset->url, alt},\n  "propertyTypes": propertyTypes[]->{"slug": slug.current, title},\n  "resources": resources[]->{"slug": slug.current, title}\n\n    },\n    "settings": *[_type == "projectSettings" && _id == "projectSettings"][0]{\n      \n  "boundaryDataUrl": boundaryData.asset->url,\n  "boundaryIdProperty": coalesce(boundaryIdProperty, "FID"),\n  "trailsDataUrl": trailsData.asset->url,\n  defaultCenter,\n  defaultZoom\n\n    }\n  }\n': PropertyMapQueryResult
     '\n  *[_type == "projectSettings" && _id == "projectSettings"][0]{\n    hideMap,\n    faqs,\n    moreProperties{\n      ...,\n      button{\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->{"path": select(\n  defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,\n  defined(parent) => parent->slug.current + "/" + slug.current,\n  slug.current\n)}.path\n  }\n\n      }\n\n      }\n    }\n  }\n': SinglePropertyPageQueryResult
