@@ -1764,3 +1764,79 @@ same bug found again.
 Checked by type-check and lint only. Needs a real browser: that the video pauses on scroll and on
 switching tabs and resumes, stays paused if the visitor paused it, and that the carousel does not
 jump after a long time in another tab.
+
+## 26. The Image Carousel is a custom engine driven by one number
+
+Status: **implemented**, checked in Chromium (mouse: autoplay, click, drag, the loop wrap; desktop and
+phone-width layouts). Not checked: touch on a real device, Safari, reduced motion.
+
+The carousel has one current slide, always centred, that steps on a timer and can be dragged,
+flicked, arrowed or clicked into place. It is `ImageCarouselTrack.tsx`, with no slider library.
+Splide (and Embla and the like) were tried and ruled out: they fix the size of a slot and measure it
+when a move starts, so a slide can't change width during a step, the loop restart animates wrongly,
+and the gap between slides isn't constant.
+
+- **One number, `pos`**: the fractional index of the slide at the centre. A slide's weight is
+  `max(0, 1 - |index - pos|)` and its width is `368 + 48 * weight` (260 + 32 on mobile). Cards are laid
+  out outward from the centre by their actual widths plus a fixed 24px gap, so the gap is exact on
+  every frame and the centre never drifts. The two cards around the centre are always one constant
+  stride apart, which is what keeps the focus centred at any fractional position.
+- **Drawn with a transform** (`translate3d` then `scale` about the centre), never by changing layout.
+  368x460 and 416x520 are both 4:5, so scaling keeps the ratio. Nothing re-lays out or re-crops.
+- **The loop has no seam.** The slides are rendered in enough copies to fill the track, and each copy is
+  placed at whichever logical index is nearest the centre; `pos` keeps counting and is only
+  re-based by whole periods when a step ends. Copies are `aria-hidden` and out of the tab order, and so
+  is every slide but the current one.
+- **A link works only on the current slide.** A click on any other slide centres it instead. Dragging
+  and flicking settle on the nearest slide leaning the way they were flung; the click after a drag is
+  swallowed.
+- **Idle means nothing runs.** There is no rAF loop at rest, only a timer, and it runs only while
+  `watchOnScreen` says the carousel is seen (DECISIONS 25) and the pointer, keyboard focus or a drag
+  is not in it, and not for reduced motion. Pausing keeps the time that was left. Only
+  `:focus-visible` focus pauses it: focus left behind by a click must not.
+- **Edge to edge.** The track is as wide as its section and the slides run to the viewport edges, cut
+  off there, with no fade (the fade belonged to the old scrolling track). The sections that hold it
+  clip sideways overflow. Copies are counted from the measured width, so a wide screen shows more
+  cards. Not capped: if that is too many on a very wide monitor, cap the track's width.
+- **Without JavaScript** the cards sit in a scrollable row. The Track sets `data-ready` once it
+  has measured, and the cards then pin themselves to the middle (`in-data-[ready]:` classes).
+- **Known limit:** the label scales with the current card (about 13% larger). `ScrollReveal` still
+  holds back and fades in the images of cards that start below the screen, as it always did.
+
+## 27. A property's gallery mixes uploaded images and related documents
+
+Status: **implemented**; the cards and the fallbacks are checked by `scripts/verifyGalleryCards.mts`
+and against the live dataset's documents; the lightbox in Chromium. A reference entry has not been
+tried end to end in the browser (no property references one yet).
+
+`property.gallery` is an array whose members are an uploaded `image` (alt text, caption) or a
+`reference` to an `article`, `project`, `property` or `event` (never the property itself). The reference member is named `relatedDocument`, and Studio stores that name as the entry's `_type`: renaming it orphans saved entries (Studio shows "Item of type relatedDocument not valid"), so the query and `galleryCards()` also accept a bare `reference`. The
+carousel is `galleryCards()` (`frontend/sanity/lib/galleryCards.ts`), a pure function.
+
+- **The uploaded images are one gallery in a lightbox**, the same dialog as the news page's image
+  gallery: next and previous, a counter, swipe, arrow keys, Escape, focus back on the card. That
+  dialog is `GalleryLightbox` (extracted from `GalleryGrid`, which keeps only its tiles).
+  `ImageLightboxProvider` wraps the carousel, holds the list of pictures and which is open, and
+  renders the dialog once; a slide asks to open its own picture by its place in the list
+  (`lightboxIndex`). A related document is a link, so it is not in the list. One picture has no
+  arrows or counter. A picture is never shown larger than its own pixels: its size is read from the
+  asset id (less any crop) and caps both `sizes` and the displayed size, because `sizes="100vw"`
+  makes the browser treat a small picture as screen-wide and stretch it blurry.
+- **A related document is a link**: its image, its title as the label, its page as the address. News
+  uses its external URL when it has one (opens in a new tab); the others use their fixed route
+  (`sanity/lib/routes.ts`, which `utils.ts` re-exports).
+- **The card image falls back**: the document's own `image`, then its SEO image, then the first image
+  in its body (an image block, or the first picture of its first gallery). The query asks for a real
+  asset at each step, so a cleared image field doesn't block the fallbacks.
+- **Anything that still can't be a card is dropped, never shown empty**: no image, no title, nothing
+  to link to, an unpublished document (it dereferences to null), a type the gallery doesn't link to.
+  The field's description tells editors a related document with no image is not shown. Alternatives
+  considered: a placeholder card (looks broken at rest), a site default image (invents a picture
+  the editor didn't choose).
+- **News requires an image and events don't** (`imageWithAltField`), so a news entry always has a
+  card; most projects, properties and events have none yet. In the live dataset, 4 of 11 projects,
+  7 of 23 properties and 1 of 7 events had an image when this was written.
+- **A slide that is not the centred one is never activated by a click**: the Track centres it and
+  stops the click, so a link or a lightbox opens only from the current slide.
+- **Not done**: the Image Carousel block still picks projects only. Extending it the same way is
+  tracked in issue #114.

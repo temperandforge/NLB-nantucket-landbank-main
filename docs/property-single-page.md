@@ -24,9 +24,9 @@ Everything except the name is optional and is simply absent when missing.
 ## Schema (studio)
 
 - `property` loses `link` (its address is derived from the slug) and gains:
-  - `about` — rich text beside the name; any "About" heading is authored in it (Heading 2), never added by the template
+  - `about` — rich text beside the name; any "About" heading is authored in it (Heading 2), never added by the template. It can hold an image gallery block, as a news article's body can
   - `mapHeading`, `mapBody` — the map section's heading and intro
-  - `gallery` — images with alt text and an optional hover caption
+  - `gallery` — the carousel's entries, each an uploaded image (alt text, optional caption; opens full size in a lightbox) or a reference to a news article, project, property or event (shows that document's image and title, links to it). See DECISIONS 27
   - `faqs` — references to `faq` documents
 - A new "Single" tab on the Properties Settings singleton (`projectSettings`, renamed
   from "Project Settings"; the type and document id keep their name):

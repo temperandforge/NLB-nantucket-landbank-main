@@ -847,7 +847,30 @@ export const propertyQuery = defineQuery(`
       },
       ${markDefsFields}
     },
-    gallery[]{_key, asset, hotspot, crop, alt, caption},
+    // An entry is an uploaded image or a reference to a related document. A document's card image is
+    // its own image, then its SEO image, then the first image in its body; galleryCards() drops one
+    // that still has none. The body fallback is its first image block, or the first picture of its first image gallery.
+    gallery[]{
+      _key,
+      _type,
+      asset,
+      hotspot,
+      crop,
+      alt,
+      caption,
+      "doc": select(_type in ["relatedDocument", "reference"] => @->{
+        "docType": _type,
+        "title": coalesce(title, name),
+        "slug": slug.current,
+        externalUrl,
+        "image": coalesce(
+          select(defined(image.asset) => image{asset, hotspot, crop, alt}),
+          select(defined(seo.image.asset) => seo.image{asset, hotspot, crop, alt}),
+          body[_type == "image" && defined(asset)][0]{asset, hotspot, crop, alt},
+          body[_type == "imageGallery"][0].images[defined(asset)][0]{asset, hotspot, crop, alt}
+        )
+      })
+    },
     // A reference to an unpublished FAQ dereferences to null.
     "faqs": faqs[]->{
       _id,

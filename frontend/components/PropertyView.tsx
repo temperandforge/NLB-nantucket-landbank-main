@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import {ViewTransition} from 'react'
+import {type ComponentProps, ViewTransition} from 'react'
 import type {PortableTextBlock} from 'next-sanity'
 
 import Cascade from '@/components/Cascade'
@@ -7,10 +7,12 @@ import BlockImage from '@/components/blocks/BlockImage'
 import FaqItem from '@/components/blocks/FaqItem'
 import ImageCarouselSlide from '@/components/blocks/ImageCarouselSlide'
 import ImageCarouselTrack from '@/components/blocks/ImageCarouselTrack'
+import {ImageLightboxProvider} from '@/components/ImageLightbox'
 import CustomPortableText from '@/components/PortableText'
 import LinkRow from '@/components/ui/LinkRow'
 import Tag from '@/components/ui/Tag'
 import type {PropertyQueryResult, SinglePropertyPageQueryResult} from '@/sanity.types'
+import {galleryCards} from '@/sanity/lib/galleryCards'
 
 /**
  * The top of a property page (Figma: property_template_desktop / _mobile): the hero image; the name
@@ -81,26 +83,52 @@ export function PropertyIntro({property}: {property: NonNullable<PropertyQueryRe
   )
 }
 
-/** The gallery carousel (Figma: Image Carousel), under a tag naming the property. */
+/**
+ * The gallery carousel (Figma: Image Carousel), under a tag naming the property. Each entry is an
+ * uploaded image (opens full size) or a related news article, project, property or event (links
+ * to it); see galleryCards for what is dropped.
+ */
 export function PropertyGallery({property}: {property: NonNullable<PropertyQueryResult>}) {
-  const images = (property.gallery ?? []).filter((image) => image.asset?._ref)
-  if (images.length === 0) return null
+  const cards = galleryCards(property.gallery)
+  if (cards.length === 0) return null
+  // The uploaded images, in order, are one gallery in the lightbox; a related document is a link.
+  const pictures = cards.flatMap((card) => {
+    const id = card.image.asset?._ref
+    if (!card.lightbox || !id) return []
+    return [
+      {
+        key: card.key,
+        id,
+        alt: card.image.alt ?? '',
+        caption: card.label,
+        crop: card.image.crop as ComponentProps<typeof ImageLightboxProvider>['images'][number]['crop'],
+      },
+    ]
+  })
+  const pictureIndex = new Map(pictures.map((picture, index) => [picture.key, index]))
   const label = `${property.name} Property and Recreation`
   return (
     <section className="w-full overflow-x-clip bg-background py-s6">
       <div className="flex w-full flex-col items-center gap-16">
-        <div className="flex items-center justify-center rounded bg-tag px-2 py-1">
-          <span className="tag-label">{label}</span>
+        <div className="tf-px tf-max-w flex justify-center">
+          <div className="flex items-center justify-center rounded bg-tag px-2 py-1">
+            <span className="tag-label">{label}</span>
+          </div>
         </div>
-        <ImageCarouselTrack label={label}>
-          {images.map((image) => (
-            <ImageCarouselSlide
-              key={image._key}
-              image={{...image, hotspot: image.hotspot ?? undefined, crop: image.crop ?? undefined}}
-              label={image.caption}
-            />
-          ))}
-        </ImageCarouselTrack>
+        <ImageLightboxProvider images={pictures}>
+          <ImageCarouselTrack label={label}>
+            {cards.map((card) => (
+              <ImageCarouselSlide
+                key={card.key}
+                image={card.image as ComponentProps<typeof ImageCarouselSlide>['image']}
+                label={card.label}
+                href={card.href}
+                external={card.external}
+                lightboxIndex={card.lightbox ? pictureIndex.get(card.key) : undefined}
+              />
+            ))}
+          </ImageCarouselTrack>
+        </ImageLightboxProvider>
       </div>
     </section>
   )

@@ -93,10 +93,10 @@ export const property = defineType({
       name: 'about',
       title: 'About',
       type: 'array',
-      of: blockContentMembers({h2: true}),
+      of: blockContentMembers({h2: true, gallery: true}),
       group: 'page',
       description:
-        'The main text beside the property name. Add an “About” heading yourself (Heading 2) if you want one; none is added for you.',
+        'The main text beside the property name. Add an “About” heading yourself (Heading 2) if you want one; none is added for you. An image gallery can be added between paragraphs.',
     }),
     defineField({
       name: 'gallery',
@@ -104,10 +104,11 @@ export const property = defineType({
       type: 'array',
       group: 'page',
       description:
-        'The image carousel on the property page. The caption appears over the image when a visitor hovers it. Leave empty to hide the carousel.',
+        'The image carousel on the property page. Add an uploaded image (it opens full size when clicked) or a related news article, project, property or event (the card uses that document’s image and title and links to its page). A related document with no image is not shown, so give it one. Leave empty to hide the carousel.',
       of: [
         defineArrayMember({
           type: 'image',
+          title: 'Image',
           options: {hotspot: true},
           fields: [
             defineField({
@@ -120,9 +121,23 @@ export const property = defineType({
               name: 'caption',
               title: 'Caption',
               type: 'string',
-              description: 'Optional. Shown over the image on hover, e.g. “Trails”.',
+              description: 'Optional. Shown over the image when it is the one in the middle, e.g. “Trails”.',
             }),
           ],
+        }),
+        defineArrayMember({
+          // Studio stores the member's name as the entry's `_type`, so this is what saved entries say.
+          name: 'relatedDocument',
+          type: 'reference',
+          title: 'Related document',
+          to: [{type: 'article'}, {type: 'project'}, {type: 'property'}, {type: 'event'}],
+          options: {
+            // Not this property itself.
+            filter: ({document}) => ({
+              filter: '_id != $self',
+              params: {self: String(document._id).replace(/^drafts\./, '')},
+            }),
+          },
         }),
       ],
     }),
