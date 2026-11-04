@@ -6,6 +6,7 @@
  *
  * Imports the real helper, not a copy. Exits non-zero on the first failure.
  */
+import {carouselCards, DEFAULT_NEWS_LIMIT} from '../sanity/lib/carouselCards.ts'
 import {galleryCards, type GalleryEntry} from '../sanity/lib/galleryCards.ts'
 
 let failed = false
@@ -130,6 +131,45 @@ same(
 )
 same(galleryCards(null), [], 'no gallery is no cards')
 same(galleryCards([]), [], 'an empty gallery is no cards')
+
+console.log('carousel block cards')
+const fallback = img('default')
+const cKeys = (entries: GalleryEntry[], options?: Parameters<typeof carouselCards>[1]) =>
+  carouselCards(entries, options).map((card) => card.key)
+same(
+  carouselCards([related('p', doc('project', {image: null}))], {defaultImage: fallback})[0]?.image
+    .asset?._ref,
+  'default',
+  'a project with no image takes the default image',
+)
+same(
+  cKeys([related('e', doc('event', {image: null}))], {defaultImage: fallback}),
+  [],
+  'an event with no image is dropped, not given the default',
+)
+same(
+  cKeys([related('a', doc('article', {image: null}))], {defaultImage: fallback}),
+  [],
+  'a news item with no image is dropped, not given the default',
+)
+const articles = Array.from({length: 10}, (_, i) =>
+  related(`n${i}`, doc('article', {image: i < 3 ? null : img(`image-${i}`)})),
+)
+same(
+  cKeys(articles, {limit: 4}),
+  ['n3', 'n4', 'n5', 'n6'],
+  'the limit counts cards that are shown, after imageless articles are dropped',
+)
+const uploads = Array.from({length: 12}, (_, i) => upload(`u${i}`))
+same(cKeys(uploads).length, 12, 'with no limit every card is kept')
+const twelveArticles = Array.from({length: 12}, (_, i) => related(`t${i}`, doc('article')))
+same(
+  cKeys(twelveArticles, {limit: DEFAULT_NEWS_LIMIT}).length,
+  8,
+  'the default news limit is 8',
+)
+same(carouselCards(null), [], 'no entries is no cards')
+same(carouselCards([]), [], 'an empty list is no cards')
 
 if (failed) process.exit(1)
 console.log('\nall ok')
