@@ -67,7 +67,7 @@ export default function NavSearch(props: DesktopProps | MobileProps) {
           // inset to line up with the bar's content.
           // The shadow's blur reaches 60px above the panel, over the header bar it is part of, so the
           // panel is clipped to its own top edge and sides and left open below, where the shadow falls.
-          className="fixed inset-x-0 top-full z-40 bg-background py-gap-lg shadow-[0_20px_80px_rgba(47,42,34,0.16)] [clip-path:inset(0_0_-120px_0)]"
+          className="fixed inset-x-0 top-full z-40 animate-nav-panel-in motion-reduce:animate-none bg-background py-gap-lg shadow-[0_20px_80px_rgba(47,42,34,0.16)] [clip-path:inset(0_0_-120px_0)]"
         >
           <div className="tf-px">
             <div className="tf-max-w">

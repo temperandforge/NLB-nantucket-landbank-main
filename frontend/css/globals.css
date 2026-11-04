@@ -31,6 +31,16 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
+  /* Header dropdown entrance: fade in while settling 6px down. Animates `transform`, not `translate`: the grouped panel's
+     -translate-x-1/2 centring is the `translate` property, and animating that too makes the panel slide sideways. */
+  --animate-nav-panel-in: nav-panel-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  @keyframes nav-panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+
   --shadow-layer: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
 
   --color-framework: #000;
