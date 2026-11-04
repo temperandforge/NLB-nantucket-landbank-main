@@ -14,7 +14,7 @@ import {resolveItemHref} from './resolveItemHref'
 // Shared by plain links and submenu triggers so the two read as one set. Items fill the bar's height so an open
 // submenu's rule (border-b) sits on the bar's bottom edge, as in Figma; hover only darkens the text.
 const ITEM_CLASS =
-  'inline-flex items-center gap-gap-mini self-stretch border-b px-2 font-secondary text-body-base whitespace-nowrap'
+  'inline-flex transition-colors duration-150 motion-reduce:transition-none items-center gap-gap-mini self-stretch border-b px-2 font-secondary text-body-base whitespace-nowrap'
 const ITEM_IDLE = 'border-transparent text-on-background-subtle hover:text-accent-primary'
 const ITEM_OPEN = 'border-border-dark text-accent-primary'
 
@@ -28,6 +28,13 @@ export default function DesktopNav({menu}: {menu: HeaderMenuData}) {
   const rootRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
   const [openKey, setOpenKey] = useState<string | null>(null)
+  // Hover (mouse only; touch has no hover) opens a dropdown and leaving closes it after a short grace so the
+  // pointer can cross the gap to the panel. hoverKey is the dropdown the hover opened and a click has not yet
+  // pinned: clicking its trigger keeps it open (rather than toggling it shut under the cursor) and pins it.
+  const hoverKey = useRef<string | null>(null)
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const cancelClose = () => clearTimeout(closeTimer.current)
+  useEffect(() => () => clearTimeout(closeTimer.current), [])
   // Reset during render when the route changes (not an effect), so a navigation by any means
   // closes the dropdown and a later return to the same path cannot reopen it.
   const [prevPath, setPrevPath] = useState(pathname)
@@ -98,14 +105,41 @@ export default function DesktopNav({menu}: {menu: HeaderMenuData}) {
             const grouped = live.some((child) => child.group?.trim())
 
             return (
-              <li key={item._key} className={`flex items-stretch ${grouped ? 'static' : 'relative'}`}>
+              <li
+                key={item._key}
+                className={`flex items-stretch ${grouped ? 'static' : 'relative'}`}
+                onPointerEnter={(event) => {
+                  if (event.pointerType !== 'mouse') return
+                  cancelClose()
+                  // Leave an open search panel alone: sweeping across the bar should not dismiss it.
+                  if (openKey === NAV_SEARCH_KEY || open) return
+                  hoverKey.current = item._key
+                  setOpenKey(item._key)
+                }}
+                onPointerLeave={(event) => {
+                  if (event.pointerType !== 'mouse' || hoverKey.current !== item._key) return
+                  cancelClose()
+                  closeTimer.current = setTimeout(() => {
+                    hoverKey.current = null
+                    setOpenKey((current) => (current === item._key ? null : current))
+                  }, 150)
+                }}
+              >
                 <button
                   id={triggerId}
                   type="button"
                   data-nav-trigger={item._key}
                   aria-expanded={open}
                   aria-controls={panelId}
-                  onClick={() => setOpenKey(open ? null : item._key)}
+                  onClick={(event) => {
+                    // A mouse click on a hover-opened dropdown pins it open; detail is 0 for keyboard activation.
+                    if (open && hoverKey.current === item._key && event.detail > 0) {
+                      hoverKey.current = null
+                      return
+                    }
+                    hoverKey.current = null
+                    setOpenKey(open ? null : item._key)
+                  }}
                   className={`${ITEM_CLASS} ${open ? ITEM_OPEN : ITEM_IDLE}`}
                 >
                   {item.label}
