@@ -118,6 +118,25 @@ Two standard patterns:
 Untranslated content falls back to English with a visible indicator, never a 404, unless the page is
 intentionally English-only (then the switcher omits that language for it).
 
+#### Full mirror
+
+If every tier 1 language mirrors the whole site, the work and the maintenance both scale with
+languages times documents:
+
+- **Cost.** Each added language is a translation of every page, article, property, event, project,
+  FAQ and menu, and then of every edit after. Two languages double the editorial load; keep tier 1
+  small.
+- **Coverage must be visible.** The Studio needs a per-language view of what is untranslated or
+  stale (the source changed after the translation), or a mirror quietly decays into a mix of
+  languages. The English fallback with an indicator is the safety net, not the plan.
+- **Machine drafts carry the load.** At this scale, a machine draft plus editor review (Sanity AI
+  Assist or the Agent Actions translate API) is the only realistic workflow. Hand translation of the
+  whole site is not.
+- **New content is not finished until it is mirrored.** Publishing in English alone leaves a gap in
+  every tier 1 language, so the editorial process needs a step for it.
+- **Migration.** The existing WordPress content (about 186 URLs) would need translating per language
+  before launch, or launch with English fallback and fill in afterwards.
+
 Machine translation is an option for first drafts: Sanity's AI Assist translation actions and the
 Agent Actions translate API both work inside the Studio. Drafts need editor review before publish; a
 property or notice mistranslated is worse than one in English only.
@@ -245,8 +264,11 @@ Whether to ship tier 2 at launch is open decision 7.
    translation; Spanish is the only one we know to be wanted. Tier 1 should stay small, so that every
    language in it can be reviewed. RTL adds layout work throughout tier 1 and is out of scope unless
    an RTL language is chosen.
-2. **Scope.** A few key pages, or a full mirror including properties and articles? This sets how many
-   types get the `language` field. Recommendation: pages and the notices people act on first.
+2. **Scope.** The client reports that each language translates the full site, which is what the live
+   widget does today. This spec treats a full mirror as the scope for every tier 1 language until told
+   otherwise: every translatable type in the table above gets the `language` field, including
+   properties and articles. Confirm that a tier 1 language is meant to be the whole site, not a subset
+   of key pages; it decides the cost in "Full mirror" below.
 3. **Who translates.** Today nobody reviews the output (raw browser machine translation). Editors by
    hand, machine draft plus review, or an agency? This decides whether to integrate a translation
    service.
