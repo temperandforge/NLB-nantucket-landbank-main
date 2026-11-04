@@ -1,6 +1,6 @@
 # Image Carousel block: mixed entries and a news source (issue #114)
 
-Status: **design, not implemented.** Closes [#114](../../../../issues/114). Builds on DECISIONS 26
+Status: **implemented** (DECISIONS 28; plan: [../plans/2026-11-04-image-carousel-mixed-sources.md](../plans/2026-11-04-image-carousel-mixed-sources.md)); the content migration still has to be run. Closes [#114](../../../../issues/114). Builds on DECISIONS 26
 (the carousel engine) and 27 (the property gallery's mixed entries).
 
 ## Intent

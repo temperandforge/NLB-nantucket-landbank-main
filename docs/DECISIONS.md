@@ -1838,5 +1838,35 @@ carousel is `galleryCards()` (`frontend/sanity/lib/galleryCards.ts`), a pure fun
   7 of 23 properties and 1 of 7 events had an image when this was written.
 - **A slide that is not the centred one is never activated by a click**: the Track centres it and
   stops the click, so a link or a lightbox opens only from the current slide.
-- **Not done**: the Image Carousel block still picks projects only. Extending it the same way is
-  tracked in issue #114.
+- **Resolved**: the Image Carousel block takes the same entries (DECISIONS 28, issue #114).
+
+## 28. The Image Carousel block takes mixed entries, projects or news
+
+Status: **implemented**, checked in Chromium (desktop and phone width) with live data through the real
+component: a news category, a project category, a hand-picked mix, a single card, an empty block, and the
+lightbox. The migration was dry-run only (see Rollout). Not checked: touch on a real device, Safari, and
+authoring the block in Studio (field visibility and validation messages).
+
+The block (`imageCarousel`) has a `source`: `manual` (hand-picked), `projectCategory` or `newsCategory`.
+All three become the same entries a property's gallery uses, so there is one card pipeline (DECISIONS 27).
+Spec: [specs/2026-11-04-image-carousel-mixed-sources-design.md](superpowers/specs/2026-11-04-image-carousel-mixed-sources-design.md).
+
+- **Hand-picked** is a `gallery` array with the members of `property.gallery`, from one shared helper
+  (`galleryEntryMembers` in `studio/src/schemaTypes/objects/galleryEntries.ts`) so the two can't drift. The
+  old `projects` field is gone.
+- **Latest news in a category**: one `newsCategory`, `date` newest first (then `_createdAt`), the editor's
+  "Show latest" `limit` (1 to 20, default 8). The query fetches 32 (the largest limit plus 12 spare) and the
+  limit is applied after articles with no image are dropped, so "latest 8" is 8 cards that are shown.
+- **One card builder**: `carouselCards()` (`frontend/sanity/lib/carouselCards.ts`) wraps `galleryCards()`. A
+  project with no image takes the block's `defaultImage`; news, events and properties with no image are
+  dropped. `GalleryCarousel` renders the cards and owns its lightbox, so two carousels on a page never page
+  into each other's pictures; `PropertyGallery` uses it too.
+- **The GROQ is shared**: `galleryDocFields` and `galleryEntryFields` in `queries.ts` serve the property query
+  and the block. The category sources emit entries in the same shape as a hand-picked document.
+- **No cards, no block.** A block with no cards renders nothing, not a lone eyebrow, including a news
+  category that was deleted or unpublished.
+- **Rollout**: `studio/scripts/migrateImageCarouselProjects.ts` moves `projects` into `gallery` and renames
+  `source: category` to `projectCategory`. Until it runs, a block still saying `category` shows no cards.
+  Dry run found 3 published blocks (conservation, recreation, agriculture), all in category mode with no
+  hand-picked projects. Drafts need `--with-user-token` to be seen.
+- **Not done**: choosing more than one news category, and a "see all news" link from the carousel.
