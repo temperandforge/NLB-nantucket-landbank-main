@@ -16,9 +16,32 @@ dependency, no `language` field on any document type, and no i18n entry in `docs
 Routing is `app/[...slug]` plus specific static routes (`/news/<slug>`), with page URLs derived from
 the `parent` chain by the `pagePath` expression in `frontend/sanity/lib/queries.ts`.
 
-The old WordPress site has some Spanish content: the CSV export spec flags it as `language:es`
-([wordpress-content-csv-export](2026-11-03-wordpress-content-csv-export-design.md)). That is the one
-concrete signal of demand so far.
+### What the live WordPress site does today
+
+Checked against https://www.nantucketlandbank.org/ on 2026-11-04. The live site has a language
+switcher in the header (a Spanish flag and a dropdown), provided by the **GTranslate** plugin
+(`wp-content/plugins/gtranslate`; markup `gtranslate_wrapper`, `gt_switcher` and Google's
+`goog-te-combo`). That is Google Translate's widget wrapped by the plugin. What follows from it:
+
+- **Translation happens in the visitor's browser.** The server sends English; the widget translates
+  after load. A text-only fetch sees only English, which is how an earlier check of this site missed
+  the switcher entirely.
+- **Nothing Spanish is indexable.** There are no `hreflang` tags and the Yoast sitemap lists no
+  per-language URLs.
+- **No one reviews the output.** It is raw machine translation. Property names, place names and
+  legal wording can come out wrong, and editors cannot correct them.
+- **Not confirmed:** whether the plugin is on a free tier (client-side only) or a paid tier that
+  adds `/es/` paths, and which languages are enabled beyond Spanish. `/es/` on the live site served
+  English content, which fits neither cleanly. The plugin settings in wp-admin would settle it.
+- **The widget appears to translate on load from the browser's language.** My browser's page came
+  back as `<html lang="es">` with a Spanish title without any click. Unconfirmed.
+
+The client chose to offer Spanish, so there is real demand. The `language:es` flag in the CSV export
+spec ([wordpress-content-csv-export](2026-11-03-wordpress-content-csv-export-design.md)) is only a
+heuristic for pages whose content is in Spanish; it is not evidence that such pages exist.
+
+**Launch gap.** The Next.js site has no switcher. Launching without a replacement removes Spanish
+access that visitors have today. See "Launch stopgap" below.
 
 ## Terms
 
@@ -176,21 +199,32 @@ extended to check hreflang reciprocity (if A lists B as an alternate, B lists A)
 ## Alternatives rejected
 
 - **Auto-redirect on `Accept-Language`.** Fragile with static rendering and bad for crawlers.
-- **A translation proxy or overlay (Google Translate widget, Weglot).** Quick, but content is not
-  indexable per language, editors cannot correct it, and it ignores the Sanity model. It is a
-  reasonable stopgap if the need is small and urgent.
+- **A translation proxy or overlay (Google Translate widget, Weglot) as the long-term answer.**
+  This is what the live site already does through GTranslate. Content is not indexable per language,
+  editors cannot correct it, and it ignores the Sanity model. It is kept only as the launch stopgap.
 - **Field-level for everything.** One document per page is tidy, but long Portable Text with per-
   language slugs and SEO becomes unmanageable, and a half-translated page publishes as a unit.
 - **Locale in a query parameter (`?lang=es`).** Not crawlable as distinct pages.
 
+## Launch stopgap
+
+To avoid dropping Spanish access at launch, embed the same Google Translate widget on the new site,
+behind the same switcher. It must follow the performance rules: load after first interaction or
+idle, not in the first paint, and never block rendering. It translates in the browser only, so it
+has the limits listed under "What the live WordPress site does today", and it should be removed per
+language as real translations ship, since the widget would otherwise re-translate them. It is
+disabled for pages that exist in a real translation. Whether to ship it is open decision 7.
+
 ## Open decisions
 
-1. **Which languages, and are any right-to-left?** Spanish is the only signal so far. RTL adds
-   layout work throughout and is out of scope unless asked for.
+1. **Which languages, and are any right-to-left?** Spanish is shown in the live switcher. Whether
+   other languages are enabled there is unconfirmed. RTL adds layout work throughout and is out of
+   scope unless asked for.
 2. **Scope.** A few key pages, or a full mirror including properties and articles? This sets how many
    types get the `language` field. Recommendation: pages and the notices people act on first.
-3. **Who translates.** Editors by hand, machine draft plus review, or an agency? This decides whether
-   to integrate a translation service.
+3. **Who translates.** Today nobody reviews the output (raw browser machine translation). Editors by
+   hand, machine draft plus review, or an agency? This decides whether to integrate a translation
+   service.
 4. **Where `/es` content lives for properties.** Property names and addresses are proper nouns; a
    translated property page may only need the description. Whether `property` is document-level or
    stays English with translated labels is open.
@@ -198,6 +232,10 @@ extended to check hreflang reciprocity (if A lists B as an alternate, B lists A)
    Accept that, or design for editor-added languages (more complex, probably not worth it).
 6. **Legal and accessibility.** Whether public notices, meeting agendas or forms must be offered in
    Spanish is a policy question for the client, and a reason to translate `record` and `form` early.
+7. **Launch stopgap.** Ship the Google Translate widget at launch to keep parity with the live site,
+   or launch English-only until real translations exist? Recommendation: ship it, deferred, so
+   Spanish access is not lost. If it ships, record it as deferred work with a GitHub issue to remove
+   it per language.
 
 ## Deferred
 
