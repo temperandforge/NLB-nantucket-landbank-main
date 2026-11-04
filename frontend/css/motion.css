@@ -178,6 +178,22 @@
   }
 
   /*
+   * A form's error message mounts after the page has entered, so the enter motion would slide it up
+   * like any paragraph. It fades only, quickly, with no stagger. Same hooks as images above.
+   */
+  .form-helper-error {
+    --part-anim: part-fade;
+    --reveal-rise: 0px;
+    --motion-duration: 200ms;
+    --enter-base: 0ms;
+    --enter-step: 0ms;
+  }
+
+  .form-helper-error[data-reveal="shown"] {
+    animation-name: part-fade !important;
+  }
+
+  /*
    * Above the fold an image is usually the LCP element, and starting it at opacity 0 delays the
    * paint the browser measures (measured on the home page hero). So on the load layer images do not
    * animate at all; below the fold they fade as they scroll in.
