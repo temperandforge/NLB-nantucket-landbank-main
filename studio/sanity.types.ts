@@ -1128,6 +1128,20 @@ export type ResourceReference = {
   [internalGroqTypeReferenceTo]?: 'resource'
 }
 
+export type ArticleReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'article'
+}
+
+export type EventReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'event'
+}
+
 export type FaqReference = {
   _ref: string
   _type: 'reference'
@@ -1197,17 +1211,26 @@ export type Property = {
     | ({
         _key: string
       } & AnchorLinks)
+    | ({
+        _key: string
+      } & ImageGallery)
   >
-  gallery?: Array<{
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    caption?: string
-    _type: 'image'
-    _key: string
-  }>
+  gallery?: Array<
+    | {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        caption?: string
+        _type: 'image'
+        _key: string
+      }
+    | ArticleReference
+    | ProjectReference
+    | PropertyReference
+    | EventReference
+  >
   mapHeading?: string
   mapBody?: string
   faqs?: Array<
@@ -1936,6 +1959,8 @@ export type AllSanitySchemaTypes =
   | Project
   | PropertyTypeReference
   | ResourceReference
+  | ArticleReference
+  | EventReference
   | FaqReference
   | Property
   | Geopoint

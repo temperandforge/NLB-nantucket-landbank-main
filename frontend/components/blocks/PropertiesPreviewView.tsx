@@ -28,7 +28,7 @@ export default function PropertiesPreviewView({
         {(heading || button) && (
           <div className="flex w-full flex-col items-start gap-8 md:flex-row md:justify-between">
             {heading && (
-              <h2 className="m-0 max-w-[434px] text-headline-lg leading-[1.1] text-on-background">
+              <h2 className="m-0 max-w-[434px] text-headline-lg leading-[1.1] text-on-background text-pretty">
                 {heading}
               </h2>
             )}
