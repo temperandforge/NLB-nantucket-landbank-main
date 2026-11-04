@@ -40,8 +40,6 @@ interface MapboxMapProps {
    * island or trail network.
    */
   focusSlug?: string | null
-  /** Off to leave the "Find out more" link out of every popup, e.g. on a property's own page. */
-  showPopupLink?: boolean
 }
 
 /** Closest a focused property is allowed to zoom, so a tiny parcel doesn't fill the map with one block. */
@@ -62,6 +60,56 @@ const FOCUSED_OUTLINE_WIDTH = 2
 /** Zoom for a focused property that has a marker but no boundary. */
 const FOCUS_MARKER_ZOOM = 15
 
+/** The arrow_forward icon (same geometry as ArrowForwardIcon), inlined because popups are HTML strings. */
+const ARROW_FORWARD_SVG =
+  '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M16.627 12.75H4.5V11.25H16.627L10.9308 5.55375L12 4.5L19.5 12L12 19.5L10.9308 18.4462L16.627 12.75Z" fill="currentColor"/></svg>'
+
+/** Keep in step with the fade duration in css/popup.css. */
+const POPUP_FADE_MS = 150
+
+/** Space kept between an opened popup and the map's edge, in px. */
+const POPUP_VIEW_PADDING = 16
+
+/**
+ * A popup with no close button that fades out instead of vanishing. It fades in through CSS; this
+ * delays the real removal so the fade-out can play. Mapbox calls remove() for click-away, for
+ * opening another popup and for toggling a marker's popup, so overriding it covers all of them.
+ */
+function createPopup(map: mapboxgl.Map, options: mapboxgl.PopupOptions): mapboxgl.Popup {
+  const popup = new mapboxgl.Popup({...options, closeButton: false})
+
+  // Mapbox clips a popup at the map's edge and never pans to show it, so a card opened low on
+  // the map loses its bottom (the arrow). Nudge the map so the whole card is inside.
+  popup.on('open', () => {
+    requestAnimationFrame(() => {
+      const el = popup.getElement()
+      if (!el) return
+      const card = el.getBoundingClientRect()
+      const view = map.getContainer().getBoundingClientRect()
+      const shift = (low: number, high: number, min: number, max: number) =>
+        low < min + POPUP_VIEW_PADDING
+          ? low - (min + POPUP_VIEW_PADDING)
+          : high > max - POPUP_VIEW_PADDING
+            ? high - (max - POPUP_VIEW_PADDING)
+            : 0
+      const dx = shift(card.left, card.right, view.left, view.right)
+      const dy = shift(card.top, card.bottom, view.top, view.bottom)
+      if (dx || dy) map.panBy([dx, dy], {duration: 300})
+    })
+  })
+  const remove = popup.remove.bind(popup)
+  let closing = false
+  popup.remove = () => {
+    const el = popup.getElement()
+    if (closing || !el) return remove()
+    closing = true
+    el.classList.add('map-popup--closing')
+    window.setTimeout(remove, POPUP_FADE_MS)
+    return popup
+  }
+  return popup
+}
+
 /** Popup content is injected as HTML, so any authored value must be escaped first. */
 function escapeHtml(value: string): string {
   return value
@@ -77,15 +125,11 @@ function escapeHtml(value: string): string {
  * Every interpolated value is escaped: these come from the CMS, and setHTML would otherwise let
  * a stray angle bracket in a description break the markup.
  */
-function buildPopupHtml(project: Property, showLink: boolean): string {
+function buildPopupHtml(project: Property, currentSlug: string | null): string {
   const resources = projectSlugs(project.resources)
 
   const accessible = resources.includes(RESOURCE_SLUG.handicapAccessible)
     ? '<div class="map-popup--is-accessible">Handicap Accessible</div>'
-    : ''
-
-  const parking = resources.includes(RESOURCE_SLUG.parking)
-    ? '<div class="map-popup--is-parking">Parking Availability</div>'
     : ''
 
   const image = project.image?.url
@@ -98,25 +142,30 @@ function buildPopupHtml(project: Property, showLink: boolean): string {
     ? `<p class="map-popup-desc">${escapeHtml(project.description)}</p>`
     : ''
 
-  const link =
-    showLink && project.slug
-      ? `<a class="map-popup-link" href="${encodeURI(propertyHref(project.slug))}">Find out more</a>`
-      : ''
+  // The focused property's own popup is not a link: the visitor is already on its page.
+  const href =
+    project.slug && project.slug !== currentSlug ? encodeURI(propertyHref(project.slug)) : null
 
-  return `
-      ${accessible}
+  const arrow = href ? `<span class="map-popup-arrow">${ARROW_FORWARD_SVG}</span>` : ''
+
+  const card = `
       ${image}
       <div class="map-popup--content">
         <div class="map-popup--content__inner">
+          ${accessible}
           <div class="map-popup--content__headline">
             <p class="map-popup-title">${escapeHtml(project.name)}</p>
             ${desc}
           </div>
-          ${parking}
         </div>
-        ${link}
+        ${arrow}
       </div>
     `
+
+  // The whole card is the link, so a click anywhere on it opens the property.
+  return href
+    ? `<a class="map-popup-card" href="${href}">${card}</a>`
+    : `<div class="map-popup-card">${card}</div>`
 }
 
 export function MapboxMap({
@@ -124,7 +173,6 @@ export function MapboxMap({
   settings,
   scrollZoom = true,
   focusSlug = null,
-  showPopupLink = true,
 }: MapboxMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<mapboxgl.Map | null>(null)
@@ -348,7 +396,7 @@ export function MapboxMap({
         const marker = new mapboxgl.Marker().setLngLat(position).addTo(map)
         if (!project.disablePopup) {
           marker.setPopup(
-            new mapboxgl.Popup({offset: 24}).setHTML(buildPopupHtml(project, showPopupLink)),
+            createPopup(map, {offset: 24}).setHTML(buildPopupHtml(project, focusSlug)),
           )
         }
         markersRef.current.push(marker)
@@ -462,9 +510,9 @@ export function MapboxMap({
           const project = featureIdToProject.get(feature.id as number)
           if (!project || project.disablePopup) return
 
-          new mapboxgl.Popup({offset: 12})
+          createPopup(map, {offset: 12})
             .setLngLat(e.lngLat)
-            .setHTML(buildPopupHtml(project, showPopupLink))
+            .setHTML(buildPopupHtml(project, focusSlug))
             .addTo(map)
         }
 
@@ -491,7 +539,7 @@ export function MapboxMap({
     return () => {
       map.off('load', renderMarkersAndGeojson)
     }
-  }, [projects, boundaries, focusSlug, showPopupLink])
+  }, [projects, boundaries, focusSlug])
 
   return <div ref={mapContainerRef} className="h-full w-full" />
 }

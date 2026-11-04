@@ -113,7 +113,6 @@ export default async function PropertyPage(props: PageProps<'/properties/[slug]'
               properties={map.properties}
               settings={map.settings}
               focusSlug={property.slug}
-              showPopupLink={false}
             />
           </Enter>
         )}
