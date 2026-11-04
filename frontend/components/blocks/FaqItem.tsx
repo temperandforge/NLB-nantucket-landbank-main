@@ -15,10 +15,12 @@ export default function FaqItem({question, children}: {question: string; childre
 
   return (
     <div
-      className={`flex w-full flex-col items-start gap-8 overflow-clip rounded p-6 text-left ${
-        // Figma open state (2103:36336): the card takes the page background; a hairline keeps it
-        // visible on a page that is the same colour.
-        open ? 'bg-background ring-1 ring-inset ring-border-light' : 'bg-surface-dark'
+      className={`flex w-full flex-col items-start overflow-clip rounded p-6 text-left transition-colors duration-300 ease-out motion-reduce:transition-none ${
+        // Figma open state (2103:36336): hover-lighter at 70% over surface-dark, no border. The
+        // token is opaque here, so the 70% is applied with color-mix (which also transitions).
+        open
+          ? 'bg-[color-mix(in_srgb,var(--color-hover-lighter)_70%,var(--color-surface-dark))]'
+          : 'bg-surface-dark'
       }`}
     >
       <h4 className="w-full">
@@ -37,8 +39,17 @@ export default function FaqItem({question, children}: {question: string; childre
           )}
         </button>
       </h4>
-      <div id={answerId} hidden={!open} className="w-full text-on-surface-dark">
-        {children}
+      {/* Height animates via a 0fr -> 1fr grid row; `invisible` (delayed on close) keeps the
+          collapsed answer out of the tab order and accessibility tree without cutting the motion. */}
+      <div
+        id={answerId}
+        className={`grid w-full text-on-surface-dark transition-[grid-template-rows,visibility] duration-300 ease-out motion-reduce:transition-none ${
+          open ? 'visible grid-rows-[1fr]' : 'invisible grid-rows-[0fr]'
+        }`}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <div className="pt-8">{children}</div>
+        </div>
       </div>
     </div>
   )
