@@ -30,9 +30,11 @@ switcher in the header (a Spanish flag and a dropdown), provided by the **GTrans
   per-language URLs.
 - **No one reviews the output.** It is raw machine translation. Property names, place names and
   legal wording can come out wrong, and editors cannot correct them.
+- **At least 50 languages are enabled** (reported by the client). Whether any beyond Spanish are
+  actually used is unknown, and so is whether the list includes right-to-left languages.
 - **Not confirmed:** whether the plugin is on a free tier (client-side only) or a paid tier that
-  adds `/es/` paths, and which languages are enabled beyond Spanish. `/es/` on the live site served
-  English content, which fits neither cleanly. The plugin settings in wp-admin would settle it.
+  adds `/es/` paths. `/es/` on the live site served English content, which fits neither cleanly. The
+  plugin settings in wp-admin would settle it.
 - **The widget appears to translate on load from the browser's language.** My browser's page came
   back as `<html lang="es">` with a Spanish title without any click. Unconfirmed.
 
@@ -41,7 +43,7 @@ spec ([wordpress-content-csv-export](2026-11-03-wordpress-content-csv-export-des
 heuristic for pages whose content is in Spanish; it is not evidence that such pages exist.
 
 **Launch gap.** The Next.js site has no switcher. Launching without a replacement removes Spanish
-access that visitors have today. See "Launch stopgap" below.
+access that visitors have today, in 50+ languages. See "Two tiers" below.
 
 ## Terms
 
@@ -201,25 +203,48 @@ extended to check hreflang reciprocity (if A lists B as an alternate, B lists A)
 - **Auto-redirect on `Accept-Language`.** Fragile with static rendering and bad for crawlers.
 - **A translation proxy or overlay (Google Translate widget, Weglot) as the long-term answer.**
   This is what the live site already does through GTranslate. Content is not indexable per language,
-  editors cannot correct it, and it ignores the Sanity model. It is kept only as the launch stopgap.
+  editors cannot correct it, and it ignores the Sanity model. It is rejected for the languages that
+  matter most (tier 1) and kept for the long tail (tier 2).
 - **Field-level for everything.** One document per page is tidy, but long Portable Text with per-
   language slugs and SEO becomes unmanageable, and a half-translated page publishes as a unit.
 - **Locale in a query parameter (`?lang=es`).** Not crawlable as distinct pages.
 
-## Launch stopgap
+## Two tiers: real translations and a machine-translated long tail
 
-To avoid dropping Spanish access at launch, embed the same Google Translate widget on the new site,
-behind the same switcher. It must follow the performance rules: load after first interaction or
-idle, not in the first paint, and never block rendering. It translates in the browser only, so it
-has the limits listed under "What the live WordPress site does today", and it should be removed per
-language as real translations ship, since the widget would otherwise re-translate them. It is
-disabled for pages that exist in a real translation. Whether to ship it is open decision 7.
+With 50+ languages enabled today, translating the site properly into all of them is not realistic,
+and the rest of this spec (document-level translation, per-language slugs, hreflang) is built for a
+small number of languages. The recommended shape is two tiers:
+
+1. **Tier 1: a few real languages**, chosen from evidence of use (open decision 8). Spanish first. These
+   get Sanity translations, `/es/` URLs, `hreflang`, and editor review, as described above.
+2. **Tier 2: everything else stays machine-translated in the browser**, through the same Google
+   Translate widget, behind the same switcher. It is not a stopgap to remove; it is the long-tail
+   answer, kept because no one will hand-translate the rest.
+
+Rules for tier 2:
+
+- It must follow the performance rules: load after first interaction or idle, never in the first
+  paint, and never block rendering.
+- It has the limits listed under "What the live WordPress site does today": nothing is indexable, no
+  `hreflang`, no editor correction. That is acceptable for the long tail and not for tier 1.
+- **It must not re-translate tier 1 content.** A page that exists in a real translation is excluded
+  from the widget (the `notranslate` hint on the page, and the switcher showing the real `/es/` link
+  for that language, not the widget's option).
+- **Real languages appear in the switcher as links; the rest appear through the widget.** Both are
+  one control to the visitor.
+- **Right-to-left** needs no layout work for tier 2, because the widget flips direction itself. RTL
+  stays out of scope for tier 1 unless an RTL language is chosen.
+- Content sent to Google for translation includes everything on the page. Nothing here is private,
+  but the privacy policy should name the widget.
+
+Whether to ship tier 2 at launch is open decision 7.
 
 ## Open decisions
 
-1. **Which languages, and are any right-to-left?** Spanish is shown in the live switcher. Whether
-   other languages are enabled there is unconfirmed. RTL adds layout work throughout and is out of
-   scope unless asked for.
+1. **Which languages get real translations (tier 1)?** The live switcher enables 50+ through machine
+   translation; Spanish is the only one we know to be wanted. Tier 1 should stay small, so that every
+   language in it can be reviewed. RTL adds layout work throughout tier 1 and is out of scope unless
+   an RTL language is chosen.
 2. **Scope.** A few key pages, or a full mirror including properties and articles? This sets how many
    types get the `language` field. Recommendation: pages and the notices people act on first.
 3. **Who translates.** Today nobody reviews the output (raw browser machine translation). Editors by
@@ -232,10 +257,13 @@ disabled for pages that exist in a real translation. Whether to ship it is open 
    Accept that, or design for editor-added languages (more complex, probably not worth it).
 6. **Legal and accessibility.** Whether public notices, meeting agendas or forms must be offered in
    Spanish is a policy question for the client, and a reason to translate `record` and `form` early.
-7. **Launch stopgap.** Ship the Google Translate widget at launch to keep parity with the live site,
-   or launch English-only until real translations exist? Recommendation: ship it, deferred, so
-   Spanish access is not lost. If it ships, record it as deferred work with a GitHub issue to remove
-   it per language.
+7. **Ship the machine-translation widget (tier 2) at launch?** Keeping parity with the live site
+   keeps every enabled language reachable. Launching English-only drops all of them. Recommendation:
+   ship it, deferred, with a language list trimmed to what is used (decision 8).
+8. **Which of the 50+ languages are used?** Nobody knows. Evidence to look for: GTranslate's own
+   statistics if the paid tier exposes them, Google Analytics language and `#googtrans` hash
+   reports, and Search Console. This decides tier 1 and lets tier 2 offer a shorter, more usable list
+   than 50+ flags.
 
 ## Deferred
 
