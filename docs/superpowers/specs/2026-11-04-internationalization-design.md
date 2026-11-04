@@ -228,6 +228,35 @@ extended to check hreflang reciprocity (if A lists B as an alternate, B lists A)
   language slugs and SEO becomes unmanageable, and a half-translated page publishes as a unit.
 - **Locale in a query parameter (`?lang=es`).** Not crawlable as distinct pages.
 
+## Legal context
+
+Researched 2026-11-04. This is not legal advice; the client's counsel should confirm it. Nothing
+found requires the Land Bank to translate its website, but the picture is incomplete.
+
+- **The Land Bank is a public instrumentality, not an ordinary nonprofit.** It was created by
+  Chapter 669 of the Acts of 1983 and a Massachusetts court has described it as a "body politic and
+  corporate" and a public instrumentality. Public-entity rules matter more than nonprofit rules.
+- **Title VI of the Civil Rights Act** applies to any organization receiving federal financial
+  assistance, and if any part receives it the whole organization is covered. The standard is
+  "reasonable steps" to give limited-English speakers meaningful access, judged by a four-factor
+  test. Federal agency guidance says an entire website generally need not be translated, only vital
+  documents, and a translated document should be posted beside its English original. That is
+  guidance, not a binding rule. **Unknown:** whether the Land Bank receives any federal money.
+- **Massachusetts.** Executive Order 526 and a 2023 executive order require language access plans of
+  executive-branch agencies; whether the Land Bank counts as one is unconfirmed (probably not). The
+  Language Access and Inclusion Act, filed in several sessions, would bar state agencies from relying
+  solely on machine translation for websites and require a disclaimer where they use it. It is
+  unconfirmed whether any version has passed, and it would cover state agencies.
+- **ADA Title II web rule (unverified, from memory).** A 2024 DOJ rule requires state and local
+  governments to meet WCAG 2.1 AA, with compliance dates in 2026 or 2027 by population served. If it
+  covers the Land Bank, it applies to the new site regardless of translation. Verify the current
+  deadlines.
+
+What follows: the legal risk concentrates in **vital documents** (notices, meeting agendas, forms,
+public-comment steps), not in a full mirror of the site. Machine translation alone is the weakest
+position for those, and a visible disclaimer is a cheap protection. This is why tier 1 starts with
+vital documents.
+
 ## Two tiers: real translations and a machine-translated long tail
 
 With 50+ languages enabled today, translating the site properly into all of them is not realistic,
@@ -236,12 +265,16 @@ small number of languages. The recommended shape is two tiers:
 
 1. **Tier 1: a few real languages**, chosen from evidence of use (open decision 8). Spanish first. These
    get Sanity translations, `/es/` URLs, `hreflang`, and editor review, as described above.
+   Vital documents (`record`, `form`, notices and agendas) are translated first, ahead of the rest of
+   the mirror (see "Legal context").
 2. **Tier 2: everything else stays machine-translated in the browser**, through the same Google
    Translate widget, behind the same switcher. It is not a stopgap to remove; it is the long-tail
    answer, kept because no one will hand-translate the rest.
 
 Rules for tier 2:
 
+- **A visible disclaimer** states that the page was machine translated and accuracy cannot be
+  ensured, and points to the English original. It is shown whenever the widget has translated a page.
 - It must follow the performance rules: load after first interaction or idle, never in the first
   paint, and never block rendering.
 - It has the limits listed under "What the live WordPress site does today": nothing is indexable, no
@@ -277,8 +310,11 @@ Whether to ship tier 2 at launch is open decision 7.
    stays English with translated labels is open.
 5. **Adding a language later.** It needs a routing change and a deploy, even if the content does not.
    Accept that, or design for editor-added languages (more complex, probably not worth it).
-6. **Legal and accessibility.** Whether public notices, meeting agendas or forms must be offered in
-   Spanish is a policy question for the client, and a reason to translate `record` and `form` early.
+6. **Legal.** Ask Land Bank or town counsel: does Title VI apply (is any federal money received), is
+   the Land Bank covered by the state language access orders, and does the ADA Title II web rule
+   cover it and by when? Until answered, this is an open question, not a requirement. Whether
+   notices, agendas and forms must be offered in Spanish is also for counsel. Either way, translate
+   those first (see "Legal context").
 7. **Ship the machine-translation widget (tier 2) at launch?** Keeping parity with the live site
    keeps every enabled language reachable. Launching English-only drops all of them. Recommendation:
    ship it, deferred, with a language list trimmed to what is used (decision 8).
