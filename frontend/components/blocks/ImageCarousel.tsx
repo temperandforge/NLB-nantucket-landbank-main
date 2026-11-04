@@ -1,12 +1,19 @@
-import {projectHref} from '@/sanity/lib/utils'
+import {carouselCards, DEFAULT_NEWS_LIMIT} from '@/sanity/lib/carouselCards'
 
-import ImageCarouselSlide from './ImageCarouselSlide'
-import ImageCarouselTrack from './ImageCarouselTrack'
+import GalleryCarousel from './GalleryCarousel'
 import {BlockProps} from './types'
 
+/**
+ * The Image Carousel block: hand-picked images and documents, a project category, or the latest news
+ * in a category (DECISIONS 26, 27, 28). Cards are decided by carouselCards; with none, nothing is
+ * drawn, not even the eyebrow.
+ */
 export default function ImageCarousel({block}: BlockProps<'imageCarousel'>) {
-  // A reference to an unpublished project dereferences to null.
-  const projects = (block.projects ?? []).flatMap((project) => (project?.name ? [project] : []))
+  const cards = carouselCards(block.entries, {
+    defaultImage: block.defaultImage,
+    limit: block.source === 'newsCategory' ? (block.limit ?? DEFAULT_NEWS_LIMIT) : undefined,
+  })
+  if (cards.length === 0) return null
   return (
     <section className="w-full overflow-x-clip bg-background py-s6">
       <div className="flex w-full flex-col items-center gap-16">
@@ -17,19 +24,7 @@ export default function ImageCarousel({block}: BlockProps<'imageCarousel'>) {
             </div>
           </div>
         )}
-        {projects.length > 0 && (
-          <ImageCarouselTrack label={block.eyebrow || 'Image carousel'}>
-            {projects.map((project) => (
-              <ImageCarouselSlide
-                key={project._id}
-                image={project.image?.asset?._ref ? project.image : block.defaultImage}
-                label={project.name}
-                // A project with no slug (unreachable through the query) is a plain card, never a dead anchor.
-                href={project.slug ? projectHref(project.slug) : null}
-              />
-            ))}
-          </ImageCarouselTrack>
-        )}
+        <GalleryCarousel cards={cards} label={block.eyebrow || 'Image carousel'} />
       </div>
     </section>
   )
