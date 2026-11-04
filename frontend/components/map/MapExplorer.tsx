@@ -124,7 +124,7 @@ export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
           </div>
         </div>
         {/* close .container--inner */}
-        <div className="relative flex-1">
+        <div className="relative h-[428px] md:h-[738px]">
           <LazyMapboxMap projects={filteredProjects} settings={settings} />
         </div>
       </div>

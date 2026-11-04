@@ -79,10 +79,6 @@
   --header-height: 5rem;
 }
 
-#mapWrap {
-  height: calc(100dvh - var(--header-height) - 2.5rem);
-}
-
 html:has(:target) {
   scroll-behavior: smooth;
 }
