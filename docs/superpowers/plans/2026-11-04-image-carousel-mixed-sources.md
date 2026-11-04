@@ -48,7 +48,7 @@
   - an `event` doc with `image: null` and the same `defaultImage` is dropped (`keys` is `[]`);
   - an `article` doc with no image and a `defaultImage` is dropped;
   - ten `article` entries where the first three have no image, with `limit: 4`, give exactly the keys of the first four that have an image;
-  - the same ten with `limit` omitted and an `article`-only list of twelve imaged entries give 8 cards (`DEFAULT_NEWS_LIMIT`), and with `limit: undefined` and no articles (a hand-picked list of 12 uploads) gives all 12, so the trim applies only when `limit` is passed;
+  - twelve imaged uploads with no `limit` give all 12 (the trim applies only when `limit` is passed), and twelve imaged articles with `limit: DEFAULT_NEWS_LIMIT` give 8;
   - `carouselCards(null)` and `carouselCards([])` are `[]`.
 
   The rule the tests pin: `limit` is applied only when the caller passes it (news mode passes `block.limit ?? DEFAULT_NEWS_LIMIT`); hand-picked and project modes pass none.
@@ -102,7 +102,7 @@
 
 - [ ] **Step 4: Run** `cd frontend && npm run sanity:typegen`. Expected: succeeds; `block.entries` appears in `GetPageQueryResult`.
 
-- [ ] **Step 5: Run** `node scripts/checkStructuredData.ts` is not needed (no builder changed). Commit `queries.ts` and generated types: `feat(carousel): block query projects all three sources as gallery entries (#114)`.
+- [ ] **Step 5: Commit** `queries.ts` and the generated types (no structured-data builder changed, so `checkStructuredData.ts` is not needed): `feat(carousel): block query projects all three sources as gallery entries (#114)`.
 
 ---
 
