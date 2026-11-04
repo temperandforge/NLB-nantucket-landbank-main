@@ -118,7 +118,7 @@ async function main() {
       _key: key(),
       _type: 'imageCarousel',
       eyebrow: 'Nantucket Farms and Agricultural Work',
-      source: 'category',
+      source: 'projectCategory',
       category: {_type: 'reference', _ref: agriculture},
     },
     {
