@@ -217,6 +217,39 @@ them:
 Plus the existing `verifyPageRouting.ts`, `checkStructuredData.ts` and `verifyStructuredData.ts`,
 extended to check hreflang reciprocity (if A lists B as an alternate, B lists A).
 
+## Delivering translated documents
+
+A `record` is one downloadable file under a category, with no page of its own, so the document-level
+machinery above is more than it needs. Options:
+
+| Option | How it works | Fit |
+|---|---|---|
+| A. One record per language | Each translation is its own `record` with a `language` field, linked to the English one. | Consistent with the rest of this spec, but duplicates the date and category and the pairs must be kept in sync. |
+| **B. One record, several files** | Add `translations: [{language, file, title?}]` to `record`. The row reads "Minutes, 12 March: English, Español". | **Recommended.** One date, one category, one row. A translation sits beside its English original. No new URLs. |
+| C. Auto-translate the PDF | A document-translation API produces a draft file. | A first draft only. Layout often breaks and accuracy is not guaranteed; a person must review it before it is attached. |
+
+Option B leaves the archive's filters and ordering alone, and the existing "title, else date, else
+file name" label rule needs no change.
+
+Rules, whichever option is chosen:
+
+- **The widget does not translate linked files.** For tier 2 languages a vital document stays
+  English-only. Show a short **language-assistance notice** ("help with this document in your
+  language is available on request"), with a contact who can act on it, in the top few languages
+  (open decision 9), next to the document list.
+- **Tier 1 languages get the real file**, labelled with the language's own name ("Español") and a
+  `lang` attribute on the link so screen readers pronounce it correctly.
+- **Fallback.** A record with no translation shows only English: no empty slot, no broken link.
+  Anything rendered site-wide degrades and never throws.
+- **Forms and notices are structured content, not files.** `form` and notices use the document-level
+  translation described above. Only file-based records use option B.
+- **Accessibility.** Translated PDFs should be tagged and carry a language property. If the ADA
+  Title II web rule covers the Land Bank, documents are likely in scope; how it treats PDFs is
+  unverified (see "Legal context").
+- **Search.** Records are searchable only if they have a destination. Whether a translated file
+  should be findable by terms in its own language depends on how search handles languages, which has
+  not been checked.
+
 ## Alternatives rejected
 
 - **Auto-redirect on `Accept-Language`.** Fragile with static rendering and bad for crawlers.
@@ -322,6 +355,10 @@ Whether to ship tier 2 at launch is open decision 7.
    statistics if the paid tier exposes them, Google Analytics language and `#googtrans` hash
    reports, and Search Console. This decides tier 1 and lets tier 2 offer a shorter, more usable list
    than 50+ flags.
+9. **Which languages get the language-assistance notice?** The notice (see "Delivering translated
+   documents") offers help on request for vital documents that exist only in English. It can cover
+   more languages than tier 1, since it is a sentence, not a mirror. Pick the top few from the usage
+   evidence in decision 8, and name a contact who can act on a request.
 
 ## Deferred
 
