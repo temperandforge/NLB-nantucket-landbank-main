@@ -14,6 +14,12 @@
 
 export declare const internalGroqTypeReferenceTo: unique symbol
 
+type ArrayOf<T> = Array<
+  T & {
+    _key: string
+  }
+>
+
 // Source: ../sanity.schema.json
 export type ShowIf = {
   field?: string
@@ -463,16 +469,43 @@ export type Timeline = {
   disabled?: boolean
 }
 
+export type ArticleReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'article'
+}
+
+export type EventReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'event'
+}
+
 export type ImageCarousel = {
   _type: 'imageCarousel'
   eyebrow?: string
-  source?: 'manual' | 'category'
-  projects?: Array<
-    {
-      _key: string
-    } & ProjectReference
+  source?: 'manual' | 'projectCategory' | 'newsCategory'
+  gallery?: Array<
+    | {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        caption?: string
+        _type: 'image'
+        _key: string
+      }
+    | ArticleReference
+    | ProjectReference
+    | PropertyReference
+    | EventReference
   >
   category?: ProjectTypeReference
+  newsCategory?: NewsCategoryReference
+  limit?: number
   disabled?: boolean
 }
 
@@ -1126,20 +1159,6 @@ export type ResourceReference = {
   _type: 'reference'
   _weak?: boolean
   [internalGroqTypeReferenceTo]?: 'resource'
-}
-
-export type ArticleReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'article'
-}
-
-export type EventReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'event'
 }
 
 export type FaqReference = {
@@ -1924,6 +1943,8 @@ export type AllSanitySchemaTypes =
   | Growers
   | DownloadBlock
   | Timeline
+  | ArticleReference
+  | EventReference
   | ImageCarousel
   | JumpNavContent
   | BasicLeftRightText
@@ -1959,8 +1980,6 @@ export type AllSanitySchemaTypes =
   | Project
   | PropertyTypeReference
   | ResourceReference
-  | ArticleReference
-  | EventReference
   | FaqReference
   | Property
   | Geopoint
@@ -2875,22 +2894,24 @@ export type GetPageQueryResult = {
         _key: string
         _type: 'imageCarousel'
         eyebrow?: string
-        source?: 'category' | 'manual'
-        projects: Array<{
-          _id: string
-          name: string
-          image: {
-            asset?: SanityImageAssetReference
-            media?: unknown
-            hotspot?: SanityImageHotspot
-            crop?: SanityImageCrop
-            alt?: string
-            _type: 'image'
-          } | null
-          slug: string
-        }> | null
+        source?: 'manual' | 'newsCategory' | 'projectCategory'
+        gallery?:
+          | Array<{
+              asset?: SanityImageAssetReference
+              media?: unknown
+              hotspot?: SanityImageHotspot
+              crop?: SanityImageCrop
+              alt?: string
+              caption?: string
+              _type: 'image'
+              _key: string
+            }>
+          | ArrayOf<ArticleReference | EventReference | ProjectReference | PropertyReference>
         category?: ProjectTypeReference
+        newsCategory?: NewsCategoryReference
+        limit?: number
         disabled?: boolean
+        projects: null
         defaultImage: {
           asset?: SanityImageAssetReference
           media?: unknown
@@ -3976,22 +3997,24 @@ export type LandingPageQueryResult = {
         _key: string
         _type: 'imageCarousel'
         eyebrow?: string
-        source?: 'category' | 'manual'
-        projects: Array<{
-          _id: string
-          name: string
-          image: {
-            asset?: SanityImageAssetReference
-            media?: unknown
-            hotspot?: SanityImageHotspot
-            crop?: SanityImageCrop
-            alt?: string
-            _type: 'image'
-          } | null
-          slug: string
-        }> | null
+        source?: 'manual' | 'newsCategory' | 'projectCategory'
+        gallery?:
+          | Array<{
+              asset?: SanityImageAssetReference
+              media?: unknown
+              hotspot?: SanityImageHotspot
+              crop?: SanityImageCrop
+              alt?: string
+              caption?: string
+              _type: 'image'
+              _key: string
+            }>
+          | ArrayOf<ArticleReference | EventReference | ProjectReference | PropertyReference>
         category?: ProjectTypeReference
+        newsCategory?: NewsCategoryReference
+        limit?: number
         disabled?: boolean
+        projects: null
         defaultImage: {
           asset?: SanityImageAssetReference
           media?: unknown

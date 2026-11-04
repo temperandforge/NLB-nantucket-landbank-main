@@ -463,16 +463,43 @@ export type Timeline = {
   disabled?: boolean
 }
 
+export type ArticleReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'article'
+}
+
+export type EventReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'event'
+}
+
 export type ImageCarousel = {
   _type: 'imageCarousel'
   eyebrow?: string
-  source?: 'manual' | 'category'
-  projects?: Array<
-    {
-      _key: string
-    } & ProjectReference
+  source?: 'manual' | 'projectCategory' | 'newsCategory'
+  gallery?: Array<
+    | {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        caption?: string
+        _type: 'image'
+        _key: string
+      }
+    | ArticleReference
+    | ProjectReference
+    | PropertyReference
+    | EventReference
   >
   category?: ProjectTypeReference
+  newsCategory?: NewsCategoryReference
+  limit?: number
   disabled?: boolean
 }
 
@@ -1197,17 +1224,26 @@ export type Property = {
     | ({
         _key: string
       } & AnchorLinks)
+    | ({
+        _key: string
+      } & ImageGallery)
   >
-  gallery?: Array<{
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    caption?: string
-    _type: 'image'
-    _key: string
-  }>
+  gallery?: Array<
+    | {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        caption?: string
+        _type: 'image'
+        _key: string
+      }
+    | ArticleReference
+    | ProjectReference
+    | PropertyReference
+    | EventReference
+  >
   mapHeading?: string
   mapBody?: string
   faqs?: Array<
@@ -1901,6 +1937,8 @@ export type AllSanitySchemaTypes =
   | Growers
   | DownloadBlock
   | Timeline
+  | ArticleReference
+  | EventReference
   | ImageCarousel
   | JumpNavContent
   | BasicLeftRightText
