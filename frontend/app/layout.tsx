@@ -7,10 +7,9 @@ import {Inter, IBM_Plex_Mono, EB_Garamond, DM_Sans, DM_Mono} from 'next/font/goo
 import {draftMode} from 'next/headers'
 import Script from 'next/script'
 import {toPlainText} from 'next-sanity'
-import {VisualEditing} from 'next-sanity/visual-editing'
 import {Toaster} from 'sonner'
 
-import DraftModeToast from '@/components/DraftModeToast'
+import DraftTools from '@/components/DraftTools'
 import SiteJsonLd from '@/components/SiteJsonLd'
 import ScrollReveal from '@/components/ScrollReveal'
 import Footer from '@/components/Footer'
@@ -110,13 +109,7 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
         {/* The <Toaster> component is responsible for rendering toast notifications used in /app/client-utils.ts and /app/components/DraftModeToast.tsx */}
         <Toaster />
         <SiteJsonLd />
-        {isDraftMode && (
-          <>
-            <DraftModeToast />
-            {/*  Enable Visual Editing, only to be rendered when Draft Mode is enabled */}
-            <VisualEditing />
-          </>
-        )}
+        {isDraftMode && <DraftTools />}
         {/* The <SanityLive> component is responsible for making all sanityFetch calls in your application live, so should always be rendered. */}
         <SanityLive onError={handleError} />
         <ScrollReveal />

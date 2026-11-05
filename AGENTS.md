@@ -136,6 +136,12 @@ Design docs live in [docs/superpowers/specs/](docs/superpowers/specs/).
 - **Defer what isn't needed for the first paint** (media downloads, third-party scripts) until
   after load or first interaction, as `HeroVideo` and the reCAPTCHA load do.
 
+- **Editing tooling never reaches a visitor's first load.** `next-sanity/hooks` and
+  `next-sanity/visual-editing` are ~180 KB compressed. A static import, or a dynamic import from a
+  server component, ships them to everyone even when never rendered. Load them only through
+  `next/dynamic` inside a client component (`DraftTools`, `DraftPageBuilderLoader`). Check
+  `route-bundle-stats.json` after build if a new import looks heavy.
+
 Reasoning: DECISIONS 25.
 
 ## Content scripts
