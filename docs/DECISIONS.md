@@ -628,8 +628,9 @@ want it.
   feel there, not in components.
 - **`<Cascade>` is opt-in, one line per headline.** It renders text that carries Sanity stega
   characters unsplit (splitting would break the visual-editing markers) and must never call
-  `draftMode()`, which would make every page dynamic. A hero description uses
-  `variant="body"` (a quicker, never-blurred sweep, capped at 48 words). Word splitting is in
+  `draftMode()`, which would make every page dynamic. A hero description is
+  not cascaded: it is a plain paragraph that fades in as one piece (`load-in`) after the headline.
+  Word splitting is in
   `frontend/sanity/lib/cascade.ts`, checked by `frontend/scripts/verifyCascade.mts`.
 - **The rest of the page enters through `data-enter`.** `BlockRenderer` tags the first two blocks
   `load` (on a timer, in CSS) and the rest `scroll`. Parts that start below the screen, in either
