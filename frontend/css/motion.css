@@ -145,6 +145,16 @@
   }
 
   /*
+   * The card image morphing into the property hero (ViewTransition share="morph"). Keep its group
+   * above the page snapshots. Otherwise the old page, which is opaque, is painted over the growing
+   * image while it fades out (page-out), so the image seems to fade in as it grows. Below the
+   * header (z-index 100).
+   */
+  ::view-transition-group(.morph) {
+    z-index: 50;
+  }
+
+  /*
    * Whole-page enter. BlockRenderer (and <Enter>) tag a block data-enter="load" (the first two,
    * data-enter-order 0 and 1) or "scroll" (the rest). Inside one, the *parts* animate: the
    * outermost heading, paragraph, image, list item or button (or anything marked data-part). A card
