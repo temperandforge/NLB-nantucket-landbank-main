@@ -13,6 +13,7 @@ import {
   loadBoundaryIndex,
   type BoundaryIndex,
 } from './boundaries'
+import {fetchTrailsBounds, type TrailsBounds} from './trailsBounds'
 import {
   DEFAULT_ZOOM,
   NANTUCKET_CENTER,
@@ -225,6 +226,15 @@ export function MapboxMap({
       style: 'mapbox://styles/tfdev/cmrmj301k000p01rdcrzp6qxr',
       center,
       zoom: settings?.defaultZoom ?? DEFAULT_ZOOM,
+      // The style is built on Mapbox Standard (imported as `basemap`). Drop the 3D buildings and the
+      // POI/transit label layers: they cost GPU and main-thread time and aren't needed here.
+      config: {
+        basemap: {
+          show3dObjects: false,
+          showPointOfInterestLabels: false,
+          showTransitLabels: false,
+        },
+      },
     })
     mapRef.current = map
     if (!scrollZoom) map.scrollZoom.disable()
@@ -243,22 +253,23 @@ export function MapboxMap({
       // the main thread is free, rather than competing with the style and tiles at `load`.
       let cancelledTrails = false
       let cancelIdle = () => {}
+      let cancelBounds = () => {}
       const loadTrails = async () => {
         try {
-          const response = await fetch(trailsUrl)
-          if (!response.ok) {
-            console.error(`Could not download the trails GeoJSON (${response.status}).`)
-            return
+          // Zooming to the whole trail network is the default view; a focused property keeps its own.
+          // The bounds come from a worker, so the multi-MB parse never blocks the page. The map is
+          // handed the URL below and its own worker parses the file for drawing.
+          let bounds: TrailsBounds | null = null
+          if (!focusSlug) {
+            const request = fetchTrailsBounds(trailsUrl)
+            cancelBounds = request.cancel
+            bounds = await request.promise
+            // The map may have been removed while the file downloaded.
+            if (cancelledTrails || mapRef.current !== map) return
+            if (!bounds) return
           }
-          const geojsonData = await response.json()
-          // The map may have been removed while the file downloaded.
-          if (cancelledTrails || mapRef.current !== map) return
-          const features: GeoJSON.Feature[] = Array.isArray(geojsonData?.features)
-            ? geojsonData.features
-            : []
-          if (!features.length) return
 
-          map.addSource('gpx-route', {type: 'geojson', data: geojsonData})
+          map.addSource('gpx-route', {type: 'geojson', data: trailsUrl})
 
           map.addLayer({
             id: 'gpx-route-line',
@@ -268,36 +279,7 @@ export function MapboxMap({
             paint: {'line-color': '#c60024', 'line-width': 1},
           })
 
-          // Zooming to the whole trail network is the default view; a focused property keeps its own.
-          // One pass over the positions: this file has hundreds of thousands, so no intermediate array.
-          if (!focusSlug) {
-            let west = Infinity
-            let south = Infinity
-            let east = -Infinity
-            let north = -Infinity
-            const extend = (position: GeoJSON.Position) => {
-              const [lng, lat] = position
-              if (lng < west) west = lng
-              if (lng > east) east = lng
-              if (lat < south) south = lat
-              if (lat > north) north = lat
-            }
-            for (const feature of features) {
-              const geometry = feature.geometry
-              if (geometry?.type === 'LineString') geometry.coordinates.forEach(extend)
-              else if (geometry?.type === 'MultiLineString')
-                geometry.coordinates.forEach((line) => line.forEach(extend))
-            }
-            if (west <= east) {
-              map.fitBounds(
-                [
-                  [west, south],
-                  [east, north],
-                ],
-                {padding: 40},
-              )
-            }
-          }
+          if (bounds) map.fitBounds(bounds, {padding: 40})
         } catch (error) {
           console.error('Failed to load the trails GeoJSON:', error)
         }
@@ -322,6 +304,7 @@ export function MapboxMap({
       cleanupTrails = () => {
         cancelledTrails = true
         cancelIdle()
+        cancelBounds()
       }
     }
 
