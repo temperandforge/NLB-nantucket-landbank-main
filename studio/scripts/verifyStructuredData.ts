@@ -33,10 +33,12 @@ import {
   placeLd,
   projectLd,
   recordsArchiveLd,
+  faqPageLd,
   webPageLd,
   websiteLd,
 } from '../../frontend/sanity/lib/structuredData'
 import {getSiteUrl} from '../../frontend/sanity/lib/siteUrl'
+import {faqItemsFromBlocks, faqItemsFromList} from '../../frontend/sanity/lib/faqs'
 
 const client = getCliClient({apiVersion: '2025-09-25'})
 
@@ -81,6 +83,13 @@ async function firstSlug(type: string): Promise<string | null> {
   return client.fetch<string | null>(`*[_type == $type && defined(slug.current) && !(_id in path("drafts.**"))][0].slug.current`, {
     type,
   })
+}
+
+async function firstSlugWith(type: string, condition: string): Promise<string | null> {
+  return client.fetch<string | null>(
+    `*[_type == $type && defined(slug.current) && ${condition} && !(_id in path("drafts.**"))][0].slug.current`,
+    {type},
+  )
 }
 
 async function main() {
@@ -181,6 +190,42 @@ async function main() {
     verify('records archive', graph, 'CollectionPage')
     const first = (graph?.mainEntity as {itemListElement?: {item: Record<string, unknown>}[]} | undefined)?.itemListElement?.[0]?.item
     check(Boolean(first?.encodingFormat), 'a record carries its mime type from the query')
+  }
+
+  const faqPage = await client.fetch<{path: string} | null>(
+    `*[_type == "page" && count(pageBuilder[_type == "faqList"]) > 0 && !(_id in path("drafts.**"))][0]{
+       "path": select(
+         defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,
+         defined(parent) => parent->slug.current + "/" + slug.current,
+         slug.current)
+     }`,
+  )
+  if (faqPage?.path) {
+    console.log(`faq page /${faqPage.path}`)
+    const segments = faqPage.path.split('/')
+    const page = await client.fetch(getPageQuery, {
+      leaf: segments[segments.length - 1],
+      path: faqPage.path,
+      includeHidden: false,
+      now: new Date().toISOString(),
+    })
+    const items = faqItemsFromBlocks(page?.pageBuilder)
+    check(items.length > 0, `faq page yields questions (${items.length})`)
+    const faqGraph = faqPageLd({path: `/${faqPage.path}`, items}, ORIGIN)
+    verify('faq page', faqGraph, 'FAQPage')
+    // A question with no answer text is dropped from the markup, not emitted empty. That is content to
+    // fix in Studio, not a builder fault, so report it rather than fail.
+    const emitted = (faqGraph?.mainEntity as unknown[] | undefined)?.length ?? 0
+    if (emitted < items.length) console.log(`  note ${items.length - emitted} of ${items.length} questions have no answer text and are left out`)
+  }
+
+  const propertyWithFaqs = await firstSlugWith('property', 'count(faqs) > 0')
+  if (propertyWithFaqs) {
+    console.log(`property with FAQs /properties/${propertyWithFaqs}`)
+    const property = await client.fetch(propertyQuery, {slug: propertyWithFaqs})
+    const items = faqItemsFromList(property?.faqs)
+    check(items.length > 0, `property yields questions (${items.length})`)
+    verify('property faq', faqPageLd({path: `/properties/${propertyWithFaqs}`, items}, ORIGIN), 'FAQPage')
   }
 
   if (failures.length) {

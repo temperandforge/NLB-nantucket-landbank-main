@@ -5,11 +5,13 @@
 import assert from 'node:assert/strict'
 
 import {serializeJsonLd} from '../components/JsonLd'
+import {faqItemsFromBlocks, faqItemsFromList} from '../sanity/lib/faqs'
 import {buildMetadata} from '../sanity/lib/seo'
 import {absoluteUrl, getSiteUrl} from '../sanity/lib/siteUrl'
 import {
   breadcrumbLd,
   eventLd,
+  faqPageLd,
   newsArticleLd,
   organizationLd,
   placeLd,
@@ -77,6 +79,30 @@ check('every builder returns null without an origin', () => {
   assert.equal(webPageLd({name: 'N', path: '/a'}, null), null)
   assert.equal(breadcrumbLd([{name: 'A', path: '/a'}, {name: 'B', path: '/a/b'}], null), null)
   assert.equal(recordsArchiveLd({path: '/r', records: [{title: 'T', fileUrl: 'https://f/x.pdf'}]}, null), null)
+  assert.equal(faqPageLd({path: '/f', items: [{question: 'Q', answer: 'A'}]}, null), null)
+})
+check('faq: drops a question missing its answer, and is null with none left', () => {
+  const ld = faqPageLd({path: '/f', items: [{question: 'Q1', answer: 'A1'}, {question: 'Q2', answer: ' '}, {question: '', answer: 'A3'}]}, ORIGIN)!
+  assert.equal(ld['@type'], 'FAQPage')
+  assert.equal(ld.url, 'https://x.org/f')
+  assert.deepEqual(ld.mainEntity, [{'@type': 'Question', name: 'Q1', acceptedAnswer: {'@type': 'Answer', text: 'A1'}}])
+  assert.equal(faqPageLd({path: '/f', items: [{question: 'Q'}]}, ORIGIN), null)
+  assert.equal(faqPageLd({path: '/f', items: []}, ORIGIN), null)
+})
+const answer = (text: string) => [{_type: 'block', _key: 'k', children: [{_type: 'span', _key: 's', text}], markDefs: []}]
+check('faq collector: gathers list, accordion and jump-nav items in page order, as plain text', () => {
+  const items = faqItemsFromBlocks([
+    {_type: 'hero'},
+    {_type: 'faqList', ungrouped: [{question: 'U', answer: answer('ua')}], groups: [{faqs: [{question: 'G', answer: answer('ga')}]}]},
+    {_type: 'jumpNavContent', content: [{_type: 'faqAccordion', items: [{question: 'J', answer: answer('ja')}]}, {_type: 'block'}]},
+    null,
+  ])
+  assert.deepEqual(items.map((i) => [i.question, i.answer]), [['U', 'ua'], ['G', 'ga'], ['J', 'ja']])
+})
+check('faq collector: a list tolerates null references and missing answers', () => {
+  const items = faqItemsFromList([null, {question: 'P', answer: answer('pa')}, {question: 'No answer'}])
+  assert.deepEqual(items.map((i) => [i.question, i.answer]), [['P', 'pa'], ['No answer', undefined]])
+  assert.deepEqual(faqItemsFromList(undefined), [])
 })
 check('event serialises in the site time zone and omits missing end and location', () => {
   const ld = eventLd({title: 'E', slug: 'e', start: '2026-11-01T14:00:00.000Z'}, ORIGIN)!

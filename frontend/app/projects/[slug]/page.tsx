@@ -17,7 +17,8 @@ import {
 import {orderRelatedProjects} from '@/sanity/lib/relatedProjects'
 import {buildMetadata} from '@/sanity/lib/seo'
 import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
-import {projectLd} from '@/sanity/lib/structuredData'
+import {faqItemsFromBlocks} from '@/sanity/lib/faqs'
+import {faqPageLd, projectLd} from '@/sanity/lib/structuredData'
 import {DereferencedLink} from '@/sanity/lib/types'
 import {linkResolver, realHref} from '@/sanity/lib/utils'
 
@@ -85,16 +86,22 @@ export default async function ProjectPage(props: PageProps<'/projects/[slug]'>) 
   return (
     <>
       <JsonLd
-        data={projectLd(
-          {
-            name: project.name,
-            slug: project.slug,
-            description: project.seo?.description || description,
-            image: resolveSeoImage(project.seo, project.image),
-            propertySlug: project.propertySlug,
-          },
-          defaults.origin,
-        )}
+        data={[
+          projectLd(
+            {
+              name: project.name,
+              slug: project.slug,
+              description: project.seo?.description || description,
+              image: resolveSeoImage(project.seo, project.image),
+              propertySlug: project.propertySlug,
+            },
+            defaults.origin,
+          ),
+          faqPageLd(
+            {path: `/projects/${project.slug}`, items: faqItemsFromBlocks(project.body)},
+            defaults.origin,
+          ),
+        ]}
       />
       <PageTransition>
         <ProjectView project={project} settings={settings} archiveHref={archiveHref} />
