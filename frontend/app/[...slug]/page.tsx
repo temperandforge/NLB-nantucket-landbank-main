@@ -10,7 +10,8 @@ import {currentHour} from '@/sanity/lib/dates'
 import {getPageQuery, landingPageQuery, pagesSlugs} from '@/sanity/lib/queries'
 import {buildMetadata} from '@/sanity/lib/seo'
 import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
-import {breadcrumbLd, recordsArchiveLd, webPageLd} from '@/sanity/lib/structuredData'
+import {faqItemsFromBlocks} from '@/sanity/lib/faqs'
+import {breadcrumbLd, faqPageLd, recordsArchiveLd, webPageLd} from '@/sanity/lib/structuredData'
 
 /**
  * This is a catch-all segment rather than a single [slug] because a page URL spans as many
@@ -135,6 +136,8 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
           ...archives.map((archive) =>
             recordsArchiveLd({name: page.name, path, records: archive.records ?? []}, defaults.origin),
           ),
+          // One FAQPage per URL: every FAQ block on the page is merged into it.
+          faqPageLd({path, items: faqItemsFromBlocks(page.pageBuilder)}, defaults.origin),
         ]}
       />
       <PageTransition>

@@ -150,9 +150,9 @@ Props come from the generated query result types. There is no test framework, so
   Console** integration: [#80](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/80).
 - **Rich Studio SEO preview** (Google/social preview panes) and SEO audit dashboard, possibly the
   plugin for its UI only (DECISIONS 24.1): [#79](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/79).
-- **`FAQPage` structured data** for the FAQ accordion. Google restricts FAQ rich results to
-  government and health sites, which this site is, so it may be eligible; confirm before building:
-  [#77](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/77).
+- **`FAQPage`** is built (merged per URL from FAQ lists, accordions and property FAQs; see DECISIONS
+  24.6). Whether Google shows the rich result for this site is unconfirmed:
+  [#77](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/77) stays open until that is checked.
 - **`JobPosting`** for job listings: needs fields the `job` document does not hold (employment type,
   valid-through, location structure): [#78](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/78).
 - **`GovernmentOrganization` precision** (department hierarchy, `areaServed`): start with

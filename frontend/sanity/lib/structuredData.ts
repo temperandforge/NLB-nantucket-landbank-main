@@ -252,6 +252,30 @@ export function breadcrumbLd(crumbs: {name?: string | null; path: string | null}
   })
 }
 
+/**
+ * A page's questions as one FAQPage. Google reads a single FAQPage per URL, so every FAQ block on
+ * the page is merged into one list by the caller. `answer` is already plain text (flattened from
+ * Portable Text); a question missing either half is dropped rather than emitted empty.
+ */
+export function faqPageLd(
+  input: {path: string; items: {question?: string | null; answer?: string | null}[]},
+  origin: string | null,
+): JsonLdGraph | null {
+  if (!origin) return null
+  const questions = input.items.flatMap((item) => {
+    const name = item.question?.trim()
+    const text = item.answer?.trim()
+    if (!name || !text) return []
+    return [{'@type': 'Question', name, acceptedAnswer: {'@type': 'Answer', text}}]
+  })
+  if (questions.length === 0) return null
+  return withContext({
+    '@type': 'FAQPage',
+    url: absoluteUrl(input.path, origin),
+    mainEntity: questions,
+  })
+}
+
 export type RecordInput = {
   title?: string | null
   date?: string | null

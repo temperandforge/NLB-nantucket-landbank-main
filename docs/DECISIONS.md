@@ -1733,8 +1733,15 @@ control of search and social appearance. The `seo` object goes on `page`, `artic
   `studio/scripts/verifyStructuredData.ts --with-user-token` (live data).
 - **Not yet validated against Google's Rich Results Test or the Schema.org validator**: both need a
   public URL, so that check is for a deployed preview once Site URL is set.
-- **Deferred, with issues:** FAQPage [#77](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/77),
-  JobPosting [#78](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/78),
+- **FAQPage is built** ([#77](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/77)):
+  `faqPageLd` in `structuredData.ts`, fed by the collectors in `frontend/sanity/lib/faqs.ts`. Google
+  reads one FAQPage per URL, so every FAQ source on a page (`faqList`, `faqAccordion` inside a jump-nav
+  body, a property's `faqs`, a project's body) is merged into a single graph. A question with no
+  answer text is dropped, not emitted empty. Whether Google shows the rich result for this site is
+  not confirmed; the markup is harmless either way. Property FAQs are still referenced FAQ documents;
+  the collector reads inline items the same way, so [#126](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/126)
+  needs no builder change.
+- **Deferred, with issues:** JobPosting [#78](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/78),
   Studio SEO preview [#79](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/79),
   hreflang, custom JSON-LD and Search Console [#80](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/80),
   GovernmentOrganization [#81](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/81).

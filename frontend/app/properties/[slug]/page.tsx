@@ -19,7 +19,8 @@ import {
 import {orderRelatedProperties} from '@/sanity/lib/relatedProperties'
 import {buildMetadata} from '@/sanity/lib/seo'
 import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
-import {placeLd} from '@/sanity/lib/structuredData'
+import {faqItemsFromList} from '@/sanity/lib/faqs'
+import {faqPageLd, placeLd} from '@/sanity/lib/structuredData'
 import {DereferencedLink} from '@/sanity/lib/types'
 import {linkResolver, realHref} from '@/sanity/lib/utils'
 
@@ -87,16 +88,22 @@ export default async function PropertyPage(props: PageProps<'/properties/[slug]'
   return (
     <>
       <JsonLd
-        data={placeLd(
-          {
-            name: property.name,
-            slug: property.slug,
-            description: property.seo?.description || description,
-            image: resolveSeoImage(property.seo, property.image),
-            location: property.location,
-          },
-          defaults.origin,
-        )}
+        data={[
+          placeLd(
+            {
+              name: property.name,
+              slug: property.slug,
+              description: property.seo?.description || description,
+              image: resolveSeoImage(property.seo, property.image),
+              location: property.location,
+            },
+            defaults.origin,
+          ),
+          faqPageLd(
+            {path: `/properties/${property.slug}`, items: faqItemsFromList(property.faqs)},
+            defaults.origin,
+          ),
+        ]}
       />
       <PageTransition>
         <Enter index={0}>
