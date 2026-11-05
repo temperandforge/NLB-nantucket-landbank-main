@@ -1759,6 +1759,15 @@ same bug found again.
 - This is a rule for *running* work. Deferring work out of the first paint (the hero video waits
   for load and idle; reCAPTCHA waits for the form to be touched) is the same idea at load time and
   is kept.
+- **Editor-only code stays out of the first load.** `PageBuilder` was a client component using
+  `useOptimistic` from `next-sanity/hooks`, and the layout imported `VisualEditing`. Both pulled the
+  visual-editing runtime (184 KB compressed of 480 KB) into every visitor's page, and `PageBuilder`
+  made every block client-rendered. Now `PageBuilder` is a server component, and the draft-only
+  versions load via `next/dynamic` in a client component. Server-side dynamic imports are not enough:
+  Turbopack still groups them into the shared client chunk. Measured locally with Lighthouse mobile:
+  first-load JS 480 -> 255 KB, score 78 -> 87, simulated LCP 5.2 -> 4.1 s.
+- **The hero video starts after first paint**, not just after `load`, so its download never
+  competes with the poster.
 
 ### 25.3 Not yet verified
 

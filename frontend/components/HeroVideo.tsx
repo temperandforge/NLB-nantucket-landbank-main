@@ -58,7 +58,7 @@ export default function HeroVideo({block}: HeroVideoProps) {
     }
     let idle: number | undefined
     let timer: number | undefined
-    const whenLoaded = () => {
+    const whenSettled = () => {
       // Safari has no requestIdleCallback: a short timer is its fallback.
       if (typeof window.requestIdleCallback === 'function') {
         idle = window.requestIdleCallback(start, {timeout: 2000})
@@ -66,11 +66,39 @@ export default function HeroVideo({block}: HeroVideoProps) {
         timer = window.setTimeout(start, 500)
       }
     }
-    if (document.readyState === 'complete') whenLoaded()
-    else window.addEventListener('load', whenLoaded, {once: true})
+    // `load` is not late enough: it can fire well before the first paint, and the video (tens of
+    // MB) then competes with the poster for bandwidth. Wait for the first paint as well.
+    let loaded = document.readyState === 'complete'
+    let painted = false
+    let began = false
+    const maybeBegin = () => {
+      if (began || !loaded || !painted) return
+      began = true
+      whenSettled()
+    }
+    const onLoad = () => {
+      loaded = true
+      maybeBegin()
+    }
+    if (!loaded) window.addEventListener('load', onLoad, {once: true})
+    let paintObserver: PerformanceObserver | undefined
+    try {
+      paintObserver = new PerformanceObserver((list) => {
+        if (list.getEntriesByName('first-contentful-paint').length === 0) return
+        painted = true
+        paintObserver?.disconnect()
+        maybeBegin()
+      })
+      paintObserver.observe({type: 'paint', buffered: true})
+    } catch {
+      // No Paint Timing: don't wait on it.
+      painted = true
+    }
+    maybeBegin()
     return () => {
       stopWatching()
-      window.removeEventListener('load', whenLoaded)
+      paintObserver?.disconnect()
+      window.removeEventListener('load', onLoad)
       if (idle !== undefined) window.cancelIdleCallback(idle)
       if (timer !== undefined) window.clearTimeout(timer)
     }
