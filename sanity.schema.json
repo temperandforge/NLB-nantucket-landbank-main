@@ -2554,6 +2554,66 @@
     }
   },
   {
+    "type": "type",
+    "name": "article.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "article"
+    }
+  },
+  {
+    "type": "type",
+    "name": "event.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "event"
+    }
+  },
+  {
     "name": "imageCarousel",
     "type": "type",
     "value": {
@@ -2584,30 +2644,109 @@
               },
               {
                 "type": "string",
-                "value": "category"
+                "value": "projectCategory"
+              },
+              {
+                "type": "string",
+                "value": "newsCategory"
               }
             ]
           },
           "optional": true
         },
-        "projects": {
+        "gallery": {
           "type": "objectAttribute",
           "value": {
             "type": "array",
             "of": {
-              "type": "object",
-              "attributes": {
-                "_key": {
-                  "type": "objectAttribute",
-                  "value": {
-                    "type": "string"
+              "type": "union",
+              "of": [
+                {
+                  "type": "object",
+                  "attributes": {
+                    "asset": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "inline",
+                        "name": "sanity.imageAsset.reference"
+                      },
+                      "optional": true
+                    },
+                    "media": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "unknown"
+                      },
+                      "optional": true
+                    },
+                    "hotspot": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "inline",
+                        "name": "sanity.imageHotspot"
+                      },
+                      "optional": true
+                    },
+                    "crop": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "inline",
+                        "name": "sanity.imageCrop"
+                      },
+                      "optional": true
+                    },
+                    "alt": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    },
+                    "caption": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    },
+                    "_type": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string",
+                        "value": "image"
+                      }
+                    }
+                  },
+                  "rest": {
+                    "type": "object",
+                    "attributes": {
+                      "_key": {
+                        "type": "objectAttribute",
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    }
                   }
+                },
+                {
+                  "type": "union",
+                  "of": [
+                    {
+                      "type": "inline",
+                      "name": "article.reference"
+                    },
+                    {
+                      "type": "inline",
+                      "name": "project.reference"
+                    },
+                    {
+                      "type": "inline",
+                      "name": "event.reference"
+                    }
+                  ]
                 }
-              },
-              "rest": {
-                "type": "inline",
-                "name": "project.reference"
-              }
+              ]
             }
           },
           "optional": true
@@ -2617,6 +2756,21 @@
           "value": {
             "type": "inline",
             "name": "projectType.reference"
+          },
+          "optional": true
+        },
+        "newsCategory": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "newsCategory.reference"
+          },
+          "optional": true
+        },
+        "limit": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "number"
           },
           "optional": true
         },
@@ -6879,66 +7033,6 @@
   },
   {
     "type": "type",
-    "name": "article.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "article"
-    }
-  },
-  {
-    "type": "type",
-    "name": "event.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "event"
-    }
-  },
-  {
-    "type": "type",
     "name": "faq.reference",
     "value": {
       "type": "object",
@@ -7517,10 +7611,6 @@
                   {
                     "type": "inline",
                     "name": "project.reference"
-                  },
-                  {
-                    "type": "inline",
-                    "name": "property.reference"
                   },
                   {
                     "type": "inline",

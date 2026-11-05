@@ -1820,7 +1820,7 @@ and against the live dataset's documents; the lightbox in Chromium. A reference 
 tried end to end in the browser (no property references one yet).
 
 `property.gallery` is an array whose members are an uploaded `image` (alt text, caption) or a
-`reference` to an `article`, `project`, `property` or `event` (never the property itself). The reference member is named `relatedDocument`, and Studio stores that name as the entry's `_type`: renaming it orphans saved entries (Studio shows "Item of type relatedDocument not valid"), so the query and `galleryCards()` also accept a bare `reference`. The
+`reference` to an `article`, `project` or `event` (properties were removed, DECISIONS 30). The reference member is named `relatedDocument`, and Studio stores that name as the entry's `_type`: renaming it orphans saved entries (Studio shows "Item of type relatedDocument not valid"), so the query and `galleryCards()` also accept a bare `reference`. The
 carousel is `galleryCards()` (`frontend/sanity/lib/galleryCards.ts`), a pure function.
 
 - **The uploaded images are one gallery in a lightbox**, the same dialog as the news page's image
@@ -1844,12 +1844,11 @@ carousel is `galleryCards()` (`frontend/sanity/lib/galleryCards.ts`), a pure fun
   considered: a placeholder card (looks broken at rest), a site default image (invents a picture
   the editor didn't choose).
 - **News requires an image and events don't** (`imageWithAltField`), so a news entry always has a
-  card; most projects, properties and events have none yet. In the live dataset, 4 of 11 projects,
-  7 of 23 properties and 1 of 7 events had an image when this was written.
+  card; most projects and events have none yet. In the live dataset, 4 of 11 projects and 1 of 7
+  events had an image when this was written.
 - **A slide that is not the centred one is never activated by a click**: the Track centres it and
   stops the click, so a link or a lightbox opens only from the current slide.
-- **Not done**: the Image Carousel block still picks projects only. Extending it the same way is
-  tracked in issue #114.
+- **Resolved**: the Image Carousel block takes the same entries (DECISIONS 29, issue #114).
 
 ## 28. Article body blocks and the gallery lightbox
 
@@ -1925,3 +1924,50 @@ Checked on desktop and mobile widths with sample markup and a temporary test pag
 article: each block added in Studio and viewed (a portrait photo in the callout, a real video
 playing, a wide table on a phone), and the lightbox swipe on a real touch device. No content uses
 these blocks yet.
+
+## 29. The Image Carousel block takes mixed entries, projects or news
+
+Status: **implemented**, checked in Chromium (desktop and phone width) with live data through the real
+component: a news category, a project category, a hand-picked mix, a single card, an empty block, and the
+lightbox. The migration was dry-run only (see Rollout). Not checked: touch on a real device, Safari, and
+authoring the block in Studio (field visibility and validation messages).
+
+The block (`imageCarousel`) has a `source`: `manual` (hand-picked), `projectCategory` or `newsCategory`.
+All three become the same entries a property's gallery uses, so there is one card pipeline (DECISIONS 27).
+Spec: [specs/2026-11-04-image-carousel-mixed-sources-design.md](superpowers/specs/2026-11-04-image-carousel-mixed-sources-design.md).
+
+- **Hand-picked** is a `gallery` array with the members of `property.gallery`, from one shared helper
+  (`galleryEntryMembers` in `studio/src/schemaTypes/objects/galleryEntries.ts`) so the two can't drift. The
+  old `projects` field is gone.
+- **Latest news in a category**: one `newsCategory`, `date` newest first (then `_createdAt`), the editor's
+  "Show latest" `limit` (1 to 20, default 8). The query fetches 32 (the largest limit plus 12 spare) and the
+  limit is applied after articles with no image are dropped, so "latest 8" is 8 cards that are shown.
+- **One card builder**: `carouselCards()` (`frontend/sanity/lib/carouselCards.ts`) wraps `galleryCards()`. A
+  project with no image takes the block's `defaultImage`; news and events with no image are
+  dropped. `GalleryCarousel` renders the cards and owns its lightbox, so two carousels on a page never page
+  into each other's pictures; `PropertyGallery` uses it too.
+- **The GROQ is shared**: `galleryDocFields` and `galleryEntryFields` in `queries.ts` serve the property query
+  and the block. The category sources emit entries in the same shape as a hand-picked document.
+- **No cards, no block.** A block with no cards renders nothing, not a lone eyebrow, including a news
+  category that was deleted or unpublished.
+- **Rollout**: `studio/scripts/migrateImageCarouselProjects.ts` moves `projects` into `gallery` and renames
+  `source: category` to `projectCategory`. Until it runs, a block still saying `category` shows no cards.
+  Dry run found 3 published blocks (conservation, recreation, agriculture), all in category mode with no
+  hand-picked projects. Drafts need `--with-user-token` to be seen.
+- **Not done**: choosing more than one news category, and a "see all news" link from the carousel.
+
+## 30. A carousel's related documents are news, projects and events, not properties
+
+Status: **implemented**; checked by `scripts/verifyGalleryCards.mts` (a property entry is dropped) and a
+read of the live dataset, which had no gallery or block entry referencing a property, so nothing needed
+migrating.
+
+The hand-picked list of `property.gallery` and the Image Carousel block (one shared `galleryEntryMembers`)
+offers an uploaded image or a reference to an `article`, `project` or `event`. Properties were dropped from
+DECISIONS 27's list by request: a property page has the map and the properties archive for that.
+
+- **The schema no longer offers `property`**, so the `excludeSelf` filter that kept a property from listing
+  itself is gone too: it can't reference a property.
+- **`galleryCards()` has no `property` case.** An entry that still points at a property, saved before this,
+  is dropped, never shown empty. Studio flags such an entry as invalid until an editor removes it.
+

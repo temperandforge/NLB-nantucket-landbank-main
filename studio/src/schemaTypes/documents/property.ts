@@ -3,6 +3,7 @@ import {PinIcon} from '@sanity/icons'
 
 import {BoundaryIdsInput} from '../../components/BoundaryIdsInput'
 import {blockContentMembers} from '../objects/blockContent'
+import {galleryEntryMembers} from '../objects/galleryEntries'
 import {seoField, seoGroup} from '../objects/seo'
 
 /**
@@ -104,42 +105,8 @@ export const property = defineType({
       type: 'array',
       group: 'page',
       description:
-        'The image carousel on the property page. Add an uploaded image (it opens full size when clicked) or a related news article, project, property or event (the card uses that document’s image and title and links to its page). A related document with no image is not shown, so give it one. Leave empty to hide the carousel.',
-      of: [
-        defineArrayMember({
-          type: 'image',
-          title: 'Image',
-          options: {hotspot: true},
-          fields: [
-            defineField({
-              name: 'alt',
-              title: 'Alternative text',
-              type: 'string',
-              description: 'Important for accessibility and SEO.',
-            }),
-            defineField({
-              name: 'caption',
-              title: 'Caption',
-              type: 'string',
-              description: 'Optional. Shown over the image when it is the one in the middle, e.g. “Trails”.',
-            }),
-          ],
-        }),
-        defineArrayMember({
-          // Studio stores the member's name as the entry's `_type`, so this is what saved entries say.
-          name: 'relatedDocument',
-          type: 'reference',
-          title: 'Related document',
-          to: [{type: 'article'}, {type: 'project'}, {type: 'property'}, {type: 'event'}],
-          options: {
-            // Not this property itself.
-            filter: ({document}) => ({
-              filter: '_id != $self',
-              params: {self: String(document._id).replace(/^drafts\./, '')},
-            }),
-          },
-        }),
-      ],
+        'The image carousel on the property page. Add an uploaded image (it opens full size when clicked) or a related news article, project or event (the card uses that document’s image and title and links to its page). A related document with no image is not shown, so give it one. Leave empty to hide the carousel.',
+      of: galleryEntryMembers(),
     }),
     defineField({
       name: 'mapHeading',

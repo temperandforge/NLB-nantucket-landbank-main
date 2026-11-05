@@ -247,11 +247,12 @@ async function main() {
       _type: 'imageCarousel',
       _key: key(),
       eyebrow: 'Image carousel',
-      images: [
-        {_key: key(), _type: 'carouselImage', image: imageValue(beach, 'Dionis Beach'), caption: 'Dionis Beach', link: {_type: 'link', linkType: 'href', href: '#'}},
-        {_key: key(), _type: 'carouselImage', image: imageValue(jetties, 'Jetties Beach'), caption: 'Jetties Beach'},
-        {_key: key(), _type: 'carouselImage', image: imageValue(pond, 'Long Pond'), caption: 'Long Pond'},
-        {_key: key(), _type: 'carouselImage', image: imageValue(beach, 'Dionis Beach'), caption: 'Dionis Beach again'},
+      source: 'manual',
+      gallery: [
+        {_key: key(), ...imageValue(beach, 'Dionis Beach'), caption: 'Dionis Beach'},
+        {_key: key(), ...imageValue(jetties, 'Jetties Beach'), caption: 'Jetties Beach'},
+        {_key: key(), ...imageValue(pond, 'Long Pond'), caption: 'Long Pond'},
+        {_key: key(), ...imageValue(beach, 'Dionis Beach'), caption: 'Dionis Beach again'},
       ],
     },
     {

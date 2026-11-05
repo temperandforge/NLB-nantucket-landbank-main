@@ -245,6 +245,37 @@ export const FORM_FOR_SUBMIT_QUERY = defineQuery(
 )
 
 /**
+ * What a carousel card needs from a related document: its type, title, page and image. The image is
+ * its own `image`, then its SEO image, then the first image in its body (an image block, or the
+ * first picture of its first image gallery); galleryCards() drops a document that still has none.
+ * Shared by a property's gallery and the Image Carousel block.
+ */
+const galleryDocFields = /* groq */ `
+  "docType": _type,
+  "title": coalesce(title, name),
+  "slug": slug.current,
+  externalUrl,
+  "image": coalesce(
+    select(defined(image.asset) => image{asset, hotspot, crop, alt}),
+    select(defined(seo.image.asset) => seo.image{asset, hotspot, crop, alt}),
+    body[_type == "image" && defined(asset)][0]{asset, hotspot, crop, alt},
+    body[_type == "imageGallery"][0].images[defined(asset)][0]{asset, hotspot, crop, alt}
+  )
+`
+
+/** One entry of a hand-picked carousel list: an uploaded image, or a related document. */
+const galleryEntryFields = /* groq */ `
+  _key,
+  _type,
+  asset,
+  hotspot,
+  crop,
+  alt,
+  caption,
+  "doc": select(_type in ["relatedDocument", "reference"] => @->{${galleryDocFields}})
+`
+
+/**
  * The page builder's sections. Blocks marked "Hide this block" are dropped here, so their content
  * never reaches a visitor's browser; $includeHidden is true only in draft mode (Presentation),
  * where hidden blocks are shown with a badge. Each block type that holds a reference, a file or Portable Text
@@ -467,22 +498,27 @@ const pageBuilderFields = /* groq */ `
     },
     _type == "imageCarousel" => {
       ...,
-      "projects": select(
-        source == "category" => *[
+      // All three sources come out as gallery entries (see galleryCards). A deleted or unpublished
+      // category selects nothing, so the block has no cards and hides. 32 is the largest "Show
+      // latest" (20) plus 12 spare for articles that have no image and are dropped.
+      "entries": select(
+        source == "newsCategory" => *[
+          _type == "article" && defined(slug.current)
+          && ^.newsCategory._ref in categories[]._ref
+        ] | order(date desc, _createdAt desc) [0...32] {
+          "_key": _id,
+          "_type": "reference",
+          "doc": {${galleryDocFields}}
+        },
+        source == "projectCategory" => *[
           _type == "project" && defined(slug.current)
           && ^.category._ref in projectTypes[]._ref
         ] | order(name asc) {
-          _id,
-          name,
-          image,
-          "slug": slug.current
+          "_key": _id,
+          "_type": "reference",
+          "doc": {${galleryDocFields}}
         },
-        projects[]->{
-          _id,
-          name,
-          image,
-          "slug": slug.current
-        }
+        gallery[]{${galleryEntryFields}}
       ),
       "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage
     },
@@ -850,27 +886,7 @@ export const propertyQuery = defineQuery(`
     // An entry is an uploaded image or a reference to a related document. A document's card image is
     // its own image, then its SEO image, then the first image in its body; galleryCards() drops one
     // that still has none. The body fallback is its first image block, or the first picture of its first image gallery.
-    gallery[]{
-      _key,
-      _type,
-      asset,
-      hotspot,
-      crop,
-      alt,
-      caption,
-      "doc": select(_type in ["relatedDocument", "reference"] => @->{
-        "docType": _type,
-        "title": coalesce(title, name),
-        "slug": slug.current,
-        externalUrl,
-        "image": coalesce(
-          select(defined(image.asset) => image{asset, hotspot, crop, alt}),
-          select(defined(seo.image.asset) => seo.image{asset, hotspot, crop, alt}),
-          body[_type == "image" && defined(asset)][0]{asset, hotspot, crop, alt},
-          body[_type == "imageGallery"][0].images[defined(asset)][0]{asset, hotspot, crop, alt}
-        )
-      })
-    },
+    gallery[]{${galleryEntryFields}},
     // A reference to an unpublished FAQ dereferences to null.
     "faqs": faqs[]->{
       _id,

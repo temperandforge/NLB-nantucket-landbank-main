@@ -1,13 +1,11 @@
 import Image from 'next/image'
-import {type ComponentProps, ViewTransition} from 'react'
+import {ViewTransition} from 'react'
 import type {PortableTextBlock} from 'next-sanity'
 
 import Cascade from '@/components/Cascade'
 import BlockImage from '@/components/blocks/BlockImage'
 import FaqItem from '@/components/blocks/FaqItem'
-import ImageCarouselSlide from '@/components/blocks/ImageCarouselSlide'
-import ImageCarouselTrack from '@/components/blocks/ImageCarouselTrack'
-import {ImageLightboxProvider} from '@/components/ImageLightbox'
+import GalleryCarousel from '@/components/blocks/GalleryCarousel'
 import CustomPortableText from '@/components/PortableText'
 import LinkRow from '@/components/ui/LinkRow'
 import Tag from '@/components/ui/Tag'
@@ -91,21 +89,6 @@ export function PropertyIntro({property}: {property: NonNullable<PropertyQueryRe
 export function PropertyGallery({property}: {property: NonNullable<PropertyQueryResult>}) {
   const cards = galleryCards(property.gallery)
   if (cards.length === 0) return null
-  // The uploaded images, in order, are one gallery in the lightbox; a related document is a link.
-  const pictures = cards.flatMap((card) => {
-    const id = card.image.asset?._ref
-    if (!card.lightbox || !id) return []
-    return [
-      {
-        key: card.key,
-        id,
-        alt: card.image.alt ?? '',
-        caption: card.label,
-        crop: card.image.crop as ComponentProps<typeof ImageLightboxProvider>['images'][number]['crop'],
-      },
-    ]
-  })
-  const pictureIndex = new Map(pictures.map((picture, index) => [picture.key, index]))
   const label = `${property.name} Property and Recreation`
   return (
     <section className="w-full overflow-x-clip bg-background py-s6">
@@ -115,20 +98,7 @@ export function PropertyGallery({property}: {property: NonNullable<PropertyQuery
             <span className="tag-label">{label}</span>
           </div>
         </div>
-        <ImageLightboxProvider images={pictures}>
-          <ImageCarouselTrack label={label}>
-            {cards.map((card) => (
-              <ImageCarouselSlide
-                key={card.key}
-                image={card.image as ComponentProps<typeof ImageCarouselSlide>['image']}
-                label={card.label}
-                href={card.href}
-                external={card.external}
-                lightboxIndex={card.lightbox ? pictureIndex.get(card.key) : undefined}
-              />
-            ))}
-          </ImageCarouselTrack>
-        </ImageLightboxProvider>
+        <GalleryCarousel cards={cards} label={label} />
       </div>
     </section>
   )
