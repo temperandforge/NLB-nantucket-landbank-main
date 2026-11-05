@@ -1,6 +1,7 @@
 import {Suspense} from 'react'
 
 import {MapExplorer} from '@/components/map/MapExplorer'
+import {MapExplorerSkeleton} from '@/components/map/MapExplorerSkeleton'
 
 import {BlockProps} from './types'
 
@@ -10,7 +11,7 @@ import {BlockProps} from './types'
  */
 export default function MapExplorerBlock({block}: BlockProps<'mapExplorer'>) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<MapExplorerSkeleton />}>
       <MapExplorer
         projects={block.properties ?? []}
         filters={block.filters}
