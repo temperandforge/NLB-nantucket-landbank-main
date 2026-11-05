@@ -117,14 +117,6 @@ check(
   'the blur keyframes live in the fine-pointer block',
 )
 
-// A hero description cascades word by word like the headline, but quicker and without the blur
-// (up to ~50 small blurred words is the expensive case on iPhone Safari).
-check(
-  /\.cascade-body\s+\.cascade-word\s*\{[^}]*animation-name\s*:\s*cascade-in\s*;/.test(inside) &&
-    /\.cascade-body\s+\.cascade-word\s*\{[^}]*animation-delay\s*:[^;]*--cascade-body-offset[^;]*--cascade-step-body/.test(inside),
-  'the body cascade uses the plain cascade-in keyframes and its own offset and step',
-)
-
 // Whole-page enter. The first two page blocks animate their parts on a timer (data-enter="load");
 // everything below the first screen is held back by ScrollReveal and plays once as it enters view
 // (data-reveal, set by JS, never by CSS scroll-driven animation: those scrub with scroll position).
@@ -165,8 +157,6 @@ const tokens: Record<string, string> = {
   '--enter-step': '70ms',
   '--enter-base-0': '120ms',
   '--enter-base-1': '360ms',
-  '--cascade-step-body': '10ms',
-  '--cascade-body-offset': '240ms',
   '--motion-duration': '450ms',
   '--motion-ease': 'cubic-bezier(.33,1,.68,1)',
   '--cascade-step': '30ms',
