@@ -9,7 +9,7 @@ export default function Hero({block}: BlockProps<'hero'>) {
       <div className="tf-max-w py-24 text-center">
         {block.eyebrow && <Eyebrow className="text-moody-moor-700 mb-3 load-in">{block.eyebrow}</Eyebrow>}
         {block.heading && <Cascade as="h1" className="text-headline-2xl mb-6" text={block.heading} />}
-        {block.body && <Cascade as="p" variant="body" className="text-moody-moor-600 max-w-[42rem] mx-auto" text={block.body} />}
+        {block.body && <p className="text-moody-moor-600 max-w-[42rem] mx-auto load-in">{block.body}</p>}
         <BlockImage
           image={block.image}
           width={1360}

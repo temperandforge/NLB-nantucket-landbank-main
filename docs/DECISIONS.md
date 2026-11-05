@@ -628,8 +628,9 @@ want it.
   feel there, not in components.
 - **`<Cascade>` is opt-in, one line per headline.** It renders text that carries Sanity stega
   characters unsplit (splitting would break the visual-editing markers) and must never call
-  `draftMode()`, which would make every page dynamic. A hero description uses
-  `variant="body"` (a quicker, never-blurred sweep, capped at 48 words). Word splitting is in
+  `draftMode()`, which would make every page dynamic. A hero description is
+  not cascaded: it is a plain paragraph that fades in as one piece (`load-in`) after the headline.
+  Word splitting is in
   `frontend/sanity/lib/cascade.ts`, checked by `frontend/scripts/verifyCascade.mts`.
 - **The rest of the page enters through `data-enter`.** `BlockRenderer` tags the first two blocks
   `load` (on a timer, in CSS) and the rest `scroll`. Parts that start below the screen, in either
@@ -1810,7 +1811,7 @@ and against the live dataset's documents; the lightbox in Chromium. A reference 
 tried end to end in the browser (no property references one yet).
 
 `property.gallery` is an array whose members are an uploaded `image` (alt text, caption) or a
-`reference` to an `article`, `project`, `property` or `event` (never the property itself). The reference member is named `relatedDocument`, and Studio stores that name as the entry's `_type`: renaming it orphans saved entries (Studio shows "Item of type relatedDocument not valid"), so the query and `galleryCards()` also accept a bare `reference`. The
+`reference` to an `article`, `project` or `event` (properties were removed, DECISIONS 30). The reference member is named `relatedDocument`, and Studio stores that name as the entry's `_type`: renaming it orphans saved entries (Studio shows "Item of type relatedDocument not valid"), so the query and `galleryCards()` also accept a bare `reference`. The
 carousel is `galleryCards()` (`frontend/sanity/lib/galleryCards.ts`), a pure function.
 
 - **The uploaded images are one gallery in a lightbox**, the same dialog as the news page's image
@@ -1834,13 +1835,88 @@ carousel is `galleryCards()` (`frontend/sanity/lib/galleryCards.ts`), a pure fun
   considered: a placeholder card (looks broken at rest), a site default image (invents a picture
   the editor didn't choose).
 - **News requires an image and events don't** (`imageWithAltField`), so a news entry always has a
-  card; most projects, properties and events have none yet. In the live dataset, 4 of 11 projects,
-  7 of 23 properties and 1 of 7 events had an image when this was written.
+  card; most projects and events have none yet. In the live dataset, 4 of 11 projects and 1 of 7
+  events had an image when this was written.
 - **A slide that is not the centred one is never activated by a click**: the Track centres it and
   stops the click, so a link or a lightbox opens only from the current slide.
-- **Resolved**: the Image Carousel block takes the same entries (DECISIONS 28, issue #114).
+- **Resolved**: the Image Carousel block takes the same entries (DECISIONS 29, issue #114).
 
-## 28. The Image Carousel block takes mixed entries, projects or news
+## 28. Article body blocks and the gallery lightbox
+
+Built in PR 113. The article body (`article.body`) gets extra blocks through opt-in options on
+`blockContentMembers` (`pullquote`, `gallery`, `divider`, `callout`, `table`, `video`); only the
+article turns them on. They are styled in `css/ui.css` under `.rich-text-article` and
+`.rich-text-project`.
+
+### 28.1 What was added, and the choices inside it
+
+- **Quote vs Pull quote.** Quote is the existing paragraph style (someone else's words, inset with a
+  1px hairline; the editor types the marks). Pull quote is a block: one line set large in brand
+  green between two rules, centred, with the quotation marks added by CSS so the editor types the
+  line bare. A coloured left border above 1px is avoided on purpose.
+- **Captions.** The body image has an optional `caption`. The gallery has a caption per image and
+  one for the whole gallery (centred, under the grid).
+- **Table** is plain-text cells (`rows[].cells[]`), every row the same width, optional header row.
+  It uses a hand-built schema rather than a plugin, to avoid a dependency for a small need.
+- **Video** accepts only YouTube and Vimeo. It is a button until pressed, so nothing third-party
+  loads before play (DECISIONS 25's "defer what isn't needed for first paint"). There is no poster
+  thumbnail, because fetching one is itself a third-party request. The host allowlist is repeated in
+  `studio/.../videoEmbed.ts` and `frontend/sanity/lib/video.ts`; change both.
+- **Callout with image** is a large statement beside a photo that keeps its own proportions. It is
+  not a general Media & Text block (see 28.3).
+- **Divider** is a real `<hr>`, full width or a short centred mark.
+
+### 28.2 The gallery lightbox is custom, not a library
+
+It is one component (`frontend/components/GalleryGrid.tsx`) on the native `<dialog>`: focus is
+trapped, Escape closes, focus returns to the tile. It has arrow keys and buttons, touch swipe
+(sideways changes image, down closes; mouse is deliberately not handled), a fade and a rise, and
+all motion is off under reduced motion. The overlay is the site background at 80% with an 8px blur.
+`::backdrop` is made transparent, or the browser's own 10% black does not fade with the dialog and
+darkens the page while it closes.
+
+**Honest history:** a library was not evaluated at the time. It was built directly. The comparison
+below was made afterwards, so treat it as a rationale after the fact, not a recorded decision.
+
+**Why custom is defensible:** no new dependency or bundle weight; it follows the project's tokens,
+motion and reduced-motion rules; the native dialog supplies focus handling; no library styling to
+override.
+
+**What a library would do better, and when to switch:**
+- **PhotoSwipe**, the usual gallery lightbox: pinch-to-zoom and pan on large photos, momentum swipe.
+  The one to pick if zoom is wanted.
+- **Swiper**: a carousel engine with drag, momentum and slide-to-slide transitions (ours snaps to
+  the next image rather than sliding it in), but heavy for a lightbox.
+- **Lity**: tiny, but opens a single image or video, so no gallery navigation or swipe; as recalled,
+  it needs jQuery, which this project does not use (verify before relying on it).
+- The project had no carousel or lightbox library at the time (nothing in `package.json`).
+
+If real swipe transitions or zoom are wanted, swap to PhotoSwipe or Swiper rather than extending
+the custom one further.
+
+### 28.3 Considered and not built
+
+- **Media & Text** (normal-size rich text beside an image). Skipped by request. If it is wanted,
+  generalise the callout's `text` from a plain string to light rich text with a size choice (Large
+  statement or Body text), rather than adding a second block; the callout has no content yet, so
+  the change is cheap now.
+- **Columns** of arbitrary blocks. Not recommended: editors can build layouts that break on mobile,
+  and it needs nested rich text. A fixed "Two columns of text" block is the alternative if the
+  migrated content needs it.
+- **Button** (shared `link` object with a primary/secondary style) and an **in-body accordion**
+  (FAQ accordions exist on pages). Low priority.
+- **Skipped as unneeded:** spacer (divider covers it), code, verse, audio, cover, group, latest
+  posts (the news preview block covers it), Constant Contact and similar embeds (case by case).
+- **Small additions not made:** superscript and strikethrough marks, nested lists.
+
+### 28.4 Not yet verified
+
+Checked on desktop and mobile widths with sample markup and a temporary test page. Needs a real
+article: each block added in Studio and viewed (a portrait photo in the callout, a real video
+playing, a wide table on a phone), and the lightbox swipe on a real touch device. No content uses
+these blocks yet.
+
+## 29. The Image Carousel block takes mixed entries, projects or news
 
 Status: **implemented**, checked in Chromium (desktop and phone width) with live data through the real
 component: a news category, a project category, a hand-picked mix, a single card, an empty block, and the
@@ -1858,7 +1934,7 @@ Spec: [specs/2026-11-04-image-carousel-mixed-sources-design.md](superpowers/spec
   "Show latest" `limit` (1 to 20, default 8). The query fetches 32 (the largest limit plus 12 spare) and the
   limit is applied after articles with no image are dropped, so "latest 8" is 8 cards that are shown.
 - **One card builder**: `carouselCards()` (`frontend/sanity/lib/carouselCards.ts`) wraps `galleryCards()`. A
-  project with no image takes the block's `defaultImage`; news, events and properties with no image are
+  project with no image takes the block's `defaultImage`; news and events with no image are
   dropped. `GalleryCarousel` renders the cards and owns its lightbox, so two carousels on a page never page
   into each other's pictures; `PropertyGallery` uses it too.
 - **The GROQ is shared**: `galleryDocFields` and `galleryEntryFields` in `queries.ts` serve the property query
@@ -1870,3 +1946,19 @@ Spec: [specs/2026-11-04-image-carousel-mixed-sources-design.md](superpowers/spec
   Dry run found 3 published blocks (conservation, recreation, agriculture), all in category mode with no
   hand-picked projects. Drafts need `--with-user-token` to be seen.
 - **Not done**: choosing more than one news category, and a "see all news" link from the carousel.
+
+## 30. A carousel's related documents are news, projects and events, not properties
+
+Status: **implemented**; checked by `scripts/verifyGalleryCards.mts` (a property entry is dropped) and a
+read of the live dataset, which had no gallery or block entry referencing a property, so nothing needed
+migrating.
+
+The hand-picked list of `property.gallery` and the Image Carousel block (one shared `galleryEntryMembers`)
+offers an uploaded image or a reference to an `article`, `project` or `event`. Properties were dropped from
+DECISIONS 27's list by request: a property page has the map and the properties archive for that.
+
+- **The schema no longer offers `property`**, so the `excludeSelf` filter that kept a property from listing
+  itself is gone too: it can't reference a property.
+- **`galleryCards()` has no `property` case.** An entry that still points at a property, saved before this,
+  is dropped, never shown empty. Studio flags such an entry as invalid until an editor removes it.
+

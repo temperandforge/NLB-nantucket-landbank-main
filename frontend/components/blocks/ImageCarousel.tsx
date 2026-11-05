@@ -18,7 +18,7 @@ export default function ImageCarousel({block}: BlockProps<'imageCarousel'>) {
     <section className="w-full overflow-x-clip bg-background py-s6">
       <div className="flex w-full flex-col items-center gap-16">
         {block.eyebrow && (
-          <div className="tf-max-w tf-px">
+          <div className="tf-max-w tf-px flex justify-center">
             <div className="flex items-center justify-center rounded bg-tag px-2 py-1 text-balance">
               <span className="tag-label">{block.eyebrow}</span>
             </div>

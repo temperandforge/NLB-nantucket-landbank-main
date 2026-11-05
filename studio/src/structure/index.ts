@@ -85,7 +85,6 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
         .title('Pages')
         .icon(DocumentsIcon)
         .child(S.documentTypeList('page').title('Pages')),
-      S.documentTypeListItem('redirect').title('Redirects').icon(ResetIcon),
       S.divider(),
       S.documentTypeListItem('event').title('Events').icon(CalendarIcon),
       S.listItem()
@@ -285,6 +284,7 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
                 .child(S.documentTypeList('menu').title('Menus')),
             ]),
         ),
+      S.documentTypeListItem('redirect').title('Redirects').icon(ResetIcon),
       // Site Settings: global config with no page/route of its own.
       S.listItem()
         .title('Site Settings')

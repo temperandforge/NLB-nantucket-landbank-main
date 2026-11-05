@@ -12,9 +12,6 @@
   --motion-duration: 450ms;
   --motion-ease: cubic-bezier(.33,1,.68,1);
   --cascade-step: 30ms;
-  /* A hero description: a quicker sweep that starts as the headline lands (8 headline steps). */
-  --cascade-step-body: 10ms;
-  --cascade-body-offset: 240ms;
   --cascade-rise: .4em;
   --cascade-blur: 6px;
   --page-out-duration: 180ms;
@@ -105,16 +102,6 @@
     }
   }
 
-  /*
-   * A description sweeps in word by word, left to right and top to bottom (about 10ms apart, so it
-   * reads as a sweep down the lines). Never blurred, even where the headline is: that is up to ~50
-   * small words. Declared after the fine-pointer block above so it wins on desktop too.
-   */
-  .cascade-body .cascade-word {
-    animation-name: cascade-in;
-    animation-delay: calc(var(--cascade-body-offset) + var(--i, 0) * var(--cascade-step-body));
-  }
-
   /* Lands after the headline; --load-in-step staggers siblings. */
   .load-in {
     animation: load-in var(--motion-duration) var(--motion-ease) both;
@@ -142,6 +129,16 @@
 
   ::view-transition-new(site-header) {
     animation: none;
+  }
+
+  /*
+   * The card image morphing into the property hero (ViewTransition share="morph"). Keep its group
+   * above the page snapshots. Otherwise the old page, which is opaque, is painted over the growing
+   * image while it fades out (page-out), so the image seems to fade in as it grows. Below the
+   * header (z-index 100).
+   */
+  ::view-transition-group(.morph) {
+    z-index: 50;
   }
 
   /*
@@ -175,6 +172,22 @@
   /* Images are usually the LCP element and large transforms are costly: they fade, no movement. */
   :is(img, picture, figure) {
     --part-anim: part-fade;
+  }
+
+  /*
+   * A form's error message mounts after the page has entered, so the enter motion would slide it up
+   * like any paragraph. It fades only, quickly, with no stagger. Same hooks as images above.
+   */
+  .form-helper-error {
+    --part-anim: part-fade;
+    --reveal-rise: 0px;
+    --motion-duration: 200ms;
+    --enter-base: 0ms;
+    --enter-step: 0ms;
+  }
+
+  .form-helper-error[data-reveal="shown"] {
+    animation-name: part-fade !important;
   }
 
   /*
