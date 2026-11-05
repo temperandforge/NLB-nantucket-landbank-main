@@ -133,7 +133,12 @@ function buildPopupHtml(project: Property, currentSlug: string | null): string {
     : ''
 
   const image = project.image?.url
-    ? `<img class="map-popup-image" src="${encodeURI(project.image.url)}" alt="${escapeHtml(
+    ? // The card is 298x190 CSS px. Without a size, Sanity serves the original upload (a 4000x3000
+      // photo is megabytes), and without loading="lazy" the browser fetches it as soon as the
+      // markup is parsed, i.e. for every marker's popup on page load, opened or not.
+      `<img class="map-popup-image" loading="lazy" decoding="async" src="${encodeURI(
+        `${project.image.url}?w=600&h=380&fit=crop&auto=format`,
+      )}" alt="${escapeHtml(
         project.image.alt ?? '',
       )}" />`
     : ''
@@ -231,8 +236,14 @@ export function MapboxMap({
      * Guarded rather than returned early - the control and the cleanup below must still run when no
      * trails file is uploaded.
      */
+    let cleanupTrails = () => {}
     if (trailsUrl) {
-      map.on('load', async () => {
+      // The trails file is the heaviest thing on the page (several MB), and nothing the visitor
+      // first sees depends on it, so it is fetched only once the map has drawn its first frame and
+      // the main thread is free, rather than competing with the style and tiles at `load`.
+      let cancelledTrails = false
+      let cancelIdle = () => {}
+      const loadTrails = async () => {
         try {
           const response = await fetch(trailsUrl)
           if (!response.ok) {
@@ -240,14 +251,12 @@ export function MapboxMap({
             return
           }
           const geojsonData = await response.json()
+          // The map may have been removed while the file downloaded.
+          if (cancelledTrails || mapRef.current !== map) return
           const features: GeoJSON.Feature[] = Array.isArray(geojsonData?.features)
             ? geojsonData.features
             : []
           if (!features.length) return
-
-          features.forEach((feature, index) => {
-            feature.id = index
-          })
 
           map.addSource('gpx-route', {type: 'geojson', data: geojsonData})
 
@@ -259,33 +268,67 @@ export function MapboxMap({
             paint: {'line-color': '#c60024', 'line-width': 1},
           })
 
-          const coordinates = features.flatMap((feature) => {
-            if (feature.geometry.type === 'LineString') return feature.geometry.coordinates
-            if (feature.geometry.type === 'MultiLineString')
-              return feature.geometry.coordinates.flat()
-            return []
-          })
-
           // Zooming to the whole trail network is the default view; a focused property keeps its own.
-          if (coordinates.length > 0 && !focusSlug) {
-            const bounds = coordinates.reduce(
-              (acc: mapboxgl.LngLatBounds, coord) => acc.extend(coord as [number, number]),
-              new mapboxgl.LngLatBounds(
-                coordinates[0] as [number, number],
-                coordinates[0] as [number, number],
-              ),
-            )
-            map.fitBounds(bounds, {padding: 40})
+          // One pass over the positions: this file has hundreds of thousands, so no intermediate array.
+          if (!focusSlug) {
+            let west = Infinity
+            let south = Infinity
+            let east = -Infinity
+            let north = -Infinity
+            const extend = (position: GeoJSON.Position) => {
+              const [lng, lat] = position
+              if (lng < west) west = lng
+              if (lng > east) east = lng
+              if (lat < south) south = lat
+              if (lat > north) north = lat
+            }
+            for (const feature of features) {
+              const geometry = feature.geometry
+              if (geometry?.type === 'LineString') geometry.coordinates.forEach(extend)
+              else if (geometry?.type === 'MultiLineString')
+                geometry.coordinates.forEach((line) => line.forEach(extend))
+            }
+            if (west <= east) {
+              map.fitBounds(
+                [
+                  [west, south],
+                  [east, north],
+                ],
+                {padding: 40},
+              )
+            }
           }
         } catch (error) {
           console.error('Failed to load the trails GeoJSON:', error)
         }
+      }
+
+      map.once('load', () => {
+        // `idle` is the first moment the map has nothing left to draw; fall back to a timer in case
+        // it never reports one.
+        const timer = window.setTimeout(() => void loadTrails(), 4000)
+        map.once('idle', () => {
+          window.clearTimeout(timer)
+          if (cancelledTrails) return
+          if ('requestIdleCallback' in window) {
+            const id = window.requestIdleCallback(() => void loadTrails(), {timeout: 1000})
+            cancelIdle = () => window.cancelIdleCallback(id)
+          } else {
+            void loadTrails()
+          }
+        })
+        cancelIdle = () => window.clearTimeout(timer)
       })
+      cleanupTrails = () => {
+        cancelledTrails = true
+        cancelIdle()
+      }
     }
 
     map.addControl(new mapboxgl.NavigationControl(), 'top-right')
 
     return () => {
+      cleanupTrails()
       map.remove()
       mapRef.current = null
     }
