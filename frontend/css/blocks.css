@@ -107,27 +107,6 @@
   background-color: var(--color-primary);
 }
 
-.hero-secondary__lines {
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-}
-
-.hero-secondary__lines--lowlands {
-  background-image: url('/images/blocks/hero-secondary-lines-lowlands.svg');
-  opacity: 0.6;
-}
-
-.hero-secondary__lines--moody-moor {
-  background-image: url('/images/blocks/hero-secondary-lines.svg');
-  opacity: 0.4;
-}
-
-.hero-secondary__lines--light-brown {
-  background-image: url('/images/blocks/decorative-line-hero.svg');
-  opacity: 0.6;
-}
-
 /* Image Carousel: scroll-snap is not expressible as utilities alone. */
 .image-carousel__track {
   scroll-snap-type: x mandatory;

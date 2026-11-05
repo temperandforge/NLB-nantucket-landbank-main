@@ -371,7 +371,7 @@ export default function ImageCarouselTrack({
     >
       <div
         ref={list}
-        className="flex items-center gap-6 overflow-x-auto px-(--tf-x) [scrollbar-width:none] data-[ready]:relative data-[ready]:block data-[ready]:h-[364px] data-[ready]:overflow-hidden data-[ready]:px-0 md:data-[ready]:h-[520px] [&::-webkit-scrollbar]:hidden"
+        className="flex h-[364px] items-center gap-6 overflow-x-auto px-(--tf-x) [scrollbar-width:none] data-[ready]:relative data-[ready]:block data-[ready]:overflow-hidden data-[ready]:px-0 md:h-[520px] [&::-webkit-scrollbar]:hidden"
       >
         {Array.from({length: copies}, (_, copy) => (
           <Fragment key={copy}>{slides}</Fragment>

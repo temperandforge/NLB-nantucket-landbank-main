@@ -2,6 +2,7 @@ import {stegaClean} from 'next-sanity'
 
 import BlockImage from './BlockImage'
 import Eyebrow from './Eyebrow'
+import HeroSecondaryLines from './HeroSecondaryLines'
 import {BlockProps} from './types'
 
 const TEXT = {
@@ -27,10 +28,7 @@ export default function HeroSecondary({block, pageName}: BlockProps<'heroSeconda
             <div
               className={`hero-secondary__panel--${variant} relative flex flex-col justify-between p-5 gap-y-10 min-h-[420px] md:p-10 md:min-h-[560px]`}
             >
-              <div
-                className={`hero-secondary__lines hero-secondary__lines--${variant} absolute inset-0 pointer-events-none`}
-                aria-hidden="true"
-              />
+              <HeroSecondaryLines variant={variant} />
               {eyebrow && (
                 <Eyebrow className={`relative z-10 mb-3 load-in ${TEXT[variant].eyebrow}`}>{eyebrow}</Eyebrow>
               )}
