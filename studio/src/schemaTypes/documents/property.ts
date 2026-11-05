@@ -105,8 +105,8 @@ export const property = defineType({
       type: 'array',
       group: 'page',
       description:
-        'The image carousel on the property page. Add an uploaded image (it opens full size when clicked) or a related news article, project, property or event (the card uses that document’s image and title and links to its page). A related document with no image is not shown, so give it one. Leave empty to hide the carousel.',
-      of: galleryEntryMembers({excludeSelf: true}),
+        'The image carousel on the property page. Add an uploaded image (it opens full size when clicked) or a related news article, project or event (the card uses that document’s image and title and links to its page). A related document with no image is not shown, so give it one. Leave empty to hide the carousel.',
+      of: galleryEntryMembers(),
     }),
     defineField({
       name: 'mapHeading',

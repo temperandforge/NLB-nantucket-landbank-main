@@ -10,7 +10,7 @@ type Parent = {source?: string} | undefined
  * The Image Carousel (Figma: Image Carousel): a row of cards, one centred, under an eyebrow tag.
  * The cards come from one of three sources, all drawn the same way as a property's gallery
  * (DECISIONS 26, 27):
- *  - `manual`: a hand-picked list of uploaded images and related news, projects, properties and
+ *  - `manual`: a hand-picked list of uploaded images and related news, projects and
  *    events;
  *  - `projectCategory`: every project in a category, A to Z;
  *  - `newsCategory`: the latest news in a category, newest first, up to `limit`.
@@ -42,7 +42,7 @@ export const imageCarousel = defineBlock({
       title: 'Cards',
       type: 'array',
       description:
-        'Shown in order. Add an uploaded image (it opens full size when clicked) or a related news article, project, property or event (the card uses that document’s image and title and links to its page). A related document with no image is not shown, so give it one. Leave empty to hide the carousel.',
+        'Shown in order. Add an uploaded image (it opens full size when clicked) or a related news article, project or event (the card uses that document’s image and title and links to its page). A related document with no image is not shown, so give it one. Leave empty to hide the carousel.',
       of: galleryEntryMembers(),
       hidden: ({parent}: {parent?: Parent}) => parent?.source === 'projectCategory' || parent?.source === 'newsCategory',
     }),

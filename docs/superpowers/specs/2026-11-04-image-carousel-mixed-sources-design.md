@@ -1,6 +1,6 @@
 # Image Carousel block: mixed entries and a news source (issue #114)
 
-Status: **implemented** (DECISIONS 28; plan: [../plans/2026-11-04-image-carousel-mixed-sources.md](../plans/2026-11-04-image-carousel-mixed-sources.md)); the content migration still has to be run. Closes [#114](../../../../issues/114). Builds on DECISIONS 26
+Status: **implemented** (DECISIONS 29; plan: [../plans/2026-11-04-image-carousel-mixed-sources.md](../plans/2026-11-04-image-carousel-mixed-sources.md)); the content migration still has to be run. Closes [#114](../../../../issues/114). Builds on DECISIONS 26
 (the carousel engine) and 27 (the property gallery's mixed entries).
 
 ## Intent
@@ -8,7 +8,7 @@ Status: **implemented** (DECISIONS 28; plan: [../plans/2026-11-04-image-carousel
 The Image Carousel page-builder block should offer what a property's gallery already does, and one
 thing more. Success looks like:
 
-- An editor can hand-pick uploaded images and related documents (news, projects, properties,
+- An editor can hand-pick uploaded images and related documents (news, projects,
   events) for the block, the same as `property.gallery`.
 - An editor can show the latest news from one category, newest first, capped at a number they set.
 - The existing "all projects in a category" mode keeps working.
@@ -44,7 +44,7 @@ Out: see Deferred.
 | --- | --- | --- | --- |
 | `eyebrow` | as today | always | |
 | `source` | radio | always | `manual` (default), `projectCategory`, `newsCategory`. The old value `category` is renamed `projectCategory`. |
-| `gallery` | array | `manual` | Same members as `property.gallery`: an uploaded `image` (alt, caption) or a `relatedDocument` reference to article, project, property or event. |
+| `gallery` | array | `manual` | Same members as `property.gallery`: an uploaded `image` (alt, caption) or a `relatedDocument` reference to article, project or event (properties were removed, DECISIONS 30). |
 | `category` | reference to `projectType` | `projectCategory` | Required in that mode, as today. |
 | `newsCategory` | reference to `newsCategory` | `newsCategory` | Required in that mode: "Choose a news category". |
 | `limit` | number, 1 to 20, default 8 | `newsCategory` | Labelled "Show latest". |
@@ -54,8 +54,8 @@ Out: see Deferred.
 The `gallery` member definitions move to one shared helper that both `property.gallery` and
 `imageCarousel.gallery` use, so they cannot drift. The member is named `relatedDocument`, as in
 `property.gallery`: Studio stores that name as `_type`, so renaming it would orphan saved entries
-(DECISIONS 27). `property.gallery` additionally excludes the property itself with a filter; the
-helper takes that as an option, and the block does not use it.
+(DECISIONS 27). Properties were later removed as a related-document type (DECISIONS 30), which also made
+the old `excludeSelf` filter unnecessary.
 
 The block preview reads `Image Carousel · N entries`, `· <project category>` or
 `· News: <category>, latest <limit>`.
@@ -87,7 +87,7 @@ cards, trim, apply the fallback) live in one pure function so a script can check
 - Uploaded images share one lightbox. Documents are links. News with an `externalUrl` opens in a new
   tab.
 - A document with no image is dropped, except a project, which takes `defaultImage` (today's
-  behaviour). News, events and properties with no image are dropped (DECISIONS 27).
+  behaviour). News and events with no image are dropped (DECISIONS 27).
 - **No cards means no block.** `ImageCarousel` returns null rather than a lone eyebrow tag.
 - A news category that was deleted or unpublished dereferences to nothing, so the list is empty and
   the block hides. It never throws.

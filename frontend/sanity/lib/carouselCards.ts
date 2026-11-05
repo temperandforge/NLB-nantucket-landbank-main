@@ -7,8 +7,8 @@ export const DEFAULT_NEWS_LIMIT = 8
  * The cards of an Image Carousel block, from entries in the same shape a property's gallery uses
  * (see galleryCards for what is dropped).
  *
- * - A project with no image of its own takes `defaultImage`, as the block always did. News, events
- *   and properties with no image are dropped, never given a stand-in.
+ * - A project with no image of its own takes `defaultImage`, as the block always did. News and
+ *   events with no image are dropped, never given a stand-in.
  * - `limit` caps the result, and is applied after cards are dropped, so "latest 8" is 8 cards that
  *   are actually shown. Only the news source passes one.
  */

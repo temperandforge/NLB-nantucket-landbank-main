@@ -2,10 +2,10 @@ import {defineArrayMember, defineField} from 'sanity'
 
 /**
  * The members of a carousel's hand-picked list: an uploaded image, or a related news article,
- * project, property or event. Shared by `property.gallery` and the Image Carousel block so the two
- * cannot drift (DECISIONS 27). `excludeSelf` keeps a property from listing itself.
+ * project or event (never a property, DECISIONS 30). Shared by `property.gallery` and the Image
+ * Carousel block so the two cannot drift (DECISIONS 27).
  */
-export function galleryEntryMembers({excludeSelf = false}: {excludeSelf?: boolean} = {}) {
+export function galleryEntryMembers() {
   return [
     defineArrayMember({
       type: 'image',
@@ -31,15 +31,7 @@ export function galleryEntryMembers({excludeSelf = false}: {excludeSelf?: boolea
       name: 'relatedDocument',
       type: 'reference',
       title: 'Related document',
-      to: [{type: 'article'}, {type: 'project'}, {type: 'property'}, {type: 'event'}],
-      options: excludeSelf
-        ? {
-            filter: ({document}) => ({
-              filter: '_id != $self',
-              params: {self: String(document._id).replace(/^drafts\./, '')},
-            }),
-          }
-        : undefined,
+      to: [{type: 'article'}, {type: 'project'}, {type: 'event'}],
     }),
   ]
 }

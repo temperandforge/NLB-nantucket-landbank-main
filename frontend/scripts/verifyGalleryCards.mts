@@ -58,7 +58,7 @@ same(keys([upload('u1', {asset: null})]), [], 'an upload with no file is dropped
 console.log('related documents: where each goes')
 same(one(related('a', doc('article', {slug: 'spring'}))).href, '/news/spring', 'article')
 same(one(related('p', doc('project', {slug: 'dune'}))).href, '/projects/dune', 'project')
-same(one(related('r', doc('property', {slug: 'maxcy'}))).href, '/properties/maxcy', 'property')
+same(keys([related('r', doc('property', {slug: 'maxcy'}))]), [], 'a property is not a gallery document, so it is dropped')
 same(one(related('e', doc('event', {slug: 'walk'}))).href, '/events/walk', 'event')
 same(one(related('a', doc('article'))).lightbox, false, 'a document does not open a lightbox')
 same(one(related('a', doc('article'))).label, 'A title', 'its title is the label')

@@ -2742,10 +2742,6 @@
                     },
                     {
                       "type": "inline",
-                      "name": "property.reference"
-                    },
-                    {
-                      "type": "inline",
                       "name": "event.reference"
                     }
                   ]
@@ -7615,10 +7611,6 @@
                   {
                     "type": "inline",
                     "name": "project.reference"
-                  },
-                  {
-                    "type": "inline",
-                    "name": "property.reference"
                   },
                   {
                     "type": "inline",

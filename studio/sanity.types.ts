@@ -494,7 +494,6 @@ export type ImageCarousel = {
       }
     | ArticleReference
     | ProjectReference
-    | PropertyReference
     | EventReference
   >
   category?: ProjectTypeReference
@@ -1155,20 +1154,6 @@ export type ResourceReference = {
   [internalGroqTypeReferenceTo]?: 'resource'
 }
 
-export type ArticleReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'article'
-}
-
-export type EventReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'event'
-}
-
 export type FaqReference = {
   _ref: string
   _type: 'reference'
@@ -1255,7 +1240,6 @@ export type Property = {
       }
     | ArticleReference
     | ProjectReference
-    | PropertyReference
     | EventReference
   >
   mapHeading?: string
@@ -1988,8 +1972,6 @@ export type AllSanitySchemaTypes =
   | Project
   | PropertyTypeReference
   | ResourceReference
-  | ArticleReference
-  | EventReference
   | FaqReference
   | Property
   | Geopoint

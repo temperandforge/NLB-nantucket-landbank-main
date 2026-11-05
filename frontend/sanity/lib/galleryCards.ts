@@ -1,8 +1,8 @@
-import {articleHref, eventHref, projectHref, propertyHref} from './routes.ts'
+import {articleHref, eventHref, projectHref} from './routes.ts'
 
 /**
  * The cards of a property's gallery carousel. An entry is either an uploaded image, which opens
- * full size in a lightbox, or a related document (news, project, property or event), which shows
+ * full size in a lightbox, or a related document (news, project or event), which shows
  * the document's image and title and links to its page. A pure function so a script can check it;
  * the page passes it the gallery field as the query returns it.
  *
@@ -72,8 +72,6 @@ function documentHref(
     }
     case 'project':
       return slug ? {href: projectHref(slug), external: false} : null
-    case 'property':
-      return slug ? {href: propertyHref(slug), external: false} : null
     case 'event':
       return slug ? {href: eventHref(slug), external: false} : null
     default:

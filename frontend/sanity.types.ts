@@ -500,7 +500,6 @@ export type ImageCarousel = {
       }
     | ArticleReference
     | ProjectReference
-    | PropertyReference
     | EventReference
   >
   category?: ProjectTypeReference
@@ -1247,7 +1246,6 @@ export type Property = {
       }
     | ArticleReference
     | ProjectReference
-    | PropertyReference
     | EventReference
   >
   mapHeading?: string
@@ -2906,7 +2904,7 @@ export type GetPageQueryResult = {
               _type: 'image'
               _key: string
             }>
-          | ArrayOf<ArticleReference | EventReference | ProjectReference | PropertyReference>
+          | ArrayOf<ArticleReference | EventReference | ProjectReference>
         category?: ProjectTypeReference
         newsCategory?: NewsCategoryReference
         limit?: number
@@ -2997,27 +2995,6 @@ export type GetPageQueryResult = {
                   caption: null
                   doc: {
                     docType: 'project'
-                    title: string
-                    slug: string
-                    externalUrl: null
-                    image: {
-                      asset: SanityImageAssetReference
-                      hotspot: SanityImageHotspot | null
-                      crop: SanityImageCrop | null
-                      alt: string | null
-                    }
-                  }
-                }
-              | {
-                  _key: null
-                  _type: 'reference'
-                  asset: null
-                  hotspot: null
-                  crop: null
-                  alt: null
-                  caption: null
-                  doc: {
-                    docType: 'property'
                     title: string
                     slug: string
                     externalUrl: null
@@ -4138,7 +4115,7 @@ export type LandingPageQueryResult = {
               _type: 'image'
               _key: string
             }>
-          | ArrayOf<ArticleReference | EventReference | ProjectReference | PropertyReference>
+          | ArrayOf<ArticleReference | EventReference | ProjectReference>
         category?: ProjectTypeReference
         newsCategory?: NewsCategoryReference
         limit?: number
@@ -4229,27 +4206,6 @@ export type LandingPageQueryResult = {
                   caption: null
                   doc: {
                     docType: 'project'
-                    title: string
-                    slug: string
-                    externalUrl: null
-                    image: {
-                      asset: SanityImageAssetReference
-                      hotspot: SanityImageHotspot | null
-                      crop: SanityImageCrop | null
-                      alt: string | null
-                    }
-                  }
-                }
-              | {
-                  _key: null
-                  _type: 'reference'
-                  asset: null
-                  hotspot: null
-                  crop: null
-                  alt: null
-                  caption: null
-                  doc: {
-                    docType: 'property'
                     title: string
                     slug: string
                     externalUrl: null
@@ -5415,27 +5371,6 @@ export type PropertyQueryResult = {
         caption: null
         doc: {
           docType: 'project'
-          title: string
-          slug: string
-          externalUrl: null
-          image: {
-            asset: SanityImageAssetReference
-            hotspot: SanityImageHotspot | null
-            crop: SanityImageCrop | null
-            alt: string | null
-          }
-        }
-      }
-    | {
-        _key: null
-        _type: 'reference'
-        asset: null
-        hotspot: null
-        crop: null
-        alt: null
-        caption: null
-        doc: {
-          docType: 'property'
           title: string
           slug: string
           externalUrl: null
