@@ -254,22 +254,32 @@ export function MapboxMap({
       let cancelledTrails = false
       let cancelIdle = () => {}
       let cancelBounds = () => {}
+      let trailsObjectUrl: string | null = null
+      const revokeTrailsUrl = () => {
+        if (trailsObjectUrl) URL.revokeObjectURL(trailsObjectUrl)
+        trailsObjectUrl = null
+      }
       const loadTrails = async () => {
         try {
           // Zooming to the whole trail network is the default view; a focused property keeps its own.
-          // The bounds come from a worker, so the multi-MB parse never blocks the page. The map is
-          // handed the URL below and its own worker parses the file for drawing.
+          // The worker downloads the file once and returns the bounds with the raw file, which the
+          // map reads through an object URL: one download, and the page never parses it. A focused
+          // property needs no bounds, so the map downloads the file itself.
           let bounds: TrailsBounds | null = null
+          let data = trailsUrl
           if (!focusSlug) {
             const request = fetchTrailsBounds(trailsUrl)
             cancelBounds = request.cancel
-            bounds = await request.promise
+            const result = await request.promise
             // The map may have been removed while the file downloaded.
             if (cancelledTrails || mapRef.current !== map) return
-            if (!bounds) return
+            if (!result.bounds) return
+            bounds = result.bounds
+            trailsObjectUrl = URL.createObjectURL(result.blob)
+            data = trailsObjectUrl
           }
 
-          map.addSource('gpx-route', {type: 'geojson', data: trailsUrl})
+          map.addSource('gpx-route', {type: 'geojson', data})
 
           map.addLayer({
             id: 'gpx-route-line',
@@ -281,6 +291,7 @@ export function MapboxMap({
 
           if (bounds) map.fitBounds(bounds, {padding: 40})
         } catch (error) {
+          revokeTrailsUrl()
           console.error('Failed to load the trails GeoJSON:', error)
         }
       }
@@ -305,6 +316,8 @@ export function MapboxMap({
         cancelledTrails = true
         cancelIdle()
         cancelBounds()
+        // Safe to release now: the map is being removed, so nothing is still reading it.
+        revokeTrailsUrl()
       }
     }
 
