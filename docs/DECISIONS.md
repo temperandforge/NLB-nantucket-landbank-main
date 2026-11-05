@@ -850,6 +850,34 @@ not. A lockfile refresh (the Node 26 bump) pulled it in silently and broke the d
 `stegaClean`, or pass `stega: false` where visual editing overlays aren't needed) or confirm
 `npm run type-check` passes. Run `type-check` before pushing any dependency or lockfile change.
 
+---
+
+### 6.5 `npm audit`: apply the safe fixes, don't chase Sanity 6
+
+**Status:** Implemented (audit fixes); Sanity 6 upgrade deferred - [#131](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/131)
+
+An audit on 2026-11-05 found 29 advisories (6 high, 23 moderate). `npm audit fix` cleared two
+(`zod` via `sanity-plugin-media`, lockfile only). The other 27 remain.
+
+**Why the rest stay:**
+- Nearly all sit in the Sanity CLI toolchain (`@sanity/cli*`, `@oclif/*`, `adm-zip`, `js-yaml`,
+  `minimatch`, `uuid`) and the eslint toolchain (`@typescript-eslint/*` via `eslint-config-next` and
+  `@sanity/eslint-config-studio`), plus `postcss-selector-parser` via `@tailwindcss/typography`. These
+  are build and editing tooling, not code served to visitors (not separated by dev/prod in the audit).
+- npm's suggested fix is to move to `sanity` 6, but that does not help. Sanity 6.22's own CLI
+  dependencies are still vulnerable (the count rose 27 -> 31, adding `smol-toml` and `undici`).
+- Sanity 6 needs `next-sanity` >= 13.4.0 (13.0.8 peers `sanity ^5`), which brings back the
+  `StegaString` type failures in 6.x. It also surfaced `GeoJSON` namespace errors in `components/map/`,
+  and the Sanity 6 CLI refuses `sanity schema extract` without `--force`, which breaks `sanity:typegen`.
+  The attempt was reverted.
+- `npm audit fix --force` is unsafe here: it proposes *downgrading* `@tailwindcss/typography` to 0.5.4
+  and `eslint-config-next` to 15.5.29.
+
+**Implication:** Don't run `--force`. Re-audit periodically; the remaining advisories should clear
+when the Sanity CLI and eslint configs release fixes upstream, or via `overrides` on the vulnerable
+leaf packages (not yet tried - re-run `type-check`, lint and studio `tsc` if so). Adopt Sanity 6
+only with the `StegaString` work in #131.
+
 ## 7. Page-builder blocks
 
 Ported from the nlb-v2 WordPress theme. Design: [the blocks spec](superpowers/specs/2026-10-07-wp-blocks-migration-design.md).
