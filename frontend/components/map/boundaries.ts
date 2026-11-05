@@ -14,12 +14,29 @@ export type BoundaryIndex = Map<string, GeoJSON.Feature>
  * Returns an empty index rather than throwing: the map is still useful with markers and no
  * outlines, and a missing or malformed file must not blank the page.
  */
-export async function loadBoundaryIndex(
+export function loadBoundaryIndex(
   url: string | null | undefined,
   idProperty: string,
 ): Promise<BoundaryIndex> {
+  if (!url) return Promise.resolve(new Map())
+  const key = `${idProperty}\n${url}`
+  let pending = boundaryCache.get(key)
+  if (!pending) {
+    pending = readBoundaryIndex(url, idProperty)
+    boundaryCache.set(key, pending)
+  }
+  return pending
+}
+
+/**
+ * One request per file per page. `LazyMapboxMap` starts this before the map's JavaScript has
+ * arrived, so the download overlaps with it instead of waiting behind it, and the map then picks up
+ * the same promise. It also stops a remount refetching and re-parsing the file.
+ */
+const boundaryCache = new Map<string, Promise<BoundaryIndex>>()
+
+async function readBoundaryIndex(url: string, idProperty: string): Promise<BoundaryIndex> {
   const index: BoundaryIndex = new Map()
-  if (!url) return index
 
   try {
     const response = await fetch(url)
