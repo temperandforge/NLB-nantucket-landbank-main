@@ -1,7 +1,7 @@
 import {ProjectsIcon} from '@sanity/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
-import {jumpNavBodyMembers} from '../objects/jumpNavBody'
+import {singleBodyMembers} from '../objects/blockContent'
 import {seoField} from '../objects/seo'
 
 /**
@@ -60,9 +60,9 @@ export const project = defineType({
       name: 'body',
       title: 'Page content',
       type: 'array',
-      of: jumpNavBodyMembers,
+      of: singleBodyMembers({h2: true, h2Title: 'Section heading (H2)'}),
       description:
-        'The project page. Each “Section heading (H2)” becomes a link in the page’s left-hand nav. Add an FAQ accordion block for questions and answers; put a Section heading above it to introduce it. Leave empty for a page with just the title and image.',
+        'The project page. Each “Section heading (H2)” becomes a link in the page’s left-hand nav. Add an FAQ accordion block for questions and answers (images, galleries, video, tables and other blocks are available too); put a Section heading above it to introduce it. Leave empty for a page with just the title and image.',
     }),
     defineField({
       name: 'property',

@@ -2,7 +2,7 @@ import {CalendarIcon} from '@sanity/icons'
 import {defineField, defineType} from 'sanity'
 
 import {imageWithAltField} from '../objects/blockFields'
-import {jumpNavBodyMembers} from '../objects/jumpNavBody'
+import {singleBodyMembers} from '../objects/blockContent'
 import {seoField} from '../objects/seo'
 
 /**
@@ -61,10 +61,9 @@ export const event = defineType({
       name: 'body',
       title: 'Page content',
       type: 'array',
-      // Sections and images only: the event page has no jump nav and no FAQ accordion.
-      of: jumpNavBodyMembers.filter((member) => member.type === 'block' || member.type === 'image'),
+      of: singleBodyMembers({h2: true, h2Title: 'Section heading (H2)'}),
       description:
-        'The event page. Use Section heading (H2) for sections such as “Activities” or “Rain Date”, and add images between them.',
+        'The event page. Use Section heading (H2) for sections such as “Activities” or “Rain Date”, and add images, galleries, video, FAQ accordions and other blocks between them.',
     }),
     seoField(),
   ],

@@ -2,7 +2,7 @@ import {defineArrayMember, defineField, defineType} from 'sanity'
 import {PinIcon} from '@sanity/icons'
 
 import {BoundaryIdsInput} from '../../components/BoundaryIdsInput'
-import {blockContentMembers} from '../objects/blockContent'
+import {singleBodyMembers} from '../objects/blockContent'
 import {galleryEntryMembers} from '../objects/galleryEntries'
 import {seoField, seoGroup} from '../objects/seo'
 
@@ -94,10 +94,10 @@ export const property = defineType({
       name: 'about',
       title: 'About',
       type: 'array',
-      of: blockContentMembers({h2: true, gallery: true}),
+      of: singleBodyMembers({h2: true}),
       group: 'page',
       description:
-        'The main text beside the property name. Add an “About” heading yourself (Heading 2) if you want one; none is added for you. An image gallery can be added between paragraphs.',
+        'The main text beside the property name. Add an “About” heading yourself (Heading 2) if you want one; none is added for you. Images, galleries, link rows, video, tables, FAQ accordions and other blocks can be added between paragraphs.',
     }),
     defineField({
       name: 'gallery',

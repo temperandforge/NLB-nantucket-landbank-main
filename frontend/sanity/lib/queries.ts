@@ -228,6 +228,31 @@ const markDefsFields = /* groq */ `
   }
 `
 
+/**
+ * The projection for a single-document body (article, project, event, property About): all four
+ * offer the same blocks (`singleBodyMembers` in the studio), so they share one projection. Link
+ * rows and FAQ answers carry links that need their page reference resolved.
+ */
+const richBodyFields = /* groq */ `
+  ...,
+  _type == "anchorLinks" => {
+    links[]{
+      ...,
+      ${linkFields}
+    }
+  },
+  _type == "faqAccordion" => {
+    items[]{
+      ...,
+      answer[]{
+        ...,
+        ${markDefsFields}
+      }
+    }
+  },
+  ${markDefsFields}
+`
+
 /** What a news tile needs. Shared by the News Preview block and the article page's "more news". */
 const articleCardFields = /* groq */ `
   _id,
@@ -733,16 +758,7 @@ export const articleQuery = defineQuery(`
     "categories": categories[]->{"slug": slug.current, title, orderRank},
     // The article's own category documents, to find related articles.
     "categoryIds": categories[]._ref,
-    body[]{
-      ...,
-      _type == "anchorLinks" => {
-        links[]{
-          ...,
-          ${linkFields}
-        }
-      },
-      ${markDefsFields}
-    }
+    body[]{${richBodyFields}}
   }
 `)
 
@@ -796,25 +812,7 @@ export const projectQuery = defineQuery(`
     "propertySlug": property->slug.current,
     // This project's own types, to find related projects.
     "projectTypeIds": projectTypes[]._ref,
-    body[]{
-      ...,
-      _type == "anchorLinks" => {
-        links[]{
-          ...,
-          ${linkFields}
-        }
-      },
-      _type == "faqAccordion" => {
-        items[]{
-          ...,
-          answer[]{
-            ...,
-            ${markDefsFields}
-          }
-        }
-      },
-      ${markDefsFields}
-    }
+    body[]{${richBodyFields}}
   }
 `)
 
@@ -873,16 +871,7 @@ export const propertyQuery = defineQuery(`
     mapBody,
     "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
     "propertyTypeIds": propertyTypes[]._ref,
-    about[]{
-      ...,
-      _type == "anchorLinks" => {
-        links[]{
-          ...,
-          ${linkFields}
-        }
-      },
-      ${markDefsFields}
-    },
+    about[]{${richBodyFields}},
     // An entry is an uploaded image or a reference to a related document. A document's card image is
     // its own image, then its SEO image, then the first image in its body; galleryCards() drops one
     // that still has none. The body fallback is its first image block, or the first picture of its first image gallery.
@@ -967,10 +956,7 @@ export const eventQuery = defineQuery(`
     description,
     image,
     seo{title, description, noIndex, image},
-    body[]{
-      ...,
-      ${markDefsFields}
-    }
+    body[]{${richBodyFields}}
   }
 `)
 

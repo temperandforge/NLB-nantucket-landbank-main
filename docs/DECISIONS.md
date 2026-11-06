@@ -1946,6 +1946,18 @@ the custom one further.
   posts (the news preview block covers it), Constant Contact and similar embeds (case by case).
 - **Small additions not made:** superscript and strikethrough marks, nested lists.
 
+### 28.3a Every single-document body offers the same blocks
+
+The news article, project, event and property About bodies share one member list,
+`singleBodyMembers` in `blockContent.tsx`: text, image, anchor links, FAQ accordion, pull quote,
+image gallery, divider, callout with image, table and video. Only the H2 style differs (the article
+has none; project and event call it "Section heading (H2)"). They share one query projection
+(`richBodyFields`) and one set of styles in `css/ui.css` (`.rich-text-article`, `.rich-text-project`
+and `.rich-text-basic`). A new body block is added in all four places by editing `singleBodyMembers`,
+`PortableText.tsx` and the CSS lists. `jumpNavBodyMembers` still serves the Jump Nav Content page
+block only. Not included: the form embed (kept to Basic Left Right Text, see `blockContentWithForm`)
+and a generic iframe embed, which does not exist.
+
 ### 28.4 Not yet verified
 
 Checked on desktop and mobile widths with sample markup and a temporary test page. Needs a real
