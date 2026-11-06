@@ -187,7 +187,7 @@ const mapPropertyFields = /* groq */ `
   location,
   disablePopup,
   description,
-  "image": image{"url": asset->url, alt},
+  "image": image{"url": asset->url, alt, hotspot{x, y}},
   "propertyTypes": propertyTypes[]->{"slug": slug.current, title},
   "resources": resources[]->{"slug": slug.current, title}
 `
