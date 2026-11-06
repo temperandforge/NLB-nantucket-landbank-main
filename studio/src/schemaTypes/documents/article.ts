@@ -1,7 +1,7 @@
 import {DocumentTextIcon} from '@sanity/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
-import {blockContentMembers} from '../objects/blockContent'
+import {singleBodyMembers} from '../objects/blockContent'
 import {imageWithAltField} from '../objects/blockFields'
 import {seoField} from '../objects/seo'
 
@@ -40,7 +40,7 @@ export const article = defineType({
       name: 'body',
       title: 'Body',
       type: 'array',
-      of: blockContentMembers({pullquote: true, gallery: true, divider: true, callout: true, table: true, video: true}),
+      of: singleBodyMembers(),
       description:
         'The article text. Paragraphs, quotes, pull quotes, images (with captions), image galleries, callouts with an image, tables, videos, dividers, Heading 3-6 and anchor links are available.',
     }),

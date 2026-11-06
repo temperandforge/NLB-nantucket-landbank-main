@@ -23,27 +23,32 @@ import {altTextField, captionField} from './blockFields'
  */
 export function blockContentMembers({
   h2 = false,
+  h2Title = 'Heading 2',
   pullquote = false,
   gallery = false,
   divider = false,
   callout = false,
   table = false,
   video = false,
+  faq = false,
 }: {
   h2?: boolean
+  /** The label editors see for the H2 style. A jump-nav page calls it a section heading. */
+  h2Title?: string
   pullquote?: boolean
   gallery?: boolean
   divider?: boolean
   callout?: boolean
   table?: boolean
   video?: boolean
+  faq?: boolean
 } = {}) {
   return [
     defineArrayMember({
       type: 'block',
       styles: [
         {title: 'Normal', value: 'normal'},
-        ...(h2 ? [{title: 'Heading 2', value: 'h2'}] : []),
+        ...(h2 ? [{title: h2Title, value: 'h2'}] : []),
         {title: 'Heading 3', value: 'h3'},
         {title: 'Heading 4', value: 'h4'},
         {title: 'Heading 5', value: 'h5'},
@@ -128,7 +133,30 @@ export function blockContentMembers({
     ...(callout ? [defineArrayMember({type: 'calloutImage'})] : []),
     ...(table ? [defineArrayMember({type: 'table'})] : []),
     ...(video ? [defineArrayMember({type: 'videoEmbed'})] : []),
+    ...(faq ? [defineArrayMember({type: 'faqAccordion'})] : []),
   ]
+}
+
+/**
+ * The members of the body of a single-document page: a news article, a project, an event, a
+ * property's About text. They all offer the same blocks, so an editor who learns one learns them
+ * all; only the H2 style differs, because a news article's title is already its page heading.
+ * `h2` adds Heading 2 (a project's is the section that becomes a jump-nav link), `h2Title` renames it.
+ * Add a block here and it is available in all of them; give it a renderer in
+ * `frontend/components/PortableText.tsx` and a style for each rich-text variant in `css/ui.css`.
+ */
+export function singleBodyMembers({h2 = false, h2Title}: {h2?: boolean; h2Title?: string} = {}) {
+  return blockContentMembers({
+    h2,
+    h2Title,
+    pullquote: true,
+    gallery: true,
+    divider: true,
+    callout: true,
+    table: true,
+    video: true,
+    faq: true,
+  })
 }
 
 export const blockContent = defineType({
