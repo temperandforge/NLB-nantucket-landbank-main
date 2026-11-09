@@ -27,4 +27,5 @@ export const jumpNavBodyMembers = [
   defineArrayMember({type: 'image', options: {hotspot: true}, fields: [altTextField()]}),
   defineArrayMember({type: 'anchorLinks'}),
   defineArrayMember({type: 'faqAccordion'}),
+  defineArrayMember({type: 'embed'}),
 ]

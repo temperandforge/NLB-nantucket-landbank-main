@@ -18,7 +18,7 @@ import {altTextField, captionField} from './blockFields'
  * The members of the rich text. No H1: a page's main heading belongs to the block's own heading
  * field. H3 is the top level by default; `h2` adds Heading 2 for a field that stands in for a page
  * section, such as a property's About text, where the editor writes the section heading.
- * `pullquote` adds the Pull quote block and `gallery` the Image gallery block, `divider` a Divider, `callout` a Callout with image, `table` a Table, `video` a Video, for long-form text
+ * `pullquote` adds the Pull quote block and `gallery` the Image gallery block, `divider` a Divider, `callout` a Callout with image, `table` a Table, `video` a Video, `embed` an Embed (Google Map or Calendar), for long-form text
  * such as a news article.
  */
 export function blockContentMembers({
@@ -29,6 +29,7 @@ export function blockContentMembers({
   callout = false,
   table = false,
   video = false,
+  embed = false,
 }: {
   h2?: boolean
   pullquote?: boolean
@@ -37,6 +38,7 @@ export function blockContentMembers({
   callout?: boolean
   table?: boolean
   video?: boolean
+  embed?: boolean
 } = {}) {
   return [
     defineArrayMember({
@@ -128,6 +130,7 @@ export function blockContentMembers({
     ...(callout ? [defineArrayMember({type: 'calloutImage'})] : []),
     ...(table ? [defineArrayMember({type: 'table'})] : []),
     ...(video ? [defineArrayMember({type: 'videoEmbed'})] : []),
+    ...(embed ? [defineArrayMember({type: 'embed'})] : []),
   ]
 }
 
