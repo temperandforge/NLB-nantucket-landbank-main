@@ -792,17 +792,18 @@
   border-top-color: var(--color-border-light);
 }
 
-/* Callout with image: a statement set large beside a photo that keeps its own proportions. Text
-   first on a phone; from 640px two columns with the text centred against the photo. The image
-   column is capped so a portrait photo does not take half the article. */
-.rich-text-article > .callout-image,
-.rich-text-project > .callout-image {
+/* Media & text: text beside a photo that keeps its own proportions. Text first on a phone; from
+   640px two columns with the text centred against the photo. The image column is capped so a
+   portrait photo does not take half the article. The text is body copy by default; "statement"
+   sets a short line large. */
+.rich-text-article > .media-text,
+.rich-text-project > .media-text {
   display: grid;
   gap: 1.5rem 3rem;
   margin-block: 3rem;
 }
 
-.callout-image__text {
+.media-text__text--statement {
   color: var(--color-accent-secondary);
   font-family: var(--font-serif);
   font-size: var(--text-headline-base);
@@ -811,22 +812,26 @@
   text-wrap: balance;
 }
 
-.callout-image__figure {
+.media-text__text > * + * {
+  margin-top: 1rem;
+}
+
+.media-text__figure {
   margin: 0;
 }
 
 @media (min-width: 40rem) {
-  .rich-text-article > .callout-image,
-  .rich-text-project > .callout-image {
+  .rich-text-article > .media-text,
+  .rich-text-project > .media-text {
     grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
     align-items: center;
   }
 
-  .callout-image--image-first {
+  .media-text--image-first {
     grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
   }
 
-  .callout-image--image-first > .callout-image__figure {
+  .media-text--image-first > .media-text__figure {
     order: -1;
   }
 }
