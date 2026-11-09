@@ -45,7 +45,7 @@ import {anchorLinks} from './objects/anchorLinks'
 import {pullquote} from './objects/pullquote'
 import {imageGallery} from './objects/imageGallery'
 import {divider} from './objects/divider'
-import {calloutImage} from './objects/calloutImage'
+import {mediaText} from './objects/mediaText'
 import {table} from './objects/table'
 import {videoEmbed} from './objects/videoEmbed'
 import {embed} from './objects/embed'
@@ -138,7 +138,7 @@ export const schemaTypes = [
   pullquote,
   imageGallery,
   divider,
-  calloutImage,
+  mediaText,
   table,
   videoEmbed,
   embed,

@@ -18,7 +18,7 @@ import {altTextField, captionField} from './blockFields'
  * The members of the rich text. No H1: a page's main heading belongs to the block's own heading
  * field. H3 is the top level by default; `h2` adds Heading 2 for a field that stands in for a page
  * section, such as a property's About text, where the editor writes the section heading.
- * `pullquote` adds the Pull quote block and `gallery` the Image gallery block, `divider` a Divider, `callout` a Callout with image, `table` a Table, `video` a Video, `embed` an Embed (Google Map or Calendar), for long-form text
+ * `pullquote` adds the Pull quote block and `gallery` the Image gallery block, `divider` a Divider, `mediaText` a Media & text block, `table` a Table, `video` a Video, `embed` an Embed (Google Map or Calendar), for long-form text
  * such as a news article.
  */
 export function blockContentMembers({
@@ -26,7 +26,7 @@ export function blockContentMembers({
   pullquote = false,
   gallery = false,
   divider = false,
-  callout = false,
+  mediaText = false,
   table = false,
   video = false,
   embed = false,
@@ -35,7 +35,7 @@ export function blockContentMembers({
   pullquote?: boolean
   gallery?: boolean
   divider?: boolean
-  callout?: boolean
+  mediaText?: boolean
   table?: boolean
   video?: boolean
   embed?: boolean
@@ -127,7 +127,7 @@ export function blockContentMembers({
     ...(pullquote ? [defineArrayMember({type: 'pullquote'})] : []),
     ...(gallery ? [defineArrayMember({type: 'imageGallery'})] : []),
     ...(divider ? [defineArrayMember({type: 'divider'})] : []),
-    ...(callout ? [defineArrayMember({type: 'calloutImage'})] : []),
+    ...(mediaText ? [defineArrayMember({type: 'mediaText'})] : []),
     ...(table ? [defineArrayMember({type: 'table'})] : []),
     ...(video ? [defineArrayMember({type: 'videoEmbed'})] : []),
     ...(embed ? [defineArrayMember({type: 'embed'})] : []),
