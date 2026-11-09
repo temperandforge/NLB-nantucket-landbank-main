@@ -24,6 +24,7 @@ import LinkRow from '@/components/ui/LinkRow'
 import {ExtractPageBuilderType} from '@/sanity/lib/types'
 import {linkResolver} from '@/sanity/lib/utils'
 import {videoEmbedSrc} from '@/sanity/lib/video'
+import {embedSrc} from '@/sanity/lib/embed'
 
 /** One row of an anchor-links item, derived from the generated query result so it cannot drift. */
 type AnchorLinkRow = NonNullable<
@@ -230,6 +231,27 @@ export default function CustomPortableText({
         return (
           <figure className="video-figure">
             <VideoEmbed src={video.src} title={value.title} />
+            {value.caption && <figcaption className="figure-caption">{value.caption}</figcaption>}
+          </figure>
+        )
+      },
+      embed: ({value}) => {
+        // An address that is not an allowed Google Maps or Calendar embed gives no frame: show nothing.
+        const src = embedSrc(value?.url)
+        if (!src || !value?.title) return null
+        const shape = stegaClean(value.shape)
+        return (
+          <figure className="embed-figure">
+            <div className={`embed-frame embed-frame--${shape === 'standard' || shape === 'square' ? shape : 'wide'}`}>
+              {/* Lazy, so a map below the fold requests nothing from Google during the first paint. */}
+              <iframe
+                src={src}
+                title={value.title}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="embed-frame__iframe"
+              />
+            </div>
             {value.caption && <figcaption className="figure-caption">{value.caption}</figcaption>}
           </figure>
         )

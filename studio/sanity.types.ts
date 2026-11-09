@@ -295,6 +295,14 @@ export type FaqAccordion = {
   }>
 }
 
+export type Embed = {
+  _type: 'embed'
+  url: string
+  title: string
+  shape?: 'wide' | 'standard' | 'square'
+  caption?: string
+}
+
 export type VideoEmbed = {
   _type: 'videoEmbed'
   url: string
@@ -540,6 +548,9 @@ export type JumpNavContent = {
     | ({
         _key: string
       } & FaqAccordion)
+    | ({
+        _key: string
+      } & Embed)
   >
   disabled?: boolean
 }
@@ -995,6 +1006,9 @@ export type Event = {
         _type: 'image'
         _key: string
       }
+    | ({
+        _key: string
+      } & Embed)
   >
   seo?: Seo
 }
@@ -1069,6 +1083,9 @@ export type Article = {
     | ({
         _key: string
       } & VideoEmbed)
+    | ({
+        _key: string
+      } & Embed)
   >
   categories?: Array<
     {
@@ -1135,6 +1152,9 @@ export type Project = {
     | ({
         _key: string
       } & FaqAccordion)
+    | ({
+        _key: string
+      } & Embed)
   >
   property?: PropertyReference
   seo?: Seo
@@ -1918,6 +1938,7 @@ export type AllSanitySchemaTypes =
   | NewsPreview
   | MissionStatement
   | FaqAccordion
+  | Embed
   | VideoEmbed
   | Table
   | CalloutImage

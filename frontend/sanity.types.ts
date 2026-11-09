@@ -301,6 +301,14 @@ export type FaqAccordion = {
   }>
 }
 
+export type Embed = {
+  _type: 'embed'
+  url: string
+  title: string
+  shape?: 'wide' | 'standard' | 'square'
+  caption?: string
+}
+
 export type VideoEmbed = {
   _type: 'videoEmbed'
   url: string
@@ -546,6 +554,9 @@ export type JumpNavContent = {
     | ({
         _key: string
       } & FaqAccordion)
+    | ({
+        _key: string
+      } & Embed)
   >
   disabled?: boolean
 }
@@ -1001,6 +1012,9 @@ export type Event = {
         _type: 'image'
         _key: string
       }
+    | ({
+        _key: string
+      } & Embed)
   >
   seo?: Seo
 }
@@ -1075,6 +1089,9 @@ export type Article = {
     | ({
         _key: string
       } & VideoEmbed)
+    | ({
+        _key: string
+      } & Embed)
   >
   categories?: Array<
     {
@@ -1141,6 +1158,9 @@ export type Project = {
     | ({
         _key: string
       } & FaqAccordion)
+    | ({
+        _key: string
+      } & Embed)
   >
   property?: PropertyReference
   seo?: Seo
@@ -1924,6 +1944,7 @@ export type AllSanitySchemaTypes =
   | NewsPreview
   | MissionStatement
   | FaqAccordion
+  | Embed
   | VideoEmbed
   | Table
   | CalloutImage
@@ -3093,6 +3114,15 @@ export type GetPageQueryResult = {
               level?: number
               _type: 'block'
               _key: string
+            }
+          | {
+              _key: string
+              _type: 'embed'
+              url: string
+              title: string
+              shape?: 'square' | 'standard' | 'wide'
+              caption?: string
+              markDefs: null
             }
           | {
               _key: string
@@ -4307,6 +4337,15 @@ export type LandingPageQueryResult = {
             }
           | {
               _key: string
+              _type: 'embed'
+              url: string
+              title: string
+              shape?: 'square' | 'standard' | 'wide'
+              caption?: string
+              markDefs: null
+            }
+          | {
+              _key: string
               _type: 'faqAccordion'
               items: Array<{
                 question: string
@@ -4900,6 +4939,15 @@ export type ArticleQueryResult = {
         markDefs: null
       }
     | {
+        _key: string
+        _type: 'embed'
+        url: string
+        title: string
+        shape?: 'square' | 'standard' | 'wide'
+        caption?: string
+        markDefs: null
+      }
+    | {
         asset?: SanityImageAssetReference
         media?: unknown
         hotspot?: SanityImageHotspot
@@ -5091,6 +5139,15 @@ export type ProjectQueryResult = {
         level?: number
         _type: 'block'
         _key: string
+      }
+    | {
+        _key: string
+        _type: 'embed'
+        url: string
+        title: string
+        shape?: 'square' | 'standard' | 'wide'
+        caption?: string
+        markDefs: null
       }
     | {
         _key: string
@@ -5629,6 +5686,15 @@ export type EventQueryResult = {
         level?: number
         _type: 'block'
         _key: string
+      }
+    | {
+        _key: string
+        _type: 'embed'
+        url: string
+        title: string
+        shape?: 'square' | 'standard' | 'wide'
+        caption?: string
+        markDefs: null
       }
     | {
         asset?: SanityImageAssetReference

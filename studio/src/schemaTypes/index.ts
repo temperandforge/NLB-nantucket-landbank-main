@@ -48,6 +48,7 @@ import {divider} from './objects/divider'
 import {calloutImage} from './objects/calloutImage'
 import {table} from './objects/table'
 import {videoEmbed} from './objects/videoEmbed'
+import {embed} from './objects/embed'
 import {faqAccordion} from './objects/faqAccordion'
 import {peopleGrid} from './objects/peopleGrid'
 import {projectGrid} from './objects/projectGrid'
@@ -140,6 +141,7 @@ export const schemaTypes = [
   calloutImage,
   table,
   videoEmbed,
+  embed,
   faqAccordion,
   missionStatement,
   newsPreview,

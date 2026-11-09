@@ -1906,6 +1906,15 @@ article turns them on. They are styled in `css/ui.css` under `.rich-text-article
   loads before play (DECISIONS 25's "defer what isn't needed for first paint"). There is no poster
   thumbnail, because fetching one is itself a third-party request. The host allowlist is repeated in
   `studio/.../videoEmbed.ts` and `frontend/sanity/lib/video.ts`; change both.
+- **Embed** shows a Google Map or Google Calendar in an iframe, on projects, events and articles
+  (and Jump Nav Content). Only `maps.google.com/maps`, `www.google.com/maps` and
+  `calendar.google.com/calendar/embed` over https are accepted, checked by the schema and again at
+  render (an address that fails renders nothing, never a frame). The list is in
+  `studio/.../embed.ts` and `frontend/sanity/lib/embed.ts`; change both. Unlike Video it is a
+  `loading="lazy"` iframe rather than a click-to-load button: a map is expected to be visible, and
+  lazy keeps it out of the first paint when it is below the fold. It exists because the old
+  site's Community Garden page had a map (closes #139). Add a host to the list deliberately; this
+  is not a general iframe block.
 - **Callout with image** is a large statement beside a photo that keeps its own proportions. It is
   not a general Media & Text block (see 28.3).
 - **Divider** is a real `<hr>`, full width or a short centred mark.
