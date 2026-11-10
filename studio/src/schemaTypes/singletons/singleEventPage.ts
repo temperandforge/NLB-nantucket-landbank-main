@@ -13,17 +13,20 @@ export const singleEventPage = defineType({
   title: 'Event Page Settings',
   type: 'document',
   icon: CogIcon,
+  groups: [{name: 'singleEvent', title: 'Single', default: true}],
   fields: [
     defineField({
       name: 'eyebrow',
       title: 'Label above the title',
       type: 'string',
+      group: 'singleEvent',
       description: 'The small label at the top of an event page. Default: "Events".',
     }),
     defineField({
       name: 'archiveLink',
       title: 'Label links to',
       type: 'link',
+      group: 'singleEvent',
       description:
         'The Events page the label links back to. With no link (or one that does not resolve) the label is plain text.',
     }),
