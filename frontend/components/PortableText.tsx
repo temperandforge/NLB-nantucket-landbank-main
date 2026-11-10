@@ -24,6 +24,7 @@ import LinkRow from '@/components/ui/LinkRow'
 import {ExtractPageBuilderType} from '@/sanity/lib/types'
 import {linkResolver} from '@/sanity/lib/utils'
 import {videoEmbedSrc} from '@/sanity/lib/video'
+import {embedSrc} from '@/sanity/lib/embed'
 
 /** One row of an anchor-links item, derived from the generated query result so it cannot drift. */
 type AnchorLinkRow = NonNullable<
@@ -158,15 +159,21 @@ export default function CustomPortableText({
           </figure>
         )
       },
-      calloutImage: ({value}) => {
-        // The block is the statement plus its photo; without either it is not this layout.
-        const text = typeof value?.text === 'string' ? value.text.trim() : ''
-        if (!text || !value?.image?.asset?._ref) return null
+      mediaText: ({value}) => {
+        // The block is its text plus its photo; without either it is not this layout.
+        const content = (value?.content ?? []) as PortableTextBlock[]
+        if (content.length === 0 || !value?.image?.asset?._ref) return null
         const imageFirst = stegaClean(value.imagePosition) === 'left'
+        const statement = stegaClean(value.size) === 'statement'
         return (
-          <div className={imageFirst ? 'callout-image callout-image--image-first' : 'callout-image'}>
-            <p className="callout-image__text">{text}</p>
-            <figure className="callout-image__figure">
+          <div className={imageFirst ? 'media-text media-text--image-first' : 'media-text'}>
+            <div className={statement ? 'media-text__text media-text__text--statement' : 'media-text__text'}>
+              <PortableText
+                value={content}
+                components={{marks: {link: ({children, value: link}) => <ResolvedLink link={link}>{children}</ResolvedLink>}}}
+              />
+            </div>
+            <figure className="media-text__figure">
               <Image
                 id={value.image.asset._ref}
                 alt={value.image.alt || ''}
@@ -230,6 +237,27 @@ export default function CustomPortableText({
         return (
           <figure className="video-figure">
             <VideoEmbed src={video.src} title={value.title} />
+            {value.caption && <figcaption className="figure-caption">{value.caption}</figcaption>}
+          </figure>
+        )
+      },
+      embed: ({value}) => {
+        // An address that is not an allowed Google Maps or Calendar embed gives no frame: show nothing.
+        const src = embedSrc(value?.url)
+        if (!src || !value?.title) return null
+        const shape = stegaClean(value.shape)
+        return (
+          <figure className="embed-figure">
+            <div className={`embed-frame embed-frame--${shape === 'standard' || shape === 'square' ? shape : 'wide'}`}>
+              {/* Lazy, so a map below the fold requests nothing from Google during the first paint. */}
+              <iframe
+                src={src}
+                title={value.title}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="embed-frame__iframe"
+              />
+            </div>
             {value.caption && <figcaption className="figure-caption">{value.caption}</figcaption>}
           </figure>
         )

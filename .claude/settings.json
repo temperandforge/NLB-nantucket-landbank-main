@@ -11,11 +11,11 @@
       "Write",
       "Edit",
       "Glob",
-      "Grep"
+      "Grep",
+      "Bash(curl *)",
     ],
     "deny": [
       "Bash(rm -rf *)",
-      "Bash(curl *)",
       "Bash(wget *)",
       "Read(.env)",
       "Read(.env.*)"

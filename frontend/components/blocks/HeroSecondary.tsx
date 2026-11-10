@@ -36,14 +36,18 @@ export default function HeroSecondary({block, pageName}: BlockProps<'heroSeconda
                 <p className={`relative z-10 load-in ${TEXT[variant].body}`}>{block.body}</p>
               )}
             </div>
-            <BlockImage
-              image={block.image}
-              width={960}
-              sizes="(min-width: 768px) 50vw, 100vw"
-              fill
-              priority
-              className="h-[420px] w-full object-cover md:h-full"
-            />
+            {/* The image is absolutely positioned inside this box so its intrinsic height can't
+                stretch the grid row: the text panel sets the height on desktop, 420px on mobile. */}
+            <div className="relative h-[420px] md:h-auto">
+              <BlockImage
+                image={block.image}
+                width={960}
+                sizes="(min-width: 768px) 50vw, 100vw"
+                fill
+                priority
+                className="absolute inset-0 size-full object-cover"
+              />
+            </div>
           </div>
         </div>
       </div>

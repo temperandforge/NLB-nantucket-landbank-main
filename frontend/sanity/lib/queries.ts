@@ -641,6 +641,13 @@ const pageBuilderFields = /* groq */ `
             }
           }
         },
+        _type == "mediaText" => {
+          ...,
+          content[]{
+            ...,
+            ${markDefsFields}
+          }
+        },
         ${markDefsFields}
       }
     },
@@ -741,6 +748,13 @@ export const articleQuery = defineQuery(`
           ${linkFields}
         }
       },
+      _type == "mediaText" => {
+        ...,
+        content[]{
+          ...,
+          ${markDefsFields}
+        }
+      },
       ${markDefsFields}
     }
   }
@@ -811,6 +825,13 @@ export const projectQuery = defineQuery(`
             ...,
             ${markDefsFields}
           }
+        }
+      },
+      _type == "mediaText" => {
+        ...,
+        content[]{
+          ...,
+          ${markDefsFields}
         }
       },
       ${markDefsFields}
@@ -969,6 +990,13 @@ export const eventQuery = defineQuery(`
     seo{title, description, noIndex, image},
     body[]{
       ...,
+      _type == "mediaText" => {
+        ...,
+        content[]{
+          ...,
+          ${markDefsFields}
+        }
+      },
       ${markDefsFields}
     }
   }

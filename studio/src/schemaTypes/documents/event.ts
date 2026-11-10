@@ -61,8 +61,8 @@ export const event = defineType({
       name: 'body',
       title: 'Page content',
       type: 'array',
-      // Sections and images only: the event page has no jump nav and no FAQ accordion.
-      of: jumpNavBodyMembers.filter((member) => member.type === 'block' || member.type === 'image'),
+      // Sections, images and embeds only: the event page has no jump nav and no FAQ accordion.
+      of: jumpNavBodyMembers.filter((member) => member.type === 'block' || member.type === 'image' || member.type === 'embed' || member.type === 'mediaText'),
       description:
         'The event page. Use Section heading (H2) for sections such as “Activities” or “Rain Date”, and add images between them.',
     }),

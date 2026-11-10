@@ -1888,7 +1888,7 @@ carousel is `galleryCards()` (`frontend/sanity/lib/galleryCards.ts`), a pure fun
 ## 28. Article body blocks and the gallery lightbox
 
 Built in PR 113. The article body (`article.body`) gets extra blocks through opt-in options on
-`blockContentMembers` (`pullquote`, `gallery`, `divider`, `callout`, `table`, `video`); only the
+`blockContentMembers` (`pullquote`, `gallery`, `divider`, `mediaText`, `table`, `video`, `embed`); only the
 article turns them on. They are styled in `css/ui.css` under `.rich-text-article` and
 `.rich-text-project`.
 
@@ -1906,8 +1906,21 @@ article turns them on. They are styled in `css/ui.css` under `.rich-text-article
   loads before play (DECISIONS 25's "defer what isn't needed for first paint"). There is no poster
   thumbnail, because fetching one is itself a third-party request. The host allowlist is repeated in
   `studio/.../videoEmbed.ts` and `frontend/sanity/lib/video.ts`; change both.
-- **Callout with image** is a large statement beside a photo that keeps its own proportions. It is
-  not a general Media & Text block (see 28.3).
+- **Embed** shows a Google Map or Google Calendar in an iframe, on projects, events and articles
+  (and Jump Nav Content). Only `maps.google.com/maps`, `www.google.com/maps` and
+  `calendar.google.com/calendar/embed` over https are accepted, checked by the schema and again at
+  render (an address that fails renders nothing, never a frame). The list is in
+  `studio/.../embed.ts` and `frontend/sanity/lib/embed.ts`; change both. Unlike Video it is a
+  `loading="lazy"` iframe rather than a click-to-load button: a map is expected to be visible, and
+  lazy keeps it out of the first paint when it is below the fold. It exists because the old
+  site's Community Garden page had a map (closes #139). Add a host to the list deliberately; this
+  is not a general iframe block.
+- **Media & text** (`mediaText`) is light rich text (paragraphs, bold, italic, links, bullets) beside
+  a photo that keeps its own proportions, at one of two sizes: Body text, or a Large statement for a
+  short line (capped at 280 characters by a validation). It replaced the plain-text "Callout with
+  image" (`calloutImage`), which no document used, so nothing was migrated. Project, event and Jump
+  Nav Content bodies take it, and project and Jump Nav Content bodies also take the Image gallery and
+  Video blocks (they come from `jumpNavBodyMembers`); the event body takes Media & text only.
 - **Divider** is a real `<hr>`, full width or a short centred mark.
 
 ### 28.2 The gallery lightbox is custom, not a library
@@ -1940,10 +1953,8 @@ the custom one further.
 
 ### 28.3 Considered and not built
 
-- **Media & Text** (normal-size rich text beside an image). Skipped by request. If it is wanted,
-  generalise the callout's `text` from a plain string to light rich text with a size choice (Large
-  statement or Body text), rather than adding a second block; the callout has no content yet, so
-  the change is cheap now.
+- ~~**Media & Text**~~ Built, as the callout generalised (see 28.1), when the Bike Park page needed
+  an image-and-paragraph row.
 - **Columns** of arbitrary blocks. Not recommended: editors can build layouts that break on mobile,
   and it needs nested rich text. A fixed "Two columns of text" block is the alternative if the
   migrated content needs it.
@@ -1956,7 +1967,7 @@ the custom one further.
 ### 28.4 Not yet verified
 
 Checked on desktop and mobile widths with sample markup and a temporary test page. Needs a real
-article: each block added in Studio and viewed (a portrait photo in the callout, a real video
+article: each block added in Studio and viewed (a portrait photo in Media & text, a real video
 playing, a wide table on a phone), and the lightbox swipe on a real touch device. No content uses
 these blocks yet.
 

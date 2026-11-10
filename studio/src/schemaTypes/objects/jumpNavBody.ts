@@ -5,7 +5,8 @@ import {altTextField} from './blockFields'
 /**
  * The rich text behind a jump nav, shared by Jump Nav Content and the project page so the two
  * cannot drift. Each "Section heading (H2)" becomes a nav link; H1 is not offered because the
- * page's own heading is the H1, and H2 must unambiguously mean "a section of the nav".
+ * page's own heading is the H1, and H2 must unambiguously mean "a section of the nav". Besides text
+ * and images it takes Media & text, Image gallery, Video, Embed, anchor links and FAQ accordions.
  */
 export const jumpNavBodyMembers = [
   defineArrayMember({
@@ -27,4 +28,8 @@ export const jumpNavBodyMembers = [
   defineArrayMember({type: 'image', options: {hotspot: true}, fields: [altTextField()]}),
   defineArrayMember({type: 'anchorLinks'}),
   defineArrayMember({type: 'faqAccordion'}),
+  defineArrayMember({type: 'mediaText'}),
+  defineArrayMember({type: 'imageGallery'}),
+  defineArrayMember({type: 'videoEmbed'}),
+  defineArrayMember({type: 'embed'}),
 ]
