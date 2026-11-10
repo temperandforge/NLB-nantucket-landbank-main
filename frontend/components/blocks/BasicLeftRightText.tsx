@@ -1,3 +1,4 @@
+import type {CSSProperties} from 'react'
 import {stegaClean, type PortableTextBlock} from 'next-sanity'
 
 import CustomPortableText from '@/components/PortableText'
@@ -22,16 +23,22 @@ export default function BasicLeftRightText({block}: BlockProps<'basicLeftRightTe
     return [{key: button._key, label: button.label, href, variant, newTab: Boolean(button.link?.openInNewTab)}]
   })
 
+  // The entrance stagger counts siblings inside each wrapper, so the buttons (alone in theirs)
+  // would start before the text above them. Continue the count from the text's position instead.
+  const textParts = [block.eyebrow, block.heading, block.description].filter(Boolean).length
+
   return (
     <section className="relative w-full overflow-clip bg-background tf-px py-s6">
       <div className="basic-left-right__lines pointer-events-none absolute inset-0 z-0" aria-hidden="true" />
       <div className="relative z-10 flex w-full flex-col gap-20 tf-max-w md:flex-row md:items-start">
         {/* Pinned below the header from md, where the columns sit side by side, so the heading and
             buttons stay in view while a long right column scrolls past (as on the event page). The
-            column is capped to the visible height and scrolls inside itself, so CMS text taller than
-            a short screen is never cut off. The padding balanced by the negative margin gives focus
-            rings room inside that scroll box without moving the text. */}
-        <div className="flex w-full flex-col items-start gap-8 md:sticky md:top-[calc(var(--header-offset,var(--header-height))+2.5rem)] md:-m-1 md:max-h-[calc(100dvh-var(--header-offset,var(--header-height))-5rem)] md:max-w-[560px] md:flex-1 md:overflow-y-auto md:overscroll-contain md:p-1 md:transition-[top] md:duration-200 md:ease-out motion-reduce:transition-none">
+            column is capped to the visible height and scrolls inside itself only when its content is taller than that, so CMS text taller than
+            a short screen is never cut off. Scroll chaining stays on: once the column reaches its
+            end the page scrolls on. The padding balanced by the negative margin gives focus
+            rings and the rise of the entrance animation (--enter-rise, 14px) room inside that
+            scroll box, which would otherwise clip them, without moving the text. */}
+        <div className="flex w-full flex-col items-start gap-8 md:sticky md:top-[calc(var(--header-offset,var(--header-height))+2.5rem)] md:-m-4 md:max-h-[calc(100dvh-var(--header-offset,var(--header-height))-5rem)] md:max-w-[560px] md:flex-1 md:overflow-y-auto md:p-4 md:transition-[top] md:duration-200 md:ease-out motion-reduce:transition-none">
           {(block.eyebrow || block.heading || block.description) && (
             <div className="flex w-full flex-col items-start gap-6 text-on-background">
               {block.eyebrow && <Eyebrow className="text-on-background">{block.eyebrow}</Eyebrow>}
@@ -45,7 +52,7 @@ export default function BasicLeftRightText({block}: BlockProps<'basicLeftRightTe
           )}
           {buttons.length > 0 && (
             <div className="flex flex-wrap gap-4">
-              {buttons.map((button) => (
+              {buttons.map((button, index) => (
                 <ButtonLink
                   key={button.key}
                   label={button.label}
@@ -53,6 +60,7 @@ export default function BasicLeftRightText({block}: BlockProps<'basicLeftRightTe
                   variant={button.variant}
                   newTab={button.newTab}
                   rightIcon
+                  style={{'--n': textParts + index} as CSSProperties}
                 />
               ))}
             </div>

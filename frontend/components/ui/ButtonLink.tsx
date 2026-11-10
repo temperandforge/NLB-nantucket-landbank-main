@@ -1,3 +1,5 @@
+import type {CSSProperties} from 'react'
+
 import {ArrowLeftIcon, ArrowRightIcon} from '@/components/icons'
 import AnchorLink from '@/components/ui/AnchorLink'
 
@@ -11,6 +13,7 @@ type ButtonLinkProps = {
   variant?: 'primary' | 'secondary' | 'ghost'
   newTab?: boolean
   className?: string
+  style?: CSSProperties
 }
 
 // Full class names as literals, so Tailwind's scanner sees them.
@@ -28,10 +31,12 @@ export default function ButtonLink({
   leftIcon = false,
   rightIcon = false,
   className,
+  style,
 }: ButtonLinkProps) {
   return (
     <AnchorLink
       href={href}
+      style={style}
       target={newTab ? '_blank' : undefined}
       rel={newTab ? 'noopener noreferrer' : undefined}
       className={`button ${VARIANT_CLASSES[variant]} ${className ?? ''}`}
