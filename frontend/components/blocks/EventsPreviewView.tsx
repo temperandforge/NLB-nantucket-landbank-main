@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import {ClockIcon, MapPinIcon} from '@/components/icons'
+import ButtonLink from '@/components/ui/ButtonLink'
 import {eventParts} from '@/sanity/lib/dates'
 
 import Eyebrow from './Eyebrow'
@@ -19,31 +20,49 @@ export type EventTile = {
 export default function EventsPreviewView({
   eyebrow,
   events: tiles,
+  button,
+  hideWhenEmpty = false,
 }: {
   eyebrow?: string | null
   events: EventTile[]
+  button?: {label: string; href: string} | null
+  /** Render nothing, rather than a "no events" message, when there is nothing to list. */
+  hideWhenEmpty?: boolean
 }) {
   const events = tiles.flatMap((event) => {
       const parts = eventParts(event.start, event.end)
       return parts ? [{event, parts}] : []
     })
 
+  if (hideWhenEmpty && events.length === 0) return null
+  const showButton = Boolean(button) && events.length > 0
+
   return (
     <div className="relative bg-background tf-px py-s4">
       <div className="flex w-full flex-col items-start gap-s4 tf-max-w">
-        {eyebrow && <Eyebrow className="w-full text-on-background">{eyebrow}</Eyebrow>}
+        {(eyebrow || showButton) && (
+          <div className={`${eyebrow ? 'flex' : 'hidden md:flex'} w-full items-center justify-between gap-8`}>
+            {eyebrow && <Eyebrow className="text-on-background">{eyebrow}</Eyebrow>}
+            {/* Beside the eyebrow from md up; below the grid on mobile (see the copy at the end). */}
+            {showButton && button && (
+              <div className="ml-auto hidden shrink-0 md:block">
+                <ButtonLink label={button.label} href={button.href} rightIcon />
+              </div>
+            )}
+          </div>
+        )}
         {events.length === 0 ? (
           <p className="font-sans text-body-base leading-[1.6] text-on-background-subtle">
             No upcoming events right now.
           </p>
         ) : (
-          <div className="flex w-full flex-col divide-y divide-border-light lg:flex-row lg:items-stretch lg:divide-x lg:divide-y-0">
+          <div className="grid w-full grid-cols-1 gap-y-12 lg:grid-cols-2 lg:gap-x-20 lg:gap-y-16">
             {events.map(({event, parts}) => (
               <div
                 key={event._id}
-                className="group relative flex gap-8 py-12 first:pt-0 last:pb-0 lg:flex-1 lg:gap-10 lg:px-10 lg:py-0 lg:first:pl-0 lg:last:pr-0"
+                className="group relative flex min-w-0 items-start gap-8 lg:gap-10"
               >
-                <div className="flex size-[112px] shrink-0 flex-col items-center justify-center gap-2 rounded bg-surface-dark p-3 text-center text-on-surface-dark md:size-[200px] md:gap-3">
+                <div className="flex shrink-0 flex-col items-center justify-center gap-2 rounded bg-surface-dark px-4 py-3 text-center text-on-surface-dark md:gap-3 md:px-8 md:py-6">
                   <p className="font-mono text-body-small leading-[1.6] tracking-wide uppercase">{parts.weekday}</p>
                   <p className="text-headline-xl leading-[1.1]">{parts.day}</p>
                   <p className="font-mono text-body-small leading-[1.6] tracking-wide uppercase">{parts.month}</p>
@@ -75,13 +94,18 @@ export default function EventsPreviewView({
                     )}
                   </div>
                   {event.description && (
-                    <p className="w-full font-sans text-body-base leading-[1.6] text-on-background-subtle">
+                    <p className="line-clamp-3 w-full md:line-clamp-5 font-sans text-body-base leading-[1.6] text-on-background-subtle">
                       {event.description}
                     </p>
                   )}
                 </div>
               </div>
             ))}
+          </div>
+        )}
+        {showButton && button && (
+          <div className="md:hidden">
+            <ButtonLink label={button.label} href={button.href} rightIcon />
           </div>
         )}
       </div>

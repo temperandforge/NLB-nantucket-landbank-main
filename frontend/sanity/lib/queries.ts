@@ -392,10 +392,14 @@ const pageBuilderFields = /* groq */ `
     },
     _type == "eventsPreview" => {
       ...,
+      button{
+        ...,
+        ${linkFields}
+      },
       "events": *[
         _type == "event" && defined(start)
         && dateTime(coalesce(end, start)) >= dateTime($now)
-      ] | order(start asc) [0...12] {
+      ] | order(start asc) [0...6] {
         _id,
         title,
         "slug": slug.current,
@@ -865,6 +869,17 @@ export const singleProjectPageQuery = defineQuery(`
         ...,
         ${linkFields}
       }
+    }
+  }
+`)
+
+/** Content shared by every event page (a singleton, so matched on its type and fixed id). */
+export const singleEventPageQuery = defineQuery(`
+  *[_type == "singleEventPage" && _id == "singleEventPage"][0]{
+    eyebrow,
+    archiveLink{
+      ...,
+      ${linkReference}
     }
   }
 `)

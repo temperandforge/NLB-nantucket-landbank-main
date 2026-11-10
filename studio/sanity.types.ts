@@ -158,6 +158,8 @@ export type EventsPreview = {
   _type: 'eventsPreview'
   eyebrow?: string
   count: number
+  hideWhenEmpty?: boolean
+  button?: Button
   disabled?: boolean
 }
 
@@ -321,9 +323,27 @@ export type Table = {
   caption?: string
 }
 
-export type CalloutImage = {
-  _type: 'calloutImage'
-  text: string
+export type MediaText = {
+  _type: 'mediaText'
+  content: Array<{
+    children?: Array<{
+      marks?: Array<string>
+      text?: string
+      _type: 'span'
+      _key: string
+    }>
+    style?: 'normal'
+    listItem?: 'bullet'
+    markDefs?: Array<
+      {
+        _key: string
+      } & Link
+    >
+    level?: number
+    _type: 'block'
+    _key: string
+  }>
+  size?: 'body' | 'statement'
   image: {
     asset?: SanityImageAssetReference
     media?: unknown
@@ -548,6 +568,15 @@ export type JumpNavContent = {
     | ({
         _key: string
       } & FaqAccordion)
+    | ({
+        _key: string
+      } & MediaText)
+    | ({
+        _key: string
+      } & ImageGallery)
+    | ({
+        _key: string
+      } & VideoEmbed)
     | ({
         _key: string
       } & Embed)
@@ -1008,6 +1037,9 @@ export type Event = {
       }
     | ({
         _key: string
+      } & MediaText)
+    | ({
+        _key: string
       } & Embed)
   >
   seo?: Seo
@@ -1076,7 +1108,7 @@ export type Article = {
       } & Divider)
     | ({
         _key: string
-      } & CalloutImage)
+      } & MediaText)
     | ({
         _key: string
       } & Table)
@@ -1152,6 +1184,15 @@ export type Project = {
     | ({
         _key: string
       } & FaqAccordion)
+    | ({
+        _key: string
+      } & MediaText)
+    | ({
+        _key: string
+      } & ImageGallery)
+    | ({
+        _key: string
+      } & VideoEmbed)
     | ({
         _key: string
       } & Embed)
@@ -1941,7 +1982,7 @@ export type AllSanitySchemaTypes =
   | Embed
   | VideoEmbed
   | Table
-  | CalloutImage
+  | MediaText
   | Divider
   | ImageGallery
   | Pullquote

@@ -79,7 +79,7 @@ export default function EventsGrid({block}: BlockProps<'eventsGrid'>) {
                       )}
                     </div>
                     {event.description && (
-                      <p className="w-full font-sans text-body-base leading-[1.6] text-on-background">
+                      <p className="line-clamp-3 w-full font-sans md:line-clamp-5 text-body-base leading-[1.6] text-on-background">
                         {event.description}
                       </p>
                     )}

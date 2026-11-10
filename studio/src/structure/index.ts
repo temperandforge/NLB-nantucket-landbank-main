@@ -39,6 +39,7 @@ import pluralize from 'pluralize-esm'
 // explicitly above/below or are internal to a plugin.
 const DISABLED_TYPES = [
   'settings',
+  'singleEventPage',
   'singleNewsPage',
   'singleProjectPage',
   'page',
@@ -86,7 +87,22 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
         .icon(DocumentsIcon)
         .child(S.documentTypeList('page').title('Pages')),
       S.divider(),
-      S.documentTypeListItem('event').title('Events').icon(CalendarIcon),
+      S.listItem()
+        .title('Events')
+        .icon(CalendarIcon)
+        .child(
+          S.list()
+            .title('Events')
+            .items([
+              S.documentTypeListItem('event').title('Events').icon(CalendarIcon),
+              S.divider(),
+              // What every event page shares (the label above the title and where it links).
+              S.listItem()
+                .title('Event Page Settings')
+                .icon(CogIcon)
+                .child(S.document().schemaType('singleEventPage').documentId('singleEventPage')),
+            ]),
+        ),
       S.listItem()
         .title('FAQs')
         .icon(HelpCircleIcon)

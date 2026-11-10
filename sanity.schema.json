@@ -783,6 +783,21 @@
           },
           "optional": false
         },
+        "hideWhenEmpty": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        },
+        "button": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "button"
+          },
+          "optional": true
+        },
         "disabled": {
           "type": "objectAttribute",
           "value": {
@@ -8377,6 +8392,58 @@
         "value": {
           "type": "inline",
           "name": "newsPreview"
+        },
+        "optional": true
+      }
+    }
+  },
+  {
+    "name": "singleEventPage",
+    "type": "document",
+    "attributes": {
+      "_id": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_type": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string",
+          "value": "singleEventPage"
+        }
+      },
+      "_createdAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_updatedAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_rev": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "eyebrow": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "archiveLink": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "link"
         },
         "optional": true
       }

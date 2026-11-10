@@ -38,6 +38,7 @@ import {header} from './singletons/header'
 import {siteBanner} from './singletons/siteBanner'
 import {faqSettings} from './singletons/faqSettings'
 import {projectSettings} from './singletons/projectSettings'
+import {singleEventPage} from './singletons/singleEventPage'
 import {singleNewsPage} from './singletons/singleNewsPage'
 import {singleProjectPage} from './singletons/singleProjectPage'
 import {link} from './objects/link'
@@ -86,6 +87,7 @@ export const schemaTypes = [
   siteBanner,
   projectSettings,
   faqSettings,
+  singleEventPage,
   singleNewsPage,
   singleProjectPage,
   // Documents

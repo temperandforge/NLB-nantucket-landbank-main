@@ -21,7 +21,22 @@ export const eventsPreview = defineBlock({
       title: 'Events shown',
       type: 'number',
       initialValue: 2,
-      validation: (rule) => rule.required().integer().min(1).max(12),
+      description: 'Up to six, shown two across.',
+      validation: (rule) => rule.required().integer().min(1).max(6),
+    }),
+    defineField({
+      name: 'hideWhenEmpty',
+      title: 'Hide when there are no upcoming events',
+      type: 'boolean',
+      group: 'settings',
+      initialValue: true,
+      description: 'On: the whole section disappears. Off: it stays and shows a "No upcoming events" message.',
+    }),
+    defineField({
+      name: 'button',
+      title: 'View more button',
+      type: 'button',
+      description: 'Shown below the events. Leave the label or link empty to hide it.',
     }),
   ],
   preview: {

@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type {PortableTextBlock} from 'next-sanity'
 
 import Cascade from '@/components/Cascade'
@@ -5,14 +6,24 @@ import Enter from '@/components/Enter'
 import {CalendarIcon, ClockIcon, MapPinIcon} from '@/components/icons'
 import CustomPortableText from '@/components/PortableText'
 import {eventDateLabel, eventParts} from '@/sanity/lib/dates'
-import type {EventQueryResult} from '@/sanity.types'
+import type {EventQueryResult, SingleEventPageQueryResult} from '@/sanity.types'
 
 /**
  * An event page (Figma: events_content_desktop / events_content_mobile): the title, date, time and
  * place on the left; the page content (sections and images) on the right. Everything but the title
  * is optional and simply absent when missing.
  */
-export default function EventView({event}: {event: NonNullable<EventQueryResult>}) {
+export default function EventView({
+  event,
+  settings,
+  archiveHref,
+}: {
+  event: NonNullable<EventQueryResult>
+  settings: SingleEventPageQueryResult
+  /** Where the eyebrow links: null renders it as plain text. */
+  archiveHref: string | null
+}) {
+  const eyebrowText = settings?.eyebrow || 'Events'
   const parts = eventParts(event.start, event.end)
   const date = eventDateLabel(event.start)
   const body = event.body ?? []
@@ -35,7 +46,13 @@ export default function EventView({event}: {event: NonNullable<EventQueryResult>
           <div className="flex w-full flex-col gap-8 self-start lg:sticky lg:top-[calc(var(--header-offset,var(--header-height))+2.5rem)] lg:max-w-[414px] lg:flex-1 lg:gap-12 lg:transition-[top] lg:duration-200 lg:ease-out motion-reduce:transition-none">
             <div className="flex w-full max-w-[560px] flex-col gap-6">
               <p className="font-mono text-body-small leading-[1.6] tracking-wide text-on-background uppercase load-in">
-                Events
+                {archiveHref ? (
+                  <Link href={archiveHref} className="no-underline hover:underline">
+                    {eyebrowText}
+                  </Link>
+                ) : (
+                  eyebrowText
+                )}
               </p>
               <Cascade
                 as="h1"

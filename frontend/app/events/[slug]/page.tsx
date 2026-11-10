@@ -7,10 +7,12 @@ import EventView from '@/components/EventView'
 import PageTransition from '@/components/PageTransition'
 import {currentHour} from '@/sanity/lib/dates'
 import {sanityFetch} from '@/sanity/lib/live'
-import {eventQuery, eventSlugs, moreEventsQuery} from '@/sanity/lib/queries'
+import {eventQuery, eventSlugs, moreEventsQuery, singleEventPageQuery} from '@/sanity/lib/queries'
 import {buildMetadata} from '@/sanity/lib/seo'
 import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
 import {eventLd} from '@/sanity/lib/structuredData'
+import {DereferencedLink} from '@/sanity/lib/types'
+import {linkResolver, realHref} from '@/sanity/lib/utils'
 
 /**
  * An event page, /events/<slug>. A static route, so it wins over the catch-all that owns CMS
@@ -45,14 +47,18 @@ export async function generateMetadata(props: PageProps<'/events/[slug]'>): Prom
 
 export default async function EventPage(props: PageProps<'/events/[slug]'>) {
   const {slug} = await props.params
-  const [{data: event}, {data: others}] = await Promise.all([
+  const [{data: event}, {data: others}, {data: settings}] = await Promise.all([
     sanityFetch({query: eventQuery, params: {slug}}),
     sanityFetch({query: moreEventsQuery, params: {slug, now: currentHour()}}),
+    sanityFetch({query: singleEventPageQuery}),
   ])
 
   // No event at this slug: a real 404, never a 200 placeholder.
   if (!event?._id) notFound()
 
+  const archiveHref = realHref(
+    settings?.archiveLink ? linkResolver(settings.archiveLink as DereferencedLink) : null,
+  )
   const defaults = await getSeoDefaults()
 
   return (
@@ -64,7 +70,7 @@ export default async function EventPage(props: PageProps<'/events/[slug]'>) {
         )}
       />
       <PageTransition>
-        <EventView event={event} />
+        <EventView event={event} settings={settings} archiveHref={archiveHref} />
         {others.length > 0 && <EventsPreviewView eyebrow="Events - Upcoming" events={others.slice(0, 2)} />}
       </PageTransition>
     </>
