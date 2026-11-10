@@ -46,7 +46,7 @@ export default function JumpNavLayout({
           )}
           {items.length > 0 && (
             <nav
-              className="flex flex-col [scrollbar-color:var(--color-border-light)_transparent] [scrollbar-width:thin] lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain"
+              className="flex flex-col [scrollbar-color:var(--color-border-light)_transparent] [scrollbar-width:thin] lg:min-h-0 lg:overflow-y-auto"
               aria-label={navLabel}
             >
               {items.map((item) => (
