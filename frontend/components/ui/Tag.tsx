@@ -12,7 +12,7 @@ export default function Tag({label, size = 'sm', rounded = true, className}: Tag
         size === 'lg' ? 'px-6 py-3' : 'px-2 py-1'
       } ${rounded ? 'rounded' : ''} ${className ?? ''}`}
     >
-      <span className="tag-label">{label}</span>
+      <span className="tag-label text-pretty">{label}</span>
     </div>
   )
 }
