@@ -92,11 +92,11 @@
 /**
  * Hero - Secondary. The panel colour and the line-art stroke are tuned per variant in the theme
  * (cream stroke at ~70% on green, brown stroke at ~40% on brown), so the art is two SVGs.
- * #5F8154 is the theme's own value for the Lowlands panel; the nearest token, lowlands-800, is
- * #63795b.
+ * The Lowlands panel is color/brand/Lowlands in the Figma page header (#3d5934), not the lighter
+ * #5F8154 the theme used.
  */
 .hero-secondary__panel--lowlands {
-  background-color: #5f8154;
+  background-color: var(--color-lowlands-500);
 }
 
 .hero-secondary__panel--moody-moor {
