@@ -13,6 +13,11 @@ type Article = NonNullable<BlockProps<'newsPreview'>['block']['articles']>[numbe
 
 type Cta = {heading?: string | null; label?: string | null; href: string | null}
 
+// `group` drives the hover and focus states of the pieces inside a tile. Tailwind only applies
+// hover where the device can hover, so a tap never leaves a tile stuck in its hover state. The
+// ring is inset because the grid's overflow-clip would cut an outer one.
+const TILE = 'group focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current'
+
 /** A tile that is a link only when its link resolves; otherwise a plain element, never a dead anchor. */
 function Tile({
   href,
@@ -25,7 +30,7 @@ function Tile({
 }) {
   // `data-part`: a tile is one unit for the page-enter animation (see motion.css), not its pieces.
   return href ? (
-    <Link href={href} className={className} data-part="">
+    <Link href={href} className={`${TILE} ${className}`} data-part="">
       {children}
     </Link>
   ) : (
@@ -78,10 +83,12 @@ export default function NewsPreviewView({
                       width={600}
                       sizes="(min-width: 768px) 33vw, 100vw"
                       fill
-                      className="size-full object-cover"
+                      className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 group-focus-visible:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100 motion-reduce:group-focus-visible:scale-100"
                     />
                   </div>
-                  <p className="w-full text-headline-base text-on-background">{article.title}</p>
+                  <p className="w-full text-headline-base text-on-background underline decoration-transparent decoration-1 underline-offset-4 transition-[text-decoration-color] duration-300 group-hover:decoration-current group-focus-visible:decoration-current motion-reduce:transition-none">
+                    {article.title}
+                  </p>
                 </div>
                 {(category || date) && (
                   <div className="flex shrink-0 items-center gap-3">
@@ -126,7 +133,7 @@ export default function NewsPreviewView({
                     {cta.label}
                   </p>
                 )}
-                <ArrowDownRightIcon className="h-[4.27rem] w-[4.35rem] shrink-0 text-on-accent-secondary" />
+                <ArrowDownRightIcon className="h-[4.27rem] w-[4.35rem] shrink-0 text-on-accent-secondary transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:translate-y-1 group-focus-visible:translate-x-1 group-focus-visible:translate-y-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 motion-reduce:group-hover:translate-y-0 motion-reduce:group-focus-visible:translate-x-0 motion-reduce:group-focus-visible:translate-y-0" />
               </div>
             </Tile>
           )}
