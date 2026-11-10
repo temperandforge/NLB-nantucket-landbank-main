@@ -212,6 +212,7 @@ const mapSettingsFields = /* groq */ `
   "boundaryDataUrl": boundaryData.asset->url,
   "boundaryIdProperty": coalesce(boundaryIdProperty, "FID"),
   "trailsDataUrl": trailsData.asset->url,
+  "fitToBoundaries": coalesce(fitToBoundaries, true),
   defaultCenter,
   defaultZoom
 `

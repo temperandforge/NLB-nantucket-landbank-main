@@ -13,7 +13,6 @@ import {
   loadBoundaryIndex,
   type BoundaryIndex,
 } from './boundaries'
-import {fetchTrailsBounds, type TrailsBounds} from './trailsBounds'
 import {
   DEFAULT_ZOOM,
   NANTUCKET_CENTER,
@@ -186,6 +185,8 @@ export function MapboxMap({
   // The focused property is fitted once, when its boundaries are available, and then left alone so
   // a later filter or data change doesn't snatch the view back from a visitor who has panned away.
   const focusedRef = useRef(false)
+  // The whole-map fit ("Fit map to boundaries") is likewise applied once, for the same reason.
+  const fittedRef = useRef(false)
   // map.on(type, layerId, listener) listeners outlive the layer they were bound to - removing and
   // re-adding 'property-polygons' on every render does not unregister them. Tracked here so each
   // render's listeners are unbound before the next render's are added, instead of stacking.
@@ -201,6 +202,7 @@ export function MapboxMap({
   const [boundaries, setBoundaries] = useState<BoundaryIndex>(() => new Map())
 
   const boundaryUrl = settings?.boundaryDataUrl ?? null
+  const fitToBoundaries = settings?.fitToBoundaries ?? true
   const idProperty = settings?.boundaryIdProperty ?? 'FID'
   const trailsUrl = settings?.trailsDataUrl ?? null
 
@@ -253,33 +255,10 @@ export function MapboxMap({
       // the main thread is free, rather than competing with the style and tiles at `load`.
       let cancelledTrails = false
       let cancelIdle = () => {}
-      let cancelBounds = () => {}
-      let trailsObjectUrl: string | null = null
-      const revokeTrailsUrl = () => {
-        if (trailsObjectUrl) URL.revokeObjectURL(trailsObjectUrl)
-        trailsObjectUrl = null
-      }
-      const loadTrails = async () => {
+      const loadTrails = () => {
+        if (cancelledTrails || mapRef.current !== map) return
         try {
-          // Zooming to the whole trail network is the default view; a focused property keeps its own.
-          // The worker downloads the file once and returns the bounds with the raw file, which the
-          // map reads through an object URL: one download, and the page never parses it. A focused
-          // property needs no bounds, so the map downloads the file itself.
-          let bounds: TrailsBounds | null = null
-          let data = trailsUrl
-          if (!focusSlug) {
-            const request = fetchTrailsBounds(trailsUrl)
-            cancelBounds = request.cancel
-            const result = await request.promise
-            // The map may have been removed while the file downloaded.
-            if (cancelledTrails || mapRef.current !== map) return
-            if (!result.bounds) return
-            bounds = result.bounds
-            trailsObjectUrl = URL.createObjectURL(result.blob)
-            data = trailsObjectUrl
-          }
-
-          map.addSource('gpx-route', {type: 'geojson', data})
+          map.addSource('gpx-route', {type: 'geojson', data: trailsUrl})
 
           map.addLayer({
             id: 'gpx-route-line',
@@ -288,10 +267,7 @@ export function MapboxMap({
             layout: {'line-join': 'round', 'line-cap': 'round'},
             paint: {'line-color': '#c60024', 'line-width': 1},
           })
-
-          if (bounds) map.fitBounds(bounds, {padding: 40})
         } catch (error) {
-          revokeTrailsUrl()
           console.error('Failed to load the trails GeoJSON:', error)
         }
       }
@@ -299,15 +275,15 @@ export function MapboxMap({
       map.once('load', () => {
         // `idle` is the first moment the map has nothing left to draw; fall back to a timer in case
         // it never reports one.
-        const timer = window.setTimeout(() => void loadTrails(), 4000)
+        const timer = window.setTimeout(() => loadTrails(), 4000)
         map.once('idle', () => {
           window.clearTimeout(timer)
           if (cancelledTrails) return
           if ('requestIdleCallback' in window) {
-            const id = window.requestIdleCallback(() => void loadTrails(), {timeout: 1000})
+            const id = window.requestIdleCallback(() => loadTrails(), {timeout: 1000})
             cancelIdle = () => window.cancelIdleCallback(id)
           } else {
-            void loadTrails()
+            loadTrails()
           }
         })
         cancelIdle = () => window.clearTimeout(timer)
@@ -315,9 +291,6 @@ export function MapboxMap({
       cleanupTrails = () => {
         cancelledTrails = true
         cancelIdle()
-        cancelBounds()
-        // Safe to release now: the map is being removed, so nothing is still reading it.
-        revokeTrailsUrl()
       }
     }
 
@@ -439,6 +412,21 @@ export function MapboxMap({
           )
         }
         markersRef.current.push(marker)
+      }
+
+      // Open framed around every boundary, once, when they are available. Skipped on a property's
+      // own page, which frames that property instead.
+      if (
+        !focusSlug &&
+        !fittedRef.current &&
+        fitToBoundaries &&
+        features.length > 0
+      ) {
+        const bounds = geometryBounds(features.map((feature) => feature.geometry))
+        if (bounds) {
+          map.fitBounds(bounds, {padding: 40, animate: false})
+          fittedRef.current = true
+        }
       }
 
       if (features.length > 0) {
@@ -578,7 +566,7 @@ export function MapboxMap({
     return () => {
       map.off('load', renderMarkersAndGeojson)
     }
-  }, [projects, boundaries, focusSlug])
+  }, [projects, boundaries, focusSlug, fitToBoundaries])
 
   return <div ref={mapContainerRef} className="h-full w-full" />
 }

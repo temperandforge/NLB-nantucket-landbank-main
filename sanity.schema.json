@@ -8740,6 +8740,13 @@
         },
         "optional": true
       },
+      "fitToBoundaries": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
       "defaultCenter": {
         "type": "objectAttribute",
         "value": {

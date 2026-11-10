@@ -1367,6 +1367,16 @@ export type SingleNewsPage = {
   moreNews?: NewsPreview
 }
 
+export type SingleEventPage = {
+  _id: string
+  _type: 'singleEventPage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  eyebrow?: string
+  archiveLink?: Link
+}
+
 export type FaqSettings = {
   _id: string
   _type: 'faqSettings'
@@ -2040,6 +2050,7 @@ export type AllSanitySchemaTypes =
   | Redirect
   | SingleProjectPage
   | SingleNewsPage
+  | SingleEventPage
   | FaqSettings
   | FaqCategory
   | ProjectSettings

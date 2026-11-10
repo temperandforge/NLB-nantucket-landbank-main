@@ -108,19 +108,28 @@ export const projectSettings = defineType({
       },
     }),
     defineField({
+      name: 'fitToBoundaries',
+      title: 'Fit map to boundaries',
+      type: 'boolean',
+      group: 'map',
+      initialValue: true,
+      description:
+        'On: the map opens framed around every property boundary, and Default map centre and Default zoom below are ignored. Off: the map opens at the centre and zoom set below. Has no effect if no boundary file is uploaded, or on a single property page.',
+    }),
+    defineField({
       name: 'defaultCenter',
       title: 'Default map centre',
       type: 'geopoint',
       group: 'map',
       description:
-        'Where the map opens. Defaults to Nantucket if empty. Note that an uploaded trails file currently overrides this, since the map zooms to fit the trails once they load.',
+        'Where the map opens. Defaults to Nantucket if empty. Ignored while Fit map to boundaries is on.',
     }),
     defineField({
       name: 'defaultZoom',
       title: 'Default zoom',
       type: 'number',
       group: 'map',
-      description: 'Mapbox zoom level the map opens at. 11 shows the whole island.',
+      description: 'How far in the map opens. A lower number zooms out (shows more area); a higher number zooms in (shows less). Typical values are 9 to 15. Ignored while Fit map to boundaries is on.',
       validation: (Rule) => Rule.min(0).max(22),
     }),
     defineField({

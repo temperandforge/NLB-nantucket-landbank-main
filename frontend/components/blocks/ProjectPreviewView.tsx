@@ -72,7 +72,7 @@ export default function ProjectPreviewView({
                     <span className="text-headline-xl whitespace-nowrap">
                       {String(index + 1).padStart(2, '0')}
                     </span>
-                    <p className="w-full font-mono text-body-base leading-[1.6]">{project.name}</p>
+                    <p className="w-full font-mono text-body-base leading-[1.6] text-pretty">{project.name}</p>
                   </div>
                   <div className={`relative ${IMAGE_RATIO[Math.min(shown.length, 3)]} w-full max-h-[40rem] overflow-clip bg-dusty-heath-800`}>
                     <BlockImage
