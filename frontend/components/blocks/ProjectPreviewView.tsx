@@ -1,6 +1,7 @@
 import type {ComponentProps} from 'react'
 
 import AnchorLink from '@/components/ui/AnchorLink'
+import {ArrowRightIcon} from '@/components/icons'
 import ButtonLink from '@/components/ui/ButtonLink'
 import {projectHref, singleHref} from '@/sanity/lib/utils'
 
@@ -64,16 +65,27 @@ export default function ProjectPreviewView({
           // name wraps to. The divider is drawn in the gap, not inside a column, for the same reason.
           <ol className={`m-0 grid min-w-0 flex-1 list-none grid-cols-1 gap-20 p-0 ${COLUMNS[Math.min(shown.length, 3)]} md:gap-x-6 md:gap-y-6`}>
             {shown.map((project, index) => {
-              const href = singleHref(project.externalUrl, project.slug, projectHref)
+                            const href = singleHref(project.externalUrl, project.slug, projectHref)
+              // `group` drives the hover and focus states below. Tailwind only applies hover where the
+              // device can hover, so a tap never leaves a card stuck in its hover state.
               const cardClass =
-                'flex min-w-0 flex-col items-start gap-5 md:row-span-2 md:grid md:grid-rows-subgrid md:gap-y-6'
+                'group flex min-w-0 flex-col items-start gap-5 md:row-span-2 md:grid md:grid-rows-subgrid md:gap-y-6 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current'
               const card = (
                 <>
                   <div className="flex w-full flex-col items-start gap-12 text-on-background md:gap-16 xl:gap-32">
-                    <span className="text-headline-xl whitespace-nowrap">
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <p className="w-full font-mono text-body-base leading-[1.6] text-pretty">{project.name}</p>
+                    <div className="flex w-full items-center justify-between gap-4">
+                      <span className="text-headline-xl whitespace-nowrap">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      {/* Slides in beside the number; decorative, the whole card is the link. Under
+                          reduced motion it appears without the slide. */}
+                      {href && (
+                        <ArrowRightIcon className="size-6 shrink-0 -translate-x-2 opacity-0 transition-[opacity,translate] duration-300 ease-out group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 motion-reduce:translate-x-0 motion-reduce:transition-none" />
+                      )}
+                    </div>
+                    <p className="w-full font-mono text-body-base leading-[1.6] text-pretty underline decoration-transparent decoration-1 underline-offset-4 transition-[text-decoration-color] duration-300 group-hover:decoration-current group-focus-visible:decoration-current motion-reduce:transition-none">
+                      {project.name}
+                    </p>
                   </div>
                   <div className={`relative ${IMAGE_RATIO[Math.min(shown.length, 3)]} w-full max-h-[40rem] overflow-clip bg-dusty-heath-800`}>
                     <BlockImage
@@ -81,7 +93,7 @@ export default function ProjectPreviewView({
                       width={692}
                       sizes="(min-width: 1280px) 40vw, (min-width: 768px) 50vw, 100vw"
                       fill
-                      className="size-full object-cover"
+                      className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 group-focus-visible:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100 motion-reduce:group-focus-visible:scale-100"
                     />
                   </div>
                 </>
