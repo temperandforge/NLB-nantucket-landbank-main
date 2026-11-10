@@ -8,7 +8,7 @@ import {seoField} from '../objects/seo'
  * A Land Bank project - an initiative the Land Bank is carrying out, shown by the Project Grid,
  * Project Preview and Image Carousel blocks. Distinct from `property`, which is a parcel on the
  * interactive map; a project can point at the property it happens on. Each project has a page of
- * its own at /projects/<slug>; its address is derived from the slug, so it has no link field.
+ * its own at /projects/<slug>; its address is derived from the slug; an optional `externalUrl` sends its tile elsewhere instead.
  */
 export const project = defineType({
   name: 'project',
@@ -70,6 +70,14 @@ export const project = defineType({
       type: 'reference',
       to: [{type: 'property'}],
       description: 'Optional. The Land Bank property this project takes place on.',
+    }),
+    defineField({
+      name: 'externalUrl',
+      title: 'External URL',
+      type: 'url',
+      validation: (rule) => rule.uri({scheme: ['http', 'https']}),
+      description:
+        'Optional. Only for a project that lives on another site: its tile and search result go to this address instead of its page. Leave empty to use the page.',
     }),
     seoField(),
   ],

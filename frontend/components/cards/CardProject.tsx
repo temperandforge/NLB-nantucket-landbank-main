@@ -3,7 +3,7 @@ import {ViewTransition} from 'react'
 import BlockImage from '@/components/blocks/BlockImage'
 import AnchorLink from '@/components/ui/AnchorLink'
 import Tag from '@/components/ui/Tag'
-import {projectHref} from '@/sanity/lib/utils'
+import {projectHref, singleHref} from '@/sanity/lib/utils'
 
 import type {ProjectItem} from './types'
 
@@ -52,7 +52,7 @@ export default function CardProject({project, morph = false}: {project: ProjectI
   )
   // Every project has a page of its own; a project with no slug (unreachable through the query,
   // which requires one) would be a plain card, never a dead anchor.
-  const href = project.slug ? projectHref(project.slug) : null
+  const href = singleHref(project.externalUrl, project.slug, projectHref)
   return href ? (
     <AnchorLink href={href} className="block w-full">
       {card}

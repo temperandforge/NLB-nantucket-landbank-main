@@ -66,6 +66,14 @@ export const event = defineType({
       description:
         'The event page. Use Section heading (H2) for sections such as “Activities” or “Rain Date”, and add images between them.',
     }),
+    defineField({
+      name: 'externalUrl',
+      title: 'External URL',
+      type: 'url',
+      validation: (rule) => rule.uri({scheme: ['http', 'https']}),
+      description:
+        'Optional. Only for an event that lives on another site: its tile and search result go to this address instead of its page. Leave empty to use the page.',
+    }),
     seoField(),
   ],
   orderings: [{title: 'Start, soonest first', name: 'startAsc', by: [{field: 'start', direction: 'asc'}]}],

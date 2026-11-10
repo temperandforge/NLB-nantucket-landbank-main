@@ -5,7 +5,7 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import '../../css/popup.css'
 
-import {propertyHref} from '@/sanity/lib/utils'
+import {propertyHref, singleHref} from '@/sanity/lib/utils'
 
 import {
   geometryBounds,
@@ -148,8 +148,11 @@ function buildPopupHtml(project: Property, currentSlug: string | null): string {
     : ''
 
   // The focused property's own popup is not a link: the visitor is already on its page.
+  // A property with an external URL sends the popup there instead of to its page.
   const href =
-    project.slug && project.slug !== currentSlug ? encodeURI(propertyHref(project.slug)) : null
+    project.slug && project.slug !== currentSlug
+      ? encodeURI(singleHref(project.externalUrl, project.slug, propertyHref) ?? '')
+      : null
 
   const arrow = href ? `<span class="map-popup-arrow">${ARROW_FORWARD_SVG}</span>` : ''
 

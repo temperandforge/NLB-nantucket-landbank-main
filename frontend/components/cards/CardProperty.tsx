@@ -3,7 +3,7 @@ import {ViewTransition} from 'react'
 
 import BlockImage from '@/components/blocks/BlockImage'
 import Tag from '@/components/ui/Tag'
-import {propertyHref} from '@/sanity/lib/utils'
+import {propertyHref, singleHref} from '@/sanity/lib/utils'
 
 import type {PropertyDefaultImage, PropertyItem} from './types'
 
@@ -71,7 +71,7 @@ export default function CardProperty({
     </div>
   )
   // A property with no slug (unreachable through the queries) is a plain card, never a dead anchor.
-  const href = property.slug ? propertyHref(property.slug) : null
+  const href = singleHref(property.externalUrl, property.slug, propertyHref)
   return href ? (
     <Link href={href} className="block w-full">
       {card}

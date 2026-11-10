@@ -1,7 +1,7 @@
 import BlockImage from '@/components/blocks/BlockImage'
 import Tag from '@/components/ui/Tag'
 import {formatDate} from '@/sanity/lib/dates'
-import {realHref} from '@/sanity/lib/utils'
+import {articleHref, singleHref} from '@/sanity/lib/utils'
 
 import Link from 'next/link'
 
@@ -39,7 +39,7 @@ export default function CardNews({article}: {article: NewsItem}) {
     </div>
   )
   // The article's own link wins (an external story); otherwise its page.
-  const href = realHref(article.externalUrl) ?? (article.slug ? `/news/${article.slug}` : null)
+  const href = singleHref(article.externalUrl, article.slug, articleHref)
   return href ? (
     <Link href={href} className="block w-full">
       {card}

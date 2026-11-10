@@ -1,4 +1,5 @@
 import {formatShortDate} from './dates.ts'
+import {articleHref, eventHref, projectHref, propertyHref} from './routes.ts'
 import type {FilterTab} from '@/sanity/lib/archiveFilter'
 import type {SearchQueryResult} from '@/sanity.types'
 
@@ -153,17 +154,21 @@ function hrefFor(row: Row): {href: string; external: boolean} | null {
   switch (row._type) {
     case 'page':
       return row.path ? {href: `/${row.path}`, external: false} : null
-    case 'article': {
+    case 'article':
+    case 'project':
+    case 'event':
+    case 'property': {
       const own = realHref(row.externalUrl)
       if (own) return {href: own, external: /^https?:\/\//i.test(own)}
-      return row.slug ? {href: `/news/${row.slug}`, external: false} : null
+      if (!row.slug) return null
+      const pageHref = {
+        article: articleHref,
+        project: projectHref,
+        event: eventHref,
+        property: propertyHref,
+      }[row._type]
+      return {href: pageHref(row.slug), external: false}
     }
-    case 'project':
-      return row.slug ? {href: `/projects/${row.slug}`, external: false} : null
-    case 'event':
-      return row.slug ? {href: `/events/${row.slug}`, external: false} : null
-    case 'property':
-      return row.slug ? {href: `/properties/${row.slug}`, external: false} : null
     case 'record':
       return row.fileUrl ? {href: row.fileUrl, external: true} : null
     default:

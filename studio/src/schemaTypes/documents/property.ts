@@ -91,6 +91,15 @@ export const property = defineType({
       description: 'Amenities available here. Drives the Resources filter on the map.',
     }),
     defineField({
+      name: 'externalUrl',
+      title: 'External URL',
+      type: 'url',
+      group: 'details',
+      validation: (rule) => rule.uri({scheme: ['http', 'https']}),
+      description:
+        'Optional. Only for a property that lives on another site: its tile and search result go to this address instead of its page. Leave empty to use the page.',
+    }),
+    defineField({
       name: 'about',
       title: 'About',
       type: 'array',

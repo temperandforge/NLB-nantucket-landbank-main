@@ -3,6 +3,7 @@ import Link from 'next/link'
 import {ClockIcon, MapPinIcon} from '@/components/icons'
 import ButtonLink from '@/components/ui/ButtonLink'
 import {eventParts} from '@/sanity/lib/dates'
+import {eventHref, singleHref} from '@/sanity/lib/utils'
 
 import Eyebrow from './Eyebrow'
 
@@ -10,6 +11,7 @@ export type EventTile = {
   _id: string
   title: string | null
   slug?: string | null
+  externalUrl?: string | null
   start: string | null
   end: string | null
   location: string | null
@@ -31,7 +33,7 @@ export default function EventsPreviewView({
 }) {
   const events = tiles.flatMap((event) => {
       const parts = eventParts(event.start, event.end)
-      return parts ? [{event, parts}] : []
+      return parts ? [{event, parts, href: singleHref(event.externalUrl, event.slug, eventHref)}] : []
     })
 
   if (hideWhenEmpty && events.length === 0) return null
@@ -57,7 +59,7 @@ export default function EventsPreviewView({
           </p>
         ) : (
           <div className="grid w-full grid-cols-1 gap-y-12 lg:grid-cols-2 lg:gap-x-20 lg:gap-y-16">
-            {events.map(({event, parts}) => (
+            {events.map(({event, parts, href}) => (
               <div
                 key={event._id}
                 className="group relative flex min-w-0 items-start gap-8 lg:gap-10"
@@ -69,8 +71,8 @@ export default function EventsPreviewView({
                 </div>
                 <div className="flex min-w-0 flex-1 flex-col items-start gap-3 md:gap-6">
                   <p className="w-full text-headline-base leading-[1.1] text-on-background">
-                    {event.slug ? (
-                      <Link href={`/events/${event.slug}`} className="no-underline after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-8 group-hover:underline">
+                    {href ? (
+                      <Link href={href} className="no-underline after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-8 group-hover:underline">
                         {event.title}
                       </Link>
                     ) : (

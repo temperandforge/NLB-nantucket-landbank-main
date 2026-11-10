@@ -3,6 +3,7 @@ import Link from 'next/link'
 import BlockImage from '@/components/blocks/BlockImage'
 import {ArrowRightIcon, ClockIcon, MapPinIcon} from '@/components/icons'
 import {eventParts} from '@/sanity/lib/dates'
+import {eventHref, singleHref} from '@/sanity/lib/utils'
 
 import {BlockProps} from './types'
 
@@ -31,7 +32,7 @@ export default function EventsGrid({block}: BlockProps<'eventsGrid'>) {
       ) : (
         <ul className="mx-auto flex w-full list-none flex-col p-0 tf-max-w">
           {events.map(({event, parts}) => {
-            const href = event.slug ? `/events/${event.slug}` : null
+            const href = singleHref(event.externalUrl, event.slug, eventHref)
             return (
               <li
                 key={event._id}

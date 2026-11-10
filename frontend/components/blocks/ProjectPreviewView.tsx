@@ -2,7 +2,7 @@ import type {ComponentProps} from 'react'
 
 import AnchorLink from '@/components/ui/AnchorLink'
 import ButtonLink from '@/components/ui/ButtonLink'
-import {projectHref} from '@/sanity/lib/utils'
+import {projectHref, singleHref} from '@/sanity/lib/utils'
 
 import BlockImage from './BlockImage'
 import Eyebrow from './Eyebrow'
@@ -11,6 +11,7 @@ export type PreviewProject = {
   _id: string
   name?: string | null
   slug?: string | null
+  externalUrl?: string | null
   image?: ComponentProps<typeof BlockImage>['image']
 }
 
@@ -63,7 +64,7 @@ export default function ProjectPreviewView({
           // name wraps to. The divider is drawn in the gap, not inside a column, for the same reason.
           <ol className={`m-0 grid min-w-0 flex-1 list-none grid-cols-1 gap-20 p-0 ${COLUMNS[Math.min(shown.length, 3)]} md:gap-x-6 md:gap-y-6`}>
             {shown.map((project, index) => {
-              const href = project.slug ? projectHref(project.slug) : null
+              const href = singleHref(project.externalUrl, project.slug, projectHref)
               const cardClass =
                 'flex min-w-0 flex-col items-start gap-5 md:row-span-2 md:grid md:grid-rows-subgrid md:gap-y-6'
               const card = (

@@ -65,15 +65,15 @@ function documentHref(
 ): {href: string; external: boolean} | null {
   const slug = doc.slug?.trim()
   switch (doc.docType) {
-    case 'article': {
+    case 'article':
+    case 'project':
+    case 'event': {
       const own = externalAddress(doc.externalUrl)
       if (own) return {href: own, external: true}
-      return slug ? {href: articleHref(slug), external: false} : null
+      if (!slug) return null
+      const pageHref = {article: articleHref, project: projectHref, event: eventHref}[doc.docType]
+      return {href: pageHref(slug), external: false}
     }
-    case 'project':
-      return slug ? {href: projectHref(slug), external: false} : null
-    case 'event':
-      return slug ? {href: eventHref(slug), external: false} : null
     default:
       return null
   }

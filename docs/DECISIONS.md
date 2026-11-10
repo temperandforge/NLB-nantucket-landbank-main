@@ -1082,6 +1082,11 @@ every article has its own page (`studio/scripts/migrateArticleLinks.ts`). A tile
 set and not `#`, otherwise to `/news/<slug>`. A call to action tile with no link stays a plain
 tile.
 
+Events, projects and properties have the same optional `externalUrl`. Their tiles (grids, previews,
+cards, the map popup, image carousels and search results) go through `singleHref()`
+(`frontend/sanity/lib/utils.ts`): the external URL when set, otherwise the page. The page itself
+still exists and stays in the sitemap; only the tiles are redirected.
+
 ### 10.3 The Share row: copy link, Facebook, LinkedIn
 
 **Status:** Implemented. Instagram is left out: it has no web share address.

@@ -1042,6 +1042,7 @@ export type Event = {
         _key: string
       } & Embed)
   >
+  externalUrl?: string
   seo?: Seo
 }
 
@@ -1198,6 +1199,7 @@ export type Project = {
       } & Embed)
   >
   property?: PropertyReference
+  externalUrl?: string
   seo?: Seo
 }
 
@@ -1249,6 +1251,7 @@ export type Property = {
       _key: string
     } & ResourceReference
   >
+  externalUrl?: string
   about?: Array<
     | {
         children?: Array<{
@@ -1427,6 +1430,7 @@ export type ProjectSettings = {
     media?: unknown
     _type: 'file'
   }
+  fitToBoundaries?: boolean
   defaultCenter?: Geopoint
   defaultZoom?: number
   hideMap?: boolean

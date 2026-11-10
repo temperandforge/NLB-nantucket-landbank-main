@@ -37,6 +37,18 @@ export function realHref(href: string | null | undefined): string | null {
   return value && value !== '#' ? value : null
 }
 
+/**
+ * Where a tile for a news article, event, project or property goes: its own external URL when
+ * the editor set one (a page on another site), otherwise its page, derived from the slug.
+ */
+export function singleHref(
+  externalUrl: string | null | undefined,
+  slug: string | null | undefined,
+  pageHref: (slug: string) => string,
+): string | null {
+  return realHref(externalUrl) ?? (slug ? pageHref(slug) : null)
+}
+
 export function linkResolver(link: Link | DereferencedLink | undefined) {
   if (!link) return null
 

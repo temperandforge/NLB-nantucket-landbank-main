@@ -183,6 +183,7 @@ const mapPropertyFields = /* groq */ `
   _id,
   name,
   "slug": slug.current,
+  externalUrl,
   boundaryIds,
   location,
   disablePopup,
@@ -384,6 +385,7 @@ const pageBuilderFields = /* groq */ `
         _id,
         title,
         "slug": slug.current,
+        externalUrl,
         start,
         end,
         location,
@@ -404,6 +406,7 @@ const pageBuilderFields = /* groq */ `
         _id,
         title,
         "slug": slug.current,
+        externalUrl,
         start,
         end,
         location,
@@ -485,6 +488,7 @@ const pageBuilderFields = /* groq */ `
         name,
         image,
         "slug": slug.current,
+        externalUrl,
         "projectTypes": projectTypes[]->{"slug": slug.current, title, orderRank}
       }
     },
@@ -494,6 +498,7 @@ const pageBuilderFields = /* groq */ `
         _id,
         name,
         "slug": slug.current,
+        externalUrl,
         description,
         image,
         "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
@@ -539,7 +544,8 @@ const pageBuilderFields = /* groq */ `
           _id,
           name,
           image,
-          "slug": slug.current
+          "slug": slug.current,
+          externalUrl
         },
         *[
           _type == "project" && defined(slug.current)
@@ -548,7 +554,8 @@ const pageBuilderFields = /* groq */ `
           _id,
           name,
           image,
-          "slug": slug.current
+          "slug": slug.current,
+          externalUrl
         }
       )
     },
@@ -573,6 +580,7 @@ const pageBuilderFields = /* groq */ `
         _id,
         name,
         "slug": slug.current,
+        externalUrl,
         description,
         image,
         "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
@@ -582,6 +590,7 @@ const pageBuilderFields = /* groq */ `
         _id,
         name,
         "slug": slug.current,
+        externalUrl,
         description,
         image,
         "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
@@ -852,6 +861,7 @@ export const moreProjectsQuery = defineQuery(`
     name,
     image,
     "slug": slug.current,
+    externalUrl,
     "projectTypeIds": projectTypes[]._ref
   }
 `)
@@ -890,6 +900,7 @@ const propertyCardFields = /* groq */ `
   _id,
   name,
   "slug": slug.current,
+  externalUrl,
   description,
   image,
   "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
@@ -1027,6 +1038,7 @@ export const moreEventsQuery = defineQuery(`
     _id,
     title,
     "slug": slug.current,
+    externalUrl,
     start,
     end,
     location,
