@@ -121,6 +121,15 @@ function escapeHtml(value: string): string {
 }
 
 /**
+ * Sanity's own focal-point crop for a hand-built image URL (the popup bypasses the Image component,
+ * which is what normally turns `hotspot` into a crop). Empty when the editor set no focal point.
+ */
+function focalPointParams(hotspot: {x?: number | null; y?: number | null} | null | undefined): string {
+  if (typeof hotspot?.x !== 'number' || typeof hotspot?.y !== 'number') return ''
+  return `&crop=focalpoint&fp-x=${hotspot.x}&fp-y=${hotspot.y}`
+}
+
+/**
  * Build the popup markup for a project. Styled by css/popup.css.
  *
  * Every interpolated value is escaped: these come from the CMS, and setHTML would otherwise let
@@ -138,7 +147,7 @@ function buildPopupHtml(project: Property, currentSlug: string | null): string {
       // photo is megabytes), and without loading="lazy" the browser fetches it as soon as the
       // markup is parsed, i.e. for every marker's popup on page load, opened or not.
       `<img class="map-popup-image" loading="lazy" decoding="async" src="${encodeURI(
-        `${project.image.url}?w=600&h=380&fit=crop&auto=format`,
+        `${project.image.url}?w=600&h=380&fit=crop&auto=format${focalPointParams(project.image.hotspot)}`,
       )}" alt="${escapeHtml(
         project.image.alt ?? '',
       )}" />`
