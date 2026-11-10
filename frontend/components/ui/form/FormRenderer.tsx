@@ -282,8 +282,12 @@ export default function FormRenderer({
         const grid = (
           <div className={`grid gap-5 ${section.columns === 2 ? 'sm:grid-cols-2' : 'grid-cols-1'}`}>
             {fields.map((field) => (
+              // `data-part`: a field (label, control, message) enters as one unit with the rest of
+              // the block (motion.css). Without it only text and buttons animate, so the form's
+              // inputs sit there while their labels and the submit button fade in.
               <div
                 key={field._key}
+                data-part=""
                 className={section.columns === 2 && field.width !== 'half' ? 'sm:col-span-2' : undefined}
               >
                 <Control
@@ -300,7 +304,7 @@ export default function FormRenderer({
         )
         return section.heading ? (
           <fieldset key={section._key} className="m-0 flex min-w-0 flex-col gap-5 border-0 p-0">
-            <legend className="form-section-heading mb-5">
+            <legend data-part="" className="form-section-heading mb-5">
               {section.heading}
               {/* A prompted field's label has no asterisk, so the heading carries it. */}
               {fields.some((field) => field.prompt && field.required) && <span aria-hidden="true">*</span>}
