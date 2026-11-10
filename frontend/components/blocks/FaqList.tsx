@@ -43,7 +43,7 @@ export default function FaqList({block}: BlockProps<'faqList'>) {
       />
       <div className="relative z-10 tf-max-w flex flex-col items-start gap-10 lg:flex-row lg:justify-between">
         {(block.heading || block.description) && (
-          <div className="flex w-full flex-col items-start gap-6 lg:w-[318px] lg:shrink-0">
+          <div className="flex w-full flex-col items-start gap-6 lg:sticky lg:top-[calc(var(--header-offset,var(--header-height))+2.5rem)] lg:w-[318px] lg:shrink-0 lg:self-start lg:transition-[top] lg:duration-200 lg:ease-out motion-reduce:transition-none">
             {block.heading && (
               <h2 className="w-full text-headline-2xl text-on-background">{block.heading}</h2>
             )}
