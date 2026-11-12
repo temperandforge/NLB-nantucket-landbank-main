@@ -441,3 +441,13 @@ export function PlayIcon({className}: IconProps) {
     </svg>
   )
 }
+
+/** Pause bars, on a video's pause button. 24 x 24, solid; drawn, not exported from Figma. */
+export function PauseIcon({className}: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" className={className}>
+      <rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" />
+      <rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" />
+    </svg>
+  )
+}
