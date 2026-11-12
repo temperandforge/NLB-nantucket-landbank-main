@@ -53,7 +53,7 @@ export default function NavSearch(props: DesktopProps | MobileProps) {
         aria-controls={panelId}
         aria-label={open ? 'Close search' : 'Open search'}
         onClick={onToggle}
-        className={`flex size-12 cursor-pointer items-center justify-center rounded bg-secondary text-on-secondary transition-colors hover:bg-goldenrod-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500 ${className ?? ''}`}
+        className={`icon-button icon-button-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500 ${className ?? ''}`}
       >
         <SearchIcon className="size-6" />
       </button>

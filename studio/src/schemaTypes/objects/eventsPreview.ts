@@ -21,8 +21,8 @@ export const eventsPreview = defineBlock({
       title: 'Events shown',
       type: 'number',
       initialValue: 2,
-      description: 'Up to six, shown two across.',
-      validation: (rule) => rule.required().integer().min(1).max(6),
+      description: 'Up to eight, shown two across.',
+      validation: (rule) => rule.required().integer().min(1).max(8),
     }),
     defineField({
       name: 'hideWhenEmpty',

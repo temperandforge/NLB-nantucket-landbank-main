@@ -157,7 +157,7 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
           S.list()
             .title('News')
             .items([
-              S.documentTypeListItem('article').title('Articles').icon(DocumentTextIcon),
+              S.documentTypeListItem('article').title('News Articles').icon(DocumentTextIcon),
               S.divider(),
               orderableDocumentListDeskItem({
                 type: 'newsCategory',
@@ -169,7 +169,7 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
               S.divider(),
               // The content every news article page shares (wording and the "more news" section).
               S.listItem()
-                .title('Article Page Settings')
+                .title('News Article Page Settings')
                 .icon(CogIcon)
                 .child(S.document().schemaType('singleNewsPage').documentId('singleNewsPage')),
             ]),
@@ -214,7 +214,13 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
           S.list()
             .title('Projects')
             .items([
-              S.documentTypeListItem('project').title('Projects').icon(ProjectsIcon),
+              orderableDocumentListDeskItem({
+                type: 'project',
+                title: 'Projects',
+                icon: ProjectsIcon,
+                S,
+                context,
+              }),
               S.divider(),
               orderableDocumentListDeskItem({
                 type: 'projectType',
@@ -243,7 +249,13 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
           S.list()
             .title('Properties')
             .items([
-              S.documentTypeListItem('property').title('Properties').icon(PinIcon),
+              orderableDocumentListDeskItem({
+                type: 'property',
+                title: 'Properties',
+                icon: PinIcon,
+                S,
+                context,
+              }),
               S.divider(),
               S.documentTypeListItem('propertyType').title('Property Types').icon(TagIcon),
               S.documentTypeListItem('resource').title('Resources').icon(DropIcon),

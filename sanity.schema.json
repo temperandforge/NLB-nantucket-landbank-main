@@ -7672,6 +7672,13 @@
           "name": "seo"
         },
         "optional": true
+      },
+      "orderRank": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
       }
     }
   },
@@ -8446,6 +8453,13 @@
         "value": {
           "type": "inline",
           "name": "seo"
+        },
+        "optional": true
+      },
+      "orderRank": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
         },
         "optional": true
       }

@@ -72,7 +72,7 @@ export default function EventsPreviewView({
                 <div className="flex min-w-0 flex-1 flex-col items-start gap-3 md:gap-6">
                   <p className="w-full text-headline-base leading-[1.1] text-on-background">
                     {href ? (
-                      <Link href={href} className="no-underline after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-8 group-hover:underline">
+                      <Link href={href} className="no-underline after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-8 group-hover:underline text-pretty">
                         {event.title}
                       </Link>
                     ) : (

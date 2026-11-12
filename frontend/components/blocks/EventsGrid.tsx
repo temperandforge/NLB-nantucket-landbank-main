@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import BlockImage from '@/components/blocks/BlockImage'
+import {CARD_IMAGE_ZOOM, CARD_TITLE_LINK, CardArrow} from '@/components/cards/cardInteraction'
 import {ArrowRightIcon, ClockIcon, MapPinIcon} from '@/components/icons'
 import {eventParts} from '@/sanity/lib/dates'
 import {eventHref, singleHref} from '@/sanity/lib/utils'
@@ -45,8 +46,9 @@ export default function EventsGrid({block}: BlockProps<'eventsGrid'>) {
                       width={760}
                       sizes="(min-width: 768px) 380px, 100vw"
                       fill
-                      className="absolute inset-0 size-full object-cover"
+                      className={`absolute inset-0 size-full object-cover ${CARD_IMAGE_ZOOM}`}
                     />
+                    {href && <CardArrow />}
                     <div className="absolute left-3 top-3 flex flex-col items-center justify-center gap-1 rounded bg-surface-light px-5 py-3 text-center text-on-surface-light md:px-6">
                       <p className="font-mono text-body-small leading-[1.6] tracking-wide uppercase">{parts.weekday}</p>
                       <p className="text-headline-lg leading-[1.1]">{parts.day}</p>
@@ -56,7 +58,7 @@ export default function EventsGrid({block}: BlockProps<'eventsGrid'>) {
                   <div className="flex min-w-0 flex-col items-start gap-3 md:max-w-[668px]">
                     <p className="w-full text-headline-base leading-[1.1] text-on-background">
                       {href ? (
-                        <Link href={href} className="no-underline after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-8 group-hover:underline">
+                        <Link href={href} className={`${CARD_TITLE_LINK} after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-8 text-pretty`}>
                           {event.title}
                         </Link>
                       ) : (

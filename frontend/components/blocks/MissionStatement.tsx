@@ -18,7 +18,13 @@ export default function MissionStatement({block}: BlockProps<'missionStatement'>
       <div className="mission-statement__lines pointer-events-none absolute inset-0 z-0" aria-hidden="true" />
       <div className="relative z-10 flex w-full flex-col items-center justify-center tf-max-w">
         <div className="flex w-full max-w-[62.375rem] flex-col items-center gap-16 md:gap-20">
-          {block.eyebrow && <Tag label={block.eyebrow} />}
+          {block.eyebrow && (
+            // The page-enter animation targets headings, paragraphs, images and `data-part`; a Tag is
+            // only divs and a span, so without this the badge would sit there while the heading animates.
+            <div data-part="" className="flex">
+              <Tag label={block.eyebrow} />
+            </div>
+          )}
           {block.heading && (
             <h2 className="w-full text-center text-headline-xl text-on-background text-pretty">
               {block.heading}

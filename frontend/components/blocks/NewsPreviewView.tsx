@@ -6,6 +6,8 @@ import {ArrowDownRightIcon} from '@/components/icons'
 import {articleHref, singleHref} from '@/sanity/lib/utils'
 import {formatDate} from '@/sanity/lib/dates'
 
+import {CARD_GROUP, CARD_IMAGE_ZOOM, CARD_TITLE_LINK, CardArrow} from '@/components/cards/cardInteraction'
+
 import BlockImage from './BlockImage'
 import {BlockProps} from './types'
 
@@ -25,7 +27,7 @@ function Tile({
 }) {
   // `data-part`: a tile is one unit for the page-enter animation (see motion.css), not its pieces.
   return href ? (
-    <Link href={href} className={className} data-part="">
+    <Link href={href} className={`${CARD_GROUP} ${className}`} data-part="">
       {children}
     </Link>
   ) : (
@@ -57,7 +59,7 @@ export default function NewsPreviewView({
   return (
     <section className="overflow-x-clip bg-background tf-px py-s6">
       <div className="flex w-full flex-col items-start gap-10 tf-max-w">
-        {heading && <h2 className="w-full text-headline-xl text-on-background">{heading}</h2>}
+        {heading && <h2 className="w-full text-headline-xl text-on-background text-balance">{heading}</h2>}
         <div className="grid w-full grid-cols-1 border-t border-l border-border-light md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => {
             // The article's own link wins (an external story); otherwise its page.
@@ -80,11 +82,12 @@ export default function NewsPreviewView({
                         width={600}
                         sizes="(min-width: 768px) 33vw, 100vw"
                         fill
-                        className="size-full object-cover"
+                        className={`size-full object-cover ${CARD_IMAGE_ZOOM}`}
                       />
+                      <CardArrow />
                     </div>
                   )}
-                  <p className="w-full text-headline-base text-on-background">{article.title}</p>
+                  <p className={`w-full text-headline-base text-on-background text-pretty ${CARD_TITLE_LINK}`}>{article.title}</p>
                 </div>
                 {(category || date) && (
                   <div className="flex shrink-0 items-center gap-3">
@@ -123,13 +126,16 @@ export default function NewsPreviewView({
                   {cta.heading}
                 </p>
               )}
+              {/* The label wraps when long: min-w-0 lets it shrink beside the arrow, and a text underline
+                  follows every line, which a full-width rule under the box could not. */}
               <div className="relative z-10 flex w-full items-end justify-between gap-4">
                 {cta.label && (
-                  <p className="relative whitespace-nowrap font-mono text-body-small leading-[1.6] tracking-wide text-on-accent-secondary uppercase after:absolute after:top-full after:left-0 after:h-px after:w-full after:bg-on-accent-secondary after:content-['']">
+                  <p className="min-w-0 font-mono text-body-small leading-[1.6] tracking-wide text-on-accent-secondary uppercase text-pretty underline decoration-1 underline-offset-[6px] transition-[text-underline-offset,text-decoration-thickness] duration-300 ease-out [overflow-wrap:anywhere] group-hover:decoration-2 group-hover:underline-offset-8 group-focus-visible:decoration-2 group-focus-visible:underline-offset-8 motion-reduce:transition-none">
                     {cta.label}
                   </p>
                 )}
-                <ArrowDownRightIcon className="h-[4.27rem] w-[4.35rem] shrink-0 text-on-accent-secondary" />
+                {/* The arrow leans further in the direction it points; transform only, so nothing reflows. */}
+                <ArrowDownRightIcon className="h-[4.27rem] w-[4.35rem] shrink-0 text-on-accent-secondary transition-transform duration-300 ease-out group-hover:translate-x-2 group-hover:translate-y-2 group-focus-visible:translate-x-2 group-focus-visible:translate-y-2 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 motion-reduce:group-hover:translate-y-0 motion-reduce:group-focus-visible:translate-x-0 motion-reduce:group-focus-visible:translate-y-0" />
               </div>
             </Tile>
           )}
