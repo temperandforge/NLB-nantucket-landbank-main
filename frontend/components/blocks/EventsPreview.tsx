@@ -5,7 +5,7 @@ import EventsPreviewView from './EventsPreviewView'
 import {BlockProps} from './types'
 
 /** The most events the preview shows, however many the editor asks for. */
-const MAX_EVENTS = 6
+const MAX_EVENTS = 8
 
 export default function EventsPreview({block}: BlockProps<'eventsPreview'>) {
   const href = realHref(block.button?.link ? linkResolver(block.button.link as DereferencedLink) : null)

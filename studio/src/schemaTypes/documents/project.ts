@@ -1,4 +1,5 @@
 import {ProjectsIcon} from '@sanity/icons'
+import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
 import {jumpNavBodyMembers} from '../objects/jumpNavBody'
@@ -80,7 +81,10 @@ export const project = defineType({
         'Optional. Only for a project that lives on another site: its tile and search result go to this address instead of its page. Leave empty to use the page.',
     }),
     seoField(),
+    // Set by dragging in the list (Studio > Projects), not edited here.
+    orderRankField({type: 'project'}),
   ],
+  orderings: [orderRankOrdering],
   preview: {
     select: {title: 'name', subtitle: 'description', media: 'image'},
   },

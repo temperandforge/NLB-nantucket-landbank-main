@@ -1628,7 +1628,7 @@ fetches or Sanity: it loads its own stylesheet and fonts. `/` still 404s when no
 
 ## 23. Drag-and-drop ordering, and the FAQ catch-all category
 
-Staff, commissioners, FAQs, and the FAQ, news, project (`projectType`), department and record
+Staff, commissioners, FAQs, properties, projects, and the FAQ, news, project (`projectType`), department and record
 categories are ordered by dragging in Studio (the Orderable Document List plugin, which stores a
 hidden `orderRank`). Their lists in Studio are the plugin's lists, not the default document lists.
 Queries sort `orderRank asc, _createdAt asc`, so nothing sorts alphabetically and a document with no
@@ -1637,7 +1637,10 @@ rank yet falls to the end, oldest first. Filter tabs built from categories (`cat
 title, so non-draggable taxonomies (property types, resources) still work. The old `order` number is
 gone from the draggable schemas; existing documents were ranked once by
 `studio/scripts/seedOrderRanks.ts` (old `order`, then the name or title they used to sort by, or
-oldest first for FAQs), and the old field is left in the data, unused.
+oldest first for FAQs), and the old field is left in the data, unused. Properties and projects
+(previously `name asc`) are ranked by `studio/scripts/seedPropertyAndProjectOrderRanks.ts`; the map, the
+Properties and Projects archives and a project-category gallery follow the dragged order, while "latest"
+previews stay newest-first.
 
 FAQs with no category are folded into a catch-all category chosen in FAQ Settings (`faqSettings`, a
 singleton under FAQs, field `uncategorisedCategory`) when one is set and published; with none set

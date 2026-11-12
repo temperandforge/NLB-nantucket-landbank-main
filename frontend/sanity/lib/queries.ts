@@ -418,7 +418,7 @@ const pageBuilderFields = /* groq */ `
       "events": *[
         _type == "event" && defined(start)
         && dateTime(coalesce(end, start)) >= dateTime($now)
-      ] | order(start asc) [0...6] {
+      ] | order(start asc) [0...8] {
         _id,
         title,
         "slug": slug.current,
@@ -499,7 +499,7 @@ const pageBuilderFields = /* groq */ `
     },
     _type == "projectGrid" => {
       ...,
-      "projects": *[_type == "project" && defined(slug.current)] | order(name asc) {
+      "projects": *[_type == "project" && defined(slug.current)] | order(orderRank asc, _createdAt asc) {
         _id,
         name,
         image,
@@ -510,7 +510,7 @@ const pageBuilderFields = /* groq */ `
     },
     _type == "propertyArchive" => {
       ...,
-      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {
+      "properties": *[_type == "property" && defined(slug.current)] | order(orderRank asc, _createdAt asc) {
         _id,
         name,
         "slug": slug.current,
@@ -539,7 +539,7 @@ const pageBuilderFields = /* groq */ `
         source == "projectCategory" => *[
           _type == "project" && defined(slug.current)
           && ^.category._ref in projectTypes[]._ref
-        ] | order(name asc) {
+        ] | order(orderRank asc, _createdAt asc) {
           "_key": _id,
           "_type": "reference",
           "doc": {${galleryDocFields}}
@@ -617,7 +617,7 @@ const pageBuilderFields = /* groq */ `
     },
     _type == "mapPreview" => {
       ...,
-      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {
+      "properties": *[_type == "property" && defined(slug.current)] | order(orderRank asc, _createdAt asc) {
         ${mapPropertyFields}
       },
       "settings": *[_type == "projectSettings" && _id == "projectSettings"][0]{
@@ -626,7 +626,7 @@ const pageBuilderFields = /* groq */ `
     },
     _type == "mapExplorer" => {
       ...,
-      "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {
+      "properties": *[_type == "property" && defined(slug.current)] | order(orderRank asc, _createdAt asc) {
         ${mapPropertyFields}
       },
       "filters": {
@@ -981,7 +981,7 @@ export const morePropertiesQuery = defineQuery(`
 /** What the property page's map shows: every property, as on the Map Preview block. */
 export const propertyMapQuery = defineQuery(`
   {
-    "properties": *[_type == "property" && defined(slug.current)] | order(name asc) {
+    "properties": *[_type == "property" && defined(slug.current)] | order(orderRank asc, _createdAt asc) {
       ${mapPropertyFields}
     },
     "settings": *[_type == "projectSettings" && _id == "projectSettings"][0]{
