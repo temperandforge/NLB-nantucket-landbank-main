@@ -1176,3 +1176,13 @@
     animation: none;
   }
 }
+
+/* Timeline entry description: rich text inside a narrow card, so spacing stays tight. */
+.timeline-description > * + * {
+  margin-top: 0.75rem;
+}
+
+.timeline-description ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}

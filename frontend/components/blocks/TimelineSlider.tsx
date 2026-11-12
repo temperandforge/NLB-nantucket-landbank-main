@@ -3,11 +3,14 @@
 import { useEffect, useRef } from "react";
 import Splide from "@splidejs/splide";
 import "@splidejs/splide/css/core";
+import {PortableText, type PortableTextBlock} from "next-sanity";
+import ResolvedLink from "@/components/ResolvedLink";
 
 export type TimelineEvent = {
   year: string;
   title: string;
-  description: string;
+  /** Rich text; a plain string is a pre-migration description and renders as one paragraph. */
+  description: PortableTextBlock[] | string | null;
   /** Reproduces the varying connector-line heights from the Figma design
    * (an intentionally organic, non-uniform rhythm). */
   lineLength: number;
@@ -360,17 +363,26 @@ export default function TimelineSlider({ events, className }: TimelineSliderProp
               <li key={`${event.year}-${event.title}`} className="splide__slide">
                 <div className="flex w-full flex-col items-start gap-3">
                   <p className="w-full font-mono text-body-base leading-[1.6] text-on-background">{event.title}</p>
-                  <div className="flex w-full items-start gap-6" style={{ height: `calc(${event.lineLength}px * var(--line-scale) + 130px)` }}>
+                  <div className="flex w-full items-stretch gap-6" style={{ minHeight: `calc(${event.lineLength}px * var(--line-scale) + 130px)` }}>
                     {/* Figma: 1px stroke, dashed 3px on / 3px off. Drawn as a gradient so the pattern is
                         exact instead of whatever the browser picks for a dashed border. */}
-                    <div className="h-full w-px shrink-0 bg-[repeating-linear-gradient(to_bottom,var(--color-on-background-subtle)_0_3px,transparent_3px_6px)]" />
-                    <div className="flex h-full flex-1 flex-col items-start justify-between">
+                    <div className="w-px shrink-0 self-stretch bg-[repeating-linear-gradient(to_bottom,var(--color-on-background-subtle)_0_3px,transparent_3px_6px)]" />
+                    <div className="flex flex-1 flex-col items-start justify-between gap-6">
                       <p className="w-full font-serif text-headline-2xl font-normal leading-[1.05] text-on-background">
                         {event.year}
                       </p>
-                      <p className="w-full font-sans text-body-base leading-[1.6] text-on-background">
-                        {event.description}
-                      </p>
+                      {event.description && (
+                        <div className="timeline-description w-full font-sans text-body-base leading-[1.6] text-on-background">
+                          {typeof event.description === "string" ? (
+                            <p>{event.description}</p>
+                          ) : (
+                            <PortableText
+                              value={event.description}
+                              components={{marks: {link: ({children, value: link}) => <ResolvedLink link={link}>{children}</ResolvedLink>}}}
+                            />
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

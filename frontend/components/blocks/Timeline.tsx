@@ -11,7 +11,7 @@ export default function Timeline({block}: BlockProps<'timeline'>) {
   const events: TimelineEvent[] = (block.entries ?? []).map((entry, index) => ({
     year: entry.year,
     title: entry.title,
-    description: entry.description ?? '',
+    description: (entry.description ?? null) as TimelineEvent['description'],
     lineLength: LINE_LENGTHS[index % LINE_LENGTHS.length],
   }))
   if (events.length === 0) return null

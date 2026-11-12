@@ -309,6 +309,13 @@ export type VideoEmbed = {
   _type: 'videoEmbed'
   url: string
   title: string
+  poster?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
   caption?: string
 }
 
@@ -705,6 +712,8 @@ export type BlockContentWithForm = Array<
       crop?: SanityImageCrop
       alt?: string
       caption?: string
+      size?: 'small' | 'medium' | 'large' | 'full'
+      align?: 'left' | 'center' | 'right'
       _type: 'image'
       _key: string
     }
@@ -764,6 +773,8 @@ export type BlockContent = Array<
       crop?: SanityImageCrop
       alt?: string
       caption?: string
+      size?: 'small' | 'medium' | 'large' | 'full'
+      align?: 'left' | 'center' | 'right'
       _type: 'image'
       _key: string
     }
@@ -1055,7 +1066,7 @@ export type Article = {
   title: string
   slug: Slug
   date: string
-  image: {
+  image?: {
     asset?: SanityImageAssetReference
     media?: unknown
     hotspot?: SanityImageHotspot
@@ -1092,6 +1103,8 @@ export type Article = {
         crop?: SanityImageCrop
         alt?: string
         caption?: string
+        size?: 'small' | 'medium' | 'large' | 'full'
+        align?: 'left' | 'center' | 'right'
         _type: 'image'
         _key: string
       }
@@ -1281,6 +1294,8 @@ export type Property = {
         crop?: SanityImageCrop
         alt?: string
         caption?: string
+        size?: 'small' | 'medium' | 'large' | 'full'
+        align?: 'left' | 'center' | 'right'
         _type: 'image'
         _key: string
       }
@@ -1365,8 +1380,17 @@ export type SingleNewsPage = {
   _updatedAt: string
   _rev: string
   eyebrow?: string
+  archiveLink?: Link
   publishedLabel?: string
   shareLabel?: string
+  fallbackImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
   moreNews?: NewsPreview
 }
 

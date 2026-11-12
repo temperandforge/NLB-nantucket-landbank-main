@@ -32,7 +32,25 @@ export const timeline = defineBlock({
               type: 'string',
               validation: (rule) => rule.required(),
             }),
-            defineField({name: 'description', title: 'Description', type: 'text', rows: 3}),
+            defineField({
+              name: 'description',
+              title: 'Description',
+              type: 'array',
+              of: [
+                defineArrayMember({
+                  type: 'block',
+                  styles: [{title: 'Normal', value: 'normal'}],
+                  lists: [{title: 'Bullet', value: 'bullet'}],
+                  marks: {
+                    decorators: [
+                      {title: 'Bold', value: 'strong'},
+                      {title: 'Italic', value: 'em'},
+                    ],
+                    annotations: [{type: 'link'}],
+                  },
+                }),
+              ],
+            }),
           ],
           preview: {
             select: {title: 'title', subtitle: 'year'},
@@ -42,7 +60,13 @@ export const timeline = defineBlock({
     }),
   ],
   preview: {
-    select: {entries: 'entries', first: 'entries.0.title'},
-    prepare: ({entries, first}) => ({title: first || 'Untitled', subtitle: `Timeline · ${entries?.length ?? 0} entries`}),
+    select: {entries: 'entries'},
+    prepare: ({entries}) => {
+      const count = Array.isArray(entries) ? entries.length : 0
+      return {
+        title: entries?.[0]?.title || 'Timeline',
+        subtitle: `Timeline · ${count} ${count === 1 ? 'entry' : 'entries'}`,
+      }
+    },
   },
 })

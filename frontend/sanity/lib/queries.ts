@@ -348,6 +348,21 @@ const pageBuilderFields = /* groq */ `
         ${articleCardFields}
       }
     },
+    _type == "timeline" => {
+      ...,
+      entries[]{
+        ...,
+        // A description not yet migrated from plain text is still a string; indexing it yields null,
+        // so it passes through unchanged and the renderer shows it as one paragraph.
+        "description": select(
+          defined(description[0]) => description[]{
+            ...,
+            ${markDefsFields}
+          },
+          description
+        )
+      }
+    },
     _type == "newsArchive" => {
       ...,
       "articles": *[_type == "article" && defined(slug.current)] | order(date desc) {
