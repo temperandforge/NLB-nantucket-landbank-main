@@ -224,12 +224,12 @@ export default function FormRenderer({
             // The footer is dark green: red on it is only 2.0:1, so the error is an inset red line inside the
             // field's own 1px cream edge. Red then sits on cream on both sides (3.6:1) and the field
             // keeps its size. Red text on the green would not pass either, so the message stays light.
-            className="h-12 min-w-0 flex-1 rounded-[4px] border border-transparent bg-warm-neutral-50 px-gap-sm font-secondary text-body-base text-lowlands-500 placeholder:text-lowlands-500/70 focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-goldenrod-500 aria-[invalid=true]:shadow-[inset_0_0_0_2px_var(--color-error)]"
+            className="h-12 min-w-0 flex-1 rounded-[4px] border border-transparent bg-warm-neutral-50 px-gap-sm transition-colors duration-200 hover:border-goldenrod-500 hover:bg-background focus:bg-warm-neutral-50 font-secondary text-body-base text-lowlands-500 placeholder:text-lowlands-500/70 focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-goldenrod-500 aria-[invalid=true]:shadow-[inset_0_0_0_2px_var(--color-error)]"
           />
           <button
             type="submit"
             disabled={status === 'submitting'}
-            className="flex size-12 shrink-0 items-center justify-center rounded-[4px] bg-goldenrod-500 text-lowlands-500 disabled:opacity-60"
+            className="icon-button icon-button-secondary shrink-0 text-lowlands-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-warm-neutral-50"
           >
             <span className="sr-only">{status === 'submitting' ? 'Sending' : form.submitLabel || 'Subscribe'}</span>
             <ArrowForwardIcon className="size-[24px]" />

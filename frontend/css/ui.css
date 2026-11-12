@@ -84,6 +84,33 @@
   font-size: var(--text-body-base);
   line-height: 1.6;
   letter-spacing: var(--tracking-normal);
+  isolation: isolate;
+  transition: color 200ms ease;
+
+  /* The hover tint is a layer that fades in. It sits under the content (z-index -1 inside this
+     element's own stacking context) and a background-image gradient could not be transitioned. */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--button-hover-overlay, transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity 200ms ease,
+      background-color 100ms ease;
+  }
+
+  &:hover:not(:disabled)::before {
+    opacity: 1;
+  }
+
+  &:active:not(:disabled)::before {
+    background-color: var(--button-press-overlay, var(--button-hover-overlay));
+    opacity: 1;
+  }
+
   cursor: pointer;
 
   &:disabled {
@@ -96,27 +123,24 @@
   background-color: var(--color-primary);
   color: var(--color-on-primary);
 
-  &:hover:not(:disabled) {
-    background-image: linear-gradient(var(--ui-hover-darker), var(--ui-hover-darker));
-  }
+  --button-hover-overlay: var(--ui-hover-darker);
+  --button-press-overlay: transparent;
 }
 
 @utility button-secondary {
   background-color: var(--color-secondary);
   color: var(--color-on-secondary);
 
-  &:hover:not(:disabled) {
-    background-image: linear-gradient(var(--ui-hover-lighter), var(--ui-hover-lighter));
-  }
+  --button-hover-overlay: var(--ui-hover-lighter);
+  --button-press-overlay: transparent;
 }
 
 @utility button-ghost {
   background-color: transparent;
   color: var(--color-on-primary);
 
-  &:hover:not(:disabled) {
-    background-image: linear-gradient(var(--ui-hover-darker), var(--ui-hover-darker));
-  }
+  --button-hover-overlay: var(--ui-hover-darker);
+  --button-press-overlay: var(--color-primary);
 }
 
 @utility icon-button {
@@ -127,6 +151,33 @@
   width: 3rem;
   height: 3rem;
   border-radius: 4px;
+  isolation: isolate;
+  transition: color 200ms ease;
+
+  /* The hover tint is a layer that fades in. It sits under the content (z-index -1 inside this
+     element's own stacking context) and a background-image gradient could not be transitioned. */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--button-hover-overlay, transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity 200ms ease,
+      background-color 100ms ease;
+  }
+
+  &:hover:not(:disabled)::before {
+    opacity: 1;
+  }
+
+  &:active:not(:disabled)::before {
+    background-color: var(--button-press-overlay, var(--button-hover-overlay));
+    opacity: 1;
+  }
+
   cursor: pointer;
 
   &:disabled {
@@ -139,8 +190,10 @@
   background-color: var(--color-primary);
   color: var(--color-on-primary);
 
+  --button-hover-overlay: var(--ui-hover-darker);
+  --button-press-overlay: transparent;
+
   &:hover:not(:disabled) {
-    background-image: linear-gradient(var(--ui-hover-darker), var(--ui-hover-darker));
     color: var(--color-accent-secondary);
   }
 }
@@ -149,18 +202,16 @@
   background-color: var(--color-secondary);
   color: var(--color-on-secondary);
 
-  &:hover:not(:disabled) {
-    background-image: linear-gradient(var(--ui-hover-lighter), var(--ui-hover-lighter));
-  }
+  --button-hover-overlay: var(--ui-hover-lighter);
+  --button-press-overlay: transparent;
 }
 
 @utility icon-button-ghost {
   background-color: transparent;
   color: var(--color-on-primary);
 
-  &:hover:not(:disabled) {
-    background-image: linear-gradient(var(--ui-hover-darker), var(--ui-hover-darker));
-  }
+  --button-hover-overlay: var(--ui-hover-darker);
+  --button-press-overlay: var(--color-primary);
 }
 
 @utility link-button {
@@ -1180,6 +1231,11 @@
 /* Timeline entry description: rich text inside a narrow card, so spacing stays tight. */
 .timeline-description > * + * {
   margin-top: 0.75rem;
+}
+
+.timeline-description a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 
 .timeline-description ul {
