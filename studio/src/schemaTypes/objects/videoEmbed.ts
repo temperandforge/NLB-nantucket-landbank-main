@@ -40,6 +40,14 @@ export const videoEmbed = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'poster',
+      title: 'Poster image',
+      type: 'image',
+      options: {hotspot: true},
+      description:
+        'Optional. Shown behind the play button until the video is played. Served from this site, so nothing is requested from YouTube or Vimeo until a visitor presses play. Without one the button sits on a plain background.',
+    }),
+    defineField({
       name: 'caption',
       title: 'Caption',
       type: 'string',
@@ -47,7 +55,7 @@ export const videoEmbed = defineType({
     }),
   ],
   preview: {
-    select: {title: 'title', subtitle: 'url'},
-    prepare: ({title, subtitle}) => ({title: title || 'Video', subtitle}),
+    select: {title: 'title', subtitle: 'url', media: 'poster'},
+    prepare: ({title, subtitle, media}) => ({title: title || 'Video', subtitle, media}),
   },
 })

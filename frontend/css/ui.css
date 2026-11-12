@@ -568,6 +568,61 @@
   text-wrap: pretty;
 }
 
+/* Image in rich text. Full width on a phone; from 640px it takes its chosen share of the column and
+   sits centred, or floats left or right so the text wraps around it. Floats are contained by the
+   rich-text wrapper and headings clear them. */
+.rich-text-article,
+.rich-text-project,
+.rich-text-basic {
+  display: flow-root;
+}
+
+.rich-text-article > :is(h2, h3, h4, h5, h6),
+.rich-text-project > :is(h2, h3, h4, h5, h6) {
+  clear: both;
+}
+
+.body-image {
+  margin-block: 2rem;
+  /* --natural is the image's own pixel width: the figure never grows past it. */
+  max-width: var(--natural, 100%);
+  margin-inline: auto;
+}
+
+/* A tall image (a flyer, a portrait) at full width would run past the screen. Cap its height and
+   let the width follow, centred in its box; a landscape image is unaffected. */
+.body-image img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: min(80vh, 800px);
+  margin-inline: auto;
+}
+
+@media (min-width: 640px) {
+  .body-image[data-size='small'] { width: min(33.333%, var(--natural, 33.333%)); }
+  .body-image[data-size='medium'] { width: min(50%, var(--natural, 50%)); }
+  .body-image[data-size='large'] { width: min(75%, var(--natural, 75%)); }
+  .body-image[data-size='full'] { width: min(100%, var(--natural, 100%)); }
+
+  .body-image[data-align='center'] { margin-inline: auto; }
+
+  .rich-text-article > .body-image[data-align='left'],
+  .rich-text-project > .body-image[data-align='left'],
+  .rich-text-basic > .body-image[data-align='left'] {
+    float: left;
+    margin: 0.5rem 1.5rem 1rem 0;
+  }
+
+  .rich-text-article > .body-image[data-align='right'],
+  .rich-text-project > .body-image[data-align='right'],
+  .rich-text-basic > .body-image[data-align='right'] {
+    float: right;
+    margin: 0.5rem 0 1rem 1.5rem;
+  }
+}
+
 /* Image gallery: a figure holding a grid of figures, so the gallery caption sits under the grid.
    One column on a phone, two from 640px. An odd last image takes the full row so the grid never
    ends on a hole. */
@@ -928,6 +983,7 @@
 }
 
 .video-embed {
+  container-type: inline-size;
   aspect-ratio: 16 / 9;
   width: 100%;
   overflow: hidden;
@@ -964,10 +1020,49 @@
   outline-offset: -6px;
 }
 
+/* With a poster the picture fills the box, a dark wash keeps the title legible, and the content sits
+   above it in light text. */
+.video-embed__play {
+  position: relative;
+}
+
+.video-embed__poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-embed__play--poster::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgb(0 0 0 / 0.65), rgb(0 0 0 / 0.15));
+  content: '';
+}
+
+.video-embed__play--poster:hover {
+  background: transparent;
+}
+
+.video-embed__play--poster > :not(.video-embed__poster) {
+  position: relative;
+  z-index: 1;
+}
+
+.video-embed__play--poster {
+  color: #fff;
+}
+
 .video-embed__icon {
   width: 4rem;
   height: 4rem;
-  padding: 1rem 0.75rem 1rem 1.25rem;
+  /* In the column flex of the play button a short video box squashed the icon into a pill, which pushed the
+     arrow off-centre; it keeps its size instead. */
+  flex: none;
+  /* Even padding: the triangle in the icon's 24-unit box already sits right of centre (its centroid is
+     near the middle, its bounding box a little right), so extra left padding pushed it off-centre. */
+  padding: 1rem;
   border-radius: 9999px;
   background: var(--color-accent-primary);
   color: var(--color-on-accent-primary);
@@ -981,6 +1076,29 @@
   letter-spacing: -0.02em;
   text-align: center;
   text-wrap: balance;
+}
+
+/* A narrow video box (a phone, or a floated column) is only about 130px tall: a smaller icon and a
+   two-line title keep both inside it. */
+@container (max-width: 400px) {
+  .video-embed__play {
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .video-embed__icon {
+    width: 3rem;
+    height: 3rem;
+    padding: 0.75rem;
+  }
+
+  .video-embed__title {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 1.125rem;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
 }
 
 .article-curve {

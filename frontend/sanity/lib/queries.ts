@@ -236,7 +236,8 @@ const articleCardFields = /* groq */ `
   title,
   "slug": slug.current,
   date,
-  image,
+  // The article's own image, else the Article Page Settings fallback (null when neither is set).
+  "image": coalesce(select(defined(image.asset) => image), *[_type == "singleNewsPage" && _id == "singleNewsPage"][0].fallbackImage),
   externalUrl,
   "categories": categories[]->{"slug": slug.current, title, orderRank}
 `
@@ -749,7 +750,8 @@ export const articleQuery = defineQuery(`
     title,
     "slug": slug.current,
     date,
-    image,
+    // Own image, else the Article Page Settings fallback: this is what the social preview uses.
+    "image": coalesce(select(defined(image.asset) => image), *[_type == "singleNewsPage" && _id == "singleNewsPage"][0].fallbackImage),
     seo{title, description, noIndex, image},
     "categories": categories[]->{"slug": slug.current, title, orderRank},
     // The article's own category documents, to find related articles.
@@ -792,6 +794,10 @@ export const moreNewsQuery = defineQuery(`
 export const singleNewsPageQuery = defineQuery(`
   *[_type == "singleNewsPage" && _id == "singleNewsPage"][0]{
     eyebrow,
+    archiveLink{
+      ...,
+      ${linkReference}
+    },
     publishedLabel,
     shareLabel,
     moreNews{

@@ -20,6 +20,8 @@ export const newsPreview = defineBlock({
       type: 'reference',
       to: [{type: 'newsCategory'}],
       description: 'Optional. Show only articles in this category. Leave empty for the latest of all news.',
+      // On an article page the section follows the article's own categories, so a fixed one makes no sense.
+      hidden: ({document}) => document?._type === 'singleNewsPage',
     }),
     defineField({
       name: 'count',

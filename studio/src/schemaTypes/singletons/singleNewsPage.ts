@@ -1,6 +1,8 @@
 import {CogIcon} from '@sanity/icons'
 import {defineField, defineType} from 'sanity'
 
+import {imageWithAltField} from '../objects/blockFields'
+
 /**
  * Single News Page (singleton, fixed id `singleNewsPage`): the content every news article page
  * shares, as opposed to the content of one article: the wording around it and the "more news"
@@ -11,7 +13,7 @@ import {defineField, defineType} from 'sanity'
  */
 export const singleNewsPage = defineType({
   name: 'singleNewsPage',
-  title: 'Article Page Settings',
+  title: 'News Article Page Settings',
   type: 'document',
   icon: CogIcon,
   fields: [
@@ -20,6 +22,13 @@ export const singleNewsPage = defineType({
       title: 'Label above the title',
       type: 'string',
       description: 'The small label at the top of an article. Default: "Nantucket News".',
+    }),
+    defineField({
+      name: 'archiveLink',
+      title: 'Label links to',
+      type: 'link',
+      description:
+        'The News page the label links back to. With no link (or one that does not resolve) the label is plain text.',
     }),
     defineField({
       name: 'publishedLabel',
@@ -32,6 +41,12 @@ export const singleNewsPage = defineType({
       title: 'Share label',
       type: 'string',
       description: 'The heading of the share buttons. Default: "Share".',
+    }),
+    imageWithAltField({
+      name: 'fallbackImage',
+      title: 'Fallback image',
+      description:
+        'Shown on the news tile and in the social preview of an article that has no image of its own. Leave empty to show no image for those articles.',
     }),
     defineField({
       name: 'moreNews',
@@ -48,5 +63,5 @@ export const singleNewsPage = defineType({
       },
     }),
   ],
-  preview: {prepare: () => ({title: 'Article Page Settings'})},
+  preview: {prepare: () => ({title: 'News Article Page Settings'})},
 })

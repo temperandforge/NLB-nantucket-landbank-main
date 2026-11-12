@@ -72,15 +72,18 @@ export default function NewsPreviewView({
                 className="flex w-full min-w-0 flex-col items-start gap-8 overflow-clip border-r border-b border-border-light bg-background p-8"
               >
                 <div className="flex w-full flex-col items-start gap-5">
-                  <div className="relative h-[16.5rem] w-full shrink-0 overflow-clip">
-                    <BlockImage
-                      image={article.image}
-                      width={600}
-                      sizes="(min-width: 768px) 33vw, 100vw"
-                      fill
-                      className="size-full object-cover"
-                    />
-                  </div>
+                  {/* An article with no image and no fallback has no picture area at all, not an empty box. */}
+                  {article.image?.asset && (
+                    <div className="relative h-[16.5rem] w-full shrink-0 overflow-clip">
+                      <BlockImage
+                        image={article.image}
+                        width={600}
+                        sizes="(min-width: 768px) 33vw, 100vw"
+                        fill
+                        className="size-full object-cover"
+                      />
+                    </div>
+                  )}
                   <p className="w-full text-headline-base text-on-background">{article.title}</p>
                 </div>
                 {(category || date) && (

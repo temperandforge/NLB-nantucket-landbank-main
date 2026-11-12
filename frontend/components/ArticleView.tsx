@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type {PortableTextBlock} from 'next-sanity'
 
 import Cascade from '@/components/Cascade'
@@ -17,12 +18,15 @@ export default function ArticleView({
   eyebrow = 'Nantucket News',
   publishedLabel = 'Published:',
   shareLabel = 'Share',
+  archiveHref = null,
 }: {
   article: NonNullable<ArticleQueryResult>
   /** The wording below comes from the Single News Page settings; these are the design's own defaults. */
   eyebrow?: string
   publishedLabel?: string
   shareLabel?: string
+  /** Where the eyebrow links back to (the News page): null renders it as plain text. */
+  archiveHref?: string | null
 }) {
   const categories = (article.categories ?? []).flatMap((c) => (c?.title ? [{key: c.slug ?? c.title, label: c.title}] : []))
   const date = formatDate(article.date)
@@ -35,7 +39,13 @@ export default function ArticleView({
       />
       <div className="relative z-10 flex w-full max-w-[820px] flex-col items-start gap-16">
         <p className="load-in whitespace-nowrap font-mono text-body-small leading-[1.6] tracking-wide text-on-background uppercase">
-          {eyebrow}
+          {archiveHref ? (
+            <Link href={archiveHref} className="no-underline hover:underline">
+              {eyebrow}
+            </Link>
+          ) : (
+            eyebrow
+          )}
         </p>
         <div className="flex w-full flex-col items-start gap-10">
           <div className="flex w-full flex-col items-start gap-3">

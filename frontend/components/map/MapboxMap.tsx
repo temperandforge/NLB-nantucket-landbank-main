@@ -408,10 +408,21 @@ export function MapboxMap({
             : null)
         if (!position) continue
 
-        const marker = new mapboxgl.Marker().setLngLat(position).addTo(map)
+        // The Figma location pin (public/map/location-pin.svg). Its 43px box has the tip at
+        // y=38.5, so the element is centred on the point and shifted up 17px to put the tip on it.
+        const pin = document.createElement('img')
+        pin.src = '/map/location-pin.svg'
+        pin.alt = ''
+        pin.width = 43
+        pin.height = 43
+        pin.style.display = 'block'
+        pin.style.cursor = 'pointer'
+        const marker = new mapboxgl.Marker({element: pin, anchor: 'center', offset: [0, -17]})
+          .setLngLat(position)
+          .addTo(map)
         if (!project.disablePopup) {
           marker.setPopup(
-            createPopup(map, {offset: 24}).setHTML(buildPopupHtml(project, focusSlug)),
+            createPopup(map, {offset: 36}).setHTML(buildPopupHtml(project, focusSlug)),
           )
         }
         markersRef.current.push(marker)

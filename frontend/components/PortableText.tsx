@@ -121,19 +121,29 @@ export default function CustomPortableText({
         if (!value?.asset?._ref) {
           return null
         }
-        const isArticle = variant === 'article'
+        // Size and alignment are the editor's choice; unset (older images) means full width, centred.
+        const size = ({small: 'small', medium: 'medium', large: 'large'} as const)[stegaClean(value.size) as 'small'] ?? 'full'
+        const align = ({left: 'left', right: 'right'} as const)[stegaClean(value.align) as 'left'] ?? 'center'
+        const widths = {small: 560, medium: 840, large: 1240, full: 1640}
+        // The asset id ends in its pixel size (image-<hash>-<w>x<h>-<ext>). Never ask for, or show,
+        // more than that: a small image stays small instead of being stretched to the column.
+        const natural = Number(value.asset._ref.match(/-(\d+)x\d+-[a-z]+$/i)?.[1]) || undefined
+        const width = natural ? Math.min(widths[size], natural) : widths[size]
         return (
-          <figure className={isArticle ? '' : 'my-8'}>
+          <figure
+            className="body-image"
+            data-size={size}
+            data-align={align}
+            style={natural ? ({'--natural': `${natural}px`} as React.CSSProperties) : undefined}
+          >
             <Image
               id={value.asset._ref}
               alt={value.alt || ''}
-              width={isArticle ? 1640 : 672}
-              sizes={isArticle ? '(min-width: 820px) 820px, 100vw' : undefined}
+              width={width}
+              sizes={`(min-width: 820px) ${{small: 273, medium: 410, large: 615, full: 820}[size]}px, 100vw`}
               crop={value.crop}
-              // The article crops every image to a strip, so honour the editor's focal point.
-              hotspot={isArticle ? value.hotspot : undefined}
-              mode="cover"
-              className={isArticle ? 'h-[362px] w-full rounded object-cover' : 'rounded-sm'}
+              // Shown whole, at its own proportions: no cropping to a fixed shape.
+              className="rounded"
             />
             {value.caption && <figcaption className="figure-caption">{value.caption}</figcaption>}
           </figure>
@@ -236,7 +246,7 @@ export default function CustomPortableText({
         if (!video || !value?.title) return null
         return (
           <figure className="video-figure">
-            <VideoEmbed src={video.src} title={value.title} />
+            <VideoEmbed src={video.src} title={value.title} poster={value.poster?.asset?._ref ? {id: value.poster.asset._ref, crop: value.poster.crop, hotspot: value.poster.hotspot} : undefined} />
             {value.caption && <figcaption className="figure-caption">{value.caption}</figcaption>}
           </figure>
         )

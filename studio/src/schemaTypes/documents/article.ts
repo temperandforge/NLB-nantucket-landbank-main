@@ -35,7 +35,10 @@ export const article = defineType({
       initialValue: () => new Date().toISOString().slice(0, 10),
       validation: (rule) => rule.required(),
     }),
-    imageWithAltField({required: true}),
+    imageWithAltField({
+      description:
+        'Optional. The news tile and the social preview use it. Without one they use the fallback image in Article Page Settings.',
+    }),
     defineField({
       name: 'body',
       title: 'Body',
@@ -60,9 +63,25 @@ export const article = defineType({
     }),
     seoField(),
   ],
-  orderings: [{title: 'Date, newest first', name: 'dateDesc', by: [{field: 'date', direction: 'desc'}]}],
+  orderings: [
+    {title: 'Date, newest first', name: 'dateDesc', by: [{field: 'date', direction: 'desc'}]},
+    {title: 'Title, A to Z', name: 'titleAsc', by: [{field: 'title', direction: 'asc'}]},
+    {title: 'Title, Z to A', name: 'titleDesc', by: [{field: 'title', direction: 'desc'}]},
+  ],
   preview: {
-    select: {title: 'title', subtitle: 'date', media: 'image'},
-    prepare: ({title, subtitle, media}) => ({title: title || 'Untitled', subtitle, media}),
+    // Preview paths, not GROQ: a reference is dereferenced with dots. Four is more than any article has.
+    select: {
+      title: 'title',
+      media: 'image',
+      category0: 'categories.0.title',
+      category1: 'categories.1.title',
+      category2: 'categories.2.title',
+      category3: 'categories.3.title',
+    },
+    prepare: ({title, media, category0, category1, category2, category3}) => ({
+      title: title || 'Untitled',
+      subtitle: [category0, category1, category2, category3].filter(Boolean).join(', ') || 'No categories',
+      media,
+    }),
   },
 })

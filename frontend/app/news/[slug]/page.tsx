@@ -78,6 +78,10 @@ export default async function NewsArticlePage(props: PageProps<'/news/[slug]'>) 
     moreSettings?.ctaLink ? linkResolver(moreSettings.ctaLink as DereferencedLink) : null,
   )
 
+  const archiveHref = realHref(
+    settings?.archiveLink ? linkResolver(settings.archiveLink as DereferencedLink) : null,
+  )
+
   const defaults = await getSeoDefaults()
   const description = article.body?.length
     ? toPlainText(article.body as PortableTextBlock[]).slice(0, 160)
@@ -103,6 +107,7 @@ export default async function NewsArticlePage(props: PageProps<'/news/[slug]'>) 
           eyebrow={settings?.eyebrow || undefined}
           publishedLabel={settings?.publishedLabel || undefined}
           shareLabel={settings?.shareLabel || undefined}
+          archiveHref={archiveHref}
         />
         {showMore && (
           <NewsPreviewView

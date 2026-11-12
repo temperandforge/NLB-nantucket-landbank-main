@@ -1,6 +1,6 @@
 import {defineArrayMember, defineType, defineField} from 'sanity'
 import type {Link} from '../../../sanity.types'
-import {altTextField, captionField} from './blockFields'
+import {altTextField, captionField, imageAlignField, imageSizeField} from './blockFields'
 
 /**
  * This is the schema definition for the rich text fields used for
@@ -121,7 +121,16 @@ export function blockContentMembers({
       options: {
         hotspot: true,
       },
-      fields: [altTextField(), captionField()],
+      fields: [altTextField(), captionField(), imageSizeField(), imageAlignField()],
+      // Without this the editor titles every body image "Untitled". Caption first, then the alt text.
+      preview: {
+        select: {caption: 'caption', alt: 'alt', size: 'size', align: 'align', media: 'asset'},
+        prepare: ({caption, alt, size, align, media}: Record<string, any>) => ({
+          title: caption || alt || 'Image',
+          subtitle: [size, align].filter(Boolean).join(', ') || undefined,
+          media,
+        }),
+      },
     }),
     defineArrayMember({type: 'anchorLinks'}),
     ...(pullquote ? [defineArrayMember({type: 'pullquote'})] : []),

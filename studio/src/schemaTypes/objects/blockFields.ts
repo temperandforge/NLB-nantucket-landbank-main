@@ -35,6 +35,45 @@ export const captionField = () =>
     description: 'Optional. Shown under the image, e.g. a credit or what the photo shows.',
   })
 
+/** How wide an image is in rich text, as a share of the text column. Phones always show it full width. */
+export const imageSizeField = () =>
+  defineField({
+    name: 'size',
+    title: 'Size',
+    type: 'string',
+    description: 'How wide the image is in the text. On a phone it is always full width.',
+    options: {
+      layout: 'radio',
+      direction: 'horizontal',
+      list: [
+        {title: 'Small (⅓)', value: 'small'},
+        {title: 'Medium (½)', value: 'medium'},
+        {title: 'Large (¾)', value: 'large'},
+        {title: 'Full width', value: 'full'},
+      ],
+    },
+    initialValue: 'full',
+  })
+
+/** Where an image sits in rich text. Left and right let the text wrap around it. */
+export const imageAlignField = () =>
+  defineField({
+    name: 'align',
+    title: 'Alignment',
+    type: 'string',
+    description: 'Left and right wrap the text around the image (when it is narrower than full width).',
+    options: {
+      layout: 'radio',
+      direction: 'horizontal',
+      list: [
+        {title: 'Left', value: 'left'},
+        {title: 'Centre', value: 'center'},
+        {title: 'Right', value: 'right'},
+      ],
+    },
+    initialValue: 'center',
+  })
+
 /**
  * An image with the alt text stored on the image itself, so it travels with the asset reference
  * in a query. Required where the block makes no sense without it.
@@ -43,10 +82,12 @@ export const imageWithAltField = ({
   name = 'image',
   title = 'Image',
   required = false,
-}: {name?: string; title?: string; required?: boolean} = {}) =>
+  description,
+}: {name?: string; title?: string; required?: boolean; description?: string} = {}) =>
   defineField({
     name,
     title,
+    description,
     type: 'image',
     options: {hotspot: true},
     fields: [altTextField()],
