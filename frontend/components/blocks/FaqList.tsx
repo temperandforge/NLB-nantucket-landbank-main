@@ -32,7 +32,7 @@ export default function FaqList({block}: BlockProps<'faqList'>) {
   if (ungrouped.length === 0 && groups.length === 0) return null
 
   return (
-    <section className="relative flex w-full overflow-clip bg-background tf-px py-24">
+    <section className="relative flex w-full overflow-clip bg-background tf-px py-s6">
       <Image
         src="/images/blocks/decorative-line-faqs.svg"
         alt=""
