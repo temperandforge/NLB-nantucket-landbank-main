@@ -5,6 +5,7 @@ import BlockImage from '@/components/blocks/BlockImage'
 import Tag from '@/components/ui/Tag'
 import {propertyHref, singleHref} from '@/sanity/lib/utils'
 
+import {CARD_IMAGE_ZOOM, CARD_LINK, CARD_TITLE_LINK, CardArrow} from './cardInteraction'
 import type {PropertyDefaultImage, PropertyItem} from './types'
 
 /**
@@ -37,8 +38,9 @@ export default function CardProperty({
         width={900}
         sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
         fill
-        className="absolute inset-0 size-full object-cover"
+        className={`absolute inset-0 size-full object-cover ${CARD_IMAGE_ZOOM}`}
       />
+      <CardArrow />
     </div>
   )
   const card = (
@@ -52,7 +54,7 @@ export default function CardProperty({
         imageBox
       )}
       <div className="flex w-full flex-col items-start gap-3">
-        <p className="w-full break-words text-headline-base leading-[1.1] tracking-normal text-on-background">
+        <p className={`w-full break-words text-headline-base leading-[1.1] tracking-normal text-on-background ${CARD_TITLE_LINK}`}>
           {property.name}
         </p>
         {tags.length > 0 && (
@@ -73,7 +75,7 @@ export default function CardProperty({
   // A property with no slug (unreachable through the queries) is a plain card, never a dead anchor.
   const href = singleHref(property.externalUrl, property.slug, propertyHref)
   return href ? (
-    <Link href={href} className="block w-full">
+    <Link href={href} className={CARD_LINK}>
       {card}
     </Link>
   ) : (

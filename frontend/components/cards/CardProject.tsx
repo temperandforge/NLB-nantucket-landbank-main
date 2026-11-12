@@ -5,6 +5,7 @@ import AnchorLink from '@/components/ui/AnchorLink'
 import Tag from '@/components/ui/Tag'
 import {projectHref, singleHref} from '@/sanity/lib/utils'
 
+import {CARD_IMAGE_ZOOM, CARD_LINK, CARD_TITLE_LINK, CardArrow} from './cardInteraction'
 import type {ProjectItem} from './types'
 
 /**
@@ -26,8 +27,9 @@ export default function CardProject({project, morph = false}: {project: ProjectI
         width={1000}
         sizes="(min-width: 1024px) 50vw, 100vw"
         fill
-        className="absolute inset-0 size-full object-cover"
+        className={`absolute inset-0 size-full object-cover ${CARD_IMAGE_ZOOM}`}
       />
+      <CardArrow />
       {tags.length > 0 && (
         <div className="relative flex flex-wrap items-center gap-1">
           {tags.map((tag) => (
@@ -47,14 +49,14 @@ export default function CardProject({project, morph = false}: {project: ProjectI
       ) : (
         imageBox
       )}
-      <p className="w-full break-words text-headline-sm leading-[1.2] tracking-normal text-on-background">{project.name}</p>
+      <p className={`w-full break-words text-headline-sm leading-[1.2] tracking-normal text-on-background ${CARD_TITLE_LINK}`}>{project.name}</p>
     </div>
   )
   // Every project has a page of its own; a project with no slug (unreachable through the query,
   // which requires one) would be a plain card, never a dead anchor.
   const href = singleHref(project.externalUrl, project.slug, projectHref)
   return href ? (
-    <AnchorLink href={href} className="block w-full">
+    <AnchorLink href={href} className={CARD_LINK}>
       {card}
     </AnchorLink>
   ) : (

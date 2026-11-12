@@ -5,6 +5,7 @@ import {articleHref, singleHref} from '@/sanity/lib/utils'
 
 import Link from 'next/link'
 
+import {CARD_IMAGE_ZOOM, CARD_LINK, CARD_TITLE_LINK, CardArrow} from './cardInteraction'
 import type {NewsItem} from './types'
 
 /** A news article (Figma: image with its categories as tags over the bottom-left, date and title below). */
@@ -22,8 +23,9 @@ export default function CardNews({article}: {article: NewsItem}) {
           width={800}
           sizes="(min-width: 768px) 33vw, 100vw"
           fill
-          className="absolute inset-0 size-full object-cover"
+          className={`absolute inset-0 size-full object-cover ${CARD_IMAGE_ZOOM}`}
         />
+        <CardArrow />
         {tags.length > 0 && (
           <div className="relative flex flex-wrap items-center gap-1">
             {tags.map((tag) => (
@@ -34,14 +36,14 @@ export default function CardNews({article}: {article: NewsItem}) {
       </div>
       <div className="flex w-full flex-col items-start gap-3 text-on-background">
         {date && <p className="font-sans text-body-large leading-[1.6] md:text-body-base md:text-on-background-subtle">{date}</p>}
-        <p className="w-full break-words text-headline-sm leading-[1.2] tracking-normal">{article.title}</p>
+        <p className={`w-full break-words text-headline-sm leading-[1.2] tracking-normal ${CARD_TITLE_LINK}`}>{article.title}</p>
       </div>
     </div>
   )
   // The article's own link wins (an external story); otherwise its page.
   const href = singleHref(article.externalUrl, article.slug, articleHref)
   return href ? (
-    <Link href={href} className="block w-full">
+    <Link href={href} className={CARD_LINK}>
       {card}
     </Link>
   ) : (
