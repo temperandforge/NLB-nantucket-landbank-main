@@ -29,7 +29,17 @@ export default function BasicLeftRightText({block}: BlockProps<'basicLeftRightTe
 
   return (
     <section className="relative w-full overflow-clip bg-background tf-px py-s6">
-      <div className="basic-left-right__lines pointer-events-none absolute inset-0 z-0" aria-hidden="true" />
+      {/* The line art is 1684px wide (Figma 2441:15140), centred behind the section and cropped by
+          it, so the lines run off both edges. The layer is at least that wide and the section's
+          overflow-clip trims it; `cover` on a layer exactly as wide as the section would shrink the
+          whole drawing to fit and stop the lines short of the edges. The lines themselves only span
+          x=88..1633 of the 1684 canvas (92%), so on a viewport wider than ~1540px the 1684px floor
+          leaves them short of the edges; scaling the layer to 115vw keeps them past both edges at
+          any width. */}
+      <div
+        className="basic-left-right__lines pointer-events-none absolute inset-y-0 left-1/2 z-0 w-full min-w-[max(1684px,115vw)] -translate-x-1/2"
+        aria-hidden="true"
+      />
       <div className="relative z-10 flex w-full flex-col gap-20 tf-max-w md:flex-row md:items-start">
         {/* Pinned below the header from md, where the columns sit side by side, so the heading and
             buttons stay in view while a long right column scrolls past (as on the event page). The

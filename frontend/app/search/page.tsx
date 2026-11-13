@@ -89,7 +89,7 @@ export default async function SearchPage(props: SearchPageProps) {
             )}
             {empty && (
               <p className="max-w-[60ch] font-secondary text-body-large leading-[1.6] text-on-background-subtle">
-                Nothing matched every word. Check the spelling, or try fewer or more general words.
+                No results found. Check the spelling, or try fewer or more general words.
               </p>
             )}
           </div>

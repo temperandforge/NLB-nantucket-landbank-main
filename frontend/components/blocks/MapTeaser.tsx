@@ -16,7 +16,7 @@ export default function MapTeaser({block}: BlockProps<'mapTeaser'>) {
   const showButton = Boolean(block.button?.buttonText && buttonHref)
 
   return (
-    <section className="w-full bg-background tf-px py-10">
+    <section className="w-full bg-background tf-px py-s3">
       <div className="tf-max-w flex flex-col lg:flex-row">
         <div className="relative flex min-h-[28rem] flex-1 flex-col justify-between gap-16 overflow-clip bg-accent-primary p-10 lg:h-[620px] lg:min-h-0">
           <div className="map-teaser__lines pointer-events-none absolute inset-0" aria-hidden="true" />

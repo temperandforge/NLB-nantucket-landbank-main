@@ -24,7 +24,7 @@ export default function JumpNavLayout({
 }) {
   return (
     <div className="tf-px w-full">
-      <div className="relative z-10 tf-max-w flex flex-col gap-12 py-12 lg:flex-row lg:justify-between lg:gap-24 lg:py-24">
+      <div className="relative z-10 tf-max-w flex flex-col gap-12 py-s6 lg:flex-row lg:justify-between lg:gap-24">
         <div
           // The column is capped to the visible height (viewport minus the sticky offset, top and
           // bottom breathing room) and the nav scrolls inside it, so every link stays reachable on a

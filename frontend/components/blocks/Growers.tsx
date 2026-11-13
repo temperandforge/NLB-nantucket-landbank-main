@@ -8,7 +8,7 @@ export default function Growers({block}: BlockProps<'growers'>) {
   )
 
   return (
-    <section className="w-full bg-background tf-px py-12 md:py-24">
+    <section className="w-full bg-background tf-px py-s6">
       <div className="tf-max-w flex flex-col items-center gap-12 text-on-background md:gap-24">
         <div className="flex w-full flex-col gap-8 md:flex-row md:justify-between md:gap-10">
           {block.heading && <h2 className="text-headline-xl">{block.heading}</h2>}

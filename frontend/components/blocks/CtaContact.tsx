@@ -12,7 +12,7 @@ export default function CtaContact({block}: BlockProps<'ctaContact'>) {
   const showButton = Boolean(block.button?.buttonText && link && linkResolver(link))
 
   return (
-    <section className="relative flex w-full items-center justify-center bg-background p-5 md:p-10">
+    <section className="relative flex w-full items-center justify-center bg-background p-s1">
       <div className="tf-max-w">
         <div className="relative h-[33.75rem] w-full overflow-clip md:h-[38.125rem]">
           <BlockImage
