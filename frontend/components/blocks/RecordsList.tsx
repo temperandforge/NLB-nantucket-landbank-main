@@ -1,7 +1,7 @@
 import FilterTabs from '@/components/ui/FilterTabs'
-import {RECORD_FILTER_LABEL, type RecordView} from '@/sanity/lib/archiveFilter'
+import {RECORD_FILTER_LABEL, type RecordView, toFilterOptions} from '@/sanity/lib/archiveFilter'
 
-import RecordFilterMenu from './RecordFilterMenu'
+import {FilterDropdown} from '../FilterDropdown'
 import RecordRow from './RecordRow'
 
 /**
@@ -34,10 +34,11 @@ export default function RecordsList({
         <div className="tf-max-w flex flex-col items-start gap-12">
           <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center">
             {filters.map((filter) => (
-              <RecordFilterMenu
+              <FilterDropdown
                 key={filter.key}
                 label={filter.label}
-                options={filter.options}
+                options={toFilterOptions(filter.options)}
+                hideWhenEmpty
                 selected={filter.value}
                 onChange={
                   onChooseFilter ? (value) => onChooseFilter(filter.param, value) : undefined

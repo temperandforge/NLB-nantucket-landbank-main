@@ -8,9 +8,10 @@ import {
   type PropertySelection,
   filterProperties,
   hasSelection,
+  toFilterOptions,
 } from '@/sanity/lib/archiveFilter'
 
-import PropertyFilterMenu from './PropertyFilterMenu'
+import {FilterDropdown} from '../FilterDropdown'
 
 /**
  * The filter menus and the card grid. A client component only for the menus' open state, so the
@@ -39,15 +40,17 @@ export default function PropertyArchiveView({
           when a filter is chosen, so they do not replay. `relative z-10` keeps the open menu's panel
           above the cards, which are animated parts with stacking contexts of their own. */}
       <div data-part="" className="relative z-10 flex w-full flex-col gap-3 sm:flex-row sm:items-center">
-        <PropertyFilterMenu
+        <FilterDropdown
           label="Property Type"
-          options={typeOptions}
+          options={toFilterOptions(typeOptions)}
+          hideWhenEmpty
           selected={selection.types}
           onChange={onChange && ((types) => onChange({...selection, types}))}
         />
-        <PropertyFilterMenu
+        <FilterDropdown
           label="Resources"
-          options={resourceOptions}
+          options={toFilterOptions(resourceOptions)}
+          hideWhenEmpty
           selected={selection.resources}
           onChange={onChange && ((resources) => onChange({...selection, resources}))}
         />

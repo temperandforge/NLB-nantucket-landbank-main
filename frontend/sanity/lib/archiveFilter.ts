@@ -7,6 +7,10 @@
 /** One tab of an archive's filter row: the slug is the stable key, the title the label. */
 export type FilterTab = {slug: string; title: string}
 
+/** A tab as the shared filter dropdown's option (`FilterDropdown` takes `{value, label}`). */
+export const toFilterOptions = (tabs: ReadonlyArray<FilterTab>) =>
+  tabs.map((tab) => ({value: tab.slug, label: tab.title}))
+
 /**
  * `orderRank` is the drag-and-drop position (a string that sorts lexically); `order` is the older
  * number, still used by taxonomies that are not draggable (property types, resources).
