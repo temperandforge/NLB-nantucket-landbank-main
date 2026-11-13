@@ -262,7 +262,12 @@ const galleryDocFields = /* groq */ `
     select(defined(image.asset) => image{asset, hotspot, crop, alt}),
     select(defined(seo.image.asset) => seo.image{asset, hotspot, crop, alt}),
     body[_type == "image" && defined(asset)][0]{asset, hotspot, crop, alt},
-    body[_type == "imageGallery"][0].images[defined(asset)][0]{asset, hotspot, crop, alt}
+    body[_type == "imageGallery"][0].images[defined(asset)][0]{asset, hotspot, crop, alt},
+    // Last resort: the fallback image of the document's own page settings (projects and events).
+    select(
+      _type == "project" => *[_type == "singleProjectPage" && _id == "singleProjectPage"][0].fallbackImage,
+      _type == "event" => *[_type == "singleEventPage" && _id == "singleEventPage"][0].fallbackImage
+    )
   )
 `
 
@@ -406,7 +411,8 @@ const pageBuilderFields = /* groq */ `
         end,
         location,
         description,
-        image
+        // Own image, else the Event Page Settings fallback.
+        "image": coalesce(select(defined(image.asset) => image), *[_type == "singleEventPage" && _id == "singleEventPage"][0].fallbackImage)
       }
     },
     _type == "eventsPreview" => {
@@ -502,7 +508,8 @@ const pageBuilderFields = /* groq */ `
       "projects": *[_type == "project" && defined(slug.current)] | order(orderRank asc, _createdAt asc) {
         _id,
         name,
-        image,
+        // Own image, else the Project Page Settings fallback.
+        "image": coalesce(select(defined(image.asset) => image), *[_type == "singleProjectPage" && _id == "singleProjectPage"][0].fallbackImage),
         "slug": slug.current,
         externalUrl,
         "projectTypes": projectTypes[]->{"slug": slug.current, title, orderRank}
@@ -520,7 +527,7 @@ const pageBuilderFields = /* groq */ `
         "propertyTypes": propertyTypes[]->{"slug": slug.current, title, order},
         "resources": resources[]->{"slug": slug.current, title, order}
       },
-      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage
+      "defaultImage": *[_type == "projectSettings" && _id == "projectSettings"][0].defaultPropertyImage
     },
     _type == "imageCarousel" => {
       ...,
@@ -546,7 +553,7 @@ const pageBuilderFields = /* groq */ `
         },
         gallery[]{${galleryEntryFields}}
       ),
-      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage
+      "defaultImage": *[_type == "projectSettings" && _id == "projectSettings"][0].defaultPropertyImage
     },
     _type == "projectPreview" => {
       ...,
@@ -559,7 +566,7 @@ const pageBuilderFields = /* groq */ `
         source != "category" && count(projects) > 0 => projects[0...3]->{
           _id,
           name,
-          image,
+          "image": coalesce(select(defined(image.asset) => image), *[_type == "singleProjectPage" && _id == "singleProjectPage"][0].fallbackImage),
           "slug": slug.current,
           externalUrl
         },
@@ -569,7 +576,7 @@ const pageBuilderFields = /* groq */ `
         ] | order(_createdAt desc) [0...3] {
           _id,
           name,
-          image,
+          "image": coalesce(select(defined(image.asset) => image), *[_type == "singleProjectPage" && _id == "singleProjectPage"][0].fallbackImage),
           "slug": slug.current,
           externalUrl
         }
@@ -613,7 +620,7 @@ const pageBuilderFields = /* groq */ `
         "resources": resources[]->{"slug": slug.current, title, order}
         }
       ),
-      "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage
+      "defaultImage": *[_type == "projectSettings" && _id == "projectSettings"][0].defaultPropertyImage
     },
     _type == "mapPreview" => {
       ...,
@@ -840,7 +847,8 @@ export const projectQuery = defineQuery(`
     name,
     "slug": slug.current,
     description,
-    image,
+    // Own image, else the Project Page Settings fallback: this is what the social preview uses.
+    "image": coalesce(select(defined(image.asset) => image), *[_type == "singleProjectPage" && _id == "singleProjectPage"][0].fallbackImage),
     seo{title, description, noIndex, image},
     "propertySlug": property->slug.current,
     // This project's own types, to find related projects.
@@ -880,7 +888,7 @@ export const moreProjectsQuery = defineQuery(`
     _id,
     _createdAt,
     name,
-    image,
+    "image": coalesce(select(defined(image.asset) => image), *[_type == "singleProjectPage" && _id == "singleProjectPage"][0].fallbackImage),
     "slug": slug.current,
     externalUrl,
     "projectTypeIds": projectTypes[]._ref
@@ -965,7 +973,7 @@ export const propertyQuery = defineQuery(`
         ${markDefsFields}
       }
     },
-    "defaultImage": *[_type == "settings" && _id == "siteSettings"][0].defaultPropertyImage
+    "defaultImage": *[_type == "projectSettings" && _id == "projectSettings"][0].defaultPropertyImage
   }
 `)
 
@@ -1034,7 +1042,8 @@ export const eventQuery = defineQuery(`
     end,
     location,
     description,
-    image,
+    // Own image, else the Event Page Settings fallback: this is what the social preview uses.
+    "image": coalesce(select(defined(image.asset) => image), *[_type == "singleEventPage" && _id == "singleEventPage"][0].fallbackImage),
     seo{title, description, noIndex, image},
     body[]{
       ...,

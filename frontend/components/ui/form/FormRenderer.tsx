@@ -269,11 +269,15 @@ export default function FormRenderer({
   return (
     <form ref={formRef} onSubmit={submit} noValidate className="flex w-full flex-col gap-10">
       {attempted && visibleErrors.length > 0 && (
-        <p role="alert" className="form-helper form-helper-error">
-          {visibleErrors.length === 1
-            ? 'There is 1 field to fix below.'
-            : `There are ${visibleErrors.length} fields to fix below.`}
-        </p>
+        <div role="alert" className="form-notice">
+          <AlertCircleIcon className="size-6 shrink-0" />
+          {/* A span, not a <p>: the page's enter animation (motion.css) slides paragraphs up. */}
+          <span>
+            {visibleErrors.length === 1
+              ? 'There is 1 field to fix below.'
+              : `There are ${visibleErrors.length} fields to fix below.`}
+          </span>
+        </div>
       )}
 
       {(form.sections ?? []).map((section) => {
@@ -334,9 +338,10 @@ export default function FormRenderer({
       {SITE_KEY && <Recaptcha siteKey={SITE_KEY} />}
 
       {serverError && (
-        <p role="alert" className="form-helper form-helper-error">
-          {serverError}
-        </p>
+        <div role="alert" className="form-notice">
+          <AlertCircleIcon className="size-6 shrink-0" />
+          <span>{serverError}</span>
+        </div>
       )}
 
       <button

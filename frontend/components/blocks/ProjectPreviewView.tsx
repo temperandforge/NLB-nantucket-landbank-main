@@ -3,7 +3,7 @@ import type {ComponentProps} from 'react'
 import AnchorLink from '@/components/ui/AnchorLink'
 import {ArrowRightIcon} from '@/components/icons'
 import ButtonLink from '@/components/ui/ButtonLink'
-import {projectHref, singleHref} from '@/sanity/lib/utils'
+import {projectHref, externalLinkProps, singleHref} from '@/sanity/lib/utils'
 
 import BlockImage from './BlockImage'
 import Eyebrow from './Eyebrow'
@@ -110,7 +110,7 @@ export default function ProjectPreviewView({
                   }`}
                 >
                   {href ? (
-                    <AnchorLink href={href} className={cardClass}>
+                    <AnchorLink href={href} className={cardClass} {...externalLinkProps(href)}>
                       {card}
                     </AnchorLink>
                   ) : (
