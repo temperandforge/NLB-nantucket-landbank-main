@@ -49,6 +49,15 @@ export function singleHref(
   return realHref(externalUrl) ?? (slug ? pageHref(slug) : null)
 }
 
+/**
+ * Props for a tile that goes to another site (an editor's external URL): it opens in a new tab and
+ * does not hand the new page a reference back. A site-relative path gets none, so it stays in the
+ * same tab.
+ */
+export function externalLinkProps(href: string | null | undefined): {target?: '_blank'; rel?: string} {
+  return href && /^https?:\/\//i.test(href) ? {target: '_blank', rel: 'noopener noreferrer'} : {}
+}
+
 export function linkResolver(link: Link | DereferencedLink | undefined) {
   if (!link) return null
 

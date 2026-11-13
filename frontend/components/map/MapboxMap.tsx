@@ -172,7 +172,7 @@ function buildPopupHtml(project: Property, currentSlug: string | null): string {
 
   // The whole card is the link, so a click anywhere on it opens the property.
   return href
-    ? `<a class="map-popup-card" href="${href}">${card}</a>`
+    ? `<a class="map-popup-card" href="${href}"${/^https?:\/\//i.test(href) ? ' target="_blank" rel="noopener noreferrer"' : ''}>${card}</a>`
     : `<div class="map-popup-card">${card}</div>`
 }
 

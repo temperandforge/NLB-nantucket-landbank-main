@@ -3,7 +3,7 @@ import {ViewTransition} from 'react'
 
 import BlockImage from '@/components/blocks/BlockImage'
 import Tag from '@/components/ui/Tag'
-import {propertyHref, singleHref} from '@/sanity/lib/utils'
+import {propertyHref, externalLinkProps, singleHref} from '@/sanity/lib/utils'
 
 import {CARD_IMAGE_ZOOM, CARD_LINK, CARD_TITLE_LINK, CardArrow} from './cardInteraction'
 import type {PropertyDefaultImage, PropertyItem} from './types'
@@ -75,7 +75,7 @@ export default function CardProperty({
   // A property with no slug (unreachable through the queries) is a plain card, never a dead anchor.
   const href = singleHref(property.externalUrl, property.slug, propertyHref)
   return href ? (
-    <Link href={href} className={CARD_LINK}>
+    <Link href={href} className={CARD_LINK} {...externalLinkProps(href)}>
       {card}
     </Link>
   ) : (

@@ -3,7 +3,7 @@ import {stegaClean} from 'next-sanity'
 import Link from 'next/link'
 
 import {ArrowDownRightIcon} from '@/components/icons'
-import {articleHref, singleHref} from '@/sanity/lib/utils'
+import {articleHref, externalLinkProps, singleHref} from '@/sanity/lib/utils'
 import {formatDate} from '@/sanity/lib/dates'
 
 import {CARD_GROUP, CARD_IMAGE_ZOOM, CARD_TITLE_LINK, CardArrow} from '@/components/cards/cardInteraction'
@@ -27,7 +27,7 @@ function Tile({
 }) {
   // `data-part`: a tile is one unit for the page-enter animation (see motion.css), not its pieces.
   return href ? (
-    <Link href={href} className={`${CARD_GROUP} ${className}`} data-part="">
+    <Link href={href} className={`${CARD_GROUP} ${className}`} data-part="" {...externalLinkProps(href)}>
       {children}
     </Link>
   ) : (

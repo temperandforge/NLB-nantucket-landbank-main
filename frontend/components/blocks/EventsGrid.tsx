@@ -4,7 +4,7 @@ import BlockImage from '@/components/blocks/BlockImage'
 import {CARD_IMAGE_ZOOM, CARD_TITLE_LINK, CardArrow} from '@/components/cards/cardInteraction'
 import {ArrowRightIcon, ClockIcon, MapPinIcon} from '@/components/icons'
 import {eventParts} from '@/sanity/lib/dates'
-import {eventHref, singleHref} from '@/sanity/lib/utils'
+import {eventHref, externalLinkProps, singleHref} from '@/sanity/lib/utils'
 
 import {BlockProps} from './types'
 
@@ -58,7 +58,7 @@ export default function EventsGrid({block}: BlockProps<'eventsGrid'>) {
                   <div className="flex min-w-0 flex-col items-start gap-3 md:max-w-[668px]">
                     <p className="w-full text-headline-base leading-[1.1] text-on-background">
                       {href ? (
-                        <Link href={href} className={`${CARD_TITLE_LINK} after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-8 text-pretty`}>
+                        <Link href={href} {...externalLinkProps(href)} className={`${CARD_TITLE_LINK} after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-8 text-pretty`}>
                           {event.title}
                         </Link>
                       ) : (
