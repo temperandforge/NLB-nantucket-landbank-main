@@ -27,7 +27,7 @@ import {
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? ''
 
 /** Property boundary colour. Mapbox paint can't read CSS variables, so this mirrors `--color-brand` in css/globals.css. */
-const BOUNDARY_COLOR = '#ff5500'
+const BOUNDARY_COLOR = '#ECBB20' // todo: read from CSS variable instead of hardcoding
 
 interface MapboxMapProps {
   projects: Property[]
@@ -228,7 +228,7 @@ export function MapboxMap({
 
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: 'mapbox://styles/tfdev/cmrmj301k000p01rdcrzp6qxr',
+      style: 'mapbox://styles/tfdev/cmwcggw5a006101sgbia12qpv',
       center,
       zoom: settings?.defaultZoom ?? DEFAULT_ZOOM,
       // The style is built on Mapbox Standard (imported as `basemap`). Drop the 3D buildings and the
@@ -268,7 +268,7 @@ export function MapboxMap({
             type: 'line',
             source: 'gpx-route',
             layout: {'line-join': 'round', 'line-cap': 'round'},
-            paint: {'line-color': '#c60024', 'line-width': 1},
+            paint: {'line-color': '#482f1a', 'line-width': 1},
           })
         } catch (error) {
           console.error('Failed to load the trails GeoJSON:', error)

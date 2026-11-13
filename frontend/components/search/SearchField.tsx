@@ -86,11 +86,11 @@ export default function SearchField({
         </button>
       </div>
       <div className="h-px w-full bg-border-light" />
-      {error && (
+      {/* {error && (
         <p id={errorId} role="alert" className="font-secondary text-body-small leading-[1.6] text-error">
           {error}
         </p>
-      )}
+      )} */}
     </form>
   )
 }

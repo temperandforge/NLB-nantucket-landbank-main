@@ -5,7 +5,6 @@ import {SpeedInsights} from '@vercel/speed-insights/next'
 import type {Metadata} from 'next'
 import {Inter, IBM_Plex_Mono, EB_Garamond, DM_Sans, DM_Mono} from 'next/font/google'
 import {draftMode} from 'next/headers'
-import Script from 'next/script'
 import {toPlainText} from 'next-sanity'
 import {Toaster} from 'sonner'
 

@@ -491,7 +491,24 @@ export type Timeline = {
   entries?: Array<{
     year: string
     title: string
-    description?: string
+    description?: Array<{
+      children?: Array<{
+        marks?: Array<string>
+        text?: string
+        _type: 'span'
+        _key: string
+      }>
+      style?: 'normal'
+      listItem?: 'bullet'
+      markDefs?: Array<
+        {
+          _key: string
+        } & Link
+      >
+      level?: number
+      _type: 'block'
+      _key: string
+    }>
     _type: 'timelineEntry'
     _key: string
   }>
@@ -1214,6 +1231,7 @@ export type Project = {
   property?: PropertyReference
   externalUrl?: string
   seo?: Seo
+  orderRank?: string
 }
 
 export type PropertyTypeReference = {
@@ -1332,6 +1350,7 @@ export type Property = {
   location?: Geopoint
   disablePopup?: boolean
   seo?: Seo
+  orderRank?: string
 }
 
 export type Geopoint = {
