@@ -9,6 +9,12 @@ description of the code.
 
 Related: [specs/](superpowers/specs/) holds the full design docs these decisions came from.
 
+**On scripts named below.** `studio/scripts` is gitignored (see 5.2). Only
+`verifyPageRouting.ts`, `verifyStructuredData.ts` and `seedPropertyAndProjectOrderRanks.ts` are
+tracked there. Any other `studio/scripts/...` file named in an entry was a one-off seed or
+migration, run once and not kept in the repo: the entry records what it did, not something you can
+rerun. `frontend/scripts` is tracked.
+
 ---
 
 ## 1. Content model
@@ -759,6 +765,14 @@ title) and reuse them. Say plainly in the script header what it overwrites: the 
 `createOrReplace` and therefore discards Studio edits to the footer, while pages are never
 overwritten.
 
+**Scripts are not kept.** `studio/scripts` is gitignored (`scripts/*` in `studio/.gitignore`): a
+seed or migration runs once and is left untracked, so its header and the commit or PR summary are
+the only record of what it did. The exceptions are checks that are re-run after changing page
+routing or structured data, re-included with a `!scripts/<name>` line: `verifyPageRouting.ts` and
+`verifyStructuredData.ts` (and `seedPropertyAndProjectOrderRanks.ts`, which was force-added). A new
+check worth re-running needs its own `!scripts/<name>` line; the pattern is `scripts/*`, not
+`scripts`, because a directory ignored whole cannot have files inside it re-included.
+
 ### 5.3 Constrain singleton queries by `_type` as well as `_id`
 
 **Status:** Implemented
@@ -1362,7 +1376,7 @@ Spec: [project single page design](superpowers/specs/2026-10-12-project-single-p
 
 **Not done:** active-section highlighting in the nav ([#31](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/31)),
 hand-picked related projects ([#32](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/32)).
-Manual: run `studio/scripts/seedSingleProjectPage.ts` and `unsetProjectLinks.ts`, and fetch the two
+Manual (one-off local scripts, not kept in the repo): run `studio/scripts/seedSingleProjectPage.ts` and `unsetProjectLinks.ts`, and fetch the two
 background curve SVGs (see the plan, Task 7). Issue [#23](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/23)
 (property detail pages) is superseded for projects.
 
@@ -1575,11 +1589,11 @@ The browser and keyboard pass, and the live POST checks, were not run. To do:
 
 1. **Decide dataset visibility (OPEN, project owner).** See the requirement under 21.3: submissions
    must not go live while the dataset is public.
-2. Seed the forms: `cd studio && npx sanity exec scripts/seedForms.ts --with-user-token -- --dry`,
+2. Seed the forms with a local script (not kept in the repo): `cd studio && npx sanity exec scripts/seedForms.ts --with-user-token -- --dry`,
    read the plan, then run it again without `--dry`.
 3. Publish the forms and place them on pages (a Contact Form block with "Contact Us", and a Basic
    Left Right Text block with a form in the right column).
-4. Run `cd studio && npx sanity exec scripts/verifyForms.ts --with-user-token`.
+4. Run the local check `cd studio && npx sanity exec scripts/verifyForms.ts --with-user-token` (not kept in the repo).
 5. Set `SANITY_API_WRITE_TOKEN` (and, if using reCAPTCHA, both `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` and `RECAPTCHA_SECRET_KEY`, or neither: with only the secret set every submission fails the captcha check) in `frontend/.env.local`, then start
    the dev server.
 6. Keyboard-only pass at desktop and mobile widths:
@@ -1720,8 +1734,8 @@ control of search and social appearance. The `seo` object goes on `page`, `artic
   `seo.ts`, `siteUrl.ts` and `structuredData.ts` pure and runnable without Sanity env, so
   `frontend/scripts/checkStructuredData.ts` can assert them with `npx tsx`.
 - **`ogImage.metadataBase` was retired outright**, not migrated. The dataset held no `ogImage` or
-  `metadataBase`, so `studio/scripts/migrateSeoDefaults.ts` found nothing to copy. The script stays
-  for any other environment that does; the schema field and the frontend's fallback to it are gone.
+  `metadataBase`, so `studio/scripts/migrateSeoDefaults.ts` found nothing to copy. That script was
+  not kept in the repo, so an environment that does hold them would need it rewritten; the schema field and the frontend's fallback to it are gone.
   `settings.ogImage` is still the social image fallback until `settings.seo.image` is set.
 - **No origin means no sitemap, no canonical and no JSON-LD.** `sitemap.ts` returns an empty list
   rather than protocol-less URLs (it used the `host` header with no scheme before). Setting **Site
@@ -2004,7 +2018,7 @@ Spec: [specs/2026-11-04-image-carousel-mixed-sources-design.md](superpowers/spec
   and the block. The category sources emit entries in the same shape as a hand-picked document.
 - **No cards, no block.** A block with no cards renders nothing, not a lone eyebrow, including a news
   category that was deleted or unpublished.
-- **Rollout**: `studio/scripts/migrateImageCarouselProjects.ts` moves `projects` into `gallery` and renames
+- **Rollout**: `studio/scripts/migrateImageCarouselProjects.ts` (a one-off, not kept in the repo) moves `projects` into `gallery` and renames
   `source: category` to `projectCategory`. Until it runs, a block still saying `category` shows no cards.
   Dry run found 3 published blocks (conservation, recreation, agriculture), all in category mode with no
   hand-picked projects. Drafts need `--with-user-token` to be seen.
