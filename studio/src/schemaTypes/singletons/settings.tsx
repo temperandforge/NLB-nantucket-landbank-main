@@ -113,26 +113,6 @@ export const settings = defineType({
       ],
     }),
     defineField({
-      name: 'defaultPropertyImage',
-      title: 'Default property image',
-      type: 'image',
-      description: 'Shown on a property that has no image of its own.',
-      options: {hotspot: true},
-      fields: [
-        defineField({
-          name: 'alt',
-          title: 'Alternative text',
-          type: 'string',
-          description: 'Important for accessibility and SEO.',
-          validation: (rule) =>
-            rule.custom((alt, context) => {
-              const image = context.document?.defaultPropertyImage as {asset?: {_ref?: string}} | undefined
-              return image?.asset?._ref && !alt ? 'Required' : true
-            }),
-        }),
-      ],
-    }),
-    defineField({
       name: 'siteUrl',
       title: 'Site URL',
       type: 'url',

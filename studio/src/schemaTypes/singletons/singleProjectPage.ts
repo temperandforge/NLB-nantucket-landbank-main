@@ -1,6 +1,8 @@
 import {CogIcon} from '@sanity/icons'
 import {defineField, defineType} from 'sanity'
 
+import {imageWithAltField} from '../objects/blockFields'
+
 /**
  * Single Project Page (singleton, fixed id `singleProjectPage`): what every project page shares,
  * as opposed to one project's own content: the eyebrow and where it links, and the "more
@@ -26,6 +28,12 @@ export const singleProjectPage = defineType({
       type: 'link',
       description:
         'The Projects page the label links back to. With no link (or one that does not resolve) the label is plain text.',
+    }),
+    imageWithAltField({
+      name: 'fallbackImage',
+      title: 'Fallback image',
+      description:
+        'Shown on the tile, the page and the social preview of a project that has no image of its own. Leave empty to show no image for those projects.',
     }),
     defineField({
       name: 'moreProjects',
