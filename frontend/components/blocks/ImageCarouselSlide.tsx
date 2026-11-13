@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type {ComponentProps} from 'react'
 
 import {ArrowForwardIcon} from '@/components/icons'
+import {CARD_IMAGE_ZOOM} from '@/components/cards/cardInteraction'
 import {useImageLightbox} from '@/components/ImageLightbox'
 
 import BlockImage from './BlockImage'
@@ -15,7 +16,7 @@ import BlockImage from './BlockImage'
 // track and the Track moves and scales it with a transform. `--w` is set by the Track, from 0 (a
 // resting card) to 1 (the current one), and drives the label.
 const CARD =
-  'group/card relative flex h-[325px] w-[260px] flex-none items-end justify-center overflow-clip rounded bg-dusty-heath-800 p-6 text-left will-change-transform in-data-[ready]:absolute in-data-[ready]:top-1/2 in-data-[ready]:left-1/2 in-data-[ready]:-mt-[162.5px] in-data-[ready]:-ml-[130px] md:h-[460px] md:w-[368px] md:in-data-[ready]:-mt-[230px] md:in-data-[ready]:-ml-[184px]'
+  'group relative flex h-[325px] w-[260px] flex-none items-end justify-center overflow-clip rounded bg-dusty-heath-800 p-6 text-left will-change-transform in-data-[ready]:absolute in-data-[ready]:top-1/2 in-data-[ready]:left-1/2 in-data-[ready]:-mt-[162.5px] in-data-[ready]:-ml-[130px] md:h-[460px] md:w-[368px] md:in-data-[ready]:-mt-[230px] md:in-data-[ready]:-ml-[184px]'
 
 type SlideImage = ComponentProps<typeof BlockImage>['image']
 
@@ -44,6 +45,10 @@ export default function ImageCarouselSlide({
   lightboxIndex?: number
 }) {
   const openLightbox = useImageLightbox()
+  // Only a slide that does something (a link, or the lightbox) zooms on hover and focus, like the
+  // other image cards: the zoom says "this opens". A plain picture would suggest a click that
+  // does nothing. The card is the `group` that CARD_IMAGE_ZOOM reacts to.
+  const interactive = Boolean(href) || (lightboxIndex !== undefined && Boolean(openLightbox))
   const content = (
     <>
       <BlockImage
@@ -51,7 +56,7 @@ export default function ImageCarouselSlide({
         width={832}
         sizes="(min-width: 768px) 416px, 292px"
         fill
-        className="absolute inset-0 size-full object-cover"
+        className={`absolute inset-0 size-full object-cover ${interactive ? CARD_IMAGE_ZOOM : ''}`}
       />
       {label && (
         <>
