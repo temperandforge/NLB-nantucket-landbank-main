@@ -105,6 +105,10 @@ const patched = Object.entries(recordCategoryPatch('policies')).reduce(
 )
 same(patched, '?x=1&category=policies', 'applying it keeps unrelated parameters')
 
+// Multi-value parameters keep a literal comma (issue #103)
+same(withFilter('?category=policies', 'year', '2025,2024'), '?category=policies&year=2025,2024', 'a multi-value filter is written with a literal comma')
+same(withFilter('', 'year', 'a b'), '?year=a%20b', 'other characters are still encoded')
+
 if (failed) {
   console.error('\nFAILED')
   process.exit(1)
