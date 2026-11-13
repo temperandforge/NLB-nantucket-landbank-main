@@ -49,7 +49,7 @@ export default function ArticleView({
         </p>
         <div className="flex w-full flex-col items-start gap-10">
           <div className="flex w-full flex-col items-start gap-3">
-            <Cascade as="h1" className="w-full text-headline-xl text-on-background" text={article.title} />
+            <Cascade as="h1" className="w-full text-headline-xl text-on-background text-pretty" text={article.title} />
             {categories.length > 0 && (
               <div className="flex flex-wrap items-center gap-1 load-in">
                 {categories.map((category) => (
