@@ -36,8 +36,8 @@ Design docs live in [docs/superpowers/specs/](docs/superpowers/specs/).
 ## Properties and the map
 
 - **`property` is a Land Bank property** — the things on the interactive map and the Properties
-  archive. It replaced the old `project` type (migrated by `studio/scripts/migrateProjectsToProperties.ts`),
-  which replaced the hardcoded `frontend/app/map/properties.ts`.
+  archive. It replaced the old `project` type (migrated by a one-off script that is no longer in the
+  repo), which replaced the hardcoded `frontend/app/map/properties.ts`.
 - **`project` is a separate, newer type** — a Land Bank initiative, categorised by `projectType`,
   optionally referencing a `property`. `projectGrid`, `projectPreview` and `imageCarousel` read
   projects; the map and `propertyArchive` read properties. See DECISIONS 1.7a.
@@ -146,12 +146,21 @@ Reasoning: DECISIONS 25.
 
 ## Content scripts
 
+- **One-off seeds and migrations are not committed.** `studio/scripts` is gitignored
+  (`scripts/*` in `studio/.gitignore`): they run once and are not kept. Write one there, run it,
+  and leave it untracked. Don't `git add -f` it, and don't expect an older seed or migration to be
+  in a fresh checkout.
+- **Two scripts there are tracked, because they are re-run:** `verifyPageRouting.ts` and
+  `verifyStructuredData.ts`. A new check that should be re-run needs a `!scripts/<name>` line in
+  `studio/.gitignore` (the pattern is `scripts/*`, not `scripts`: a directory ignored whole cannot
+  have files inside it re-included).
 - **Run seeds and migrations via `cd studio && npx sanity exec scripts/<name>.ts
   --with-user-token`.** This authenticates as the logged-in CLI user, so no write token needs to
   exist in the environment.
 - **Make them idempotent** — match existing documents on a natural key and reuse them.
-- **State what a script overwrites in its header.** The footer seed uses `createOrReplace` and
-  discards Studio edits to the footer; pages are never overwritten.
+- **State what a script overwrites in its header.** With the script not kept, the header and your
+  summary are the only record. A seed that uses `createOrReplace` discards Studio edits to that
+  document; pages are never overwritten.
 - **Give anything that rewrites existing documents a `--dry` mode**, and read the plan before the
   real run.
 - **Don't filter with a GROQ `match` glob to test for a character.** `match` is word-tokenized,
@@ -197,4 +206,5 @@ cd studio && npx sanity exec scripts/verifyPageRouting.ts --with-user-token
 
 Where a contract depends on document data rather than code, add a script like that one — the
 compiler can't catch it. Import the definitions under test instead of restating them, or the check
-drifts from the thing it checks.
+drifts from the thing it checks. A check meant to be re-run is committed, which means adding its
+`!scripts/<name>` line to `studio/.gitignore` (see Content scripts); a one-off isn't.
