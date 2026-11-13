@@ -1450,8 +1450,8 @@ standalone map queries. Filters write to the current pathname.
 in Studio. A block can.
 
 **Implication:** There is no redirect: old `/map` links 404. `/` with no landing page also 404s.
-`projectSettings.heading`, `intro` and `eyebrow` no longer feed the map and can be removed
-(tracked in [#44](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/44)). Two Map Explorers on one page share their URL filters.
+`projectSettings.heading`, `intro` and `eyebrow` no longer fed the map and have been removed
+([#44](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/44); the live values were empty). Two Map Explorers on one page share their URL filters.
 
 ## 21. Forms
 

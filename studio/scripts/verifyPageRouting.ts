@@ -62,7 +62,11 @@ async function main() {
 
   console.log('Location projection resolves the parent chain:')
   const nested = pages.filter((p) => p.parentSlug)
-  check(nested.length > 0, `${nested.length} page(s) resolved a parentSlug via parent->slug.current`)
+  if (pages.length === 0) {
+    console.log('  no pages to check (empty dataset) - skipping')
+  } else {
+    check(nested.length > 0, `${nested.length} page(s) resolved a parentSlug via parent->slug.current`)
+  }
 
   /**
    * Presentation picks the route whose parameter count matches the URL's segment count, so only
