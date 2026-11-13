@@ -27,6 +27,22 @@
     }
   }
 
+  /* The form-level error callout: shown above the fields after a failed submit, and for a server error. */
+  .form-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--color-error);
+    border-radius: 4px;
+    background-color: color-mix(in srgb, var(--color-error) 8%, var(--color-background));
+    color: var(--color-error);
+    font-family: var(--font-sans);
+    font-size: var(--text-body-base);
+    line-height: 1.6;
+    animation: form-error-in 200ms ease-out;
+  }
+
   /* A group's question: the mono body style, as in the design. */
   .form-legend,
   .form-section-heading {
@@ -144,6 +160,13 @@
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
     list-style: none;
     margin: 0;
+  }
+  /* Each field enters as a `data-part` unit (motion.css), which makes it its own stacking context,
+     so the list's z-index only counts inside its field and later fields paint over it. Lift the
+     field that has a list open above its siblings. */
+  [data-part]:has(> [data-field-name] [role='combobox'][aria-expanded='true']) {
+    position: relative;
+    z-index: 30;
   }
   /* Focus lives in the list while it is open, but the ring stays on the trigger (aria-expanded
      above): the design's panel has no outline, and the trigger still shows where the control is. */
