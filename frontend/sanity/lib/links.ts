@@ -6,3 +6,11 @@
 export function isInternalHref(href: string): boolean {
   return href.startsWith('/') && !href.startsWith('//') && !href.startsWith('/\\')
 }
+
+/**
+ * The href for a page's resolved `path` (what the `link` fragment returns as `page`). The landing
+ * page comes back as `/` and maps to the root; any other path gets its leading slash.
+ */
+export function pageHref(path: string): string {
+  return path === '/' ? '/' : `/${path}`
+}

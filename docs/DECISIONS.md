@@ -378,11 +378,34 @@ that renders the page means it cannot drift when the landing page changes.
   unverified; so is positive 301/410 evidence from a running site. If Functions are unavailable, the
   fallback is the same handler as a Studio publish action.
 - Pattern and regex rules are deferred ([#72](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/72));
-  so are the rename warning (#73), hit logging (#74), deleted pages (#75) and the WordPress bulk import
-  (#76). `/map` is out of scope (see 20).
-- **Known limitation:** the proxy matcher excludes any path containing a dot, so a source like
-  `/old-page.html` or `/x.php` can never fire, and Studio currently accepts one. Tracked in
-  [#83](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/83).
+  so are hit logging (#74) and the WordPress bulk import (#76). `/map` is out of scope (see 20).
+- **Sources with a file extension work** ([#83](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/83)).
+  The proxy matcher skips only a fixed list of static-asset extensions (js, css, images, fonts, media,
+  txt, xml, json and a few more), not every dotted path, so `/old-page.html` and `/x.php` reach the
+  lookup. The cost is a proxy run on those requests, which is a cached in-memory match. A source ending
+  in an excluded extension (say `/old.png`) could never fire, so Studio rejects it. The list lives in the
+  matcher literal in `frontend/proxy.ts` (Next reads it statically) and in `ASSET_EXTENSIONS` in
+  `studio/src/lib/redirectSource.ts`; `frontend/scripts/verifyRedirectMatcher.mts` fails if they differ and
+  pins the `/apiary` / `/api/x` boundary. Old WordPress image uploads therefore cannot be redirected.
+- **Studio's source comparison equals the matcher's** ([#84](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/84)):
+  `normaliseSource` decodes `%XX`, collapses `//` and sorts query params, so the duplicate check sees what
+  the matcher sees as one rule. A destination typed as a URL must be `/path` or `http(s)://`; the matcher
+  skips anything else as a backstop. The landing page resolves to `/` in the shared `link` fragment (via
+  `pageHref`), saving the 308 hop, and the catch-all uses the page's own `isLanding` instead of a second
+  query. The proxy's rule loader is stale-while-revalidate: past the TTL it answers from the old rules at
+  once and refreshes behind the request; only the very first load waits.
+  Still open: a parent and child renamed in one publish lose the child's old URL
+  ([#159](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/159)).
+- **Studio warns before a URL breaks** ([#73](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/73),
+  [#75](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/75)). Changing a page's slug,
+  parent or path-only flag shows a warning on those fields listing the URLs that will change and whether a
+  redirect already exists (`studio/src/lib/pageUrlImpact.ts`, using the same `redirectDiff` as the function).
+  Unpublishing or deleting a page opens a confirmation listing the URLs that will 404 and the redirects
+  pointing at it (`withPageRemovalWarning`). A redirect whose destination page is unpublished or a path
+  segment warns on its destination. **Decision:** removal is warned about, not auto-redirected: where an
+  old URL should go (410, the parent, home) is an editorial call and a delete has no after-state. Offering
+  the redirect from the dialog is [#160](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/160).
+  The warnings say redirects are created automatically, which is true only once the function is deployed.
 - `studio/scripts/verifyRedirects.ts` checks the dataset (no enabled redirect shadows a live page, every
   destination resolves, no duplicate sources); run it after bulk edits.
 

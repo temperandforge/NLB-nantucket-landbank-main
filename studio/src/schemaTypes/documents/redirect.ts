@@ -2,7 +2,12 @@ import {defineField, defineType} from 'sanity'
 import {ResetIcon} from '@sanity/icons'
 
 import {buildPagePath, PAGE_LOCATION_SELECT, previewPathToGroq} from '../../lib/pageHierarchy'
-import {normaliseSource, STATUS_CODES, validateSourceShape} from '../../lib/redirectSource'
+import {
+  normaliseSource,
+  STATUS_CODES,
+  validateDestinationHref,
+  validateSourceShape,
+} from '../../lib/redirectSource'
 
 /**
  * Redirect schema. One document per old path. Matching is exact on the path (case-insensitive,
@@ -101,7 +106,7 @@ export const redirect = defineType({
       type: 'link',
       description: 'A page on this site or a URL. Not needed for 410 Gone.',
       hidden: ({document}) => document?.statusCode === 410,
-      validation: (Rule) =>
+      validation: (Rule) => [
         Rule.custom((value, context) => {
           const gone = context.document?.statusCode === 410
           const link = value as {linkType?: string; href?: string; page?: {_ref?: string}} | undefined
@@ -114,9 +119,32 @@ export const redirect = defineType({
             if (href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) {
               return 'Redirect to a page or an http(s) URL. #, mailto: and tel: links cannot be redirect targets.'
             }
+            const shape = validateDestinationHref(link.href)
+            if (shape !== true) return shape
           }
           return true
         }),
+        // A page destination that is unpublished or only a path segment resolves to nothing, so the
+        // proxy skips this rule and the old URL 404s with no sign of why.
+        Rule.custom(async (value, context) => {
+          if (context.document?.statusCode === 410) return true
+          const link = value as {linkType?: string; page?: {_ref?: string}} | undefined
+          const ref = link?.linkType === 'page' ? link.page?._ref : undefined
+          if (!ref) return true
+          const client = context.getClient({apiVersion: '2025-09-25'})
+          const target = await client.fetch<{pathOnly: boolean} | null>(
+            `*[_type == "page" && _id == $id][0]{"pathOnly": coalesce(pathOnly, false)}`,
+            {id: publishedId(ref)},
+          )
+          if (!target) {
+            return 'This page is not published, so this redirect is skipped and the old path returns 404. Publish the page or choose another destination.'
+          }
+          if (target.pathOnly) {
+            return 'This page is only a path segment and has no URL of its own, so this redirect is skipped. Choose another destination.'
+          }
+          return true
+        }).warning(),
+      ],
     }),
 
     defineField({

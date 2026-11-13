@@ -3,6 +3,7 @@ import {dataset, projectId, studioUrl} from '@/sanity/lib/api'
 import {createDataAttribute, CreateDataAttributeProps, stegaClean} from 'next-sanity'
 import {createImageUrlBuilder, type SanityImageSource} from '@sanity/image-url'
 import {DereferencedLink} from '@/sanity/lib/types'
+import {pageHref} from '@/sanity/lib/links'
 
 const builder = createImageUrlBuilder({
   projectId: projectId || '',
@@ -71,7 +72,7 @@ export function linkResolver(link: Link | DereferencedLink | undefined) {
       return link.href || null
     case 'page':
       if (link?.page && typeof link.page === 'string') {
-        return `/${link.page}`
+        return pageHref(link.page)
       }
     default:
       return null
