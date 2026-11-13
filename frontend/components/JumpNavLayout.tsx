@@ -46,19 +46,25 @@ export default function JumpNavLayout({
           )}
           {items.length > 0 && (
             <nav
-              className="flex flex-col [scrollbar-color:var(--color-border-light)_transparent] [scrollbar-width:thin] lg:min-h-0 lg:overflow-y-auto"
+              // -mx-3 px-3: the rows' hover background extends 12px past the column, and on a short
+              // screen this box scrolls (overflow clips), so it has to contain that overhang.
+              className="-mx-3 flex flex-col px-3 [scrollbar-color:var(--color-border-light)_transparent] [scrollbar-width:thin] lg:min-h-0 lg:overflow-y-auto"
               aria-label={navLabel}
             >
               {items.map((item) => (
                 <a
                   key={item.id}
-                  // Figma (anchor links): the arrow is faint at rest; on hover or focus the row indents
-                  // 12px and takes the darker surface, and the label and arrow darken.
-                  className="group flex items-center justify-between gap-4 border-t border-border-light bg-background py-3 font-mono text-body-base leading-[1.6] text-on-background no-underline transition-[padding,background-color,color] hover:bg-surface-dark hover:px-3 hover:text-on-surface-dark focus-visible:bg-surface-dark focus-visible:px-3 focus-visible:text-on-surface-dark focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-moody-moor-500"
+                  // Figma (anchor links): the arrow is faint at rest; on hover or focus the row takes
+                  // the darker surface, its content indents 12px, and the label and arrow darken. The
+                  // row keeps a constant 12px padding (offset by -mx-3) and only the content moves, so
+                  // the label never re-wraps on hover. Same as SearchResults and RecordRow.
+                  className="group -mx-3 flex items-center justify-between gap-9 border-t border-border-light bg-background px-3 py-3 font-mono text-body-base leading-[1.6] text-on-background no-underline transition-colors hover:bg-surface-dark hover:text-on-surface-dark focus-visible:bg-surface-dark focus-visible:text-on-surface-dark focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-moody-moor-500"
                   href={`#${item.id}`}
                 >
-                  <span>{item.text}</span>
-                  <ArrowRightIcon className="size-6 shrink-0 text-moody-moor-900 transition-colors group-hover:text-on-surface-dark group-focus-visible:text-on-surface-dark" />
+                  <span className="transition-transform group-hover:translate-x-3 group-focus-visible:translate-x-3 motion-reduce:transition-none">
+                    {item.text}
+                  </span>
+                  <ArrowRightIcon className="size-6 shrink-0 text-moody-moor-900 transition-[translate,color] group-hover:-translate-x-3 group-hover:text-on-surface-dark group-focus-visible:-translate-x-3 group-focus-visible:text-on-surface-dark motion-reduce:transition-none" />
                 </a>
               ))}
             </nav>

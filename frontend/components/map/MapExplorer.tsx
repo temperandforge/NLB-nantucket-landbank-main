@@ -30,8 +30,19 @@ interface MapExplorerProps {
   settings: MapSettings | null
 }
 
-function parseParam(value: string | null): string[] {
-  return value ? value.split(',').filter(Boolean) : []
+/**
+ * The slugs in a comma-separated parameter, limited to ones that exist. An unknown slug (a typo, a
+ * deleted category, a crawler's guess) is ignored rather than filtering the map down to nothing,
+ * and duplicates are dropped. Order is not kept: see `serialize`.
+ */
+function parseParam(value: string | null, known: ReadonlySet<string>): string[] {
+  if (!value) return []
+  return [...new Set(value.split(',').filter((slug) => known.has(slug)))]
+}
+
+/** Sorted, so one filter state is one URL however the visitor picked the options. */
+function serialize(slugs: string[]): string {
+  return [...slugs].sort().join(',')
 }
 
 export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
@@ -43,10 +54,14 @@ export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
   const resourceOptions = useMemo(() => toFilterOptions(filters.resources), [filters])
 
   const selectedPropertyTypes = useMemo(
-    () => parseParam(searchParams.get('propertyType')),
-    [searchParams],
+    () =>
+      parseParam(searchParams.get('propertyType'), new Set(propertyTypeOptions.map((o) => o.value))),
+    [searchParams, propertyTypeOptions],
   )
-  const selectedResources = useMemo(() => parseParam(searchParams.get('resources')), [searchParams])
+  const selectedResources = useMemo(
+    () => parseParam(searchParams.get('resources'), new Set(resourceOptions.map((o) => o.value))),
+    [searchParams, resourceOptions],
+  )
 
   function updateParams(next: {propertyType?: string[]; resources?: string[]}) {
     const params = new URLSearchParams(searchParams.toString())
@@ -54,13 +69,13 @@ export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
     const nextResources = next.resources ?? selectedResources
 
     if (nextPropertyTypes.length > 0) {
-      params.set('propertyType', nextPropertyTypes.join(','))
+      params.set('propertyType', serialize(nextPropertyTypes))
     } else {
       params.delete('propertyType')
     }
 
     if (nextResources.length > 0) {
-      params.set('resources', nextResources.join(','))
+      params.set('resources', serialize(nextResources))
     } else {
       params.delete('resources')
     }
@@ -97,7 +112,7 @@ export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
     // under the hero heading at every width. The starter's `container` class used a different max
     // width and padding, which left them left of the heading.
     <div className="tf-px w-full">
-      <div id="mapWrap" className="tf-max-w flex flex-col gap-10 py-10">
+      <div id="mapWrap" className="tf-max-w flex flex-col gap-10 xl:pt-10 pb-s6">
         <div className="container--inner flex flex-col gap-2">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <MultiSelectDropdown
@@ -116,7 +131,7 @@ export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
               <button
                 type="button"
                 onClick={clearAll}
-                className="cursor-pointer text-sm font-medium text-error hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500 sm:ml-2"
+                className="cursor-pointer text-sm font-medium text-error hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500 sm:ml-2 max-sm:mt-2"
               >
                 Clear all
               </button>

@@ -34,6 +34,16 @@ function Runs({runs}: {runs: TextRun[]}) {
 }
 
 /**
+ * The row's hover indent. The row keeps a constant 12px padding (offset by -mx-3 so it still lines
+ * up with the column) and only its content moves: the left side in, the icon in from the right. The
+ * width the text wraps in never changes, so a hover can't reflow a line. Same as RecordRow.
+ */
+const SLIDE_IN =
+  'transition-transform group-hover:translate-x-3 group-focus-visible:translate-x-3 motion-reduce:transition-none'
+const SLIDE_OUT =
+  'transition-[translate,color] group-hover:-translate-x-3 group-focus-visible:-translate-x-3 motion-reduce:transition-none'
+
+/**
  * One result: what kind of thing it is, its title, its date, an excerpt around where the
  * words were found, and an arrow, or the download tray for a record. The whole row is the link and
  * takes the darker surface on hover and focus, like a record row.
@@ -46,12 +56,12 @@ function ResultRow({result}: {result: SearchResult}) {
         download={result.download ? '' : undefined}
         target={result.external && !result.download ? '_blank' : undefined}
         rel={result.external && !result.download ? 'noopener noreferrer' : undefined}
-        className="group grid grid-cols-[1fr_auto] items-start gap-x-6 gap-y-3 bg-background py-8 text-on-background no-underline transition-[padding,background-color] hover:bg-surface-dark hover:px-3 focus-visible:bg-surface-dark focus-visible:px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500 md:grid-cols-[9rem_1fr_auto] md:gap-x-10"
+        className="group -mx-3 grid grid-cols-[1fr_auto] items-start gap-x-9 gap-y-3 bg-background px-3 py-8 text-on-background no-underline transition-colors hover:bg-surface-dark focus-visible:bg-surface-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moody-moor-500 md:grid-cols-[9rem_1fr_auto] md:gap-x-10"
       >
-        <p className="col-span-2 font-mono-tracked text-body-small uppercase tracking-[1.54px] leading-[1.6] text-on-background-subtle md:col-span-1 md:pt-2">
+        <p className={`col-span-2 ${SLIDE_IN} font-mono-tracked text-body-small uppercase tracking-[1.54px] leading-[1.6] text-on-background-subtle md:col-span-1 md:pt-2`}>
           {result.typeLabel}
         </p>
-        <div className="flex min-w-0 flex-col gap-3">
+        <div className={`flex min-w-0 flex-col gap-3 ${SLIDE_IN}`}>
           {/* The date belongs to the title, so the two sit closer than the snippet below them. */}
           <div className="flex flex-col gap-1">
             <h2 className="break-words text-headline-sm leading-[1.2] tracking-normal">
@@ -68,9 +78,9 @@ function ResultRow({result}: {result: SearchResult}) {
           )}
         </div>
         {result.download ? (
-          <DownloadIcon className="mt-1 size-6 shrink-0 text-border-light group-hover:text-on-surface-dark group-focus-visible:text-on-surface-dark" />
+          <DownloadIcon className={`mt-1 size-6 shrink-0 text-border-light group-hover:text-on-surface-dark group-focus-visible:text-on-surface-dark ${SLIDE_OUT}`} />
         ) : (
-          <ArrowRightIcon className="mt-1 size-6 shrink-0 text-border-light group-hover:text-secondary group-focus-visible:text-secondary" />
+          <ArrowRightIcon className={`mt-1 size-6 shrink-0 text-border-light group-hover:text-secondary group-focus-visible:text-secondary ${SLIDE_OUT}`} />
         )}
       </AnchorLink>
     </li>
@@ -92,13 +102,13 @@ export default function SearchResults({results, capped}: {results: SearchResult[
       {tabs.length > 1 && <FilterTabs tabs={tabs} active={active} label={SEARCH_FILTER_LABEL} onChoose={choose} />}
       <div className="tf-px">
        <div className="tf-max-w flex flex-col gap-6">
-        <p
+        {/* <p
           role="status"
           className="font-mono-tracked text-body-small uppercase tracking-[1.54px] leading-[1.6] text-on-background-subtle"
         >
           {shown.length} {shown.length === 1 ? 'result' : 'results'}
           {capped && !active ? ' (first ' + results.length + ')' : ''}
-        </p>
+        </p> */}
         <ol className="flex flex-col">
           {shown.map((result) => (
             <ResultRow key={result.id} result={result} />

@@ -87,6 +87,16 @@
     background: color-mix(in srgb, var(--scrollbar-thumb) calc(var(--scrollbar-alpha) * 100%), transparent);
     border-radius: 9999px;
   }
+
+  /* Touch devices: no scrollbar at all. The row is swiped, and the edge fade already shows that
+     more tabs are off-screen. Last in the rule so it wins over the thin Firefox bar above. */
+  @media (pointer: coarse) {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
 }
 
 /**
