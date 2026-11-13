@@ -238,6 +238,9 @@ and the discrepancy flagged.
   three env vars in `frontend/.env.example`, and settling `X-Forwarded-For` trust with the hosting
   target (with #21). The issue also lists the smaller accessibility, Studio and script-check
   follow-ups from the branch review. Issue: #27.
+- **Edge protection for the submit route (and `/search`).** Rate-limit or challenge rules in the
+  Vercel Firewall, since robots rules and the per-instance limiter do not stop abusive clients.
+  Dashboard configuration, so it is not verifiable from the codebase. Issue: #152.
 - **Hover state has no border in the Figma**, so a hovered field disappears into the page
   background. Needs a design decision. Issue: #46.
 - **A single select cannot be cleared once chosen** in the styled listbox. Issue: #47.

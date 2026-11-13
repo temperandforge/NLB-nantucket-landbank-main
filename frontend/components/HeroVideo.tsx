@@ -117,7 +117,11 @@ export default function HeroVideo({block}: HeroVideoProps) {
   }
 
   return (
-    <section className="relative w-full aspect-[9/5] min-h-72 overflow-hidden bg-black">
+    // Height is capped to what's left of the first screen once the nav bar (--header-height) and the
+    // 34px minimum banner are taken off, so the whole section is above the fold on short or wide
+    // viewports. `object-cover` on the poster and video crops the sides to fit; min-h-72 still wins
+    // on a phone, where the 9/5 box is already short.
+    <section className="relative w-full aspect-[9/5] min-h-72 max-h-[calc(100dvh-var(--header-height)-2.125rem)] overflow-hidden bg-black">
       {poster?.asset?._ref && (
         <Image
           id={poster.asset._ref}
@@ -148,10 +152,18 @@ export default function HeroVideo({block}: HeroVideoProps) {
       <button
         type="button"
         onClick={toggle}
-        className="icon-button icon-button-primary absolute right-4 bottom-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        className="group icon-button icon-button-primary absolute right-4 bottom-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
       >
         {playing ? <PauseIcon className="size-6" /> : <PlayIcon className="size-6" />}
         <span className="sr-only">{playing ? 'Pause video' : 'Play video'}</span>
+        {/* Visual tooltip only: the sr-only label above is the accessible name. Shown on hover and
+            keyboard focus; `pointer-events-none` so it never blocks the video beneath. */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute right-0 bottom-full mb-2 whitespace-nowrap rounded bg-black/85 px-2.5 py-1.5 font-secondary text-body-small text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
+        >
+          {playing ? 'Pause video' : 'Play video'}
+        </span>
       </button>
     </section>
   )
