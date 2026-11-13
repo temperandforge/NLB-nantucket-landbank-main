@@ -35,13 +35,32 @@ export const job = defineType({
       name: 'location',
       title: 'Location',
       type: 'string',
-      description: 'e.g. "In-Person", "Remote" or "Hybrid".',
+      description:
+        'e.g. "In-Person", "Remote" or "Hybrid". For search engines an in-person or hybrid job is at the Land Bank\'s address (Settings > Organization); a remote one gets no job markup.',
     }),
     defineField({
       name: 'employmentType',
       title: 'Employment type',
       type: 'string',
-      description: 'e.g. "Full Time", "Part Time", "Seasonal" or "Internship".',
+      description:
+        'e.g. "Full Time", "Part Time", "Seasonal" or "Internship". Search engines read these (and Contract, Temporary, Volunteer, Per Diem); any other wording is shown on the card but left out of the job markup.',
+    }),
+    defineField({
+      name: 'datePosted',
+      title: 'Date posted',
+      type: 'date',
+      description: 'Search engines require it to list the job. Without it the job gets no job markup.',
+    }),
+    defineField({
+      name: 'validThrough',
+      title: 'Apply by',
+      type: 'date',
+      description: 'The last day applications are accepted. After it the job is left out of the markup. Leave empty if there is no deadline.',
+      validation: (rule) =>
+        rule.custom((value, context) => {
+          const posted = (context.document as {datePosted?: string} | undefined)?.datePosted
+          return value && posted && value < posted ? 'The apply-by date is before the date posted.' : true
+        }),
     }),
     defineField({
       name: 'applyLink',

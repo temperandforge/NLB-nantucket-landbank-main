@@ -473,6 +473,11 @@ const pageBuilderFields = /* groq */ `
     },
     _type == "jobListings" => {
       ...,
+      // The employer for each job's JobPosting markup: the Land Bank, from Settings.
+      "hiringOrganization": *[_type == "settings" && _id == "siteSettings"][0]{
+        "name": coalesce(organization.legalName, title),
+        "address": organization.address
+      },
       "jobs": *[_type == "job"] | order(order asc, title asc) {
         _id,
         title,
@@ -480,6 +485,8 @@ const pageBuilderFields = /* groq */ `
         location,
         employmentType,
         department,
+        datePosted,
+        validThrough,
         applyLink{
           ...,
           ${linkReference}

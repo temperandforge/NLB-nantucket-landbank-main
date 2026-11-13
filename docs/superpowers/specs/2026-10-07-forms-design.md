@@ -233,17 +233,21 @@ and the discrepancy flagged.
   client or to Studio. Whether Sanity can issue a create-only, `formSubmission`-only token on this
   plan, or whether the writes should move behind a Sanity Function, is investigated separately.
   Issue: #22.
-- **Go-live hardening and review follow-ups.** Before the forms go live: timeouts on the
-  reCAPTCHA and Sanity calls in the submit route, a byte-accurate streaming body-size cap, the
-  three env vars in `frontend/.env.example`, and settling `X-Forwarded-For` trust with the hosting
-  target (with #21). The issue also lists the smaller accessibility, Studio and script-check
-  follow-ups from the branch review. Issue: #27.
+- **Go-live hardening and review follow-ups.** Done: timeouts on the reCAPTCHA and Sanity calls,
+  a byte-counting streaming body cap, the env vars in `frontend/.env.example`, a per-attempt
+  announcement of the error count, the "form changed" message when no rejected field is on screen,
+  `aria-disabled` on the submit button, listbox scroll and key-repeat fixes, option uniqueness in
+  Studio. Still open, because they need hosting, a design or a content decision or a browser pass:
+  `X-Forwarded-For` trust (with #21), focus rings after a mouse submit, the date/time icon in
+  Firefox, Studio field-key auto-fill and show-if messages, the `verifyFormLogic`/`verifyForms`/
+  `seedForms` items, and the unverified phone-size pass. Issue: #27 (its checklist is updated).
 - **Edge protection for the submit route (and `/search`).** Rate-limit or challenge rules in the
   Vercel Firewall, since robots rules and the per-instance limiter do not stop abusive clients.
   Dashboard configuration, so it is not verifiable from the codebase. Issue: #152.
 - **Hover state has no border in the Figma**, so a hovered field disappears into the page
   background. Needs a design decision. Issue: #46.
-- **A single select cannot be cleared once chosen** in the styled listbox. Issue: #47.
+- ~~A single select cannot be cleared once chosen~~: done. An optional single select has a leading
+  "None" row and Backspace/Delete on the closed trigger clears it (DECISIONS 21.4). Issue: #47.
 - **Seeded labels, placeholders and options** that differ from the Figma or are stand-in client
   content. Issue: #48.
 

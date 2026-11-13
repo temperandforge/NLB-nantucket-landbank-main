@@ -324,3 +324,85 @@ export function recordsArchiveLd(
     }),
   )
 }
+
+export type JobInput = {
+  title?: string | null
+  description?: string | null
+  /** The `location` field is a work mode ("In-Person", "Remote", "Hybrid"), not a place. */
+  location?: string | null
+  employmentType?: string | null
+  /** A `YYYY-MM-DD` date. */
+  datePosted?: string | null
+  validThrough?: string | null
+}
+
+export type JobEmployerInput = {
+  name?: string | null
+  address?: {
+    streetAddress?: string | null
+    addressLocality?: string | null
+    addressRegion?: string | null
+    postalCode?: string | null
+  } | null
+}
+
+/** The schema.org `employmentType` values; the editor's wording is matched loosely, anything else is left out. */
+const EMPLOYMENT_TYPES: [RegExp, string][] = [
+  [/full[\s-]*time/i, 'FULL_TIME'],
+  [/part[\s-]*time/i, 'PART_TIME'],
+  [/per[\s-]*diem/i, 'PER_DIEM'],
+  [/contract/i, 'CONTRACTOR'],
+  [/temp|seasonal/i, 'TEMPORARY'],
+  [/intern/i, 'INTERN'],
+  [/volunteer/i, 'VOLUNTEER'],
+]
+
+export function schemaEmploymentType(label: string | null | undefined): string | undefined {
+  if (!label) return undefined
+  return EMPLOYMENT_TYPES.find(([pattern]) => pattern.test(label))?.[1]
+}
+
+/**
+ * One job as a JobPosting. Google needs a title, description, date posted, employer and place, so
+ * without any of them there is no markup. The place is the employer's address (the job document
+ * holds only a work mode), and a remote job has no place to give, so it gets none. A job past its
+ * apply-by date is left out. `now` is a parameter so the builder stays pure; dates are compared as
+ * `YYYY-MM-DD` strings. A job has no page of its own, so the posting points at the listings page.
+ */
+export function jobPostingLd(
+  job: JobInput,
+  employer: JobEmployerInput | null | undefined,
+  path: string,
+  origin: string | null,
+  now: string,
+): JsonLdGraph | null {
+  const title = job.title?.trim()
+  const description = job.description?.trim()
+  if (!origin || !title || !description || !job.datePosted || !employer?.name) return null
+  if (job.validThrough && job.validThrough < now.slice(0, 10)) return null
+  if (job.location && /remote/i.test(job.location) && !/hybrid/i.test(job.location)) return null
+  const address = employer.address
+  if (!address || !Object.values(address).some(Boolean)) return null
+  return withContext(
+    compact({
+      '@type': 'JobPosting',
+      title,
+      description,
+      datePosted: job.datePosted,
+      validThrough: job.validThrough,
+      employmentType: schemaEmploymentType(job.employmentType),
+      url: absoluteUrl(path, origin),
+      hiringOrganization: {'@type': 'Organization', name: employer.name, '@id': organizationId(origin)},
+      jobLocation: {
+        '@type': 'Place',
+        address: compact({
+          '@type': 'PostalAddress',
+          streetAddress: address.streetAddress,
+          addressLocality: address.addressLocality,
+          addressRegion: address.addressRegion,
+          postalCode: address.postalCode,
+        }),
+      },
+    }),
+  )
+}

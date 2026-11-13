@@ -93,7 +93,12 @@ export const formField = defineType({
         rule.custom((value, context) => {
           const type = (context.parent as Parent)?.fieldType ?? ''
           if (!CHOICE.includes(type)) return true
-          return Array.isArray(value) && value.length > 0 ? true : 'Add at least one option'
+          if (!Array.isArray(value) || value.length === 0) return 'Add at least one option'
+          // Options are list keys and the stored answer, so a repeat or a blank would collide.
+          const texts = (value as unknown[]).map((option) => (typeof option === 'string' ? option.trim() : ''))
+          if (texts.some((text) => text === '')) return 'An option is empty'
+          const repeated = texts.find((text, index) => texts.indexOf(text) !== index)
+          return repeated ? `"${repeated}" is listed twice` : true
         }),
     }),
     defineField({

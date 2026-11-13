@@ -1576,6 +1576,20 @@ browser.
 - **Icons.** Time fields use the Figma clock-2 icon (`Clock2Icon`). The design system has no radio
   icons and the Figma draws the Yes/No pair as squares, so radio groups use the same square icons
   as checkboxes and keep radio behaviour (one answer, arrow keys, one tab stop).
+- **An optional single select can be cleared.** Its list starts with a "None" row (the empty
+  answer), and Backspace or Delete on the focused, closed trigger clears it. A required single
+  select never shows the row, and a multi select clears by unticking. The row is shown selected
+  while nothing is chosen, and typeahead matches it by the word "None".
+- **Listbox scrolling follows the keyboard only.** The active row scrolls into view when an arrow,
+  Home/End or a typed letter moves it, not on mouse hover (the list jumped under the pointer), and
+  opening the list focuses it without scrolling the page. A held Enter/Space does not repeat.
+- **A failed submit is announced once per attempt.** A visually hidden `role="alert"` (remounted per
+  attempt, so an identical failure speaks again) carries the count; the visible notice is not a live
+  region, so fixing fields does not re-announce a changing count. The submit button uses
+  `aria-disabled` while sending (guarded in the handler) so keyboard focus is not dropped.
+- **The submit route bounds its waiting.** The reCAPTCHA check (5 s) and the Sanity read (8 s) time
+  out, and the body is read as a stream and cut off at 50,000 bytes, so a chunked body is not
+  buffered whole.
 - **A field's `prompt`** is the small text above the control when the section heading already asks
   the question (Figma: the mono heading plus "Select one"). The `label` stays the question: it is
   in the accessible name (as visually hidden text before the prompt), in validation messages and in
@@ -1703,7 +1717,7 @@ the page already fetched. A builder returns `null` when required data is missing
 omitted rather than emitted empty. Output is serialised with `<` escaped as `<` (Next.js
 JSON-LD guide). **Why:** one source of truth, so structured data cannot contradict the page.
 **Implication:** a type with no matching fields (`JobPosting`, `FAQPage`) is deferred until the
-data exists, not approximated.
+data exists, not approximated. (`JobPosting` has since been built: see 24.8.)
 
 ### 24.3 One site origin, and no origin means no JSON-LD
 
@@ -1763,11 +1777,26 @@ control of search and social appearance. The `seo` object goes on `page`, `artic
   not confirmed; the markup is harmless either way. Property FAQs are still referenced FAQ documents;
   the collector reads inline items the same way, so [#126](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/126)
   needs no builder change.
-- **Deferred, with issues:** JobPosting [#78](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/78),
-  Studio SEO preview [#79](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/79),
+- **Deferred, with issues:** Studio SEO preview [#79](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/79),
   hreflang, custom JSON-LD and Search Console [#80](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/80),
   GovernmentOrganization [#81](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/81).
   The records archive, #41, is built.
+
+### 24.8 JobPosting ([#78](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/78))
+
+- **Fields added to `job`:** `datePosted` and `validThrough` ("Apply by"), both dates. The existing
+  free-text `employmentType` and `location` stay as they are; the builder maps the first to the
+  schema.org enum by loose match (`Full Time` becomes `FULL_TIME`, anything unrecognised is left
+  out) and reads the second as a work mode, not a place.
+- **The place is the Land Bank's own address** (Settings > Organization), because the document holds
+  only a work mode. A remote job gets no markup at all (Google requires an applicant location for
+  one, which we do not hold); hybrid counts as on-site. An expired job (`validThrough` before today)
+  and a job with no `datePosted` are left out, so no markup is invented or stale.
+- **Where it lives:** jobs have no page of their own, so each is a `JobPosting` on the page that holds
+  the `jobListings` block (`url` is that page), emitted by the catch-all route next to the page's
+  other graphs. The block's query returns `hiringOrganization` from Settings.
+- **Content step:** existing jobs have no `datePosted`, so no markup appears until editors enter it.
+  Open follow-ups (remote jobs, structured location, validation): [#156](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/156).
 
 ### 24.7 Fixes from the whole-branch review
 

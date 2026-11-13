@@ -7,6 +7,9 @@ import {verifyRecaptcha} from '@/sanity/lib/recaptcha'
 
 const MAX_BODY_BYTES = 50_000
 
+// A hung upstream must not hold the request (and leave the visitor's button on "Sending…").
+const SANITY_READ_TIMEOUT_MS = 8000
+
 // Must match the action the browser requests the token for (components/ui/form/Recaptcha.tsx).
 const RECAPTCHA_ACTION = 'form_submit'
 
@@ -17,6 +20,39 @@ const json = (body: unknown, status = 200) => Response.json(body, {status})
 
 function clientIp(request: Request): string {
   return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+}
+
+/**
+ * The request body as text, or null if it is over `limit` bytes. Reads the stream and counts bytes
+ * as they arrive, so a chunked body (which has no Content-Length) is cut off at the cap instead of
+ * being buffered whole, and the count is in bytes, not UTF-16 units.
+ */
+async function readCappedBody(request: Request, limit: number): Promise<string | null> {
+  if (!request.body) return ''
+  const reader = request.body.getReader()
+  const chunks: Uint8Array[] = []
+  let total = 0
+  try {
+    for (;;) {
+      const {done, value} = await reader.read()
+      if (done) break
+      total += value.byteLength
+      if (total > limit) {
+        await reader.cancel().catch(() => {})
+        return null
+      }
+      chunks.push(value)
+    }
+  } catch {
+    return ''
+  }
+  const bytes = new Uint8Array(total)
+  let offset = 0
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset)
+    offset += chunk.byteLength
+  }
+  return new TextDecoder().decode(bytes)
 }
 
 /**
@@ -34,8 +70,8 @@ export async function POST(request: Request, ctx: {params: Promise<{formId: stri
   if (Number(request.headers.get('content-length') ?? 0) > MAX_BODY_BYTES) {
     return json({error: 'invalid'}, 413)
   }
-  const text = await request.text().catch(() => '')
-  if (text.length > MAX_BODY_BYTES) return json({error: 'invalid'}, 413)
+  const text = await readCappedBody(request, MAX_BODY_BYTES)
+  if (text === null) return json({error: 'invalid'}, 413)
   let body: Record<string, unknown>
   try {
     const parsed: unknown = JSON.parse(text)
@@ -60,7 +96,11 @@ export async function POST(request: Request, ctx: {params: Promise<{formId: stri
 
   let form
   try {
-    form = await client.withConfig({useCdn: false}).fetch(FORM_FOR_SUBMIT_QUERY, {id: formId})
+    form = await client.withConfig({useCdn: false}).fetch(
+      FORM_FOR_SUBMIT_QUERY,
+      {id: formId},
+      {signal: AbortSignal.timeout(SANITY_READ_TIMEOUT_MS)},
+    )
   } catch (error) {
     console.error('Could not read a form for a submission', error)
     return json({error: 'server'}, 500)
