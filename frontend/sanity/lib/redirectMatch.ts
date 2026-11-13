@@ -18,6 +18,16 @@ export type MatchableRule = {
 
 export type RedirectResult = {status: number; location: string | null}
 
+/**
+ * A destination the proxy will follow: a site path with a single leading slash, or http(s). Mirrors
+ * `validateDestinationHref` in `studio/src/lib/redirectSource.ts`; this is the backstop for data that
+ * predates that validation or was written by a script.
+ */
+export function isSafeDestination(destination: string): boolean {
+  const value = destination.trim()
+  return /^\/(?![/\\])/.test(value) || /^https?:\/\/[^\s/]/i.test(value)
+}
+
 function normalisePath(raw: string): string {
   let path = raw
   try {
@@ -68,7 +78,7 @@ export function matchRedirect(
   const candidates: {rule: MatchableRule; weight: number}[] = []
   for (const rule of rules) {
     if (!SUPPORTED_STATUS.has(rule.statusCode)) continue
-    if (rule.statusCode !== 410 && !rule.destination) continue
+    if (rule.statusCode !== 410 && (!rule.destination || !isSafeDestination(rule.destination))) continue
     const {path: sourcePath, query} = splitQuery(rule.source)
     if (normalisePath(sourcePath) !== path) continue
     const required = new URLSearchParams(query)

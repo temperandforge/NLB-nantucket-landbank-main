@@ -41,9 +41,14 @@ const pagePath = /* groq */ `select(
   slug.current
 )`
 
+// The landing page resolves to "/" rather than its own path, which would cost a redirect hop
+// (`app/[...slug]` 308s it to "/"). `pageHref` turns "/" into the root.
 const linkReference = /* groq */ `
   _type == "link" => {
-    "page": page->{"path": ${pagePath}}.path
+    "page": page->{"path": select(
+      _id == *[_type == "settings" && _id == "siteSettings"][0].landingPage._ref => "/",
+      ${pagePath}
+    )}.path
   }
 `
 

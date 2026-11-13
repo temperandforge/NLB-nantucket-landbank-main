@@ -1,4 +1,4 @@
-import {defineField, defineType} from 'sanity'
+import {defineField, defineType, type CustomValidator} from 'sanity'
 import {DocumentIcon} from '@sanity/icons'
 
 import {basicLeftRightText} from '../objects/basicLeftRightText'
@@ -32,6 +32,7 @@ import {recordsArchive} from '../objects/recordsArchive'
 import {seoField, seoGroup} from '../objects/seo'
 import {timeline} from '../objects/timeline'
 import {buildPagePath, MAX_PAGE_DEPTH, slugifySegment} from '../../lib/pageHierarchy'
+import {describeRenameImpact, type PageDraft} from '../../lib/pageUrlImpact'
 
 /**
  * Every block a page can hold. Sorted by title when the Studio loads, so the "Add item" menu is
@@ -109,6 +110,21 @@ function publishedId(id: string): string {
   return id.replace(/^drafts\./, '')
 }
 
+/**
+ * A warning (not an error) when publishing this draft would change existing URLs. Shared by the
+ * fields that move a page: slug, parent and pathOnly. Studio validates the draft, so this reads the
+ * published version from the dataset and compares.
+ */
+const renameCheck: CustomValidator = async (_value, context) => {
+  const client = context.getClient({apiVersion: '2025-09-25'})
+  try {
+    return (await describeRenameImpact(client, context.document as PageDraft)) ?? true
+  } catch {
+    // A failed lookup must not block editing; the warning is advisory.
+    return true
+  }
+}
+
 export const page = defineType({
   name: 'page',
   title: 'Page',
@@ -135,7 +151,7 @@ export const page = defineType({
       type: 'slug',
       description:
         'This page’s own URL segment - one word or hyphenated phrase, no slashes. The full path is built from the parent chain.',
-      validation: (Rule) =>
+      validation: (Rule) => [
         Rule.required().custom(async (slug, context) => {
           const current = slug?.current
           if (!current) return true
@@ -166,6 +182,8 @@ export const page = defineType({
           }
           return true
         }),
+        Rule.custom(renameCheck).warning(),
+      ],
       options: {
         source: 'name',
         maxLength: 96,
@@ -182,7 +200,7 @@ export const page = defineType({
       to: [{type: 'page'}],
       description:
         'Optional. Nests this page under another one in the URL. Leave empty for a top-level page. The parent must be published, or this page’s URL will break.',
-      validation: (Rule) =>
+      validation: (Rule) => [
         Rule.custom(async (value, context) => {
           const ref = (value as {_ref?: string} | undefined)?._ref
           if (!ref) return true
@@ -204,6 +222,8 @@ export const page = defineType({
           }
           return true
         }),
+        Rule.custom(renameCheck).warning(),
+      ],
     }),
 
     defineField({
@@ -214,6 +234,7 @@ export const page = defineType({
       initialValue: false,
       description:
         'Turn on for a page that exists only to group its children in the URL, such as "About Us". Its slug still appears in its children’s paths, but the page itself is not viewable and returns 404.',
+      validation: (Rule) => Rule.custom(renameCheck).warning(),
     }),
 
     defineField({

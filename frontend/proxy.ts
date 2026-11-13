@@ -50,7 +50,14 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
-  // Skip Next internals (`/_next/...`), the API routes (`/api` and `/api/...`) and anything with a
-  // dot (static assets). The `(?:/|$)` boundaries keep page paths like `/apiary` or `/api-docs`.
-  matcher: ['/((?!_next(?:/|$)|api(?:/|$)|.*\\..*).*)'],
+  // Skip Next internals (`/_next/...`), the API routes (`/api` and `/api/...`) and requests for static
+  // assets, recognised by a fixed list of file extensions. The `(?:/|$)` boundaries keep page paths
+  // like `/apiary` or `/api-docs`. Other dotted paths (`/old-page.html`, `/x.php`) reach the proxy so
+  // a redirect can match them. The extension list is mirrored in `ASSET_EXTENSIONS` in
+  // `studio/src/lib/redirectSource.ts`, which rejects a source ending in one (it could never fire);
+  // `scripts/verifyRedirectMatcher.mts` fails if the two drift. It must stay a string literal here:
+  // Next reads `config` statically, so it cannot be built from a constant. See DECISIONS 2.8.
+  matcher: [
+    '/((?!_next(?:/|$)|api(?:/|$)|.*\\.(?:js|mjs|css|map|png|jpe?g|gif|svg|webp|avif|ico|bmp|woff2?|ttf|otf|eot|mp4|webm|mov|mp3|txt|xml|json|geojson|webmanifest)$).*)',
+  ],
 }
