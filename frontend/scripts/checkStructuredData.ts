@@ -12,6 +12,7 @@ import {
   breadcrumbLd,
   eventLd,
   faqPageLd,
+  jobPostingLd,
   newsArticleLd,
   organizationLd,
   placeLd,
@@ -117,6 +118,35 @@ check('event with an end and a location keeps both', () => {
   assert.equal(ld.endDate, '2026-07-01T12:00:00-04:00')
   assert.deepEqual(ld.location, {'@type': 'Place', name: 'Pier'})
   assert.equal(ld.url, 'https://x.org/events/e')
+})
+const EMPLOYER = {name: 'Land Bank', address: {streetAddress: '2 Fairgrounds Rd', addressLocality: 'Nantucket', addressRegion: 'MA', postalCode: '02554'}}
+const JOB = {title: 'Ranger', description: 'Walk the trails.', datePosted: '2026-10-01', location: 'In-Person', employmentType: 'Full Time'}
+const NOW = '2026-11-13T10:00:00.000Z'
+check('job posting needs an origin, title, description, date posted, employer and address', () => {
+  assert.equal(jobPostingLd(JOB, EMPLOYER, '/jobs', null, NOW), null)
+  for (const missing of ['title', 'description', 'datePosted'] as const) {
+    assert.equal(jobPostingLd({...JOB, [missing]: null}, EMPLOYER, '/jobs', ORIGIN, NOW), null, missing)
+  }
+  assert.equal(jobPostingLd(JOB, {...EMPLOYER, name: null}, '/jobs', ORIGIN, NOW), null)
+  assert.equal(jobPostingLd(JOB, {name: 'Land Bank'}, '/jobs', ORIGIN, NOW), null)
+  assert.equal(jobPostingLd(JOB, {name: 'Land Bank', address: {streetAddress: ''}}, '/jobs', ORIGIN, NOW), null)
+})
+check('job posting maps employment type and omits what is not known', () => {
+  const ld = jobPostingLd(JOB, EMPLOYER, '/jobs', ORIGIN, NOW)!
+  assert.equal(ld['@type'], 'JobPosting')
+  assert.equal(ld.employmentType, 'FULL_TIME')
+  assert.equal(ld.url, 'https://x.org/jobs')
+  assert.ok(!('validThrough' in ld))
+  assert.deepEqual(ld.jobLocation, {'@type': 'Place', address: {'@type': 'PostalAddress', ...EMPLOYER.address}})
+  const odd = jobPostingLd({...JOB, employmentType: 'Whenever'}, EMPLOYER, '/jobs', ORIGIN, NOW)!
+  assert.ok(!('employmentType' in odd))
+  assert.equal(jobPostingLd({...JOB, employmentType: 'Seasonal'}, EMPLOYER, '/jobs', ORIGIN, NOW)!.employmentType, 'TEMPORARY')
+})
+check('job posting: a remote job and an expired job are left out, an apply-by today is kept', () => {
+  assert.equal(jobPostingLd({...JOB, location: 'Remote'}, EMPLOYER, '/jobs', ORIGIN, NOW), null)
+  assert.ok(jobPostingLd({...JOB, location: 'Hybrid'}, EMPLOYER, '/jobs', ORIGIN, NOW))
+  assert.equal(jobPostingLd({...JOB, validThrough: '2026-11-12'}, EMPLOYER, '/jobs', ORIGIN, NOW), null)
+  assert.equal(jobPostingLd({...JOB, validThrough: '2026-11-13'}, EMPLOYER, '/jobs', ORIGIN, NOW)!.validThrough, '2026-11-13')
 })
 check('place has geo only when it has a location', () => {
   assert.ok(!('geo' in placeLd({name: 'P', slug: 'p'}, ORIGIN)!))

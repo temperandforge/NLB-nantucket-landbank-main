@@ -152,7 +152,8 @@ export function validateForm(
       errors[name] = message
       continue
     }
-    const value = Array.isArray(raw) ? raw : (raw ?? '').trim()
+    // A repeated option (a replayed request) is stored once.
+    const value = Array.isArray(raw) ? [...new Set(raw)] : (raw ?? '').trim()
     if (value.length > 0) clean[name] = value
   }
   return {errors, clean}
