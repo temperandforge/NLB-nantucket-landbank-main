@@ -130,7 +130,7 @@ export default function NewsPreviewView({
                   follows every line, which a full-width rule under the box could not. */}
               <div className="relative z-10 flex w-full items-end justify-between gap-4">
                 {cta.label && (
-                  <p className="min-w-0 font-mono text-body-small leading-[1.6] tracking-wide text-on-accent-secondary uppercase text-pretty underline decoration-1 underline-offset-[6px] transition-[text-underline-offset,text-decoration-thickness] duration-300 ease-out [overflow-wrap:anywhere] group-hover:decoration-2 group-hover:underline-offset-8 group-focus-visible:decoration-2 group-focus-visible:underline-offset-8 motion-reduce:transition-none">
+                  <p className="min-w-0 font-mono text-body-small leading-[1.6] tracking-wide text-on-accent-secondary uppercase text-pretty underline decoration-1 underline-offset-[6px] transition-[text-decoration-thickness] duration-300 ease-out [overflow-wrap:anywhere] group-hover:decoration-2 group-focus-visible:decoration-2 motion-reduce:transition-none">
                     {cta.label}
                   </p>
                 )}
