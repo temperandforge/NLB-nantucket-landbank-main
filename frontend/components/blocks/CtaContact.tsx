@@ -13,8 +13,7 @@ export default function CtaContact({block}: BlockProps<'ctaContact'>) {
 
   return (
     <section className="relative flex w-full items-center justify-center bg-background p-s1">
-      {/* Not held to tf-max-w: the image spans the viewport inside the section's padding. */}
-      <div className="w-full">
+      <div className="w-full tf-max-w">
         <div className="relative h-[33.75rem] w-full overflow-clip md:h-[38.125rem]">
           <BlockImage
             image={block.mobileImage}

@@ -1099,7 +1099,7 @@ export type Article = {
           _type: 'span'
           _key: string
         }>
-        style?: 'normal' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
+        style?: 'normal' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
         listItem?: 'bullet' | 'number'
         markDefs?: Array<{
           linkType?: 'href' | 'page'
