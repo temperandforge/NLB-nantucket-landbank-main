@@ -86,9 +86,11 @@ export default function EventsGrid({block}: BlockProps<'eventsGrid'>) {
                         {event.description}
                       </p>
                     )}
-                    {/* No inline padding here: with no background behind it the button's padding only reads as an indent. */}
+                    {/* No inline padding here: with no background behind it the button's padding only reads as an indent.
+                        Natural height (the whole row is the tap target via the stretched title link) and overflow
+                        visible, so the arrow's 8px hover nudge isn't clipped by the now-padless box. */}
                     {href && (
-                      <span aria-hidden="true" className="link-button mt-3 h-14 !px-0 group-hover:[&_svg]:text-secondary lg:hidden">
+                      <span aria-hidden="true" className="link-button mt-3 h-auto !px-0 !overflow-visible group-hover:[&_svg]:text-secondary lg:hidden">
                         <span>View details</span>
                         <ArrowRightIcon className="link-button-icon" />
                       </span>
