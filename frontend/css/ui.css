@@ -320,7 +320,10 @@
 
 /* ---- Decorative line art backgrounds ----------------------------------------------------------- */
 .basic-left-right__lines {
-  background: url('/images/blocks/decorative-line-basic-left-right.svg') center / cover no-repeat;
+  background: url('/images/blocks/decorative-line-basic-left-right.svg') center / 100% 100% no-repeat;
+  /* Stretched to the layer, not cropped to it: `cover` cut the lines off at the section's top and
+     bottom. The SVG is preserveAspectRatio="none" with non-scaling strokes, so the stretch bends
+     the curves but keeps the lines 1px. */
 }
 
 /* Mission block (Figma 1910:9547 desktop, 2440:14716 mobile): the curve is drawn at its natural
