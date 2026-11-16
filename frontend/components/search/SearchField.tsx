@@ -54,7 +54,7 @@ export default function SearchField({
     <form role="search" action="/search" method="get" onSubmit={submit} className={`flex flex-col gap-gap-sm ${className ?? ''}`}>
       <div className="flex items-end justify-between gap-gap-sm">
         <div className="flex min-w-0 grow flex-col gap-gap-sm">
-          <label htmlFor={inputId} className="font-mono-tracked text-body-small uppercase tracking-[1.54px] leading-[1.6]">
+          <label htmlFor={inputId} className="font-mono-tracked text-body-small uppercase tracking-wide leading-[1.6]">
             Search
           </label>
           <input

@@ -70,7 +70,7 @@ export default async function SearchPage(props: SearchPageProps) {
         <div className="tf-px">
           <div className="tf-max-w flex flex-col gap-12 md:gap-16">
             <div className="flex flex-col gap-10 md:gap-12">
-              <h1 className="max-w-[24ch] break-words text-headline-xl leading-[1.1] tracking-tight text-on-background">
+              <h1 className="max-w-[24ch] break-words text-headline-xl leading-[1.1] tracking-normal text-on-background">
                 {searched ? <>Results for &ldquo;{query}&rdquo;</> : 'Search'}
               </h1>
               {/* Keyed on the query so a new search resets the field to it, error state included. */}

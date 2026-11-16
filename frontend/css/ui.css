@@ -22,7 +22,7 @@
 @utility text-heading-base {
   font-family: var(--font-serif);
   font-weight: 400;
-  letter-spacing: -0.05em;
+  letter-spacing: var(--tracking-normal);
   line-height: 1.1;
 }
 
@@ -390,7 +390,7 @@
 .rich-text-basic > h6 {
   font-family: var(--font-serif);
   font-weight: 400;
-  letter-spacing: -0.05em;
+  letter-spacing: var(--tracking-normal);
   line-height: 1.1;
   margin-top: 0;
   margin-bottom: 2rem;
@@ -468,7 +468,7 @@
 .rich-text-project > h6 {
   font-family: var(--font-serif);
   font-weight: 400;
-  letter-spacing: -0.05em;
+  letter-spacing: var(--tracking-normal);
   line-height: 1.1;
 }
 
@@ -543,7 +543,7 @@
   margin-top: 2.5rem;
   font-family: var(--font-serif);
   font-weight: 400;
-  letter-spacing: -0.05em;
+  letter-spacing: var(--tracking-normal);
   line-height: 1.1;
 }
 
@@ -592,7 +592,7 @@
   font-family: var(--font-serif);
   font-size: var(--text-headline-sm);
   line-height: 1.35;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-normal);
   text-wrap: pretty;
 }
 
@@ -613,7 +613,7 @@
   font-family: var(--font-serif);
   font-size: var(--text-headline-lg);
   line-height: 1.15;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--tracking-normal);
   text-wrap: balance;
 }
 
@@ -941,7 +941,7 @@
   font-family: var(--font-serif);
   font-size: var(--text-headline-base);
   line-height: 1.2;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--tracking-normal);
   text-wrap: balance;
 }
 
@@ -1151,7 +1151,7 @@
   font-family: var(--font-serif);
   font-size: var(--text-headline-sm);
   line-height: 1.2;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-normal);
   text-align: center;
   text-wrap: balance;
 }

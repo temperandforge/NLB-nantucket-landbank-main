@@ -6,7 +6,7 @@ import {groupMenuLinks} from '@/sanity/lib/menuGroups'
 import type {HeaderMenuChild} from '@/sanity/lib/types'
 
 /** Tracked uppercase label - Figma type style mono/tracked. */
-const LABEL_CLASS = 'font-mono-tracked text-[12px] uppercase tracking-[1.32px] leading-[1.6]'
+const LABEL_CLASS = 'font-mono-tracked text-[12px] uppercase tracking-wide leading-[1.6]'
 
 /** ArrowDown/ArrowUp move focus between the panel's links, wrapping at the ends. */
 function moveFocus(event: KeyboardEvent<HTMLDivElement>) {

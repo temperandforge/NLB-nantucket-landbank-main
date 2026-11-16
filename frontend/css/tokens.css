@@ -21,10 +21,14 @@
 
   --font-weight-regular: 400;
 
-  /* Figma stores letter-spacing as a bare -2 / 0 / 2 with no unit; read as percent (em / 100). */
-  --tracking-tight: -0.02em;
+  /*
+   * Figma has exactly two letter-spacing variables: font/letter-spacing/normal = 0 (every headline,
+   * body and mono/base style) and font/letter-spacing/wide = 2 (mono/tracked). The values are bare
+   * numbers in px. There is no tight/negative tracking in the design, so none is defined here:
+   * Tailwind's own tracking-tight (-0.025em) would otherwise come back as the fallback.
+   */
   --tracking-normal: 0em;
-  --tracking-wide: 0.125rem;
+  --tracking-wide: 2px;
 
   /*
    * The Figma font-size scale, in rem (px / 16). Named --font-size-* rather than --text-* so it
