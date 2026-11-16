@@ -26,7 +26,7 @@ export default function MissionStatement({block}: BlockProps<'missionStatement'>
             </div>
           )}
           {block.heading && (
-            <h2 className="w-full text-center text-headline-xl text-on-background text-pretty">
+            <h2 className="w-full text-center text-headline-xl tracking-normal text-on-background text-pretty">
               {block.heading}
             </h2>
           )}

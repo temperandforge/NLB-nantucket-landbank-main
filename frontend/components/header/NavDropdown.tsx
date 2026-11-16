@@ -73,12 +73,12 @@ export default function NavDropdown({
                 <li key={item._key}>
                   <ResolvedLink
                     link={item.link}
-                    className="group relative flex h-14 w-fit items-center gap-gap-sm font-secondary text-body-base text-on-primary after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-left after:scale-x-0 after:bg-border-alt after:transition-transform after:duration-400 after:ease-out motion-reduce:after:transition-none hover:after:scale-x-100 hover:after:delay-150 focus-visible:after:scale-x-100 focus-visible:after:delay-150"
+                    className="group relative flex h-14 w-fit items-center gap-gap-sm font-secondary text-body-base text-on-primary after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-left after:scale-x-0 after:bg-border-alt after:transition-transform after:duration-200 after:ease-linear motion-reduce:after:transition-none hover:after:scale-x-100 focus-visible:after:scale-x-100"
                   >
                     {item.label}
                     {/* Always laid out, only transparent until hover or focus: if it took space only then,
                         hovering the longest item would widen the whole panel. shrink-0 keeps it 24px. */}
-                    <ArrowRightIcon className="size-6 shrink-0 -translate-x-1 text-secondary opacity-0 transition-[opacity,translate] duration-150 motion-reduce:transition-none group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100" />
+                    <ArrowRightIcon className="size-6 shrink-0 -translate-x-1 text-secondary opacity-0 transition-[opacity,translate] duration-300 ease-out motion-reduce:transition-none group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100" />
                   </ResolvedLink>
                 </li>
               ))}

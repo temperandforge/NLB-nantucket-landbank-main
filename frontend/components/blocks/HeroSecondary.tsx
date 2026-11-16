@@ -5,14 +5,14 @@ import Eyebrow from './Eyebrow'
 import HeroSecondaryLines from './HeroSecondaryLines'
 import {BlockProps} from './types'
 
+// The Figma page header sets the panel text at body/lg (20px, line-height 1.6) in every variant, so
+// the size is shared and only the colour differs.
+const BODY = 'text-body-large leading-[1.6]'
+
 const TEXT = {
-  lowlands: {eyebrow: 'text-warm-neutral-50', body: 'text-warm-neutral-50'},
-  'moody-moor': {eyebrow: 'text-warm-neutral-50', body: 'text-warm-neutral-50'},
-  // Light panel: dark text, and the larger body size from the Figma page header.
-  'light-brown': {
-    eyebrow: 'text-moody-moor-600',
-    body: 'text-moody-moor-600 text-body-large leading-[1.6]',
-  },
+  lowlands: {eyebrow: 'text-warm-neutral-50', body: `text-warm-neutral-50 ${BODY}`},
+  'moody-moor': {eyebrow: 'text-warm-neutral-50', body: `text-warm-neutral-50 ${BODY}`},
+  'light-brown': {eyebrow: 'text-moody-moor-600', body: `text-moody-moor-600 ${BODY}`},
 }
 
 export default function HeroSecondary({block, pageName}: BlockProps<'heroSecondary'>) {
