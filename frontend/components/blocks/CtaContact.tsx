@@ -13,7 +13,8 @@ export default function CtaContact({block}: BlockProps<'ctaContact'>) {
 
   return (
     <section className="relative flex w-full items-center justify-center bg-background p-s1">
-      <div className="tf-max-w">
+      {/* Not held to tf-max-w: the image spans the viewport inside the section's padding. */}
+      <div className="w-full">
         <div className="relative h-[33.75rem] w-full overflow-clip md:h-[38.125rem]">
           <BlockImage
             image={block.mobileImage}
@@ -42,7 +43,7 @@ export default function CtaContact({block}: BlockProps<'ctaContact'>) {
             aria-hidden="true"
             width={1703}
             height={248}
-            className="pointer-events-none absolute top-[3.4%] left-[calc(50%-14.5rem)] z-0 hidden w-[177%] max-w-none -translate-x-1/2 md:block"
+            className="pointer-events-none absolute top-[3.4%] left-[calc(50%-14.5rem)] z-0 hidden w-[min(177%,150.45rem)] max-w-none -translate-x-1/2 md:block"
           />
           <Image
             src="/images/blocks/decorative-line-cta-contact-2.svg"
@@ -50,7 +51,7 @@ export default function CtaContact({block}: BlockProps<'ctaContact'>) {
             aria-hidden="true"
             width={1523}
             height={238}
-            className="pointer-events-none absolute top-[1.5%] left-1/2 z-0 hidden w-[159%] max-w-none -translate-x-1/2 md:block"
+            className="pointer-events-none absolute top-[1.5%] left-1/2 z-0 hidden w-[min(159%,135.15rem)] max-w-none -translate-x-1/2 md:block"
           />
 
           <div className="relative z-10 flex size-full flex-col items-center justify-center gap-8 px-5 text-center md:mx-auto md:w-[30.4375rem] md:gap-10 md:px-0">

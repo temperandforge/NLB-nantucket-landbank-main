@@ -83,9 +83,8 @@ export default function HeaderShell({banner, children}: {banner?: React.ReactNod
       }`}
     >
       {banner}
-      <div className="tf-px">
-        <div className="tf-max-w">{children}</div>
-      </div>
+      {/* Not held to tf-max-w: the bar spans the viewport inside its gutter. */}
+      <div className="tf-px">{children}</div>
     </header>
   )
 }
