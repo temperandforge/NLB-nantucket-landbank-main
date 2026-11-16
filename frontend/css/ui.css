@@ -323,8 +323,31 @@
   background: url('/images/blocks/decorative-line-basic-left-right.svg') center / cover no-repeat;
 }
 
-.mission-statement__lines {
-  background: url('/images/blocks/decorative-line-mission.svg') center / cover no-repeat;
+/* Mission block (Figma 1910:9547 desktop, 2440:14716 mobile): the curve is drawn at its natural
+   size (2332.7 x 1258.9), rotated 25.92deg, and centred on an anchor that differs per breakpoint.
+   `cover` would rescale it to the section and lose the rotation, so the section just clips it. */
+.mission-statement__lines::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: calc(50% - 10.5px);
+  width: 2332.708px;
+  height: 1258.932px;
+  background: url('/images/blocks/decorative-line-mission.svg') center / 100% 100% no-repeat;
+  transform: translate(-50%, -50%) rotate(25.92deg);
+}
+
+/* On desktop the section grows wider than the Figma frame (1440) but not taller, so scaling the
+   whole drawing would push its peaks out of the section and leave a gap. Instead it is stretched
+   horizontally only, in screen space (outside the rotation), by viewport width / 1440 so the curve
+   still crosses the full width. `tan(atan2(a, b))` is the way to get a unitless a / b from two
+   lengths. At or below 1440 the factor is 1, identical to the design. */
+@media (min-width: 48rem) {
+  .mission-statement__lines::before {
+    top: calc(50% + 0.5px);
+    left: calc(37.5% + 36px);
+    transform: translate(-50%, -50%) scaleX(max(1, tan(atan2(100vw, 1440px)))) rotate(25.92deg);
+  }
 }
 
 /* Rich text in Basic - Left Right Text (nlb-design BasicLeftRight): sections 64px apart, a
