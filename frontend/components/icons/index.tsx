@@ -218,11 +218,15 @@ export function ChevronUpIcon({className}: IconProps) {
   )
 }
 
-/** Link, from the Figma news template's Share row (Icon / link-alt). 24 x 24. */
+/**
+ * Link, from the Figma news template's Share row (Icon / link-alt). Drawn on a 24 x 24 artboard, but
+ * the glyph only spans 2.76 to 21.24, so the viewBox is cropped to that square: the glyph fills the
+ * svg the way the Facebook, Instagram and LinkedIn marks do, and matches them at the same size.
+ */
 export function LinkAltIcon({className}: IconProps) {
   return (
     <svg
-      viewBox="0 0 24 24"
+      viewBox="2.76 2.76 18.48 18.48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
