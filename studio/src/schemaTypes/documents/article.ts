@@ -43,7 +43,7 @@ export const article = defineType({
       name: 'body',
       title: 'Body',
       type: 'array',
-      of: blockContentMembers({pullquote: true, gallery: true, divider: true, mediaText: true, table: true, video: true, embed: true}),
+      of: blockContentMembers({h2: true, pullquote: true, gallery: true, divider: true, mediaText: true, table: true, video: true, embed: true}),
       description:
         'The article text. Paragraphs, quotes, pull quotes, images (with captions), image galleries, Media & text blocks, tables, videos, map and calendar embeds, dividers, Heading 3-6 and anchor links are available.',
     }),

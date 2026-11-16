@@ -535,6 +535,7 @@
   margin-top: 0;
 }
 
+.rich-text-article > h2,
 .rich-text-article > h3,
 .rich-text-article > h4,
 .rich-text-article > h5,
@@ -546,10 +547,13 @@
   line-height: 1.1;
 }
 
-.rich-text-article > h3 {
+/* H2 is the section heading (the title is the H1), so it takes the larger step; H3 sits under it.
+   Same scale as the project body. */
+.rich-text-article > h2 {
   font-size: var(--text-headline-lg);
 }
 
+.rich-text-article > h3,
 .rich-text-article > h4 {
   font-size: var(--text-headline-base);
 }
@@ -1177,17 +1181,63 @@
 
 .article-curve {
   background: url('/images/blocks/article-curve.svg') center / 100% 100% no-repeat;
+  transform-origin: 0 0;
+  /* The drawing is 1840 wide for a 1440 frame, so it runs off the right edge there. Past 1440 it is
+     stretched horizontally by viewport width / 1440 (tan(atan2()) makes a unitless ratio from two
+     lengths) so it still reaches the right edge; its height and left anchor are unchanged. */
+  transform: scaleX(max(1, tan(atan2(100vw, 1440px))));
 }
 
-/* Project page (Figma 1910:14941 desktop, 1910:15044 mobile): the line art behind the content. The
-   two frames use different drawings, so the mobile one is swapped in below the md breakpoint. */
+/* Project, event and jump-nav pages (Figma 2613:31722 desktop, 2613:31992 mobile): the line art
+   behind the content. The two frames use different drawings at different sizes and anchors, so each
+   breakpoint sets its own. Mobile: 3101 x 1887, centred 215px right of the middle (the frame's
+   2919px box at 50% + 306px, with the drawing running 6.24% past its left edge). Desktop: 1684 x
+   1089 centred on the page; past the 1440 frame it is stretched horizontally by viewport width /
+   1440 (tan(atan2()) makes a unitless ratio from two lengths) so it still crosses the full width. */
 .project-curve {
+  left: calc(50% + 215px);
+  top: calc(50% - 197px);
+  width: 3101.16px;
+  height: 1887px;
   background: url('/images/blocks/project-curve-mobile.svg') center / 100% 100% no-repeat;
+  transform: translate(-50%, -50%);
+}
+
+/* The event page (Figma 2614:32263 desktop, 1910:15238 mobile) uses the same desktop drawing but its
+   own mobile one: 2490 x 1584.5, centred 27px right of the right edge (the frame's 2308px box at
+   100% + 118px, with the drawing running 7.89% past its left edge). The jump nav block (Figma
+   1910:14531 desktop, 1910:14638 mobile) uses that same mobile drawing and anchor. */
+.event-curve,
+.jump-nav-curve {
+  left: calc(100% + 26.95px);
+  top: calc(50% - 231.25px);
+  width: 2490.16px;
+  height: 1584.5px;
+  background: url('/images/blocks/event-curve-mobile.svg') center / 100% 100% no-repeat;
+  transform: translate(-50%, -50%);
 }
 
 @media (min-width: 48rem) {
+  .event-curve,
   .project-curve {
+    left: 50%;
+    top: 40%;
+    width: 1684px;
+    height: 1088.66px;
     background-image: url('/images/blocks/project-curve-desktop.svg');
+    transform: translate(-50%, -50%) scaleX(max(1, tan(atan2(100vw, 1440px))));
+  }
+
+  /* Jump nav desktop: its own drawing (1684 x 1090), pinned to the left edge 256px down rather than
+     centred, so it is stretched from the left (same viewport / 1440 factor). */
+  .jump-nav-curve {
+    left: 0;
+    top: 256px;
+    width: 1684.19px;
+    height: 1089.66px;
+    background-image: url('/images/blocks/jump-nav-curve-desktop.svg');
+    transform: scaleX(max(1, tan(atan2(100vw, 1440px))));
+    transform-origin: 0 0;
   }
 }
 

@@ -37,9 +37,9 @@ export default function EventsGrid({block}: BlockProps<'eventsGrid'>) {
             return (
               <li
                 key={event._id}
-                className="group relative flex flex-col gap-6 border-t border-border-light py-10 first:border-t-0 first:pt-0 last:pb-0 md:flex-row md:items-start md:justify-between md:gap-0"
+                className="group relative flex flex-col gap-6 border-t border-border-light py-10 first:border-t-0 first:pt-0 last:pb-0 lg:flex-row lg:items-start lg:justify-between lg:gap-0"
               >
-                <div className="flex flex-col gap-8 md:flex-row md:gap-16">
+                <div className="flex min-w-0 flex-col gap-8 md:flex-row md:gap-8 lg:gap-16">
                   <div className="relative h-[288px] w-full shrink-0 overflow-clip rounded bg-surface-dark md:w-[380px]">
                     <BlockImage
                       image={event.image}
@@ -55,7 +55,7 @@ export default function EventsGrid({block}: BlockProps<'eventsGrid'>) {
                       <p className="font-mono text-body-small leading-[1.6] tracking-wide uppercase">{parts.month}</p>
                     </div>
                   </div>
-                  <div className="flex min-w-0 flex-col items-start gap-3 md:max-w-[668px]">
+                  <div className="flex min-w-0 flex-col items-start gap-3 md:flex-1 md:max-w-[668px]">
                     <p className="w-full text-headline-base leading-[1.1] text-on-background">
                       {href ? (
                         <Link href={href} {...externalLinkProps(href)} className={`${CARD_TITLE_LINK} after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-8 text-pretty`}>
@@ -65,10 +65,10 @@ export default function EventsGrid({block}: BlockProps<'eventsGrid'>) {
                         event.title
                       )}
                     </p>
-                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-6">
+                    <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:gap-x-6 md:gap-y-3">
                       <div className="flex items-center gap-3">
                         <ClockIcon className="size-[22px] shrink-0" />
-                        <p className="font-sans text-body-base leading-[1.6] text-on-background-subtle">
+                        <p className="whitespace-nowrap font-sans text-body-base leading-[1.6] text-on-background-subtle">
                           {parts.time}
                         </p>
                       </div>
@@ -86,10 +86,19 @@ export default function EventsGrid({block}: BlockProps<'eventsGrid'>) {
                         {event.description}
                       </p>
                     )}
+                    {href && (
+                      <span aria-hidden="true" className="link-button mt-3 h-14 group-hover:[&_svg]:text-secondary lg:hidden">
+                        <span>View details</span>
+                        <ArrowRightIcon className="link-button-icon" />
+                      </span>
+                    )}
                   </div>
                 </div>
+                {/* The cue sits beside the row from lg and under the description below it, so it never
+                    gets its own row. Two copies, one shown per range; both are hidden from assistive
+                    tech and are not links (the stretched title link covers the row). */}
                 {href && (
-                  <span aria-hidden="true" className="link-button md:shrink-0 group-hover:[&_svg]:text-secondary">
+                  <span aria-hidden="true" className="link-button hidden shrink-0 group-hover:[&_svg]:text-secondary lg:flex">
                     <span>View details</span>
                     <ArrowRightIcon className="link-button-icon" />
                   </span>

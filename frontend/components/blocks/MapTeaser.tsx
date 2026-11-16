@@ -18,7 +18,7 @@ export default function MapTeaser({block}: BlockProps<'mapTeaser'>) {
   return (
     <section className="w-full bg-background tf-px py-s3">
       <div className="tf-max-w flex flex-col lg:flex-row">
-        <div className="relative flex min-h-[28rem] flex-1 flex-col justify-between gap-16 overflow-clip bg-accent-primary p-10 lg:h-[620px] lg:min-h-0">
+        <div className="relative flex min-h-[28rem] flex-1 flex-col justify-between gap-16 overflow-clip bg-accent-primary p-8 lg:h-[620px] lg:min-h-0">
           <div className="map-teaser__lines pointer-events-none absolute inset-0" aria-hidden="true" />
           {block.eyebrow && (
             <Eyebrow className="relative z-10 text-on-accent-primary">{block.eyebrow}</Eyebrow>

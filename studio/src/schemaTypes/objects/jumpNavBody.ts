@@ -4,7 +4,7 @@ import {altTextField} from './blockFields'
 
 /**
  * The rich text behind a jump nav, shared by Jump Nav Content and the project page so the two
- * cannot drift. Each "Section heading (H2)" becomes a nav link; H1 is not offered because the
+ * cannot drift. Each "H2" becomes a nav link; H1 is not offered because the
  * page's own heading is the H1, and H2 must unambiguously mean "a section of the nav". Besides text
  * and images it takes Media & text, Image gallery, Video, Embed, anchor links and FAQ accordions.
  */
@@ -13,7 +13,7 @@ export const jumpNavBodyMembers = [
     type: 'block',
     styles: [
       {title: 'Normal', value: 'normal'},
-      {title: 'Section heading (H2)', value: 'h2'},
+      {title: 'H2', value: 'h2'},
       {title: 'H3', value: 'h3'},
       {title: 'H4', value: 'h4'},
       {title: 'H5', value: 'h5'},

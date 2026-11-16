@@ -1101,9 +1101,11 @@ cards, the map popup, image carousels and search results) go through `singleHref
 (`frontend/sanity/lib/utils.ts`): the external URL when set, otherwise the page. The page itself
 still exists and stays in the sitemap; only the tiles are redirected.
 
-### 10.3 The Share row: copy link, Facebook, LinkedIn
+### 10.3 The Share row: copy link, Facebook, Instagram, LinkedIn
 
-**Status:** Implemented. Instagram is left out: it has no web share address.
+**Status:** Implemented. Instagram has no web share address, so its button copies the link, shows
+"Link copied. Paste it into Instagram." in a tooltip and opens instagram.com in a new tab (the tab
+opens first, inside the click, so it is not blocked as a popup).
 
 The buttons read the page address in the browser when clicked (`frontend/sanity/lib/share.ts`,
 checked by `frontend/scripts/verifyShare.mts`), so no site URL setting is needed and nothing is

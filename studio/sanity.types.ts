@@ -1383,6 +1383,14 @@ export type SingleProjectPage = {
   _rev: string
   eyebrow?: string
   archiveLink?: Link
+  fallbackImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
   moreProjects?: {
     disabled?: boolean
     eyebrow?: string
@@ -1421,6 +1429,14 @@ export type SingleEventPage = {
   _rev: string
   eyebrow?: string
   archiveLink?: Link
+  fallbackImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
 }
 
 export type FaqSettings = {
@@ -1452,6 +1468,14 @@ export type ProjectSettings = {
   eyebrow?: string
   heading?: string
   intro?: string
+  defaultPropertyImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
   boundarySource?: {
     asset?: SanityFileAssetReference
     media?: unknown
@@ -1608,14 +1632,6 @@ export type Settings = {
     _type: 'block'
     _key: string
   }>
-  defaultPropertyImage?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    _type: 'image'
-  }
   siteUrl?: string
   seo?: Seo
   organization?: {

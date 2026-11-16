@@ -6792,6 +6792,10 @@
                         },
                         {
                           "type": "string",
+                          "value": "h2"
+                        },
+                        {
+                          "type": "string",
                           "value": "h3"
                         },
                         {

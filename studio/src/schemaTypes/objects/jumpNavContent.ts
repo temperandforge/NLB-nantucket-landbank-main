@@ -22,7 +22,7 @@ export const jumpNavContent = defineBlock({
       name: 'content',
       title: 'Content',
       type: 'array',
-      description: 'Each “Section heading (H2)” becomes a link in the left-hand nav.',
+      description: 'Each “H2” becomes a link in the left-hand nav.',
       of: jumpNavBodyMembers,
     }),
   ],
