@@ -23,7 +23,7 @@ export const CARD_IMAGE_ZOOM =
 
 /** On the title: the underline is always there but transparent, so it fades in without moving text. */
 export const CARD_TITLE_LINK =
-  'underline decoration-transparent decoration-1 underline-offset-4 transition-[text-decoration-color] duration-300 group-hover:decoration-current group-focus-visible:decoration-current group-has-[:focus-visible]:decoration-current motion-reduce:transition-none'
+  'underline decoration-transparent decoration-1 underline-offset-4 transition-[text-decoration-color] duration-150 group-hover:decoration-current group-focus-visible:decoration-current group-has-[:focus-visible]:decoration-current motion-reduce:transition-none'
 
 /**
  * An arrow chip in the top-right corner of the image, sliding in on hover or focus. Decorative:
