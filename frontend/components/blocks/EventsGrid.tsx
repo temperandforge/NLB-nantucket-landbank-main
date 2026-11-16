@@ -90,7 +90,7 @@ export default function EventsGrid({block}: BlockProps<'eventsGrid'>) {
                         Natural height (the whole row is the tap target via the stretched title link) and overflow
                         visible, so the arrow's 8px hover nudge isn't clipped by the now-padless box. */}
                     {href && (
-                      <span aria-hidden="true" className="link-button mt-3 h-auto !px-0 !overflow-visible group-hover:[&_svg]:text-secondary lg:hidden">
+                      <span aria-hidden="true" className="link-button mt-3 h-auto !px-0 !overflow-visible group-hover:[&_svg]:text-secondary lg:hidden group-hover:[&_svg]:[transform:translateX(0.5rem)] group-focus-visible:[&_svg]:[transform:translateX(0.5rem)] group-has-[:focus-visible]:[&_svg]:[transform:translateX(0.5rem)] [&_svg]:!duration-300 motion-reduce:group-hover:[&_svg]:[transform:none] motion-reduce:group-focus-visible:[&_svg]:[transform:none] motion-reduce:group-has-[:focus-visible]:[&_svg]:[transform:none]">
                         <span>View details</span>
                         <ArrowRightIcon className="link-button-icon" />
                       </span>
@@ -101,7 +101,7 @@ export default function EventsGrid({block}: BlockProps<'eventsGrid'>) {
                     gets its own row. Two copies, one shown per range; both are hidden from assistive
                     tech and are not links (the stretched title link covers the row). */}
                 {href && (
-                  <span aria-hidden="true" className="link-button hidden shrink-0 group-hover:[&_svg]:text-secondary lg:flex">
+                  <span aria-hidden="true" className="link-button hidden shrink-0 group-hover:[&_svg]:text-secondary lg:flex group-hover:[&_svg]:[transform:translateX(0.5rem)] group-focus-visible:[&_svg]:[transform:translateX(0.5rem)] group-has-[:focus-visible]:[&_svg]:[transform:translateX(0.5rem)] [&_svg]:!duration-300 motion-reduce:group-hover:[&_svg]:[transform:none] motion-reduce:group-focus-visible:[&_svg]:[transform:none] motion-reduce:group-has-[:focus-visible]:[&_svg]:[transform:none]">
                     <span>View details</span>
                     <ArrowRightIcon className="link-button-icon" />
                   </span>
