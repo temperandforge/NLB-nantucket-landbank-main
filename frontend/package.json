@@ -24,7 +24,7 @@
     "autoprefixer": "^10.5.0",
     "date-fns": "^4.4.0",
     "mapbox-gl": "^3.26.0",
-    "next": "^16.2.7",
+    "next": "^16.4.6",
     "next-sanity": "13.0.8",
     "postcss": "^8.5.15",
     "react": "^19.2.7",
@@ -39,7 +39,7 @@
     "@types/react": "^19.2.16",
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.4",
-    "eslint-config-next": "^16.2.7",
+    "eslint-config-next": "^16.4.6",
     "typescript": "^5.9.3"
   }
 }
