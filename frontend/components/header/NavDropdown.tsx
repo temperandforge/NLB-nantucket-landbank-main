@@ -73,7 +73,7 @@ export default function NavDropdown({
                 <li key={item._key}>
                   <ResolvedLink
                     link={item.link}
-                    className="group relative flex h-14 w-fit items-center gap-gap-sm font-secondary text-body-base text-on-primary after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-left after:scale-x-0 after:bg-border-alt after:transition-transform after:duration-300 after:ease-out motion-reduce:after:transition-none hover:after:scale-x-100 focus-visible:after:scale-x-100"
+                    className="group relative flex h-14 w-fit items-center gap-gap-sm font-secondary text-body-base text-on-primary after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-left after:scale-x-0 after:bg-border-alt after:transition-transform after:duration-200 after:ease-linear motion-reduce:after:transition-none hover:after:scale-x-100 focus-visible:after:scale-x-100"
                   >
                     {item.label}
                     {/* Always laid out, only transparent until hover or focus: if it took space only then,
