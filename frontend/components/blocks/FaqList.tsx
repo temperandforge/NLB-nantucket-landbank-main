@@ -33,13 +33,17 @@ export default function FaqList({block}: BlockProps<'faqList'>) {
 
   return (
     <section className="relative flex w-full overflow-clip bg-background tf-px py-s6">
+      {/* Figma 1910:12152 places the 4204 x 569 art at x=-1382, y=189 in a 1440 x 1166 section: it
+          starts 96% of the section width off the left edge and is 292% as wide, so its right end
+          (where the two lines meet) is far past the right edge. Centring it at 150% pulled that
+          corner into view. The height follows the art's own ratio, so nothing is stretched. */}
       <Image
         src="/images/blocks/decorative-line-faqs.svg"
         alt=""
         aria-hidden="true"
-        width={2102}
-        height={284}
-        className="pointer-events-none absolute top-48 left-1/2 z-0 w-[150%] max-w-none -translate-x-1/2"
+        width={4204}
+        height={569}
+        className="pointer-events-none absolute top-[16%] left-[-96%] z-0 h-auto w-[292%] max-w-none"
       />
       <div className="relative z-10 tf-max-w flex flex-col items-start gap-10 lg:flex-row lg:justify-between">
         {(block.heading || block.description) && (
