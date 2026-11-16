@@ -86,8 +86,9 @@ export default function EventsGrid({block}: BlockProps<'eventsGrid'>) {
                         {event.description}
                       </p>
                     )}
+                    {/* No inline padding here: with no background behind it the button's padding only reads as an indent. */}
                     {href && (
-                      <span aria-hidden="true" className="link-button mt-3 h-14 group-hover:[&_svg]:text-secondary lg:hidden">
+                      <span aria-hidden="true" className="link-button mt-3 h-14 !px-0 group-hover:[&_svg]:text-secondary lg:hidden">
                         <span>View details</span>
                         <ArrowRightIcon className="link-button-icon" />
                       </span>
