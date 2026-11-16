@@ -93,7 +93,7 @@ export default function ShareLinks({label = 'Share'}: {label?: string}) {
       <div className="flex items-center gap-2">
         <div className="relative">
           <button type="button" onClick={copy} aria-label="Copy link" className={BUTTON}>
-            <LinkAltIcon className="size-6" />
+            <LinkAltIcon className="size-[29px]" />
           </button>
           {renderTip('copy')}
         </div>
