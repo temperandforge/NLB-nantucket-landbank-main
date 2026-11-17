@@ -9,14 +9,14 @@ import {useImageLightbox} from '@/components/ImageLightbox'
 
 import BlockImage from './BlockImage'
 
-// Sizes from the Figma carousel: a 368 x 460 card, 416 x 520 when it is the current one (260 x 325
-// and 292 x 364 on mobile). Both are 4:5, so the current card is the resting card scaled about its
+// Sizes from the Figma carousel: a 368 x 460 card, 416 x 520 when it is the current one (224 x 280
+// and 252 x 315 on mobile, narrow enough that the next slide peeks in beside the current one). Both are 4:5, so the current card is the resting card scaled about its
 // centre. The slide is the card itself: until the Track has measured (or without JavaScript) cards
 // sit in a scrollable row, and once it has (`data-ready`) every card is pinned to the middle of the
 // track and the Track moves and scales it with a transform. `--w` is set by the Track, from 0 (a
 // resting card) to 1 (the current one), and drives the label.
 const CARD =
-  'group relative flex h-[325px] w-[260px] flex-none items-end justify-center overflow-clip rounded bg-dusty-heath-800 p-6 text-left will-change-transform in-data-[ready]:absolute in-data-[ready]:top-1/2 in-data-[ready]:left-1/2 in-data-[ready]:-mt-[162.5px] in-data-[ready]:-ml-[130px] md:h-[460px] md:w-[368px] md:in-data-[ready]:-mt-[230px] md:in-data-[ready]:-ml-[184px]'
+  'group relative flex h-[280px] w-[224px] flex-none items-end justify-center overflow-clip rounded bg-dusty-heath-800 p-6 text-left will-change-transform in-data-[ready]:absolute in-data-[ready]:top-1/2 in-data-[ready]:left-1/2 in-data-[ready]:-mt-[140px] in-data-[ready]:-ml-[112px] md:h-[460px] md:w-[368px] md:in-data-[ready]:-mt-[230px] md:in-data-[ready]:-ml-[184px]'
 
 type SlideImage = ComponentProps<typeof BlockImage>['image']
 
@@ -54,7 +54,7 @@ export default function ImageCarouselSlide({
       <BlockImage
         image={image}
         width={832}
-        sizes="(min-width: 768px) 416px, 292px"
+        sizes="(min-width: 768px) 416px, 252px"
         fill
         className={`absolute inset-0 size-full object-cover ${interactive ? CARD_IMAGE_ZOOM : ''}`}
       />
