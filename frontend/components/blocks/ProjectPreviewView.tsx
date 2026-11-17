@@ -77,10 +77,10 @@ export default function ProjectPreviewView({
                       <span className="text-headline-xl whitespace-nowrap">
                         {String(index + 1).padStart(2, '0')}
                       </span>
-                      {/* Slides in beside the number; decorative, the whole card is the link. Under
-                          reduced motion it appears without the slide. */}
+                      {/* Always visible, so the card reads as a link (touch has no hover); slides right on
+                          hover or focus. Decorative, the whole card is the link. No slide under reduced motion. */}
                       {href && (
-                        <ArrowRightIcon className="size-6 shrink-0 -translate-x-2 opacity-0 transition-[opacity,translate] duration-300 ease-out group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 motion-reduce:translate-x-0 motion-reduce:transition-none" />
+                        <ArrowRightIcon className="size-6 shrink-0 -translate-x-2 transition-[translate] duration-300 ease-out group-hover:translate-x-0 group-focus-visible:translate-x-0 motion-reduce:translate-x-0 motion-reduce:transition-none" />
                       )}
                     </div>
                     <p className="w-full font-mono text-body-base leading-[1.6] text-pretty underline decoration-transparent decoration-1 underline-offset-4 transition-[text-decoration-color] duration-300 group-hover:decoration-current group-focus-visible:decoration-current motion-reduce:transition-none">
