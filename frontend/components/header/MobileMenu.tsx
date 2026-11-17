@@ -171,7 +171,7 @@ export default function MobileMenu({menu}: {menu: HeaderMenuData}) {
               ).map((column, index) => (
                 <div
                   key={`${column.heading ?? 'none'}-${index}`}
-                  className="flex flex-col border-border-light not-last:border-b"
+                  className="flex flex-col border-border-light not-last:mb-5 not-last:border-b"
                 >
                   {column.heading && (
                     <h3 className="py-4 font-mono-tracked text-body-small uppercase leading-[1.6] tracking-wide text-on-accent-primary-tonal">
