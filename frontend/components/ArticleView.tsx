@@ -60,7 +60,7 @@ export default function ArticleView({
             {date && (
               <p
                 className="font-sans text-body-large leading-[1.6] text-on-background-subtle load-in"
-                style={{'--load-in-step': 1} as React.CSSProperties}
+                style={{'--load-in-step': 1, fontSize: '1rem'} as React.CSSProperties}
               >
                 {publishedLabel} {date}
               </p>
