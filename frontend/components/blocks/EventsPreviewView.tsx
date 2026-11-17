@@ -63,7 +63,7 @@ export default function EventsPreviewView({
             {events.map(({event, parts, href}) => (
               <div
                 key={event._id}
-                className="group relative flex min-w-0 items-start gap-8 lg:gap-10"
+                className="group relative flex min-w-0 flex-col items-start gap-5 md:flex-row md:gap-8 lg:gap-10"
               >
                 <div className="flex shrink-0 flex-col items-center justify-center gap-2 rounded bg-surface-dark px-4 py-3 text-center text-on-surface-dark md:gap-3 md:px-8 md:py-6">
                   <p className="font-mono text-body-small leading-[1.6] tracking-wide uppercase">{parts.weekday}</p>
