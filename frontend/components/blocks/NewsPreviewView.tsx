@@ -90,14 +90,14 @@ export default function NewsPreviewView({
                   <p className={`w-full text-headline-base text-on-background text-pretty ${CARD_TITLE_LINK}`}>{article.title}</p>
                 </div>
                 {(category || date) && (
-                  <div className="flex shrink-0 items-center gap-3">
+                  <div className="flex min-w-0 shrink-0 flex-col items-start gap-1 md:flex-row md:items-center md:gap-3">
                     {category && (
                       <p className="font-mono text-body-small leading-[1.6] tracking-wide text-on-background uppercase">
                         {category}
                       </p>
                     )}
                     {category && date && (
-                      <span className="size-1.5 shrink-0 rounded-full bg-on-background" aria-hidden="true" />
+                      <span className="hidden size-1.5 shrink-0 rounded-full bg-on-background md:block" aria-hidden="true" />
                     )}
                     {date && (
                       <p className="font-mono text-body-small leading-[1.6] tracking-wide text-on-background uppercase">
