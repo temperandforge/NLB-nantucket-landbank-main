@@ -26,7 +26,7 @@ export default function MapTeaser({block}: BlockProps<'mapTeaser'>) {
           <div className="relative z-10 flex w-full flex-col items-start gap-6 text-on-accent-primary">
             {block.heading && <h2 className="w-full text-headline-xl text-balance">{block.heading}</h2>}
             {block.body && (
-              <p className="w-full font-sans text-body-large leading-[1.6]">{block.body}</p>
+              <p className="w-full font-sans text-body-large leading-[1.6] max-lg:text-[18px]">{block.body}</p>
             )}
           </div>
         </div>
