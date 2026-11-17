@@ -281,6 +281,7 @@
 
   & > svg {
     flex-shrink: 0;
+    align-self: center;
     width: 1.5rem;
     height: 1.5rem;
   }

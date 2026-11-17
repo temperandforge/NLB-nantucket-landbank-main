@@ -20,7 +20,7 @@ const GAP = 24
 // Sizes from the Figma carousel: a resting card and how much wider the current one is (matching the
 // classes in ImageCarouselSlide).
 const DESKTOP = {base: 368, grow: 48}
-const MOBILE = {base: 260, grow: 32}
+const MOBILE = {base: 224, grow: 28}
 // Pointer travel before a press becomes a drag, and how far ahead (ms of release velocity) a flick
 // looks when choosing where to settle.
 const DRAG_START_PX = 6
