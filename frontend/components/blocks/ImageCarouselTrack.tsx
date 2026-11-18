@@ -3,6 +3,7 @@
 import {
   Children,
   Fragment,
+  isValidElement,
   type ReactNode,
   useEffect,
   useLayoutEffect,
@@ -61,6 +62,9 @@ export default function ImageCarouselTrack({
   const [copies, setCopies] = useState(1)
   // Where the track is and where it is headed; survives the engine restarting when copies change.
   const motion = useRef({pos: 0, target: 0})
+  // The slide the dots show as current, and how a dot moves the track (set by the engine below).
+  const [active, setActive] = useState(0)
+  const goToRef = useRef<((target: number) => void) | null>(null)
 
   // Copies enough of the slides to fill the track and a few more.
   useEffect(() => {
@@ -136,6 +140,7 @@ export default function ImageCarouselTrack({
     // copy, are decoration.
     const markCurrent = () => {
       const current = looped ? mod(state.target, n) : 0
+      setActive(current % count)
       items.forEach((item, i) => {
         item.tabIndex = i === current ? 0 : -1
         if (i === current) item.removeAttribute('aria-hidden')
@@ -148,6 +153,7 @@ export default function ImageCarouselTrack({
       render()
     }
 
+    goToRef.current = goTo
     track.dataset.ready = ''
     layout()
     markCurrent()
@@ -339,6 +345,7 @@ export default function ImageCarouselTrack({
 
     return () => {
       stopWatching()
+      goToRef.current = null
       stop()
       window.clearTimeout(timer)
       wide.removeEventListener('change', layout)
@@ -361,22 +368,51 @@ export default function ImageCarouselTrack({
   // viewport and are cut off there, with no fade. The sections that hold it clip sideways overflow.
   // Without JavaScript the row keeps the page's side margins.
   return (
-    <section
-      ref={root}
-      role="region"
-      aria-roledescription="carousel"
-      aria-label={label}
-      tabIndex={0}
-      className="w-full touch-pan-y select-none"
-    >
-      <div
-        ref={list}
-        className="flex h-[364px] items-center gap-6 overflow-x-auto px-(--tf-x) [scrollbar-width:none] data-[ready]:relative data-[ready]:block data-[ready]:overflow-hidden data-[ready]:px-0 md:h-[520px] [&::-webkit-scrollbar]:hidden"
+    <div className="w-full">
+      <section
+        ref={root}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label={label}
+        tabIndex={0}
+        className="w-full touch-pan-y select-none"
       >
-        {Array.from({length: copies}, (_, copy) => (
-          <Fragment key={copy}>{slides}</Fragment>
-        ))}
-      </div>
-    </section>
+        <div
+          ref={list}
+          className="flex h-[364px] items-center gap-6 overflow-x-auto px-(--tf-x) [scrollbar-width:none] data-[ready]:relative data-[ready]:block data-[ready]:overflow-hidden data-[ready]:px-0 md:h-[520px] [&::-webkit-scrollbar]:hidden"
+        >
+          {Array.from({length: copies}, (_, copy) => (
+            <Fragment key={copy}>{slides}</Fragment>
+          ))}
+        </div>
+      </section>
+      {/* Where you are, on a phone, where the neighbouring cards are cut off at the edges. A dot goes to
+        its slide by the shortest way round. */}
+      {count > 1 && (
+        <div className="mt-6 flex items-center justify-center md:hidden">
+          {slides.map((slide, index) => (
+            <button
+              key={isValidElement(slide) && slide.key != null ? slide.key : index}
+              type="button"
+              aria-label={`Show slide ${index + 1} of ${count}`}
+              aria-current={index === active ? 'true' : undefined}
+              onClick={() => {
+                const state = motion.current
+                let delta = mod(index - mod(state.target, count), count)
+                if (delta > count / 2) delta -= count
+                goToRef.current?.(state.target + delta)
+              }}
+              className="group flex size-6 items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-current"
+            >
+              <span
+                className={`size-2 rounded-full bg-on-background transition-opacity duration-300 motion-reduce:transition-none ${
+                  index === active ? 'opacity-100' : 'opacity-25'
+                }`}
+              />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
