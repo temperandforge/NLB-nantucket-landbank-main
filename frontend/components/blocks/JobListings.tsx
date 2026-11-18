@@ -46,7 +46,7 @@ function JobItem({job}: {job: Job}) {
         <LinkButton
           label="Apply now"
           href={href}
-          className="!px-0 !overflow-visible lg:col-start-2 lg:row-start-1 lg:self-start"
+          className="!px-0 !h-auto !overflow-visible lg:col-start-2 lg:row-start-1 lg:self-start"
         />
       )}
     </li>
