@@ -63,7 +63,7 @@ export default function ProjectPreviewView({
           // Three equal columns on one grid, so every card is the same width (and so the same image
           // size) and the two rows, header and image, line up across the cards however many lines a
           // name wraps to. The divider is drawn in the gap, not inside a column, for the same reason.
-          <ol className={`m-0 grid min-w-0 flex-1 list-none grid-cols-1 gap-20 p-0 ${COLUMNS[Math.min(shown.length, 3)]} md:gap-x-6 md:gap-y-6`}>
+          <ol className={`m-0 grid min-w-0 flex-1 list-none grid-cols-1 gap-20 p-0 ${COLUMNS[Math.min(shown.length, 3)]} md:gap-x-12 md:gap-y-6`}>
             {shown.map((project, index) => {
                             const href = singleHref(project.externalUrl, project.slug, projectHref)
               // `group` drives the hover and focus states below. Tailwind only applies hover where the
@@ -105,8 +105,9 @@ export default function ProjectPreviewView({
                   className={`relative min-w-0 md:row-span-2 md:grid md:grid-rows-subgrid ${
                     index > 0
                       ? // Stacked (below md) the divider is a horizontal rule centred in the gap above the
-                        // card; from md the cards sit in columns and it is a vertical rule beside it.
-                        'before:absolute before:inset-x-0 before:-top-10 before:h-px before:bg-border-light md:before:inset-x-auto md:before:inset-y-0 md:before:-left-3 md:before:h-auto md:before:w-px'
+                        // card; from md the cards sit in columns and it is a vertical rule beside it,
+                        // with 24px (Figma's gap) between the rule and the cards either side.
+                        'before:absolute before:inset-x-0 before:-top-10 before:h-px before:bg-border-light md:before:inset-x-auto md:before:inset-y-0 md:before:-left-6 md:before:h-auto md:before:w-px'
                       : ''
                   }`}
                 >

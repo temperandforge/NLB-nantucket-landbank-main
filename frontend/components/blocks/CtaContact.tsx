@@ -1,5 +1,6 @@
 import Image from 'next/image'
 
+import {ArrowRightIcon} from '@/components/icons'
 import ResolvedLink from '@/components/ResolvedLink'
 import {DereferencedLink} from '@/sanity/lib/types'
 import {linkResolver} from '@/sanity/lib/utils'
@@ -61,6 +62,7 @@ export default function CtaContact({block}: BlockProps<'ctaContact'>) {
             {showButton && link && (
               <ResolvedLink link={link} className="button button-secondary">
                 {block.button?.buttonText}
+                <ArrowRightIcon className="size-6 shrink-0" />
               </ResolvedLink>
             )}
           </div>
