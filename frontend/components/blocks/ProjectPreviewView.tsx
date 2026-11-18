@@ -1,7 +1,7 @@
 import type {ComponentProps} from 'react'
 
 import AnchorLink from '@/components/ui/AnchorLink'
-import {ArrowRightIcon} from '@/components/icons'
+import {ArrowDownRightIcon} from '@/components/icons'
 import ButtonLink from '@/components/ui/ButtonLink'
 import {projectHref, externalLinkProps, singleHref} from '@/sanity/lib/utils'
 
@@ -77,10 +77,11 @@ export default function ProjectPreviewView({
                       <span className="text-headline-xl whitespace-nowrap">
                         {String(index + 1).padStart(2, '0')}
                       </span>
-                      {/* Always visible, so the card reads as a link (touch has no hover); slides right on
-                          hover or focus. Decorative, the whole card is the link. No slide under reduced motion. */}
+                      {/* Always visible, so the card reads as a link (touch has no hover); rests a little down and
+                          left and slides up and right into the corner on hover or focus, so it never moves past
+                          the column edge into the card padding (the down-right icon turned a quarter back). Decorative, the whole card is the link. No slide under reduced motion. */}
                       {href && (
-                        <ArrowRightIcon className="size-6 shrink-0 -translate-x-2 transition-[translate] duration-300 ease-out group-hover:translate-x-0 group-focus-visible:translate-x-0 motion-reduce:translate-x-0 motion-reduce:transition-none" />
+                        <ArrowDownRightIcon className="size-12 shrink-0 -rotate-90 -translate-x-2 translate-y-2 transition-[translate] duration-300 ease-out group-hover:translate-x-0 group-hover:translate-y-0 group-focus-visible:translate-x-0 group-focus-visible:translate-y-0 motion-reduce:translate-x-0 motion-reduce:translate-y-0 motion-reduce:transition-none" />
                       )}
                     </div>
                     <p className="w-full font-mono text-body-base leading-[1.6] text-pretty underline decoration-transparent decoration-1 underline-offset-4 transition-[text-decoration-color] duration-300 group-hover:decoration-current group-focus-visible:decoration-current motion-reduce:transition-none">

@@ -73,7 +73,7 @@ export default function NewsPreviewView({
                 href={href}
                 className="flex w-full min-w-0 flex-col items-start gap-8 overflow-clip border-r border-b border-border-light bg-background p-5 md:p-8"
               >
-                <div className="flex w-full flex-col items-start gap-5">
+                <div className="flex w-full flex-col items-start gap-8">
                   {/* An article with no image and no fallback has no picture area at all, not an empty box. */}
                   {article.image?.asset && (
                     <div className="relative h-[16.5rem] w-full shrink-0 overflow-clip">
@@ -87,24 +87,19 @@ export default function NewsPreviewView({
                       <CardArrow />
                     </div>
                   )}
-                  <p className={`w-full text-headline-base text-on-background text-pretty ${CARD_TITLE_LINK}`}>{article.title}</p>
-                </div>
-                {(category || date) && (
-                  <div className="flex min-w-0 shrink-0 flex-col items-start gap-1 md:flex-row md:items-center md:gap-3">
+                  <div className="flex w-full flex-col items-start gap-1">
                     {category && (
                       <p className="font-mono text-body-small leading-[1.6] tracking-wide text-on-background uppercase">
                         {category}
                       </p>
                     )}
-                    {category && date && (
-                      <span className="hidden size-1.5 shrink-0 rounded-full bg-on-background md:block" aria-hidden="true" />
-                    )}
-                    {date && (
-                      <p className="font-mono text-body-small leading-[1.6] tracking-wide text-on-background uppercase">
-                        {date}
-                      </p>
-                    )}
+                    <p className={`w-full text-headline-base text-on-background text-pretty ${CARD_TITLE_LINK}`}>{article.title}</p>
                   </div>
+                </div>
+                {date && (
+                  <p className="min-w-0 shrink-0 font-mono text-body-small leading-[1.6] tracking-wide text-on-background uppercase">
+                    {date}
+                  </p>
                 )}
               </Tile>
             )
