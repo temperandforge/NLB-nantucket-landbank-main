@@ -152,9 +152,9 @@ export default function HeroVideo({block}: HeroVideoProps) {
       <button
         type="button"
         onClick={toggle}
-        className="group icon-button icon-button-primary absolute right-4 bottom-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        className="group icon-button icon-button-primary absolute right-4 bottom-4 max-md:right-3 max-md:bottom-3 max-md:!size-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
       >
-        {playing ? <PauseIcon className="size-6" /> : <PlayIcon className="size-6" />}
+        {playing ? <PauseIcon className="size-6 max-md:size-5" /> : <PlayIcon className="size-6 max-md:size-5" />}
         <span className="sr-only">{playing ? 'Pause video' : 'Play video'}</span>
         {/* Visual tooltip only: the sr-only label above is the accessible name. Shown on hover and
             keyboard focus; `pointer-events-none` so it never blocks the video beneath. */}
