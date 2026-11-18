@@ -389,7 +389,7 @@ export default function ImageCarouselTrack({
       {/* Where you are, on a phone, where the neighbouring cards are cut off at the edges. A dot goes to
         its slide by the shortest way round. */}
       {count > 1 && (
-        <div className="mt-6 flex items-center justify-center md:hidden">
+        <div className="flex items-center justify-center md:hidden">
           {slides.map((slide, index) => (
             <button
               key={isValidElement(slide) && slide.key != null ? slide.key : index}
