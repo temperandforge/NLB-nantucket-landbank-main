@@ -3,7 +3,6 @@
 import {type CSSProperties, useState} from 'react'
 
 import BlockImage from '@/components/blocks/BlockImage'
-import {ChevronDownIcon} from '@/components/icons'
 import Tag from '@/components/ui/Tag'
 import type {ExtractPageBuilderType} from '@/sanity/lib/types'
 
@@ -63,7 +62,6 @@ export default function GrowersGrid({growers}: {growers: Grower[]}) {
           className="button button-primary"
         >
           <span>View more growers</span>
-          <ChevronDownIcon className="size-6 shrink-0" />
         </button>
       )}
     </>
