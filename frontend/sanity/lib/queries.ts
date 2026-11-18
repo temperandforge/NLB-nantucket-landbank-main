@@ -1004,6 +1004,11 @@ export const propertyMapQuery = defineQuery(`
  */
 export const singlePropertyPageQuery = defineQuery(`
   *[_type == "projectSettings" && _id == "projectSettings"][0]{
+    singleEyebrow,
+    archiveLink{
+      ...,
+      ${linkReference}
+    },
     hideMap,
     faqs,
     moreProperties{

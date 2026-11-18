@@ -9381,6 +9381,21 @@
         },
         "optional": true
       },
+      "singleEyebrow": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "archiveLink": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "link"
+        },
+        "optional": true
+      },
       "hideMap": {
         "type": "objectAttribute",
         "value": {

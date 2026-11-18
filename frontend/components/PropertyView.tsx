@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import {ViewTransition} from 'react'
 import type {PortableTextBlock} from 'next-sanity'
 
@@ -18,7 +19,17 @@ import {galleryCards} from '@/sanity/lib/galleryCards'
  * gallery carousel and the property's FAQs. The map and the "more properties" section are composed
  * by the route. Everything but the name is optional and simply absent when missing.
  */
-export function PropertyIntro({property}: {property: NonNullable<PropertyQueryResult>}) {
+export function PropertyIntro({
+  property,
+  settings,
+  archiveHref,
+}: {
+  property: NonNullable<PropertyQueryResult>
+  settings: SinglePropertyPageQueryResult
+  /** Where the eyebrow links back to (the Properties page): null renders it as plain text. */
+  archiveHref: string | null
+}) {
+  const eyebrowText = settings?.singleEyebrow || 'Properties'
   const hero = property.image?.asset?._ref ? property.image : property.defaultImage
   const tags = (property.propertyTypes ?? []).flatMap((tag) =>
     tag?.title ? [{key: tag.slug ?? tag.title, label: tag.title}] : [],
@@ -53,6 +64,15 @@ export function PropertyIntro({property}: {property: NonNullable<PropertyQueryRe
         <div className="basic-left-right__lines pointer-events-none absolute inset-0 z-0" aria-hidden="true" />
         <div className="relative z-10 flex w-full flex-col gap-16 tf-max-w md:flex-row md:items-start md:justify-between md:gap-20">
           <div className="flex w-full flex-col items-start gap-10 md:max-w-[553px] md:flex-1">
+            <p className="load-in font-mono text-body-small leading-[1.6] tracking-wide text-on-background uppercase">
+              {archiveHref ? (
+                <Link href={archiveHref} className="no-underline hover:underline">
+                  {eyebrowText}
+                </Link>
+              ) : (
+                eyebrowText
+              )}
+            </p>
             <Cascade as="h1" className="w-full text-headline-xl text-on-background text-balance" text={property.name} />
             {tags.length > 0 && (
               <div className="flex flex-wrap items-start gap-2 load-in">
