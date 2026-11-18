@@ -153,8 +153,9 @@ Props come from the generated query result types. There is no test framework, so
 - **`FAQPage`** is built (merged per URL from FAQ lists, accordions and property FAQs; see DECISIONS
   24.6). Whether Google shows the rich result for this site is unconfirmed:
   [#77](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/77) stays open until that is checked.
-- **`JobPosting`** for job listings: needs fields the `job` document does not hold (employment type,
-  valid-through, location structure): [#78](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/78).
+- **`JobPosting`** is built (DECISIONS 24.8): `datePosted` and `validThrough` added to `job`, markup
+  on the page holding the listings. Editors must fill `datePosted`; remote jobs get no markup.
+  Follow-ups: see the issue linked from DECISIONS 24.8.
 - **`GovernmentOrganization` precision** (department hierarchy, `areaServed`): start with
   `Organization`: [#81](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/81).
 

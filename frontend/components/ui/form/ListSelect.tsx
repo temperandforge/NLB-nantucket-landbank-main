@@ -23,11 +23,20 @@ export default function ListSelect({field, id, value, error, onChange, onBlur}: 
   const list = useRef<HTMLUListElement>(null)
   const typedText = useRef('')
   const typedTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  // Scroll the active row into view only when the keyboard moved it: under the mouse the row is
+  // already visible, and scrolling on hover makes the list jump beneath the pointer.
+  const keyboardMoved = useRef(false)
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(-1)
 
   const multi = field.fieldType === 'multiSelect'
   const options = field.options ?? []
+  // An optional single select starts with a "None" row (the empty string), the way the native
+  // <select> it replaced had a blank option, so a chosen answer can be taken back. Required ones
+  // never offer it, and a multi select clears by unticking.
+  const clearable = !multi && !field.required
+  const entries = clearable ? ['', ...options] : options
+  const labelOf = (entry: string) => entry || 'None'
   const chosen = Array.isArray(value) ? value : typeof value === 'string' && value ? [value] : []
   const summary =
     chosen.length > 0 ? options.filter((option) => chosen.includes(option)).join(', ') : field.placeholder || (multi ? 'Select all that apply' : 'Select one')
@@ -35,20 +44,21 @@ export default function ListSelect({field, id, value, error, onChange, onBlur}: 
 
   // Focus moves into the list while it is open; the wrapper's blur check treats that as staying inside.
   useEffect(() => {
-    if (open) list.current?.focus()
+    if (open) list.current?.focus({preventScroll: true})
   }, [open])
 
   // Keep the active option visible when the list scrolls.
   useEffect(() => {
-    if (open && active >= 0) document.getElementById(`${listId}-${active}`)?.scrollIntoView({block: 'nearest'})
+    if (open && active >= 0 && keyboardMoved.current) document.getElementById(`${listId}-${active}`)?.scrollIntoView({block: 'nearest'})
   }, [open, active, listId])
 
   // The list unmounts with the field; don't leave the typeahead timer behind.
   useEffect(() => () => clearTimeout(typedTimer.current), [])
 
   function openList() {
-    const first = options.findIndex((option) => chosen.includes(option))
-    setActive(options.length === 0 ? -1 : first === -1 ? 0 : first)
+    const first = entries.findIndex((entry) => entry !== '' && chosen.includes(entry))
+    keyboardMoved.current = true
+    setActive(entries.length === 0 ? -1 : first === -1 ? 0 : first)
     setOpen(true)
   }
 
@@ -71,17 +81,23 @@ export default function ListSelect({field, id, value, error, onChange, onBlur}: 
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault()
       openList()
+    } else if (clearable && (event.key === 'Backspace' || event.key === 'Delete') && chosen.length > 0) {
+      // A shortcut for the "None" row, without opening the list.
+      event.preventDefault()
+      onChange('')
     }
   }
 
   function onListKeyDown(event: KeyboardEvent<HTMLUListElement>) {
     const {key} = event
+    keyboardMoved.current = true
     if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(key)) {
       event.preventDefault()
-      setActive((current) => moveActive(current, options.length, key))
+      setActive((current) => moveActive(current, entries.length, key))
     } else if (key === ' ' || key === 'Enter') {
       event.preventDefault()
-      if (active >= 0 && active < options.length) choose(options[active])
+      // A held key repeats; for a multi select that would tick and untick the row.
+      if (!event.repeat && active >= 0 && active < entries.length) choose(entries[active])
     } else if (key === 'Escape') {
       event.preventDefault()
       closeList(true)
@@ -95,7 +111,7 @@ export default function ListSelect({field, id, value, error, onChange, onBlur}: 
       typedTimer.current = setTimeout(() => {
         typedText.current = ''
       }, 600)
-      const match = typeaheadMatch(options, typedText.current, active)
+      const match = typeaheadMatch(entries.map(labelOf), typedText.current, active)
       if (match !== -1) setActive(match)
     }
     // Plain Tab is left alone: focus leaves the wrapper and onBlur below closes the list.
@@ -165,16 +181,19 @@ export default function ListSelect({field, id, value, error, onChange, onBlur}: 
             onKeyDown={onListKeyDown}
             className="form-menu"
           >
-            {options.map((option, index) => {
-              const selected = chosen.includes(option)
+            {entries.map((option, index) => {
+              const selected = option === '' ? chosen.length === 0 : chosen.includes(option)
               return (
                 <li
-                  key={option}
+                  key={option || '__none'}
                   id={optionId(index)}
                   role="option"
                   aria-selected={selected}
                   data-active={index === active}
-                  onMouseMove={() => setActive(index)}
+                  onMouseMove={() => {
+                    keyboardMoved.current = false
+                    setActive(index)
+                  }}
                   // mouseDown, not click: a click would blur the list first and close it.
                   onMouseDown={(event) => {
                     event.preventDefault()
@@ -182,7 +201,7 @@ export default function ListSelect({field, id, value, error, onChange, onBlur}: 
                   }}
                   className="form-option"
                 >
-                  <span>{option}</span>
+                  <span>{labelOf(option)}</span>
                   {/* The design's menu uses the square for both kinds, including Contact Us's single topic. */}
                   {selected ? <SquareCheckIcon className="size-6 shrink-0" /> : <SquareIcon className="size-6 shrink-0" />}
                 </li>

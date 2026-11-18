@@ -11,7 +11,7 @@ import {getPageQuery, landingPageQuery, pagesSlugs} from '@/sanity/lib/queries'
 import {buildMetadata} from '@/sanity/lib/seo'
 import {getSeoDefaults, resolveSeoImage} from '@/sanity/lib/seoDefaults'
 import {faqItemsFromBlocks} from '@/sanity/lib/faqs'
-import {breadcrumbLd, faqPageLd, recordsArchiveLd, webPageLd} from '@/sanity/lib/structuredData'
+import {breadcrumbLd, faqPageLd, jobPostingLd, recordsArchiveLd, webPageLd} from '@/sanity/lib/structuredData'
 
 /**
  * This is a catch-all segment rather than a single [slug] because a page URL spans as many
@@ -127,6 +127,9 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
   ]
   const archives = (page.pageBuilder ?? []).flatMap((block) => (block._type === 'recordsArchive' ? [block] : []))
 
+  const jobBlocks = (page.pageBuilder ?? []).flatMap((block) => (block._type === 'jobListings' ? [block] : []))
+  const now = currentHour()
+
   return (
     <>
       <JsonLd
@@ -135,6 +138,9 @@ export default async function Page(props: PageProps<'/[...slug]'>) {
           breadcrumbLd(crumbs, defaults.origin),
           ...archives.map((archive) =>
             recordsArchiveLd({name: page.name, path, records: archive.records ?? []}, defaults.origin),
+          ),
+          ...jobBlocks.flatMap((block) =>
+            (block.jobs ?? []).map((job) => jobPostingLd(job, block.hiringOrganization, path, defaults.origin, now)),
           ),
           // One FAQPage per URL: every FAQ block on the page is merged into it.
           faqPageLd({path, items: faqItemsFromBlocks(page.pageBuilder)}, defaults.origin),

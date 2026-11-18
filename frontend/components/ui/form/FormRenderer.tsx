@@ -28,6 +28,7 @@ const MESSAGES = {
   captcha: 'We could not verify that you are human. Please try again.',
   changed: 'This form has changed since the page was loaded. Please reload the page and try again.',
   generic: 'Something went wrong. Please try again.',
+  sent: 'Thank you. Your message has been sent.',
 }
 
 function Control(props: ControlProps) {
@@ -73,6 +74,15 @@ export default function FormRenderer({
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle')
   const [serverError, setServerError] = useState<string | null>(null)
   const [honeypot, setHoneypot] = useState('')
+  // The spoken summary of a failed submit. A new object (and key) per attempt, so an identical
+  // failure is announced again and editing afterwards does not re-announce a changing count.
+  const [announcement, setAnnouncement] = useState<{id: number; text: string} | null>(null)
+  const attempts = useRef(0)
+  // The latest answers, for a server reply that arrives after the visitor kept typing.
+  const latestValues = useRef(values)
+  useEffect(() => {
+    latestValues.current = values
+  }, [values])
 
   const shown = visibleFields(form, values)
   const shownNames = new Set(shown.map((field) => field.name as string))
@@ -81,6 +91,14 @@ export default function FormRenderer({
   useEffect(() => {
     if (status === 'success') successRef.current?.focus()
   }, [status])
+
+  function announce(count: number) {
+    attempts.current += 1
+    setAnnouncement({
+      id: attempts.current,
+      text: count === 1 ? 'There is 1 field to fix below.' : `There are ${count} fields to fix below.`,
+    })
+  }
 
   function focusField(name: string) {
     const field = formRef.current?.querySelector<HTMLElement>(`[data-field-name="${CSS.escape(name)}"]`)
@@ -116,11 +134,15 @@ export default function FormRenderer({
     if (status === 'submitting' || sending.current) return
     setAttempted(true)
     setServerError(null)
+    setAnnouncement(null)
     const found = validateForm(form, values).errors
     // Commit the errors before focusing, so the control already carries aria-invalid and its message.
     flushSync(() => setErrors(found))
     const first = shown.find((field) => found[field.name as string])
-    if (first) return focusField(first.name as string)
+    if (first) {
+      announce(Object.keys(found).filter((name) => shownNames.has(name)).length)
+      return focusField(first.name as string)
+    }
 
     const sent = values
     sending.current = true
@@ -155,12 +177,16 @@ export default function FormRenderer({
         const serverErrors = data.errors
         // The fields that were submitted, not the ones for whatever the visitor typed since.
         const invalid = visibleFields(form, sent).find((field) => serverErrors[field.name as string])
+        // What is on screen now, which can differ from what was sent if the visitor kept typing.
+        const shownNow = visibleFields(form, latestValues.current).filter((field) => serverErrors[field.name as string])
         flushSync(() => {
           setErrors(serverErrors)
-          // Keys matching no field means the form changed since this page loaded.
-          if (!invalid) setServerError(MESSAGES.changed)
+          // No rejected field is on screen: the form changed since this page loaded, or an edit
+          // during the send hid it. Either way the visitor needs a message, not silence.
+          if (!invalid || shownNow.length === 0) setServerError(MESSAGES.changed)
         })
-        if (invalid) focusField(invalid.name as string)
+        if (shownNow.length > 0) announce(shownNow.length)
+        if (invalid && shownNow.length > 0) focusField(invalid.name as string)
       } else {
         setServerError(
           response.status === 429
@@ -190,7 +216,7 @@ export default function FormRenderer({
             : 'w-full text-body-base text-on-background'
         }
       >
-        {form.successMessage}
+        {form.successMessage || MESSAGES.sent}
       </div>
     )
   }
@@ -228,7 +254,7 @@ export default function FormRenderer({
           />
           <button
             type="submit"
-            disabled={status === 'submitting'}
+            aria-disabled={status === 'submitting' || undefined}
             className="icon-button icon-button-secondary shrink-0 text-lowlands-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-warm-neutral-50"
           >
             <span className="sr-only">{status === 'submitting' ? 'Sending' : form.submitLabel || 'Subscribe'}</span>
@@ -268,8 +294,15 @@ export default function FormRenderer({
 
   return (
     <form ref={formRef} onSubmit={submit} noValidate className="flex w-full flex-col gap-10">
+      {announcement && (
+        <div key={announcement.id} role="alert" className="sr-only">
+          {announcement.text}
+        </div>
+      )}
       {attempted && visibleErrors.length > 0 && (
-        <div role="alert" className="form-notice">
+        // Not a live region: the count changes as the visitor fixes fields, and the announcement above
+        // speaks once per attempt.
+        <div className="form-notice">
           <AlertCircleIcon className="size-6 shrink-0" />
           {/* A span, not a <p>: the page's enter animation (motion.css) slides paragraphs up. */}
           <span>
@@ -346,7 +379,7 @@ export default function FormRenderer({
 
       <button
         type="submit"
-        disabled={status === 'submitting'}
+        aria-disabled={status === 'submitting' || undefined}
         className="button button-secondary self-start"
       >
         {status === 'submitting' ? 'Sending…' : form.submitLabel || 'Submit'}

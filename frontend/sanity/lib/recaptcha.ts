@@ -31,6 +31,8 @@ export async function verifyRecaptcha(
     const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
       method: 'POST',
       body,
+      // A hung siteverify must not hold the submission; a timeout fails the check like any error.
+      signal: AbortSignal.timeout(5000),
     })
     const result = (await response.json()) as {success?: boolean; score?: number; action?: string}
     return result.success === true && (result.score ?? 0) >= MIN_SCORE && result.action === action

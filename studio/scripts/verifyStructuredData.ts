@@ -34,6 +34,7 @@ import {
   projectLd,
   recordsArchiveLd,
   faqPageLd,
+  jobPostingLd,
   webPageLd,
   websiteLd,
 } from '../../frontend/sanity/lib/structuredData'
@@ -226,6 +227,36 @@ async function main() {
     const items = faqItemsFromList(property?.faqs)
     check(items.length > 0, `property yields questions (${items.length})`)
     verify('property faq', faqPageLd({path: `/properties/${propertyWithFaqs}`, items}, ORIGIN), 'FAQPage')
+  }
+
+  const jobsPage = await client.fetch<{path: string} | null>(
+    `*[_type == "page" && count(pageBuilder[_type == "jobListings"]) > 0 && !(_id in path("drafts.**"))][0]{
+       "path": select(
+         defined(parent->parent) => parent->parent->slug.current + "/" + parent->slug.current + "/" + slug.current,
+         defined(parent) => parent->slug.current + "/" + slug.current,
+         slug.current)
+     }`,
+  )
+  if (jobsPage?.path) {
+    console.log(`jobs page /${jobsPage.path}`)
+    const segments = jobsPage.path.split('/')
+    const page = await client.fetch(getPageQuery, {
+      leaf: segments[segments.length - 1],
+      path: jobsPage.path,
+      includeHidden: false,
+      now: new Date().toISOString(),
+    })
+    const block = page?.pageBuilder?.find((entry: {_type: string}) => entry._type === 'jobListings')
+    check(Boolean(block), 'jobs page has a job listings block')
+    const now = new Date().toISOString()
+    const graphs = (block?.jobs ?? []).map((job: Parameters<typeof jobPostingLd>[0]) =>
+      jobPostingLd(job, block?.hiringOrganization, `/${jobsPage.path}`, ORIGIN, now),
+    )
+    const built = graphs.filter((graph: JsonLdGraph | null): graph is JsonLdGraph => graph !== null)
+    // A job with no date posted (or a remote or expired one) is left out on purpose: content to fix in
+    // Studio, not a builder fault, so report it rather than fail.
+    console.log(`  note ${built.length} of ${graphs.length} jobs have the data for a JobPosting`)
+    built.forEach((graph: JsonLdGraph, index: number) => verify(`job ${index + 1}`, graph, 'JobPosting'))
   }
 
   if (failures.length) {

@@ -5696,6 +5696,20 @@
         },
         "optional": true
       },
+      "datePosted": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "validThrough": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "applyLink": {
         "type": "objectAttribute",
         "value": {
