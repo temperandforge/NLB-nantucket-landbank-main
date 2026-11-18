@@ -154,6 +154,21 @@ export const projectSettings = defineType({
       validation: (Rule) => Rule.min(0).max(22),
     }),
     defineField({
+      name: 'singleEyebrow',
+      title: 'Label above the title',
+      type: 'string',
+      group: 'singleProperty',
+      description: 'The small label at the top of a property page. Default: "Properties".',
+    }),
+    defineField({
+      name: 'archiveLink',
+      title: 'Label links to',
+      type: 'link',
+      group: 'singleProperty',
+      description:
+        'The Properties page the label links back to. With no link (or one that does not resolve) the label is plain text.',
+    }),
+    defineField({
       name: 'hideMap',
       title: 'Hide the map section',
       type: 'boolean',

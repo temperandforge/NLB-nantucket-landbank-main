@@ -70,6 +70,10 @@ export default async function PropertyPage(props: PageProps<'/properties/[slug]'
   // No property at this slug: a real 404, never a 200 placeholder.
   if (!property?._id) notFound()
 
+  const archiveHref = realHref(
+    settings?.archiveLink ? linkResolver(settings.archiveLink as DereferencedLink) : null,
+  )
+
   const more = settings?.moreProperties
   const showMore = !more?.disabled
   const count = Math.min(Math.max(more?.count ?? 3, 1), 3)
@@ -107,7 +111,7 @@ export default async function PropertyPage(props: PageProps<'/properties/[slug]'
       />
       <PageTransition>
         <Enter index={0}>
-          <PropertyIntro property={property} />
+          <PropertyIntro property={property} settings={settings} archiveHref={archiveHref} />
         </Enter>
         <Enter>
           <PropertyGallery property={property} />
