@@ -54,14 +54,15 @@ export function parseFilter(search: string, param: string, tabs: ReadonlyArray<F
 
 /**
  * A query string with the filter set (or cleared, with null), keeping every other parameter.
- * Returns '' or a string starting with '?'.
+ * Returns '' or a string starting with '?'. The value is encoded except for commas, which stay
+ * literal so a multi-value parameter reads ?year=2025,2024 like withSelection writes it.
  */
 export function withFilter(search: string, param: string, slug: string | null): string {
   const params = new URLSearchParams(search)
   params.delete(param)
   const others = params.toString()
   if (!slug) return others ? `?${others}` : ''
-  return `?${others ? `${others}&` : ''}${param}=${encodeURIComponent(slug)}`
+  return `?${others ? `${others}&` : ''}${param}=${encodeURIComponent(slug).replace(/%2C/gi, ',')}`
 }
 
 // Staff, by department.
