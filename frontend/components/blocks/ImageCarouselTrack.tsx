@@ -402,7 +402,7 @@ export default function ImageCarouselTrack({
                 if (delta > count / 2) delta -= count
                 goToRef.current?.(state.target + delta)
               }}
-              className="group flex size-6 items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-current"
+              className="group flex h-6 w-5 items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-current"
             >
               <span
                 className={`size-2 rounded-full bg-on-background transition-opacity duration-300 motion-reduce:transition-none ${
