@@ -31,6 +31,17 @@ const exact = [rule('/old', '/new')]
 same(matchRedirect(exact, '/old', ''), {status: 301, location: '/new'}, 'exact match redirects')
 same(matchRedirect(exact, '/other', ''), null, 'an unmatched path is null')
 
+// sources with a file extension
+same(matchRedirect([rule('/old-page.html', '/new')], '/old-page.html', '')?.location, '/new', 'a .html source matches')
+same(matchRedirect([rule('/x.php?id=3', '/new')], '/x.php', '?id=3&z=1')?.location, '/new', 'a .php source with a query matches')
+
+// destinations the proxy refuses to follow
+same(matchRedirect([rule('/o', 'old/page')], '/o', ''), null, 'a destination without a leading slash is skipped')
+same(matchRedirect([rule('/o', 'javascript:alert(1)')], '/o', ''), null, 'a javascript: destination is skipped')
+same(matchRedirect([rule('/o', '//evil.example/x')], '/o', ''), null, 'a protocol-relative destination is skipped')
+same(matchRedirect([rule('/o', 'https://example.org/x')], '/o', '')?.location, 'https://example.org/x', 'an https destination is followed')
+same(matchRedirect([rule('/o', 'old/page'), rule('/o', '/ok')], '/o', '')?.location, '/ok', 'an unsafe rule does not shadow a good one')
+
 // case, slash, encoding, double slash
 same(matchRedirect(exact, '/OLD/', '')?.location, '/new', 'case and trailing slash are ignored')
 same(matchRedirect(exact, '/old//', '')?.location, '/new', 'repeated trailing slashes are ignored')

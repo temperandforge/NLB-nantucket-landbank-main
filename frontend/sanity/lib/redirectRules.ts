@@ -22,9 +22,10 @@ export type RulesLoaderOptions = {
 
 /**
  * Returns a function that resolves to the current rules, or null when none have ever loaded (the
- * caller then passes the request through). Fresh rules are returned without calling `load`; stale
- * rules trigger one refresh shared by all concurrent callers; a failed or timed-out refresh serves
- * the stale rules. Never rejects.
+ * caller then passes the request through). Fresh rules are returned without calling `load`. Stale
+ * rules are returned immediately and trigger one background refresh shared by all concurrent
+ * callers (stale-while-revalidate); a failed or timed-out refresh keeps the stale rules. Only the
+ * very first load is awaited. Never rejects.
  */
 export function createRulesLoader(options: RulesLoaderOptions): () => Promise<MatchableRule[] | null> {
   const {load, ttlMs, timeoutMs, failureBackoffMs} = options
@@ -64,17 +65,30 @@ export function createRulesLoader(options: RulesLoaderOptions): () => Promise<Ma
     }
   }
 
+  /** Starts a refresh unless one is running. Never rejects. */
+  function startRefresh(): Promise<MatchableRule[] | null> {
+    if (!inFlight) {
+      inFlight = refresh().finally(() => {
+        inFlight = null
+      })
+    }
+    return inFlight
+  }
+
   return async function getRules() {
     try {
       const t = now()
       if (cached && t - cached.at < ttlMs) return cached.rules
-      if (failedAt !== null && t - failedAt < failureBackoffMs) return cached?.rules ?? null
-      if (!inFlight) {
-        inFlight = refresh().finally(() => {
-          inFlight = null
-        })
+      const backingOff = failedAt !== null && t - failedAt < failureBackoffMs
+      if (cached) {
+        // Stale: answer now from what we have and refresh behind the request, so a visitor never
+        // waits on Sanity at the TTL boundary.
+        if (!backingOff) void startRefresh()
+        return cached.rules
       }
-      return await inFlight
+      // Nothing cached yet: the first request has to wait (up to the timeout) or pass through.
+      if (backingOff) return null
+      return await startRefresh()
     } catch {
       return cached?.rules ?? null
     }

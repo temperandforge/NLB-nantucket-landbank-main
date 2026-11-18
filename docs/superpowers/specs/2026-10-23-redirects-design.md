@@ -72,8 +72,8 @@ so the verify script exercises it directly.
 - Fetches the enabled redirects through a single GROQ query, resolving page destinations with the
   shared `pagePath` constant. Next does not cache `fetch` in Proxy (`next.revalidate` and
   `next.tags` have no effect there), so the rules are held in an in-memory cache per server instance
-  (`frontend/sanity/lib/redirectRules.ts`): a 60 s TTL, one shared refresh, a 1.5 s timeout, and the
-  last good rules served on error (with a 10 s backoff before retrying). An edit to a redirect takes up
+  (`frontend/sanity/lib/redirectRules.ts`): a 60 s TTL, one shared refresh, a 1.5 s timeout, stale rules served at once while a background
+  refresh runs, and the last good rules served on error (with a 10 s backoff before retrying). An edit to a redirect takes up
   to 60 s per instance to apply.
 - GET and HEAD only. The matcher excludes `/_next/...`, `/api` and `/api/...` (with segment boundaries,
   so `/apiary` is still matched) and static files.
@@ -157,10 +157,10 @@ missed run means a missing redirect and nothing notices.
 Deploy is separate from the frontend and Studio deploys and is per dataset, so it is documented in
 `studio/README.md`.
 
-**Known limitation: sources with a file extension never fire.** The proxy matcher excludes any path
-containing a dot (to leave static assets alone), so a source such as `/old-page.html` or `/x.php` is
-never looked up, and Studio's validation currently accepts it. Not fixed here; a candidate follow-up,
-tracked in [#83](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/83).
+**Sources with a file extension.** The matcher excludes `/_next`, `/api` and a fixed list of static-asset
+extensions rather than every dotted path, so `/old-page.html` and `/x.php` are looked up
+([#83](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/83)). A source ending in an
+excluded extension is rejected in Studio. See DECISIONS 2.8 for the list and where it is kept in step.
 
 ## Landing page
 
@@ -211,13 +211,13 @@ URLs were public" and 11.1's note, and a comment on #9 saying which of the three
 
 Each has an issue; none is built.
 
+Done since the first build: dotted sources (#83), the #84 hardening items 1 to 6, the rename warning (#73) and removal warnings (#75). Verified by `frontend/scripts/verifyRedirectMatcher.mts`, `studio/scripts/verifyRedirectSource.ts` and `studio/scripts/verifyPageUrlImpact.ts`.
+
 - Pattern (`:param`, `*`) and regex rules: [#72](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/72)
-- Studio warning before a rename or move breaks URLs: [#73](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/73)
 - Hit logging and a 404 log: [#74](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/74)
-- Deleted and unpublished pages: [#75](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/75)
+- Creating a redirect or 410 when a page is unpublished or deleted (Studio only warns today, see DECISIONS 2.8): [#160](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/160)
 - Bulk import of the old WordPress URLs: [#76](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/76)
-- Sources with a file extension never fire (proxy matcher excludes dotted paths): [#83](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/83)
-- Hardening follow-ups from the final review (normaliser divergence, destination validation, landing-page query and link hop, stale-while-revalidate loader, matcher-boundary assertion, parent-and-child renamed in one publish): [#84](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/84)
+- Parent and child renamed in one publish lose the child's original URL (the rest of the #84 hardening list is done): [#159](https://github.com/temperandforge/NLB-nantucket-landbank-main/issues/159)
 
 Also not carried over from the WordPress Redirection plugin: conditional matching on login, referrer,
 user agent or language; random and pass-through actions; groups; CSV import and export.

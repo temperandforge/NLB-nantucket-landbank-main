@@ -5,7 +5,7 @@
  *
  * Imports the real helper, not a copy. Exits non-zero on failure.
  */
-import {isInternalHref} from '../sanity/lib/links.ts'
+import {isInternalHref, pageHref} from '../sanity/lib/links.ts'
 
 let failed = false
 function same(actual: unknown, expected: unknown, message: string) {
@@ -17,6 +17,8 @@ function same(actual: unknown, expected: unknown, message: string) {
   }
 }
 
+same(pageHref('/'), '/', 'the landing page resolves to the root')
+same(pageHref('about/history'), '/about/history', 'a page path gets a leading slash')
 same(isInternalHref('/'), true, 'root is internal')
 same(isInternalHref('/news'), true, 'site-relative path is internal')
 same(isInternalHref('/news?tag=a#b'), true, 'path with query and hash is internal')

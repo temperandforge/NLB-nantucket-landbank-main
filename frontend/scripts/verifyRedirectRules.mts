@@ -55,6 +55,9 @@ function harness(steps: Step[], timeoutMs = 1000) {
   }
 }
 
+/** Lets a background refresh run to completion. */
+const settle = () => new Promise((resolve) => setTimeout(resolve, 5))
+
 async function neverThrows(fn: () => Promise<unknown>): Promise<unknown> {
   try {
     return await fn()
@@ -81,9 +84,12 @@ async function neverThrows(fn: () => Promise<unknown>): Promise<unknown> {
   const results = await Promise.all(Array.from({length: 10}, () => h.loader()))
   same(h.calls(), 2, 'ten concurrent callers on a stale cache share one refresh')
   check(
-    results.every((r) => JSON.stringify(r) === JSON.stringify(RULES_B)),
-    'every concurrent caller gets the refreshed rules',
+    results.every((r) => JSON.stringify(r) === JSON.stringify(RULES_A)),
+    'concurrent callers on a stale cache are answered at once with the stale rules',
   )
+  await settle()
+  same(await h.loader(), RULES_B, 'once the background refresh lands, callers get the new rules')
+  same(h.calls(), 2, 'and no further load was needed')
 }
 
 // failed refresh serves stale rules and backs off
@@ -91,14 +97,18 @@ async function neverThrows(fn: () => Promise<unknown>): Promise<unknown> {
   const h = harness(['ok-a', 'fail', 'ok-b'])
   await h.loader()
   h.advance(60_000)
-  same(await neverThrows(h.loader), RULES_A, 'a failed refresh returns the stale rules')
-  same(h.calls(), 2, 'the failed refresh called load once')
+  same(await neverThrows(h.loader), RULES_A, 'a stale call returns the stale rules')
+  await settle()
+  same(h.calls(), 2, 'the background refresh called load once and failed')
+  same(await neverThrows(h.loader), RULES_A, 'after a failed refresh the stale rules are still returned')
   h.advance(9_999)
   same(await neverThrows(h.loader), RULES_A, 'inside the backoff window the stale rules are returned')
   same(h.calls(), 2, 'inside the backoff window load is not called again')
   h.advance(1)
-  same(await h.loader(), RULES_B, 'after the backoff window a refresh is tried again')
+  same(await h.loader(), RULES_A, 'after the backoff window the stale rules are returned while it retries')
+  await settle()
   same(h.calls(), 3, 'one more load after the backoff window')
+  same(await h.loader(), RULES_B, 'and the retry replaced the rules')
 }
 
 // no cache plus failure is null
@@ -133,7 +143,11 @@ async function neverThrows(fn: () => Promise<unknown>): Promise<unknown> {
   const h = harness(['ok-a', 'hang'], 20)
   await h.loader()
   h.advance(60_000)
-  same(await neverThrows(h.loader), RULES_A, 'a hung refresh returns the stale rules after the timeout')
+  const started = Date.now()
+  same(await neverThrows(h.loader), RULES_A, 'a hung refresh returns the stale rules')
+  check(Date.now() - started < 15, 'and returns without waiting for the refresh to time out')
+  await new Promise((resolve) => setTimeout(resolve, 40))
+  same(await neverThrows(h.loader), RULES_A, 'the hung refresh timed out and the stale rules remain')
 }
 
 // the load receives an abort signal that fires at the timeout

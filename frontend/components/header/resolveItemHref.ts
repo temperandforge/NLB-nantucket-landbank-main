@@ -1,3 +1,4 @@
+import {pageHref} from '../../sanity/lib/links.ts'
 import type {DereferencedLink} from '../../sanity/lib/types.ts'
 
 /**
@@ -12,6 +13,6 @@ export function resolveItemHref(link: DereferencedLink | undefined): string | nu
   if (!link) return null
   const linkType = link.linkType ?? (link.href ? 'href' : undefined)
   if (linkType === 'href') return link.href || null
-  if (linkType === 'page') return typeof link.page === 'string' && link.page ? `/${link.page}` : null
+  if (linkType === 'page') return typeof link.page === 'string' && link.page ? pageHref(link.page) : null
   return null
 }

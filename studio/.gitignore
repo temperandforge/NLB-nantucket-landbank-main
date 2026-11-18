@@ -32,9 +32,11 @@
 /functions/*/.build
 
 # Miscellaneous
-# One-off seeds and migrations are run once and not kept. The two checks that get re-run after
-# changing page routing or structured data are the exception. (`scripts/*`, not `scripts`: a
+# One-off seeds and migrations are run once and not kept. The checks that get re-run after
+# changing page routing, structured data or redirect rules are the exception. (`scripts/*`, not `scripts`: a
 # directory that is ignored whole cannot have files inside it re-included.)
 scripts/*
 !scripts/verifyPageRouting.ts
+!scripts/verifyRedirectSource.ts
+!scripts/verifyPageUrlImpact.ts
 !scripts/verifyStructuredData.ts

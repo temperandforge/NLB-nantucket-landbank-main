@@ -3,6 +3,7 @@
  * Learn more: https://www.sanity.io/docs/configuration
  */
 
+import {withPageRemovalWarning} from './src/components/withPageRemovalWarning'
 import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
@@ -183,6 +184,16 @@ export default defineConfig({
   document: {
     // Submissions are created by the site's form route only.
     newDocumentOptions: (prev) => prev.filter((option) => option.templateId !== 'formSubmission'),
+    // Unpublishing or deleting a page breaks its URL, its descendants' and any redirect pointing at
+    // it, so say so first (DECISIONS 2.8).
+    actions: (prev, context) =>
+      context.schemaType === 'page'
+        ? prev.map((action) =>
+            action.action === 'unpublish' || action.action === 'delete'
+              ? withPageRemovalWarning(action)
+              : action,
+          )
+        : prev,
   },
 
   // Schema configuration, imported from ./src/schemaTypes/index.ts
