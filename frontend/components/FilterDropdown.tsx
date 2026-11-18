@@ -4,31 +4,35 @@ import { useEffect, useId, useRef, useState } from "react";
 
 import { ChevronDownIcon, ChevronUpIcon, SquareCheckIcon, SquareIcon } from "@/components/icons";
 
-interface Option {
+export interface FilterOption {
   value: string;
   label: string;
 }
 
-interface MultiSelectDropdownProps {
+interface FilterDropdownProps {
   label: string;
-  options: Option[];
+  options: FilterOption[];
   selected: string[];
-  onChange: (selected: string[]) => void;
+  /** Without it the checkboxes do nothing (only until a page that wires them has loaded). */
+  onChange?: (selected: string[]) => void;
+  /** Render nothing when there are no options (the archives); the map shows the empty dropdown. */
+  hideWhenEmpty?: boolean;
 }
 
 /**
- * One filter of the map (Figma: a button that opens a white panel of checkboxes). The button is the
+ * One multi-select filter, shared by the map, the Properties archive and the Records archive (Figma: a button that opens a white panel of checkboxes). The button is the
  * same as the one on the Properties page: label and chevron, with the light border while open or
  * once something is chosen. The panel lists each option with the design's square on the right, "View All"
  * first (checked while nothing is chosen; choosing it clears the filter). Closed by Escape (focus returns to the
  * button) or a press outside.
  */
-export function MultiSelectDropdown({
+export function FilterDropdown({
   label,
   options,
   selected,
   onChange,
-}: MultiSelectDropdownProps) {
+  hideWhenEmpty = false,
+}: FilterDropdownProps) {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
@@ -54,12 +58,13 @@ export function MultiSelectDropdown({
 
   function toggleValue(value: string) {
     if (selected.includes(value)) {
-      onChange(selected.filter((v) => v !== value));
+      onChange?.(selected.filter((v) => v !== value));
     } else {
-      onChange([...selected, value]);
+      onChange?.([...selected, value]);
     }
   }
 
+  if (hideWhenEmpty && options.length === 0) return null;
   const Chevron = open ? ChevronUpIcon : ChevronDownIcon;
 
   return (
@@ -93,7 +98,7 @@ export function MultiSelectDropdown({
             <input
               type="checkbox"
               checked={selected.length === 0}
-              onChange={() => onChange([])}
+              onChange={() => onChange?.([])}
               className="peer sr-only"
             />
             <span className="flex shrink-0 rounded-[2px] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-moody-moor-500">

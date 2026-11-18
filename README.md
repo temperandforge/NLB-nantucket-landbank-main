@@ -44,16 +44,16 @@ Open the Studio running locally in your browser on [http://localhost:3333](http:
 
 #### 1. Publish your first document
 
-The template comes pre-defined with a schema containing `Page`, `Post`, `Person`, and `Settings` document types.
+The template comes pre-defined with a schema of document types such as `Page`, `Project` and `Property`, plus singleton settings documents.
 
-From the Studio, click "+ Create" and select the `Post` document type. Go ahead and create and publish the document.
+From the Studio, click "+ Create" and select the `Page` document type. Go ahead and create and publish the document.
 
 Your content should now appear in your Next.js app ([http://localhost:3000](http://localhost:3000)) as well as in the Studio on the "Presentation" Tab
 
 
 #### 3. Extending the Sanity schema
 
-The schema for the `Post` document type is defined in the `studio/src/schemaTypes/post.ts` file. You can [add more document types](https://www.sanity.io/docs/studio/schema-types) to the schema to suit your needs.
+The schema for the `Page` document type is defined in `studio/src/schemaTypes/documents/page.ts` (and `project.ts` for projects). You can [add more document types](https://www.sanity.io/docs/studio/schema-types) to the schema to suit your needs.
 
 ## Resources
 

@@ -4,7 +4,7 @@ import {useMemo} from 'react'
 import {usePathname, useRouter, useSearchParams} from 'next/navigation'
 
 import {LazyMapboxMap} from './LazyMapboxMap'
-import {MultiSelectDropdown} from './MultiSelectDropdown'
+import {FilterDropdown} from '../FilterDropdown'
 import {
   projectSlugs,
   toFilterOptions,
@@ -115,13 +115,13 @@ export function MapExplorer({projects, filters, settings}: MapExplorerProps) {
       <div id="mapWrap" className="tf-max-w flex flex-col gap-10 xl:pt-10 pb-s6">
         <div className="container--inner flex flex-col gap-2">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <MultiSelectDropdown
+            <FilterDropdown
               label="Property Type"
               options={propertyTypeOptions}
               selected={selectedPropertyTypes}
               onChange={(values) => updateParams({propertyType: values})}
             />
-            <MultiSelectDropdown
+            <FilterDropdown
               label="Resources"
               options={resourceOptions}
               selected={selectedResources}

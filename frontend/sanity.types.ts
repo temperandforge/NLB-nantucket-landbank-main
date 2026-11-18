@@ -1471,9 +1471,6 @@ export type ProjectSettings = {
   _createdAt: string
   _updatedAt: string
   _rev: string
-  eyebrow?: string
-  heading?: string
-  intro?: string
   defaultPropertyImage?: {
     asset?: SanityImageAssetReference
     media?: unknown

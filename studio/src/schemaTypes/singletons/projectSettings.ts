@@ -10,7 +10,7 @@ import {geoFileInput} from '../../components/GeoFileInput'
  * Three concerns, kept in one document because they all configure the Properties section, and split
  * into field groups so the form does not read as a grab bag:
  *
- *  - Page content: the fixed intro above the properties archive.
+ *  - Page content: the default image shown on a property without one.
  *  - Map: the single GeoJSON file holding every property boundary, plus how to read it.
  *  - Single: what every property page shares (the map switch, the FAQ wording and the
  *    "more properties" section), as opposed to one property's own content.
@@ -27,28 +27,6 @@ export const projectSettings = defineType({
     {name: 'singleProperty', title: 'Single'},
   ],
   fields: [
-    defineField({
-      name: 'eyebrow',
-      title: 'Eyebrow',
-      type: 'string',
-      group: 'page',
-      description: 'Small label above the headline, e.g. "PROPERTIES".',
-    }),
-    defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-      group: 'page',
-      description: 'Main page headline.',
-    }),
-    defineField({
-      name: 'intro',
-      title: 'Intro paragraph',
-      type: 'text',
-      group: 'page',
-      description: 'Short intro text shown below the headline.',
-    }),
-
     defineField({
       name: 'defaultPropertyImage',
       title: 'Default property image',
