@@ -266,7 +266,12 @@
   border-radius: 4px;
   background-color: var(--color-surface-dark);
   padding-block: var(--spacing-gap-sm);
-  padding-inline: var(--spacing-gap-md);
+  /* Tighter on a phone, where the row is already narrow; the Figma 24px from md up. */
+  padding-inline: 1rem;
+
+  @media (min-width: 48rem) {
+    padding-inline: var(--spacing-gap-md);
+  }
 
   & > span,
   & > p {
