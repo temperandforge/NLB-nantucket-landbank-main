@@ -41,6 +41,13 @@ export async function generateStaticParams() {
 
 export const dynamicParams = true
 
+/**
+ * Regenerate at most hourly, as the landing page and catch-all do. The publish webhook
+ * (app/api/revalidate) is what makes an edit appear promptly; this is the backstop for when it
+ * is not configured or a delivery is missed.
+ */
+export const revalidate = 3600
+
 export async function generateMetadata(props: PageProps<'/properties/[slug]'>): Promise<Metadata> {
   const {slug} = await props.params
   const {data: property} = await sanityFetch({query: propertyQuery, params: {slug}, stega: false})
